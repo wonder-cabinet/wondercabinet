@@ -879,16 +879,14 @@ html[data-lang="ar"] .ar-only{ direction: rtl; }
 
 /* ---------- THIS WEEK (the headline) ---------- */
 .this-week{
-  max-width: var(--maxw);
-  margin: 0 auto;
-  padding: clamp(8px, 2vw, 24px) var(--pad) clamp(40px, 5vw, 72px);
+  padding: clamp(8px, 2vw, 24px) 0 clamp(40px, 5vw, 72px);
 }
 .tw-head{
   display: grid;
   grid-template-columns: auto 1fr auto;
   align-items: end;
   gap: clamp(20px, 3vw, 40px);
-  padding-bottom: clamp(18px, 2.4vw, 28px);
+  padding: 0 var(--pad) clamp(18px, 2.4vw, 28px);
   border-bottom: 4px solid var(--ink);
 }
 .tw-eyebrow{
