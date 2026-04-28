@@ -143,24 +143,15 @@
   <div class="tw-grid" id="tw-grid"></div>
 </section>
 
-<!-- PROGRAMME — section title + season/year selector -->
+<!-- PROGRAMME — sticky full-bleed filter bar, HKW-style -->
 <section class="programme-head" id="programme">
-  <div class="ph-row">
-    <div class="ph-titles">
-      <h2 class="en-only">Programme</h2>
-      <h2 class="ar-only ar" dir="rtl">البرنامج</h2>
-      <p class="ph-sub">
-        <span class="en-only">One continuous timeline. Scroll forward for what's coming, back for what already happened.</span>
-        <span class="ar-only ar" dir="rtl">شريط زمني واحد متّصل. تَقدّم لما هو قادم، عُد للوراء لما حدث.</span>
-      </p>
+  <div class="ph-bar">
+    <div class="ph-title-cell">
+      <span class="en-only">Programme</span>
+      <span class="ar-only ar" dir="rtl">البرنامج</span>
     </div>
-    <div class="ph-jump">
-      <div class="ph-label">
-        <span class="en-only">Jump to</span>
-        <span class="ar-only ar" dir="rtl">القفز إلى</span>
-      </div>
-      <div class="season-rail" id="season-rail"></div>
-    </div>
+    <div class="ph-filters" id="ph-filters"></div>
+    <div class="ph-seasons" id="season-rail"></div>
   </div>
 </section>
 
@@ -348,6 +339,36 @@ function eventTimestamp(e){
 
   document.getElementById("tw-prev").onclick = () => scrollToSeason(currentSeasonOffset(-1));
   document.getElementById("tw-next").onclick = () => scrollToSeason(currentSeasonOffset(+1));
+})();
+
+/* ============================================================
+   FILTER BAR — type filters with counts, primary navigation
+   ============================================================ */
+(function renderFilters(){
+  const TYPES = ["", "Performance", "Film", "Class", "Workshop", "Radio", "Reading", "Opening"];
+  const LABEL_EN = { "":"All", Performance:"Performance", Film:"Film", Class:"Class", Workshop:"Workshop", Radio:"Radio", Reading:"Reading", Opening:"Opening" };
+  const LABEL_AR = { "":"الكل", Performance:"عرض", Film:"فيلم", Class:"صف", Workshop:"ورشة", Radio:"إذاعة", Reading:"قراءة", Opening:"افتتاح" };
+
+  function build(){
+    const container = document.getElementById("ph-filters");
+    container.innerHTML = TYPES.map(t => {
+      const count = t ? ALL.filter(e => e.type === t).length : ALL.length;
+      if (t && count === 0) return "";
+      return `<button class="ph-filter${STATE.type === t ? " is-active" : ""}" data-type="${t}">
+        <span class="en-only">${LABEL_EN[t]}</span>
+        <span class="ar-only ar">${LABEL_AR[t]}</span>
+        <span class="ph-filter-count">${count}</span>
+      </button>`;
+    }).join("");
+    container.querySelectorAll(".ph-filter").forEach(btn => {
+      btn.addEventListener("click", () => {
+        STATE.type = btn.dataset.type;
+        build();
+        renderTimeline();
+      });
+    });
+  }
+  build();
 })();
 
 /* ============================================================
@@ -564,7 +585,7 @@ function initStickyMonths(){
   const heads = Array.from(document.querySelectorAll(".tl-month-head"));
   if (!heads.length) return;
 
-  const TOP_OFFSET = 68; // matches .tl-month-head top value
+  const TOP_OFFSET = 118; // topbar (68) + filter bar (50)
   function update(){
     heads.forEach(h => {
       const body = h.parentElement;
