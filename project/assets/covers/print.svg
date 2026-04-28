@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice">
+    <rect width="1200" height="800" fill="hsl(330, 30%, 92%)"></rect>
+    <g stroke="hsl(330, 70%, 18%)" stroke-width="3">
+      <rect x="380" y="260" width="320" height="420" fill="hsl(330, 90%, 70%)" fill-opacity=".6"></rect>
+      <rect x="500" y="320" width="320" height="420" fill="hsl(220, 90%, 60%)" fill-opacity=".5"></rect>
+    </g>
+    <text x="40" y="764" font-family="Helvetica,Arial,sans-serif" font-size="14" font-weight="700" letter-spacing="3" fill="hsl(330, 70%, 18%)" opacity=".55">[ PRINT · ARCHIVE ]</text>
+  </svg>

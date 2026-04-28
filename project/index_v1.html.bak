@@ -1,0 +1,1188 @@
+<!DOCTYPE html><html lang="en" data-lang="en" style="--bg: #f6f3ea; --ink: #1d24ff; --highlight: #ffe65c; --paper: #f6f3ea; --card: #f6f3ea; --rule: #1d24ff; --rule-strong: #1d24ff;"><head>
+
+
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Programme · The Wonder Cabinet</title>
+<link rel="stylesheet" href="assets/app.css?v=5">
+</head>
+<body data-view="list">
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <a class="brand" href="index.html">
+      <span class="en-only">The Wonder Cabinet</span>
+      <span class="ar-only ar" dir="rtl">مجلس العجب</span>
+    </a>
+    <div class="topbar-center"></div>
+    <nav class="topbar-right">
+      <a href="#programme"><span class="en-only">Programme</span><span class="ar-only ar">البرنامج</span></a>
+      <a href="#archive"><span class="en-only">Archive</span><span class="ar-only ar">الأرشيف</span></a>
+      <a href="#visit"><span class="en-only">Visit</span><span class="ar-only ar">زيارة</span></a>
+      <div class="lang-toggle" role="group" aria-label="Language">
+        <button data-lang-btn="en" aria-pressed="true">EN</button>
+        <button data-lang-btn="ar" aria-pressed="false">AR</button>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="kicker">
+    <span class="en-only">Programme · Autumn 2025</span>
+    <span class="ar-only ar">البرنامج · خريف ٢٠٢٥</span>
+    <span class="rule"></span>
+    <span class="en-only">Films · Performances · Radio · Practices · Writing</span>
+    <span class="ar-only ar">أفلام · عروض · إذاعة · ممارسات · كتابة</span>
+  </div>
+  <h1 style="font-size: clamp(67.2px, 16.8vw, 280px);"><span class="en-only">Programme</span><span class="ar-only ar" dir="rtl">برنامج</span></h1>
+  <div class="hero-sub">
+    <p class="en-only" style="font-size: 38px; line-height: 1.25; font-weight: 600; width: 800px">Films, performances, radio sessions and ongoing practices at the Cabinet — alongside what we have already done, and what we have written about it. The events page is also our blog and our archive.</p>
+    <p class="ar-only ar" dir="rtl">أفلام، عروض، جلسات إذاعية وممارسات مستمرّة في مجلس العجب — إلى جانب ما قمنا به سابقاً وما كتبناه عنه. صفحة الفعاليات هي أيضاً مدوّنتنا وأرشيفنا.</p>
+  </div>
+</section>
+
+<!-- TOOLBAR: filters + view switcher -->
+<div class="toolbar">
+  <div class="filter-bar" id="filter-bar">
+    <span class="toolbar-label en-only">Filter:</span>
+    <span class="toolbar-label ar-only ar" dir="rtl">تصفية:</span>
+    <select id="f-type" data-i18n="type">
+      <option value="" data-en="Everything" data-ar="الكل">Everything</option>
+      <option value="Film" data-en="Film" data-ar="فيلم">Film</option>
+      <option value="Performance" data-en="Performance" data-ar="عرض">Performance</option>
+      <option value="Radio" data-en="Radio" data-ar="إذاعة">Radio</option>
+      <option value="Class" data-en="Class" data-ar="صف">Class</option>
+      <option value="Reading" data-en="Reading" data-ar="قراءة">Reading</option>
+      <option value="Workshop" data-en="Workshop" data-ar="ورشة">Workshop</option>
+      <option value="Opening" data-en="Opening" data-ar="افتتاح">Opening</option>
+    </select>
+    <select id="f-when">
+      <option value="" data-en="Anytime" data-ar="في أي وقت">Anytime</option>
+      <option value="this-week" data-en="This week" data-ar="هذا الأسبوع">This week</option>
+      <option value="this-month" data-en="This month" data-ar="هذا الشهر">This month</option>
+      <option value="next-month" data-en="Next month" data-ar="الشهر القادم">Next month</option>
+    </select>
+    <select id="f-sort">
+      <option value="date" data-en="Sort: Date" data-ar="ترتيب: التاريخ">Sort: Date</option>
+      <option value="az" data-en="Sort: A–Z" data-ar="ترتيب: أبجدي">Sort: A–Z</option>
+    </select>
+  </div>
+  <div class="view-switch" role="group" aria-label="View">
+    <button data-view-btn="list" aria-pressed="true"><span class="en-only">List</span><span class="ar-only ar">قائمة</span></button>
+    <button data-view-btn="calendar" aria-pressed="false" style="margin: 1px;"><span class="en-only">Calendar</span><span class="ar-only ar">تقويم</span></button>
+    <button data-view-btn="archive" aria-pressed="false"><span class="en-only">Archive</span><span class="ar-only ar">أرشيف</span></button>
+  </div>
+</div>
+
+<!-- THIS WEEK (horizontal) — visible in list view only -->
+<section class="week" id="programme">
+  <div class="week-head">
+    <h2><span class="en-only">This week · <em>06 — 12 November</em></span><span class="ar-only ar" dir="rtl">هذا الأسبوع · ٠٦ — ١٢ نوفمبر</span></h2>
+    <div class="week-nav">
+      <button id="week-prev" aria-label="Previous week">← Prev</button>
+      <button id="week-next" aria-label="Next week">Next →</button>
+    </div>
+  </div>
+  <div class="week-scroll" id="week-scroll">
+        <a class="week-card " href="event.html?id=yoga-nov-06">
+          <div class="wc-date-row">
+            <div class="wc-day">06</div>
+            <div class="wc-dow">Mon<span class="ar">الاثنين</span></div>
+          </div>
+          <div class="wc-type">Class · 19:00 · ↻</div>
+          <h3 class="wc-title">Yoga with Eilda Zaghmout</h3>
+          <div class="wc-meta">
+            <span>Ground floor</span>
+            <span class="arrow">→</span>
+          </div>
+        </a>
+        <div class="week-card" style="opacity:.55;">
+          <div class="wc-date-row">
+            <div class="wc-day">07</div>
+            <div class="wc-dow">Tue<span class="ar">الثلاثاء</span></div>
+          </div>
+          <div class="wc-type" style="margin-top:auto;">No event</div>
+          <div class="wc-title" style="color:var(--ink-mute);font-style:italic;">—</div>
+          <div class="wc-meta"><span>Rest day</span><span></span></div>
+        </div>
+        <a class="week-card today" href="event.html?id=soundwaves-nov-08">
+          <div class="wc-date-row">
+            <div class="wc-day">08</div>
+            <div class="wc-dow">Wed<span class="ar">الأربعاء</span></div>
+          </div>
+          <div class="wc-type">Film · 19:00</div>
+          <h3 class="wc-title">Sound Waves: The Symphony of Physics</h3>
+          <div class="wc-meta">
+            <span>Screening room</span>
+            <span class="arrow">→</span>
+          </div>
+        </a>
+        <div class="week-card" style="opacity:.55;">
+          <div class="wc-date-row">
+            <div class="wc-day">09</div>
+            <div class="wc-dow">Thu<span class="ar">الخميس</span></div>
+          </div>
+          <div class="wc-type" style="margin-top:auto;">No event</div>
+          <div class="wc-title" style="color:var(--ink-mute);font-style:italic;">—</div>
+          <div class="wc-meta"><span>Rest day</span><span></span></div>
+        </div>
+        <div class="week-card" style="opacity:.55;">
+          <div class="wc-date-row">
+            <div class="wc-day">10</div>
+            <div class="wc-dow">Fri<span class="ar">الجمعة</span></div>
+          </div>
+          <div class="wc-type" style="margin-top:auto;">No event</div>
+          <div class="wc-title" style="color:var(--ink-mute);font-style:italic;">—</div>
+          <div class="wc-meta"><span>Rest day</span><span></span></div>
+        </div>
+        <a class="week-card " href="event.html?id=rast-nov-11">
+          <div class="wc-date-row">
+            <div class="wc-day">11</div>
+            <div class="wc-dow">Sat<span class="ar">السبت</span></div>
+          </div>
+          <div class="wc-type">Performance · 19:00</div>
+          <h3 class="wc-title">Rast</h3>
+          <div class="wc-meta">
+            <span>Main hall</span>
+            <span class="arrow">→</span>
+          </div>
+        </a>
+        <div class="week-card" style="opacity:.55;">
+          <div class="wc-date-row">
+            <div class="wc-day">12</div>
+            <div class="wc-dow">Sun<span class="ar">الأحد</span></div>
+          </div>
+          <div class="wc-type" style="margin-top:auto;">No event</div>
+          <div class="wc-title" style="color:var(--ink-mute);font-style:italic;">—</div>
+          <div class="wc-meta"><span>Rest day</span><span></span></div>
+        </div></div>
+</section>
+
+<!-- MONTHS (vertical) -->
+<section class="months">
+
+  <div class="month-group" id="month-Nov">
+    <header class="month-head">
+      <h2 class="en-only">November</h2>
+      <div class="ar-only ar" dir="rtl">نوفمبر</div>
+      <div class="count" id="count-Nov"><span class="en-only">04 events</span><span class="ar-only ar">٠٤ فعاليات</span></div>
+    </header>
+    <div class="month-list" data-month="Nov">
+        <div class="day-group">
+          <div class="dg-date">
+            <div class="dg-day">08</div>
+            <div class="dg-dow">Wed</div>
+            <div class="dg-dow-ar ar" dir="rtl">الأربعاء</div>
+          </div>
+          <div class="dg-events">
+            
+              <a class="event-line" href="event.html?id=soundwaves-nov-08" style="padding-top: 12px; padding-bottom: 12px;">
+                <div class="el-time">19:00</div>
+                <div class="el-body">
+                  <div class="el-type">
+                    Film
+                  </div>
+                  <h3 class="el-title">Sound Waves: The Symphony of Physics</h3>
+                  <div class="el-title-ar ar" dir="rtl">الموجات الصوتية: سيمفونية الفيزياء</div>
+                  <div class="el-sub en-only">Making Sound — Part I of II · Dr. Helen Czerski</div>
+                </div>
+                <div class="el-meta">
+                  <span>Screening room</span>
+                  <span class="el-arrow">→</span>
+                </div>
+              </a>
+            
+          </div>
+        </div>
+      
+        <div class="day-group">
+          <div class="dg-date">
+            <div class="dg-day">11</div>
+            <div class="dg-dow">Sat</div>
+            <div class="dg-dow-ar ar" dir="rtl">السبت</div>
+          </div>
+          <div class="dg-events">
+            
+              <a class="event-line" href="event.html?id=rast-nov-11" style="padding-top: 12px; padding-bottom: 12px;">
+                <div class="el-time">19:00</div>
+                <div class="el-body">
+                  <div class="el-type">
+                    Performance<span class="el-featured-mark">Featured</span>
+                  </div>
+                  <h3 class="el-title">Rast</h3>
+                  <div class="el-title-ar ar" dir="rtl">راست</div>
+                  <div class="el-sub en-only">A solo performance on the oud · Tareq Abu Salameh</div>
+                </div>
+                <div class="el-meta">
+                  <span>Main hall</span>
+                  <span class="el-arrow">→</span>
+                </div>
+              </a>
+            
+          </div>
+        </div>
+      
+        <div class="day-group">
+          <div class="dg-date">
+            <div class="dg-day">15</div>
+            <div class="dg-dow">Wed</div>
+            <div class="dg-dow-ar ar" dir="rtl">الأربعاء</div>
+          </div>
+          <div class="dg-events">
+            
+              <a class="event-line" href="event.html?id=dome-nov-15" style="padding-top: 12px; padding-bottom: 12px;">
+                <div class="el-time">19:00</div>
+                <div class="el-body">
+                  <div class="el-type">
+                    Film<span class="el-featured-mark">Featured</span>
+                  </div>
+                  <h3 class="el-title">The Dome Sessions</h3>
+                  <div class="el-title-ar ar" dir="rtl">جلسات القُبّة</div>
+                  <div class="el-sub en-only">In Resonance Collective · Q&amp;A with Firas El Hallak</div>
+                </div>
+                <div class="el-meta">
+                  <span>Screening room</span>
+                  <span class="el-arrow">→</span>
+                </div>
+              </a>
+            
+          </div>
+        </div>
+      
+        <div class="day-group">
+          <div class="dg-date">
+            <div class="dg-day">18</div>
+            <div class="dg-dow">Sat</div>
+            <div class="dg-dow-ar ar" dir="rtl">السبت</div>
+          </div>
+          <div class="dg-events">
+            
+              <a class="event-line" href="event.html?id=radio-nov-18" style="padding-top: 12px; padding-bottom: 12px;">
+                <div class="el-time">19:00</div>
+                <div class="el-body">
+                  <div class="el-type">
+                    Radio<span class="el-featured-mark">Featured</span>
+                  </div>
+                  <h3 class="el-title">7orany + ADAN</h3>
+                  <div class="el-title-ar ar" dir="rtl">جلسات إذاعية: 7orany و ADAN</div>
+                  <div class="el-sub en-only">Radio Session · Live on Radio AlHara</div>
+                </div>
+                <div class="el-meta">
+                  <span>Main hall · Bar open</span>
+                  <span class="el-arrow">→</span>
+                </div>
+              </a>
+            
+          </div>
+        </div>
+      </div>
+  </div>
+  <div class="month-group" id="month-Dec">
+    <header class="month-head">
+      <h2 class="en-only">December</h2>
+      <div class="ar-only ar" dir="rtl">ديسمبر</div>
+      <div class="count" id="count-Dec"><span class="en-only">02 events</span><span class="ar-only ar">٠٢ فعاليات</span></div>
+    </header>
+    <div class="month-list" data-month="Dec">
+        <div class="day-group">
+          <div class="dg-date">
+            <div class="dg-day">03</div>
+            <div class="dg-dow">Wed</div>
+            <div class="dg-dow-ar ar" dir="rtl">الأربعاء</div>
+          </div>
+          <div class="dg-events">
+            
+              <a class="event-line" href="event.html?id=soundwaves-2-dec-03" style="padding-top: 12px; padding-bottom: 12px;">
+                <div class="el-time">19:00</div>
+                <div class="el-body">
+                  <div class="el-type">
+                    Film
+                  </div>
+                  <h3 class="el-title">Sound Waves II: Making Waves</h3>
+                  <div class="el-title-ar ar" dir="rtl">الموجات الصوتية ٢</div>
+                  <div class="el-sub en-only">Part II of II · Dr. Helen Czerski</div>
+                </div>
+                <div class="el-meta">
+                  <span>Screening room</span>
+                  <span class="el-arrow">→</span>
+                </div>
+              </a>
+            
+          </div>
+        </div>
+      
+        <div class="day-group">
+          <div class="dg-date">
+            <div class="dg-day">06</div>
+            <div class="dg-dow">Sat</div>
+            <div class="dg-dow-ar ar" dir="rtl">السبت</div>
+          </div>
+          <div class="dg-events">
+            
+              <a class="event-line" href="event.html?id=reading-dec-06" style="padding-top: 12px; padding-bottom: 12px;">
+                <div class="el-time">18:00</div>
+                <div class="el-body">
+                  <div class="el-type">
+                    Reading
+                  </div>
+                  <h3 class="el-title">Evening Reading Room</h3>
+                  <div class="el-title-ar ar" dir="rtl">غرفة القراءة المسائية</div>
+                  <div class="el-sub en-only">Open readings from the Cabinet library</div>
+                </div>
+                <div class="el-meta">
+                  <span>Library</span>
+                  <span class="el-arrow">→</span>
+                </div>
+              </a>
+            
+          </div>
+        </div>
+      </div>
+  </div>
+</section>
+
+<!-- CALENDAR VIEW -->
+<div class="cal-wrap" id="cal-wrap">
+      <div class="cal-month">
+        <div class="cal-month-head">
+          <h2>November</h2>
+          <div></div>
+          <div class="ar" dir="rtl">نوفمبر</div>
+        </div>
+        <div class="cal-grid">
+          <div class="cal-dow">Mon</div><div class="cal-dow">Tue</div><div class="cal-dow">Wed</div><div class="cal-dow">Thu</div><div class="cal-dow">Fri</div><div class="cal-dow">Sat</div><div class="cal-dow">Sun</div>
+          <div class="cal-cell empty"></div><div class="cal-cell empty"></div><div class="cal-cell empty"></div><div class="cal-cell empty"></div><div class="cal-cell empty"></div>
+        <div class="cal-cell">
+          <span class="cal-num ">1</span>
+          
+        </div>
+        <div class="cal-cell">
+          <span class="cal-num ">2</span>
+          
+        </div>
+        <div class="cal-cell">
+          <span class="cal-num ">3</span>
+          
+        </div>
+        <div class="cal-cell">
+          <span class="cal-num ">4</span>
+          
+        </div>
+        <div class="cal-cell">
+          <span class="cal-num ">5</span>
+          
+        </div>
+        <div class="cal-cell">
+          <span class="cal-num ">6</span>
+          
+            <a class="cal-event  recurring" href="event.html?id=yoga-nov-06">
+              <span class="e-time">19:00 · Class</span>
+              Yoga with Eilda Zaghmout
+            </a>
+          
+        </div>
+        <div class="cal-cell">
+          <span class="cal-num ">7</span>
+          
+        </div>
+        <div class="cal-cell">
+          <span class="cal-num is-today">8</span>
+          
+            <a class="cal-event  " href="event.html?id=soundwaves-nov-08">
+              <span class="e-time">19:00 · Film</span>
+              Sound Waves: The Symphony of…
+            </a>
+          
+        </div>
+        <div class="cal-cell">
+          <span class="cal-num ">9</span>
+          
+        </div>
+        <div class="cal-cell">
+          <span class="cal-num ">10</span>
+          
+        </div>
+        <div class="cal-cell">
+          <span class="cal-num ">11</span>
+          
+            <a class="cal-event featured " href="event.html?id=rast-nov-11">
+              <span class="e-time">19:00 · Performance</span>
+              Rast
+            </a>
+          
+        </div>
+        <div class="cal-cell">
+          <span class="cal-num ">12</span>
+          
+        </div>
+        <div class="cal-cell">
+          <span class="cal-num ">13</span>
+          
+            <a class="cal-event  recurring" href="event.html?id=yoga-nov-13">
+              <span class="e-time">19:00 · Class</span>
+              Yoga with Eilda Zaghmout
+            </a>
+          
+        </div>
+        <div class="cal-cell">
+          <span class="cal-num ">14</span>
+          
+        </div>
+        <div class="cal-cell">
+          <span class="cal-num ">15</span>
+          
+            <a class="cal-event featured " href="event.html?id=dome-nov-15">
+              <span class="e-time">19:00 · Film</span>
+              The Dome Sessions
+            </a>
+          
+        </div>
+        <div class="cal-cell">
+          <span class="cal-num ">16</span>
+          
+        </div>
+        <div class="cal-cell">
+          <span class="cal-num ">17</span>
+          
+        </div>
+        <div class="cal-cell">
+          <span class="cal-num ">18</span>
+          
+            <a class="cal-event featured " href="event.html?id=radio-nov-18">
+              <span class="e-time">19:00 · Radio</span>
+              7orany + ADAN
+            </a>
+          
+        </div>
+        <div class="cal-cell">
+          <span class="cal-num ">19</span>
+          
+        </div>
+        <div class="cal-cell">
+          <span class="cal-num ">20</span>
+          
+            <a class="cal-event  recurring" href="event.html?id=yoga-nov-20">
+              <span class="e-time">19:00 · Class</span>
+              Yoga with Eilda Zaghmout
+            </a>
+          
+        </div>
+        <div class="cal-cell">
+          <span class="cal-num ">21</span>
+          
+        </div>
+        <div class="cal-cell">
+          <span class="cal-num ">22</span>
+          
+        </div>
+        <div class="cal-cell">
+          <span class="cal-num ">23</span>
+          
+        </div>
+        <div class="cal-cell">
+          <span class="cal-num ">24</span>
+          
+        </div>
+        <div class="cal-cell">
+          <span class="cal-num ">25</span>
+          
+        </div>
+        <div class="cal-cell">
+          <span class="cal-num ">26</span>
+          
+        </div>
+        <div class="cal-cell">
+          <span class="cal-num ">27</span>
+          
+            <a class="cal-event  recurring" href="event.html?id=yoga-nov-27">
+              <span class="e-time">19:00 · Class</span>
+              Yoga with Eilda Zaghmout
+            </a>
+          
+        </div>
+        <div class="cal-cell">
+          <span class="cal-num ">28</span>
+          
+        </div>
+        <div class="cal-cell">
+          <span class="cal-num ">29</span>
+          
+        </div>
+        <div class="cal-cell">
+          <span class="cal-num ">30</span>
+          
+        </div>
+        </div>
+      </div>
+      <div class="cal-month">
+        <div class="cal-month-head">
+          <h2>December</h2>
+          <div></div>
+          <div class="ar" dir="rtl">ديسمبر</div>
+        </div>
+        <div class="cal-grid">
+          <div class="cal-dow">Mon</div><div class="cal-dow">Tue</div><div class="cal-dow">Wed</div><div class="cal-dow">Thu</div><div class="cal-dow">Fri</div><div class="cal-dow">Sat</div><div class="cal-dow">Sun</div>
+          
+        <div class="cal-cell">
+          <span class="cal-num ">1</span>
+          
+        </div>
+        <div class="cal-cell">
+          <span class="cal-num ">2</span>
+          
+        </div>
+        <div class="cal-cell">
+          <span class="cal-num ">3</span>
+          
+            <a class="cal-event  " href="event.html?id=soundwaves-2-dec-03">
+              <span class="e-time">19:00 · Film</span>
+              Sound Waves II: Making Waves
+            </a>
+          
+        </div>
+        <div class="cal-cell">
+          <span class="cal-num ">4</span>
+          
+        </div>
+        <div class="cal-cell">
+          <span class="cal-num ">5</span>
+          
+        </div>
+        <div class="cal-cell">
+          <span class="cal-num ">6</span>
+          
+            <a class="cal-event  " href="event.html?id=reading-dec-06">
+              <span class="e-time">18:00 · Reading</span>
+              Evening Reading Room
+            </a>
+          
+        </div>
+        <div class="cal-cell">
+          <span class="cal-num ">7</span>
+          
+        </div>
+        <div class="cal-cell">
+          <span class="cal-num ">8</span>
+          
+        </div>
+        <div class="cal-cell">
+          <span class="cal-num ">9</span>
+          
+        </div>
+        <div class="cal-cell">
+          <span class="cal-num ">10</span>
+          
+        </div>
+        <div class="cal-cell">
+          <span class="cal-num ">11</span>
+          
+        </div>
+        <div class="cal-cell">
+          <span class="cal-num ">12</span>
+          
+        </div>
+        <div class="cal-cell">
+          <span class="cal-num ">13</span>
+          
+        </div>
+        <div class="cal-cell">
+          <span class="cal-num ">14</span>
+          
+        </div>
+        <div class="cal-cell">
+          <span class="cal-num ">15</span>
+          
+        </div>
+        <div class="cal-cell">
+          <span class="cal-num ">16</span>
+          
+        </div>
+        <div class="cal-cell">
+          <span class="cal-num ">17</span>
+          
+        </div>
+        <div class="cal-cell">
+          <span class="cal-num ">18</span>
+          
+        </div>
+        <div class="cal-cell">
+          <span class="cal-num ">19</span>
+          
+        </div>
+        <div class="cal-cell">
+          <span class="cal-num ">20</span>
+          
+        </div>
+        <div class="cal-cell">
+          <span class="cal-num ">21</span>
+          
+        </div>
+        <div class="cal-cell">
+          <span class="cal-num ">22</span>
+          
+        </div>
+        <div class="cal-cell">
+          <span class="cal-num ">23</span>
+          
+        </div>
+        <div class="cal-cell">
+          <span class="cal-num ">24</span>
+          
+        </div>
+        <div class="cal-cell">
+          <span class="cal-num ">25</span>
+          
+        </div>
+        <div class="cal-cell">
+          <span class="cal-num ">26</span>
+          
+        </div>
+        <div class="cal-cell">
+          <span class="cal-num ">27</span>
+          
+        </div>
+        <div class="cal-cell">
+          <span class="cal-num ">28</span>
+          
+        </div>
+        <div class="cal-cell">
+          <span class="cal-num ">29</span>
+          
+        </div>
+        <div class="cal-cell">
+          <span class="cal-num ">30</span>
+          
+        </div>
+        <div class="cal-cell">
+          <span class="cal-num ">31</span>
+          
+        </div>
+        </div>
+      </div></div>
+
+<!-- ARCHIVE VIEW -->
+<section class="archive-section" id="archive">
+  <div class="archive-intro">
+    <div>
+      <h2><span class="en-only">Archive</span><span class="ar-only ar" dir="rtl">الأرشيف</span></h2>
+    </div>
+    <p class="en-only">A record of what has happened in the Cabinet — opening nights, choirs, workshops, the slow rebuild of a 1986 bus into a cinema. Each entry is a short note from us, written soon after the event.</p>
+    <p class="ar-only ar" dir="rtl">سِجلٌّ لما حدث في المجلس — ليالي افتتاح، جوقات، ورش، وإعادة بناء بطيئة لحافلة من ١٩٨٦ لتصبح سينما. كل مدخلة هي ملاحظة قصيرة منّا، مكتوبة بعد الحدث.</p>
+  </div>
+  <div class="archive-list" id="archive-list">
+    <a class="archive-entry" href="event.html?id=archive-printclub-jul-2025">
+      <div class="ae-cover"><img src="assets/covers/print.svg" alt="" loading="lazy"></div>
+      <div>
+        <div class="archive-meta-row">
+          <span class="type">Workshop</span>
+          <span>05 July 2025</span>
+          <span>Studio</span>
+        </div>
+        <h3 class="ae-title">Risograph Print Club</h3>
+        <div class="ae-title-ar ar" dir="rtl">نادي الريزوغراف</div>
+        <p class="ae-writeup en-only">Twelve people walked out with their first risograph prints — fluorescent pink and blue, ink still drying. The two-colour palette became the constraint that shaped half a dozen unexpected collaborations.</p>
+        <p class="ae-writeup-ar ar-only ar" dir="rtl">اثنا عشر شخصاً غادروا الستوديو حاملين أوّل أعمالهم بالريزوغراف، بحبر زهري فلوري وأزرق.</p>
+        <span class="ae-readmore">
+          <span class="en-only">Read full account</span>
+          <span class="ar-only ar" dir="rtl">القراءة كاملةً</span>
+          <span class="ae-readmore-arrow">→</span>
+        </span>
+      </div>
+    </a>
+  
+    <a class="archive-entry" href="event.html?id=archive-sumud-may-2025">
+      <div class="ae-cover"><img src="assets/covers/sumud.svg" alt="" loading="lazy"></div>
+      <div>
+        <div class="archive-meta-row">
+          <span class="type">Performance</span>
+          <span>10 May 2025</span>
+          <span>Main hall</span>
+        </div>
+        <h3 class="ae-title">Sumud — A Choir for the Land</h3>
+        <div class="ae-title-ar ar" dir="rtl">صمود — جوقة للأرض</div>
+        <p class="ae-writeup en-only">A choir of twenty-four voices, drawn from villages across Palestine, performed an evening of work songs, lullabies and lament. Recordings of the night were broadcast a week later on Radio AlHara.</p>
+        <p class="ae-writeup-ar ar-only ar" dir="rtl">جوقة من أربعة وعشرين صوتاً، من قرى متعددة في فلسطين، أدّت أمسية من أغاني العمل والتهليلات والرثاء.</p>
+        <span class="ae-readmore">
+          <span class="en-only">Read full account</span>
+          <span class="ar-only ar" dir="rtl">القراءة كاملةً</span>
+          <span class="ae-readmore-arrow">→</span>
+        </span>
+      </div>
+    </a>
+  
+    <a class="archive-entry" href="event.html?id=archive-bigbus-mar-2025">
+      <div class="ae-cover"><img src="assets/covers/bus.svg" alt="" loading="lazy"></div>
+      <div>
+        <div class="archive-meta-row">
+          <span class="type">Workshop</span>
+          <span>22 March 2025</span>
+          <span>Workshop</span>
+        </div>
+        <h3 class="ae-title">The Big Bus — Building Workshop</h3>
+        <div class="ae-title-ar ar" dir="rtl">ورشة الحافلة الكبيرة</div>
+        <p class="ae-writeup en-only">We tried to convert a 1986 Mercedes coach into a mobile cinema, and mostly succeeded. Three benches, one projector mount, two broken drill bits. The bus is now parked behind the Cabinet, ready for its first screening tour through the West Bank.</p>
+        <p class="ae-writeup-ar ar-only ar" dir="rtl">حاولنا تحويل حافلة مرسيدس موديل ١٩٨٦ إلى سينما متنقلة. ثلاثة مقاعد، حامل بروجكتور، ولقمتي ثقب مكسورتين.</p>
+        <span class="ae-readmore">
+          <span class="en-only">Read full account</span>
+          <span class="ar-only ar" dir="rtl">القراءة كاملةً</span>
+          <span class="ae-readmore-arrow">→</span>
+        </span>
+      </div>
+    </a>
+  
+    <a class="archive-entry" href="event.html?id=archive-opening-oct-2024">
+      <div class="ae-cover"><img src="assets/covers/opening.svg" alt="" loading="lazy"></div>
+      <div>
+        <div class="archive-meta-row">
+          <span class="type">Opening</span>
+          <span>12 October 2024</span>
+          <span>Whole building</span>
+        </div>
+        <h3 class="ae-title">Cabinet Opening Night</h3>
+        <div class="ae-title-ar ar" dir="rtl">ليلة افتتاح المجلس</div>
+        <p class="ae-writeup en-only">Two hundred people walked through the doors on the night the Cabinet first opened — neighbours, makers, students, friends from Bethlehem, Ramallah, Jerusalem, Haifa. Tea kept appearing. Three hours in, the courtyard had turned into a small dance floor. Notes from that night still hang on the corkboard upstairs.</p>
+        <p class="ae-writeup-ar ar-only ar" dir="rtl">في ليلة افتتاح المجلس، عبرت أبوابه نحو مئتين من الأصدقاء والجيران والصنّاع. الشاي لا ينتهي، والساحة تحوّلت بعد ثلاث ساعات إلى حلبة رقص صغيرة.</p>
+        <span class="ae-readmore">
+          <span class="en-only">Read full account</span>
+          <span class="ar-only ar" dir="rtl">القراءة كاملةً</span>
+          <span class="ae-readmore-arrow">→</span>
+        </span>
+      </div>
+    </a>
+  </div>
+</section>
+
+<footer class="foot" id="visit">
+  <div>
+    <div class="brand-foot"><span class="en-only">The Wonder Cabinet</span><span class="ar-only ar" dir="rtl">مجلس العجب</span></div>
+  </div>
+  <div>
+    <div class="k">Visit</div>
+    <div class="v">Qaws Zqaq, Bethlehem, Palestine<br><span style="font-family:var(--ff-sans);font-size:12px;letter-spacing:.1em;color:var(--ink-soft);">Wed–Sun · 10:00–22:00</span></div>
+  </div>
+  <div>
+    <div class="k">Correspond</div>
+    <div class="v"><a href="#">days@wondercabinet.space</a><br><a href="#">Newsletter</a><br><a href="#">Instagram</a></div>
+  </div>
+</footer>
+
+<script src="assets/events.js?v=4"></script>
+
+<!-- React + Babel for tweaks panel -->
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script type="text/babel" src="assets/tweaks-panel.jsx" data-plugins="transform-react-jsx-source,om-src-id" data-filename="assets/tweaks-panel.jsx"></script>
+<div id="tweaks-root"></div>
+<script type="text/babel" data-plugins="transform-react-jsx-source,om-src-id" data-filename="inline-1">
+const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+  "bg": "#00d26a",
+  "ink": "#1d24ff",
+  "highlight": "#ffe65c",
+  "preset": "paper-blue",
+  "heroScale": 1.4,
+  "density": "compact",
+  "showRecurringStrip": true,
+  "defaultView": "list"
+}/*EDITMODE-END*/;
+
+const PRESETS = {
+  "green-blue": { bg: "#00d26a", ink: "#1d24ff", highlight: "#ffe65c", paper: "#f6f3ea" },
+  "paper-blue": { bg: "#f6f3ea", ink: "#1d24ff", highlight: "#ffe65c", paper: "#f6f3ea" },
+  "paper-ink":  { bg: "#f6f3ea", ink: "#0a0a16", highlight: "#ff3b1d", paper: "#f6f3ea" },
+  "blue-paper": { bg: "#1d24ff", ink: "#f6f3ea", highlight: "#ffe65c", paper: "#1d24ff" },
+  "orange-ink": { bg: "#ffd6c2", ink: "#0a0a16", highlight: "#ff3b1d", paper: "#ffd6c2" }
+};
+
+function App(){
+  const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
+
+  // Apply theme vars
+  React.useEffect(() => {
+    const r = document.documentElement.style;
+    const preset = PRESETS[t.preset] || PRESETS["green-blue"];
+    const bg = t.preset === "custom" ? t.bg : preset.bg;
+    const ink = t.preset === "custom" ? t.ink : preset.ink;
+    const hl = t.preset === "custom" ? t.highlight : preset.highlight;
+    r.setProperty("--bg", bg);
+    r.setProperty("--ink", ink);
+    r.setProperty("--highlight", hl);
+    r.setProperty("--paper", preset.paper || bg);
+    r.setProperty("--card", bg);
+    r.setProperty("--rule", ink);
+    r.setProperty("--rule-strong", ink);
+  }, [t.preset, t.bg, t.ink, t.highlight]);
+
+  // Hero scale
+  React.useEffect(() => {
+    const h1 = document.querySelector(".hero h1");
+    if (h1) h1.style.fontSize = `clamp(${48*t.heroScale}px, ${12*t.heroScale}vw, ${200*t.heroScale}px)`;
+  }, [t.heroScale]);
+
+  // Density (target schedule rows now)
+  React.useEffect(() => {
+    const map = { compact: "10px", regular: "16px", comfy: "24px" };
+    document.querySelectorAll(".schedule-row").forEach(el => {
+      el.style.paddingTop = map[t.density];
+      el.style.paddingBottom = map[t.density];
+    });
+  }, [t.density]);
+
+  // Recurring strip (removed feature — keep no-op for back-compat)
+  React.useEffect(() => {
+    const s = document.querySelector(".recurring-strip");
+    if (s) s.style.display = "none";
+  }, [t.showRecurringStrip]);
+
+  // Default view
+  React.useEffect(() => {
+    if (t.defaultView && document.body.getAttribute("data-view-locked") !== "true"){
+      document.body.setAttribute("data-view", t.defaultView);
+      document.querySelectorAll("[data-view-btn]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.viewBtn === t.defaultView)));
+    }
+  }, [t.defaultView]);
+
+  return (
+    <TweaksPanel>
+      <TweakSection label="Theme" />
+      <TweakSelect label="Palette" value={t.preset}
+        options={[
+          {value:"green-blue", label:"Green + Blue (default)"},
+          {value:"paper-blue", label:"Paper + Blue"},
+          {value:"paper-ink",  label:"Paper + Ink"},
+          {value:"blue-paper", label:"Blue + Paper (inverted)"},
+          {value:"orange-ink", label:"Apricot + Ink"},
+          {value:"custom",     label:"Custom…"}
+        ]}
+        onChange={(v) => setTweak('preset', v)} />
+      {t.preset === "custom" && (<>
+        <TweakColor label="Background" value={t.bg}        onChange={(v) => setTweak('bg', v)} />
+        <TweakColor label="Ink"        value={t.ink}       onChange={(v) => setTweak('ink', v)} />
+        <TweakColor label="Highlight"  value={t.highlight} onChange={(v) => setTweak('highlight', v)} />
+      </>)}
+
+      <TweakSection label="Layout" />
+      <TweakSlider label="Hero scale" value={t.heroScale} min={0.6} max={1.4} step={0.05}
+        onChange={(v) => setTweak('heroScale', v)} />
+      <TweakRadio  label="Event density" value={t.density}
+        options={['compact','regular','comfy']}
+        onChange={(v) => setTweak('density', v)} />
+
+      <TweakSection label="Default view" />
+      <TweakRadio label="Open in" value={t.defaultView}
+        options={['list','calendar','archive']}
+        onChange={(v) => setTweak('defaultView', v)} />
+    </TweaksPanel>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("tweaks-root")).render(<App/>);
+</script>
+<script>
+/* ============================================================
+   STATE
+   ============================================================ */
+const STATE = {
+  view: "list",
+  type: "",
+  when: "",
+  sort: "date"
+};
+
+const UPCOMING = window.EVENTS.filter(e => e.status === "upcoming");
+const PAST     = window.EVENTS.filter(e => e.status === "past");
+
+/* ============================================================
+   WEEK STRIP
+   ============================================================ */
+(function(){
+  const weekDays = [
+    { day: "06", dow: "Mon", dowAr: "الاثنين" },
+    { day: "07", dow: "Tue", dowAr: "الثلاثاء" },
+    { day: "08", dow: "Wed", dowAr: "الأربعاء" },
+    { day: "09", dow: "Thu", dowAr: "الخميس" },
+    { day: "10", dow: "Fri", dowAr: "الجمعة" },
+    { day: "11", dow: "Sat", dowAr: "السبت" },
+    { day: "12", dow: "Sun", dowAr: "الأحد" }
+  ];
+  const today = "08";
+  const track = document.getElementById("week-scroll");
+  const html = weekDays.map(d => {
+    const ev = UPCOMING.find(e => e.month === "Nov" && e.day === d.day);
+    const isToday = d.day === today;
+    if (ev) {
+      const locAr = ({"Ground floor":"الطابق الأرضي","Screening room":"غرفة العرض","Main hall":"القاعة الرئيسية","Library":"المكتبة","Studio":"الستوديو","Workshop":"الورشة","Whole building":"كامل المبنى"})[ev.location] || ev.location || "";
+      const typeAr = ({Class:"صف",Film:"فيلم",Performance:"عرض",Radio:"إذاعة",Reading:"قراءة",Workshop:"ورشة",Opening:"افتتاح"})[ev.type] || ev.type;
+      return `
+        <a class="week-card ${isToday ? "today" : ""}" href="event.html?id=${ev.id}">
+          <div class="wc-date-row">
+            <div class="wc-day">${ev.day}</div>
+            <div class="wc-dow"><span class="en-only">${ev.dow}</span><span class="ar-only ar">${ev.dowAr}</span></div>
+          </div>
+          <div class="wc-type"><span class="en-only">${ev.type} · ${ev.start}${ev.recurring ? " · ↻" : ""}</span><span class="ar-only ar">${typeAr} · ${ev.start}${ev.recurring ? " · ↻" : ""}</span></div>
+          <h3 class="wc-title"><span class="en-only">${ev.title}</span><span class="ar-only ar" dir="rtl">${ev.titleAr || ev.title}</span></h3>
+          <div class="wc-meta">
+            <span><span class="en-only">${ev.location || ""}</span><span class="ar-only ar">${locAr}</span></span>
+            <span class="arrow">→</span>
+          </div>
+        </a>`;
+    } else {
+      return `
+        <div class="week-card empty">
+          <div class="wc-date-row">
+            <div class="wc-day">${d.day}</div>
+            <div class="wc-dow"><span class="en-only">${d.dow}</span><span class="ar-only ar">${d.dowAr}</span></div>
+          </div>
+          <div class="wc-title wc-empty-mark">—</div>
+          <div class="wc-meta"><span><span class="en-only">Rest day</span><span class="ar-only ar">يوم راحة</span></span><span></span></div>
+        </div>`;
+    }
+  }).join("");
+  track.innerHTML = html;
+  const todayCard = track.querySelector(".week-card.today");
+  if (todayCard) track.scrollLeft = todayCard.offsetLeft - track.offsetLeft - 20;
+  const step = 300;
+  document.getElementById("week-prev").onclick = () => track.scrollBy({left:-step, behavior:"smooth"});
+  document.getElementById("week-next").onclick = () => track.scrollBy({left:step, behavior:"smooth"});
+})();
+
+/* ============================================================
+   RECURRING STRIP — (removed)
+   Now inlined into week + month lists with ↻ marker.
+   ============================================================ */
+
+/* ============================================================
+   MONTH LISTS (filtered, no recurring duplicates)
+   ============================================================ */
+function applyFilters(arr){
+  let out = arr.slice();
+  if (STATE.type) out = out.filter(e => e.type === STATE.type);
+  if (STATE.when === "this-week") out = out.filter(e => e.month === "Nov" && parseInt(e.day) >= 6 && parseInt(e.day) <= 12);
+  if (STATE.when === "this-month") out = out.filter(e => e.month === "Nov");
+  if (STATE.when === "next-month") out = out.filter(e => e.month === "Dec");
+  if (STATE.sort === "az") out.sort((a,b) => a.title.localeCompare(b.title));
+  return out;
+}
+
+function renderMonths(){
+  // Include recurring events inline (marked with ↻)
+  const filtered = applyFilters(UPCOMING);
+  const byMonth = {};
+  filtered.forEach(e => { (byMonth[e.month] = byMonth[e.month] || []).push(e); });
+
+  ["Nov","Dec"].forEach(month => {
+    const list = document.querySelector(`.month-list[data-month="${month}"]`);
+    const events = byMonth[month] || [];
+    if (!list) return;
+    if (!events.length){
+      list.innerHTML = `<div class="schedule-empty"><span class="en-only">No events match these filters.</span><span class="ar-only ar" dir="rtl">لا توجد فعاليات تطابق التصفية.</span></div>`;
+      const elc = document.getElementById(`count-${month}`);
+      if (elc) elc.textContent = `00 events`;
+      return;
+    }
+    // Group by day, sort each day by start time
+    const byDay = {};
+    events.forEach(e => { (byDay[e.day] = byDay[e.day] || { day: e.day, dow: e.dow, dowAr: e.dowAr, evs: [] }).evs.push(e); });
+    const days = Object.values(byDay)
+      .sort((a,b) => a.day.localeCompare(b.day))
+      .map(d => ({ ...d, evs: d.evs.slice().sort((a,b) => (a.start||"").localeCompare(b.start||"")) }));
+
+    list.innerHTML = `
+      <div class="schedule" role="table">
+        <div class="schedule-headrow" role="row">
+          <div class="sh-date"><span class="en-only">Date</span><span class="ar-only ar">التاريخ</span></div>
+          <div class="sh-time"><span class="en-only">Time</span><span class="ar-only ar">الوقت</span></div>
+          <div class="sh-venue"><span class="en-only">Venue</span><span class="ar-only ar">المكان</span></div>
+          <div class="sh-title"><span class="en-only">Programme</span><span class="ar-only ar">الفعالية</span></div>
+          <div class="sh-tag"></div>
+        </div>
+        ${days.map(d => d.evs.map((e, i) => {
+          const venueParts = (e.location || "").split("·").map(s => s.trim()).filter(Boolean);
+          const venue = venueParts[0] || e.location || "";
+          const floor = venueParts[1] || "";
+          const venueArMap = { "Ground floor":"الطابق الأرضي","Screening room":"غرفة العرض","Main hall":"القاعة الرئيسية","Library":"المكتبة","Studio":"الستوديو","Workshop":"الورشة","Whole building":"كامل المبنى","Bar open":"البار مفتوح" };
+          const venueAr = venueArMap[venue] || venue;
+          const floorAr = venueArMap[floor] || floor;
+          const typeAr = { Class: "صف", Film: "فيلم", Performance: "عرض", Radio: "إذاعة", Reading: "قراءة", Workshop: "ورشة", Opening: "افتتاح" }[e.type] || e.type;
+          const tag = e.featured ? `<span class="sch-tag sch-featured"><span class="en-only">Featured</span><span class="ar-only ar">مميّز</span></span>`
+                    : e.recurring ? `<span class="sch-tag sch-recurring"><span class="en-only">↻ Weekly</span><span class="ar-only ar">↻ أسبوعي</span></span>`
+                    : (e.register ? `<span class="sch-tag sch-rsvp"><span class="en-only">Register</span><span class="ar-only ar">تسجيل</span></span>` : `<span class="sch-tag sch-free"><span class="en-only">Free entry</span><span class="ar-only ar">دخول حرّ</span></span>`);
+          const isFirst = i === 0;
+          return `
+            <a class="schedule-row${isFirst ? ' sch-first' : ''}" href="event.html?id=${e.id}" role="row">
+              <div class="sch-date">
+                ${isFirst ? `
+                  <span class="sch-day">${d.day}</span>
+                  <span class="sch-dow"><span class="en-only">${d.dow}</span><span class="ar-only ar">${d.dowAr}</span></span>
+                ` : ''}
+              </div>
+              <div class="sch-time">
+                <span class="sch-start">${e.start || ""}</span>
+                ${e.end ? `<span class="sch-end">${e.end}</span>` : ''}
+              </div>
+              <div class="sch-venue">
+                <span class="sch-venue-name"><span class="en-only">${venue}</span><span class="ar-only ar">${venueAr}</span></span>
+                ${floor ? `<span class="sch-venue-sub"><span class="en-only">${floor}</span><span class="ar-only ar">${floorAr}</span></span>` : ''}
+              </div>
+              <div class="sch-title">
+                <span class="sch-type"><span class="en-only">${e.type}</span><span class="ar-only ar">${typeAr}</span></span>
+                <span class="sch-name">
+                  <span class="en-only">${e.title}${e.recurring ? ' <span class="sch-recur-mark">↻</span>' : ''}</span>
+                  <span class="ar-only ar" dir="rtl">${e.titleAr || e.title}${e.recurring ? ' <span class="sch-recur-mark">↻</span>' : ''}</span>
+                </span>
+              </div>
+              <div class="sch-tag-cell">${tag}</div>
+            </a>`;
+        }).join('')).join('')}
+      </div>`;
+    const n = events.length.toString().padStart(2,"0");
+    const arN = n.replace(/[0-9]/g, d => "٠١٢٣٤٥٦٧٨٩"[d]);
+    const el = document.getElementById(`count-${month}`);
+    if (el) el.innerHTML = `<span class="en-only">${n} ${events.length===1?"event":"events"}</span><span class="ar-only ar">${arN} فعاليات</span>`;
+  });
+}
+renderMonths();
+
+/* ============================================================
+   CALENDAR VIEW
+   ============================================================ */
+function renderCalendar(){
+  const months = [
+    { key: "Nov", name: "November", ar: "نوفمبر", days: 30, firstDow: 6 }, // Nov 1, 2025 = Saturday
+    { key: "Dec", name: "December", ar: "ديسمبر", days: 31, firstDow: 1 }  // Dec 1, 2025 = Monday
+  ];
+  const dows = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+  // Map firstDow from Sunday-based JS index to Monday-based grid
+  const today = { month: "Nov", day: "08" };
+
+  const html = months.map(m => {
+    // Convert firstDow: Sun=0 -> 6, Mon=1 -> 0, etc.
+    const startCol = (m.firstDow + 6) % 7;
+    const filtered = applyFilters(UPCOMING).filter(e => e.month === m.key);
+
+    let cells = "";
+    for (let i = 0; i < startCol; i++) cells += `<div class="cal-cell empty"></div>`;
+    for (let d = 1; d <= m.days; d++){
+      const ds = String(d).padStart(2,"0");
+      const evs = filtered.filter(e => e.day === ds);
+      const isToday = m.key === today.month && ds === today.day;
+      cells += `
+        <div class="cal-cell">
+          <span class="cal-num ${isToday ? "is-today" : ""}">${d}</span>
+          ${evs.map(e => `
+            <a class="cal-event ${e.featured ? "featured" : ""} ${e.recurring ? "recurring" : ""}" href="event.html?id=${e.id}">
+              <span class="e-time">${e.start} · ${e.type}</span>
+              ${e.title.length > 28 ? e.title.slice(0,28)+"…" : e.title}
+            </a>
+          `).join("")}
+        </div>`;
+    }
+    return `
+      <div class="cal-month">
+        <div class="cal-month-head">
+          <h2>${m.name}</h2>
+          <div></div>
+          <div class="ar" dir="rtl">${m.ar}</div>
+        </div>
+        <div class="cal-grid">
+          ${dows.map(d => `<div class="cal-dow">${d}</div>`).join("")}
+          ${cells}
+        </div>
+      </div>`;
+  }).join("");
+  document.getElementById("cal-wrap").innerHTML = html;
+}
+renderCalendar();
+
+/* ============================================================
+   ARCHIVE VIEW
+   ============================================================ */
+function renderArchive(){
+  const monthNames = { Oct: "October", Mar: "March", May: "May", Jul: "July" };
+  const sorted = PAST.slice().sort((a,b) => {
+    const aa = a.year * 100 + ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"].indexOf(a.month);
+    const bb = b.year * 100 + ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"].indexOf(b.month);
+    return bb - aa;
+  });
+  const html = sorted.map(e => `
+    <a class="archive-entry" href="event.html?id=${e.id}">
+      <div class="ae-cover"><img src="${e.cover}" alt="" loading="lazy"/></div>
+      <div>
+        <div class="archive-meta-row">
+          <span class="type">${e.type}</span>
+          <span>${e.day} ${monthNames[e.month] || e.month} ${e.year}</span>
+          <span>${e.location}</span>
+        </div>
+        <h3 class="ae-title">${e.title}</h3>
+        <div class="ae-title-ar ar" dir="rtl">${e.titleAr}</div>
+        <p class="ae-writeup en-only">${e.writeup}</p>
+        <p class="ae-writeup-ar ar-only ar" dir="rtl">${e.writeupAr}</p>
+        <span class="ae-readmore">
+          <span class="en-only">Read full account</span>
+          <span class="ar-only ar" dir="rtl">القراءة كاملةً</span>
+          <span class="ae-readmore-arrow">→</span>
+        </span>
+      </div>
+    </a>
+  `).join("");
+  document.getElementById("archive-list").innerHTML = html;
+}
+renderArchive();
+
+/* ============================================================
+   VIEW SWITCH + FILTERS
+   ============================================================ */
+function setView(v){
+  STATE.view = v;
+  document.body.setAttribute("data-view", v);
+  document.querySelectorAll("[data-view-btn]").forEach(b => {
+    b.setAttribute("aria-pressed", String(b.dataset.viewBtn === v));
+  });
+  try { localStorage.setItem("twc-view", v); } catch(e){}
+}
+document.querySelectorAll("[data-view-btn]").forEach(btn => {
+  btn.addEventListener("click", () => { document.body.setAttribute("data-view-locked","true"); setView(btn.dataset.viewBtn); });
+});
+try {
+  const saved = localStorage.getItem("twc-view");
+  if (saved && ["list","calendar","archive"].includes(saved)) setView(saved);
+} catch(e){}
+
+document.getElementById("f-type").addEventListener("change", e => { STATE.type = e.target.value; renderMonths(); renderCalendar(); });
+document.getElementById("f-when").addEventListener("change", e => { STATE.when = e.target.value; renderMonths(); renderCalendar(); });
+document.getElementById("f-sort").addEventListener("change", e => { STATE.sort = e.target.value; renderMonths(); });
+
+/* ============================================================
+   LANGUAGE TOGGLE
+   ============================================================ */
+function applyLangToOptions(lang){
+  document.querySelectorAll("option[data-en][data-ar]").forEach(o => {
+    o.textContent = lang === "ar" ? o.dataset.ar : o.dataset.en;
+  });
+}
+document.querySelectorAll("[data-lang-btn]").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll("[data-lang-btn]").forEach(b => b.setAttribute("aria-pressed","false"));
+    btn.setAttribute("aria-pressed","true");
+    document.documentElement.setAttribute("data-lang", btn.dataset.langBtn);
+    applyLangToOptions(btn.dataset.langBtn);
+    try { localStorage.setItem("twc-lang", btn.dataset.langBtn); } catch(e){}
+  });
+});
+try {
+  const saved = localStorage.getItem("twc-lang");
+  if (saved && (saved === "en" || saved === "ar")) {
+    document.documentElement.setAttribute("data-lang", saved);
+    document.querySelectorAll("[data-lang-btn]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.langBtn===saved)));
+    applyLangToOptions(saved);
+  } else {
+    applyLangToOptions(document.documentElement.getAttribute("data-lang") || "en");
+  }
+} catch(e){
+  applyLangToOptions("en");
+}
+</script>
+
+
+</body></html>
