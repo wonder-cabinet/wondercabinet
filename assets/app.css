@@ -1137,26 +1137,26 @@ html[data-lang="ar"] .ar-only{ direction: rtl; }
 .tl-month{ position: relative; }
 .tl-month-head{
   --tl-shrink: 0;
-  position: sticky; top: 60px; z-index: 5;
+  position: sticky; top: 68px; z-index: 5;
   background: var(--bg);
   display: grid;
   grid-template-columns: 1fr auto;
   align-items: baseline;
   gap: 16px;
-  padding: clamp(18px, 2vw, 28px) 0 calc(12px - (var(--tl-shrink) * 6px));
+  padding: clamp(18px, 2vw, 28px) 0 12px;
   margin-top: clamp(8px, 1.4vw, 18px);
   border-bottom: 2px solid var(--ink);
-  /* shrink height as next month approaches */
-  transform-origin: left bottom;
+  transform: scaleY(calc(1 - var(--tl-shrink) * 0.45)) translateY(calc(var(--tl-shrink) * -8px));
+  transform-origin: left top;
+  will-change: transform;
 }
 .tl-month-name{
   margin: 0;
   font-family: var(--ff-sans); font-weight: 700;
-  font-size: calc(clamp(48px, 7vw, 96px) - (var(--tl-shrink) * clamp(28px, 4vw, 56px)));
+  font-size: clamp(48px, 7vw, 96px);
   line-height: .9; letter-spacing: -.04em;
   text-transform: uppercase;
   color: var(--ink);
-  transition: font-size .15s linear;
 }
 .tl-month-name .ar{ font-family: var(--ff-ar); letter-spacing: 0; text-transform: none; }
 .tl-month-meta{

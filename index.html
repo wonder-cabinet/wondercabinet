@@ -564,7 +564,7 @@ function initStickyMonths(){
   const heads = Array.from(document.querySelectorAll(".tl-month-head"));
   if (!heads.length) return;
 
-  const TOP_OFFSET = 64; // below the topbar
+  const TOP_OFFSET = 68; // matches .tl-month-head top value
   function update(){
     heads.forEach(h => {
       const body = h.parentElement;
