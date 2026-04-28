@@ -11,13 +11,12 @@
 <header class="topbar">
   <div class="topbar-inner">
     <a class="brand" href="index.html">
-      <img class="logo" src="assets/wc-logo.svg" alt="" width="34" height="34">
-      <span class="en-only">The Wonder Cabinet</span>
-      <span class="ar-only ar" dir="rtl">مجلس العجب</span>
+      <img class="logo" src="assets/wc-logo.svg" alt="The Wonder Cabinet" width="34" height="34">
     </a>
     <div class="topbar-center">
-      <span class="en-only">Bethlehem, Palestine</span>
-      <span class="ar-only ar" dir="rtl">بيت لحم، فلسطين</span>
+      <div class="topbar-search">
+        <input type="search" id="site-search" placeholder="Search…" autocomplete="off" spellcheck="false">
+      </div>
     </div>
     <nav class="topbar-right">
       <a href="#programme"><span class="en-only">Programme</span><span class="ar-only ar">البرنامج</span></a>
@@ -131,10 +130,7 @@
       <span class="en-only">This week</span>
       <span class="ar-only ar" dir="rtl">هذا الأسبوع</span>
     </div>
-    <div class="tw-range">
-      <span class="en-only">06 — 12 November 2025</span>
-      <span class="ar-only ar" dir="rtl">٠٦ — ١٢ نوفمبر ٢٠٢٥</span>
-    </div>
+    <div class="tw-range" id="tw-range"></div>
     <div class="tw-nav">
       <button id="tw-prev" aria-label="Previous week">←</button>
       <button id="tw-next" aria-label="Next week">→</button>
@@ -193,7 +189,8 @@ const PRESETS = {
   "paper-blue": { bg: "#f6f3ea", ink: "#1d24ff", highlight: "#ffe65c", paper: "#f6f3ea" },
   "paper-ink":  { bg: "#f6f3ea", ink: "#0a0a16", highlight: "#ff3b1d", paper: "#f6f3ea" },
   "blue-paper": { bg: "#1d24ff", ink: "#f6f3ea", highlight: "#ffe65c", paper: "#1d24ff" },
-  "orange-ink": { bg: "#ffd6c2", ink: "#0a0a16", highlight: "#ff3b1d", paper: "#ffd6c2" }
+  "orange-ink": { bg: "#ffd6c2", ink: "#0a0a16", highlight: "#ff3b1d", paper: "#ffd6c2" },
+  "pink-ink":   { bg: "#f0507a", ink: "#0a0a16", highlight: "#ffe65c", paper: "#fce8ee" }
 };
 
 function App(){
@@ -231,6 +228,7 @@ function App(){
           {value:"paper-ink",  label:"Paper + Ink"},
           {value:"blue-paper", label:"Blue + Paper (inverted)"},
           {value:"orange-ink", label:"Apricot + Ink"},
+          {value:"pink-ink",   label:"Pink + Ink"},
           {value:"custom",     label:"Custom…"}
         ]}
         onChange={(v) => setTweak('preset', v)} />
@@ -256,6 +254,8 @@ ReactDOM.createRoot(document.getElementById("tweaks-root")).render(<App/>);
    ============================================================ */
 const STATE = {
   type: "",
+  search: "",
+  weekStart: new Date(2025, 10, 6), // Nov 6 2025 — Monday
 };
 
 const ALL = window.EVENTS.slice();
@@ -281,22 +281,39 @@ function eventTimestamp(e){
    THIS WEEK — bigger, headline treatment
    Cards span the page, today is highlighted.
    ============================================================ */
-(function renderThisWeek(){
-  const weekDays = [
-    { day: "06", dow: "Mon", dowAr: "الاثنين" },
-    { day: "07", dow: "Tue", dowAr: "الثلاثاء" },
-    { day: "08", dow: "Wed", dowAr: "الأربعاء" },
-    { day: "09", dow: "Thu", dowAr: "الخميس" },
-    { day: "10", dow: "Fri", dowAr: "الجمعة" },
-    { day: "11", dow: "Sat", dowAr: "السبت" },
-    { day: "12", dow: "Sun", dowAr: "الأحد" }
-  ];
-  const todayDay = "08";
+const DOW_EN = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+const DOW_AR = ["الأحد","الاثنين","الثلاثاء","الأربعاء","الخميس","الجمعة","السبت"];
+const MONTH_FULL_EN = { Jan:"January",Feb:"February",Mar:"March",Apr:"April",May:"May",Jun:"June",Jul:"July",Aug:"August",Sep:"September",Oct:"October",Nov:"November",Dec:"December" };
+
+function renderThisWeek(){
+  const start = STATE.weekStart;
+  const today = new Date(); today.setHours(0,0,0,0);
   const grid = document.getElementById("tw-grid");
-  grid.innerHTML = weekDays.map(d => {
-    const ev = ALL.find(e => e.month === "Nov" && e.year === 2025 && e.day === d.day);
-    const isToday = d.day === todayDay;
-    const cls = "tw-cell" + (isToday ? " is-today" : "") + (!ev ? " is-empty" : "");
+  const rangeEl = document.getElementById("tw-range");
+
+  const days = Array.from({length:7}, (_,i) => {
+    const d = new Date(start); d.setDate(start.getDate() + i);
+    return {
+      date: d,
+      day: String(d.getDate()).padStart(2,"0"),
+      month: MONTH_ORDER[d.getMonth()],
+      year: d.getFullYear(),
+      dow: DOW_EN[d.getDay()],
+      dowAr: DOW_AR[d.getDay()],
+      isToday: d.getTime() === today.getTime()
+    };
+  });
+
+  // Update range label
+  const s = days[0], e = days[6];
+  const sameMonth = s.month === e.month;
+  rangeEl.innerHTML = `
+    <span class="en-only">${s.day} — ${e.day} ${MONTH_FULL_EN[e.month]} ${e.year}</span>
+    <span class="ar-only ar" dir="rtl">${arNum(s.day)} — ${arNum(e.day)} ${MONTH_NAME_AR[e.month]} ${arNum(e.year)}</span>`;
+
+  grid.innerHTML = days.map(d => {
+    const ev = ALL.find(e => e.month === d.month && e.year === d.year && e.day === d.day);
+    const cls = "tw-cell" + (d.isToday ? " is-today" : "") + (!ev ? " is-empty" : "");
     if (!ev) {
       return `<div class="${cls}">
         <div class="tw-date">
@@ -309,24 +326,23 @@ function eventTimestamp(e){
         </div>
       </div>`;
     }
-    const venueParts = (ev.location || "").split("·").map(s=>s.trim()).filter(Boolean);
-    const venue = venueParts[0] || ev.location || "";
-    const venueAr = VENUE_AR[venue] || venue;
-    const typeAr = TYPE_AR[ev.type] || ev.type;
+    const venueParts = (ev.location||"").split("·").map(s=>s.trim()).filter(Boolean);
+    const venue = venueParts[0]||""; const venueAr = VENUE_AR[venue]||venue;
+    const typeAr = TYPE_AR[ev.type]||ev.type;
     return `<a class="${cls}" href="event.html?id=${ev.id}">
       <div class="tw-date">
         <span class="tw-day">${ev.day}</span>
-        <span class="tw-dow"><span class="en-only">${ev.dow}</span><span class="ar-only ar">${ev.dowAr}</span></span>
+        <span class="tw-dow"><span class="en-only">${d.dow}</span><span class="ar-only ar">${d.dowAr}</span></span>
       </div>
       <div class="tw-body">
         <div class="tw-meta">
           <span class="tw-type"><span class="en-only">${ev.type}</span><span class="ar-only ar">${typeAr}</span></span>
           <span class="tw-time">${ev.start}</span>
-          ${ev.recurring ? '<span class="tw-recur">↻</span>' : ''}
+          ${ev.recurring?'<span class="tw-recur">↻</span>':''}
         </div>
         <h3 class="tw-title">
           <span class="en-only">${ev.title}</span>
-          <span class="ar-only ar" dir="rtl">${ev.titleAr || ev.title}</span>
+          <span class="ar-only ar" dir="rtl">${ev.titleAr||ev.title}</span>
         </h3>
         <div class="tw-venue">
           <span class="en-only">${venue}</span>
@@ -337,9 +353,18 @@ function eventTimestamp(e){
     </a>`;
   }).join("");
 
-  document.getElementById("tw-prev").onclick = () => scrollToSeason(currentSeasonOffset(-1));
-  document.getElementById("tw-next").onclick = () => scrollToSeason(currentSeasonOffset(+1));
-})();
+  document.getElementById("tw-prev").onclick = () => {
+    STATE.weekStart = new Date(STATE.weekStart);
+    STATE.weekStart.setDate(STATE.weekStart.getDate() - 7);
+    renderThisWeek();
+  };
+  document.getElementById("tw-next").onclick = () => {
+    STATE.weekStart = new Date(STATE.weekStart);
+    STATE.weekStart.setDate(STATE.weekStart.getDate() + 7);
+    renderThisWeek();
+  };
+}
+renderThisWeek();
 
 /* ============================================================
    FILTER BAR — type filters with counts, primary navigation
@@ -424,9 +449,25 @@ function currentSeasonOffset(delta){
    Sticky shrinking month header, year markers between seasons of different years.
    ============================================================ */
 function applyTypeFilter(arr){
-  if (!STATE.type) return arr;
-  return arr.filter(e => e.type === STATE.type);
+  let out = arr;
+  if (STATE.type) out = out.filter(e => e.type === STATE.type);
+  if (STATE.search) {
+    const q = STATE.search.toLowerCase();
+    out = out.filter(e =>
+      e.title.toLowerCase().includes(q) ||
+      (e.titleAr && e.titleAr.includes(q)) ||
+      (e.type && e.type.toLowerCase().includes(q)) ||
+      (e.location && e.location.toLowerCase().includes(q))
+    );
+  }
+  return out;
 }
+
+// Search input wiring (runs after DOM ready)
+document.getElementById("site-search").addEventListener("input", function(){
+  STATE.search = this.value.trim();
+  renderTimeline();
+});
 
 function renderTimeline(){
   const tl = document.getElementById("timeline");
