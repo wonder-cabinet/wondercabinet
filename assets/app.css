@@ -1596,6 +1596,7 @@ html[data-lang="ar"] .ar-only{ direction: rtl; }
 .fs-normal:hover  { background: color-mix(in oklab, var(--ink) 6%, var(--bg)); }
 .fs-accent:hover  { background: color-mix(in oklab, var(--ink) 8%, var(--highlight)); }
 .fs-pink:hover    { background: #d93a68; }
+.fs-noise:hover   { opacity: .88; background: none; }
 
 /* Box content layout */
 .fsb-content{
