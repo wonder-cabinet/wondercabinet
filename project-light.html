@@ -3,8 +3,120 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Sounds of Places — Cremisan Valley · The Wonder Cabinet</title>
+<title>Sounds of Places · The Wonder Cabinet</title>
 <link rel="stylesheet" href="assets/app.css?v=7">
+<style>
+  /* ---- SOUNDS OF PLACES — clean document aesthetic ---- */
+  body { background: #fff; color: #0a0a16; }
+
+  .sop { font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; }
+
+  .sop-bar {
+    font-size: 11px;
+    letter-spacing: .12em;
+    padding: clamp(28px,3.5vw,48px) clamp(24px,5vw,72px) 0;
+    color: #0a0a16;
+    text-transform: lowercase;
+  }
+  .sop-rule {
+    border: none;
+    border-top: 1px solid #0a0a16;
+    margin: 6px clamp(24px,5vw,72px) 0;
+    opacity: .35;
+  }
+
+  /* OPENING TEXT */
+  .sop-intro {
+    padding: clamp(48px,7vw,100px) clamp(24px,5vw,72px) clamp(60px,8vw,120px);
+    max-width: 780px;
+  }
+  .sop-intro p {
+    font-size: clamp(15px,1.6vw,18px);
+    line-height: 1.75;
+    margin: 0 0 1.6em;
+    color: #0a0a16;
+  }
+  .sop-intro p:last-child { margin-bottom: 0; }
+
+  /* TWO-COLUMN SECTION */
+  .sop-two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(32px,5vw,80px);
+    padding: clamp(40px,5vw,72px) clamp(24px,5vw,72px) clamp(48px,6vw,96px);
+    align-items: start;
+    border-top: 1px solid #e8e8e8;
+  }
+  .sop-col p {
+    font-size: clamp(13px,1.3vw,15px);
+    line-height: 1.8;
+    margin: 0 0 1.3em;
+    color: #0a0a16;
+  }
+  .sop-col p:last-child { margin-bottom: 0; }
+  .sop-col figure { margin: 0; }
+  .sop-col figure img { width: 100%; display: block; }
+  .sop-col figcaption {
+    font-size: 11px; line-height: 1.55;
+    color: #0a0a16; opacity: .5;
+    padding-top: 8px;
+  }
+
+  /* INSTALLATIONS SECTION — images left, text right */
+  .sop-inst {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: clamp(32px,5vw,72px);
+    padding: clamp(40px,5vw,72px) clamp(24px,5vw,72px) clamp(48px,6vw,96px);
+    align-items: start;
+    border-top: 1px solid #e8e8e8;
+  }
+  .sop-inst-images { display: flex; flex-direction: column; gap: 16px; }
+  .sop-inst-images figure { margin: 0; }
+  .sop-inst-images figure img { width: 100%; display: block; }
+  .sop-inst-images figcaption {
+    font-size: 11px; line-height: 1.55;
+    color: #0a0a16; opacity: .5;
+    padding-top: 6px;
+  }
+  .sop-inst-text p {
+    font-size: clamp(13px,1.3vw,15px);
+    line-height: 1.8;
+    margin: 0 0 1.3em;
+    color: #0a0a16;
+  }
+  .sop-inst-text p.sop-inst-label {
+    font-weight: 700;
+    margin-bottom: .4em;
+  }
+  .sop-inst-text p:last-child { margin-bottom: 0; }
+
+  /* PHOTO COLLAGE SECTION */
+  .sop-collage {
+    border-top: 1px solid #e8e8e8;
+    padding: clamp(40px,5vw,72px) clamp(24px,5vw,72px) clamp(48px,6vw,96px);
+  }
+  .sop-collage img { width: 100%; display: block; }
+  .sop-collage figcaption {
+    font-size: 11px; color: #0a0a16; opacity: .5;
+    padding-top: 8px;
+  }
+
+  .sop-back {
+    font-size: 11px; letter-spacing: .18em; text-transform: uppercase;
+    color: #0a0a16; padding: 8px 14px; border: 1px solid #0a0a16;
+    text-decoration: none;
+    margin: clamp(8px,2vw,24px) clamp(24px,5vw,72px) clamp(40px,5vw,72px);
+    display: inline-block;
+    transition: background .12s, color .12s;
+  }
+  .sop-back:hover { background: #0a0a16; color: #fff; }
+
+  @media (max-width: 680px) {
+    .sop-two-col,
+    .sop-inst { grid-template-columns: 1fr; }
+  }
+</style>
 </head>
 <body>
 
@@ -32,163 +144,87 @@
   </div>
 </header>
 
-<article class="prj prj-light">
+<article class="sop">
 
-  <!-- HERO -->
-  <div class="prj-hero">
-    <img src="uploads/mothanna-hussein-featured_7c037f96-8519-4f06-9517-1d844dc4dda0.webp"
-         alt="Sounds of Places — Cremisan Valley, Bethlehem, 2024">
-    <div class="prj-hero-caption en-only">
-      Cremisan Valley, Bethlehem, Palestine — May 2024.<br>
-      Photography: Sofia Lambrou.
+  <!-- SECTION 1 — OPENING -->
+  <div class="sop-bar">wonder cabinet : sounds of places</div>
+  <hr class="sop-rule">
+
+  <div class="sop-intro">
+    <p>"Sounds of Places" is an annual residency-based sound gathering that focuses on the sonic aesthetics of place. The first edition will take place from May 24 to June 2, 2024 in the Cremisan valley, one of the last green spaces around the city of Bethlehem in Palestine. The residency involves sonic artists, artisans, designers, visual artists, and the nuns at the Cremisan monastery during the entire period. Three sound sculptures will be placed in the landscape. Whether activated by wind, rain, humidity, dew, sun, or by the active participation of visitors, or by blending composed sonic pieces with live sounds from the landscape, the three installations resonate with the valley and with each other. Together, they create a repository of sounds that potentially speaks to the spirits of other environments, landscapes, both close by and on the other side of the world.</p>
+    <p>"Sounds of Places" seeks to create sonic analogies beyond the spatial limit every sound emerges from. In that sense, it builds upon and expands existing strategies to reclaim our ever-renewed sense of belonging.</p>
+  </div>
+
+  <!-- SECTION 2 — CREMISAN VALLEY -->
+  <div class="sop-bar">wonder cabinet : sounds of places</div>
+  <hr class="sop-rule">
+
+  <div class="sop-two-col">
+    <div class="sop-col">
+      <p>The Cremisan Valley has been a long-standing transversal theme in our practice. It runs through our architectural work as well as through the activities of Wonder Cabinet and several of its projects, including Sounds of Places.</p>
+      <p>Our attachment to Cremisan is both personal and cultural. The valley has shaped our imagination of what a green space is and forged our understanding of the relationship between the Palestinian city and its surrounding landscape. Historically, Palestinian cities developed as dense urban nuclei embedded within vast natural landscapes, particularly olive orchards. These cultivated landscapes were often left largely open, not as unused land but as a way of preserving the territory while maintaining a living relationship to it. The land was punctuated by small stone structures, manātir, that marked property and presence in a time when formal land registries did not exist.</p>
+      <p>Cremisan is one of the landscapes where this imaginary was formed: a place where the city and the land remain in dialogue, where nature is neither purely wild nor entirely domesticated, but culturally inhabited. It embodies a particular form of cultural claim over nature, one that is based on proximity.</p>
+      <p>Today, Cremisan is also the last remaining green space around Bethlehem. It is under direct threat of destruction, annexation, and exclusion through the route of the apartheid wall. In response, the local community, and particularly the religious community, initiated weekly gatherings in the valley in the form of open-air masses. While these gatherings protested the construction of the wall, they also expressed something deeper: a defense of a certain relationship to the landscape.</p>
     </div>
-    <div class="prj-hero-caption ar-only ar" dir="rtl">
-      وادي كريميزان، بيت لحم، فلسطين — مايو ٢٠٢٤.<br>
-      تصوير: صوفيا لامبرو.
+    <div class="sop-col">
+      <figure>
+        <img src="uploads/sop-cremisan-valley.jpg"
+             alt="Cremisan valley and monastery"
+             onerror="this.src='uploads/mothanna-hussein-featured_7c037f96-8519-4f06-9517-1d844dc4dda0.webp'">
+        <figcaption>Cremisan valley and monastery, ©Mikaela Burstow</figcaption>
+      </figure>
     </div>
   </div>
 
-  <!-- ARTICLE HEADER -->
-  <header class="prj-head">
-    <div class="prj-head-meta">
-      <span class="prj-category en-only">Annual Project</span>
-      <span class="prj-category ar-only ar">مشروع سنوي</span>
-      <span class="prj-date en-only">First Edition · 24 May – 2 June 2024</span>
-      <span class="prj-date ar-only ar">الطبعة الأولى · ٢٤ مايو – ٢ يونيو ٢٠٢٤</span>
-      <span class="prj-date en-only" style="opacity:.35;">Cremisan Valley, Bethlehem</span>
-      <span class="prj-date ar-only ar" style="opacity:.35;">وادي كريميزان، بيت لحم</span>
-    </div>
-    <div class="prj-title-col">
-      <h1 class="prj-title en-only">Sounds<br>of Places</h1>
-      <h1 class="prj-title-ar ar-only ar">أصوات<br>الأماكن</h1>
-      <p class="prj-byline en-only">
-        An annual residency-based sound gathering dedicated to the sonic identity of places — conceived by Elias and Yousef Anastas, rooted in the Wonder Cabinet in Bethlehem.
-      </p>
-      <p class="prj-byline ar-only ar" dir="rtl">
-        تجمّعٌ صوتيٌّ سنويٌّ قائمٌ على الإقامة، مكرّسٌ للهوية الصوتية للأماكن — من تصوّر إلياس ويوسف أناستاس، متجذّرٌ في مجلس العجب في بيت لحم.
-      </p>
-    </div>
-  </header>
+  <!-- SECTION 3 — INSTALLATIONS -->
+  <div class="sop-bar">wonder cabinet : sounds of places</div>
+  <hr class="sop-rule">
 
-  <div class="prj-body">
-
-    <!-- LEAD -->
-    <div class="prj-lead">
-      <p class="en-only">
-        <em>Sounds of Places</em> was launched in the spring of 2024, amid the ongoing genocide in Gaza and the increasingly restrictive annexation practices in the West Bank. The project positions itself as a tool of resistance, protection, and preservation — attending to places that are at risk of becoming inaccessible to their legitimate inhabitants.
-      </p>
-      <p class="ar-only ar" dir="rtl">
-        انطلق «أصوات الأماكن» في ربيع ٢٠٢٤، وسط الإبادة الجماعية المستمرة في غزة والممارسات الاستيطانية المتصاعدة في الضفة الغربية. يضع المشروعُ نفسه أداةً للمقاومة والحماية والحفاظ — إذ يُعنى بالأماكن المهدّدة بالأقتال عن أصحابها الشرعيين.
-      </p>
-    </div>
-
-    <hr class="prj-rule">
-
-    <!-- CREMISAN VALLEY CONTEXT -->
-    <div class="prj-cols">
-      <div class="en-only">
-        <p>The first edition took place in the Cremisan Valley — one of the last green spaces around Bethlehem, a place of extraordinary biodiversity and deep historical significance, threatened by the ongoing construction of Israel's separation barrier.</p>
-        <p>Over ten days, the residency immersed participants in the valley to narrate and preserve its character: its sounds, its plants, its soil, its quality of light and air at different hours of the day. The programme involved sound artists, craftspeople, designers, visual artists, and the nuns of the Cremisan Monastery — a Salesian community that has tended the valley for over a century.</p>
-        <p>Alongside workshops, conversations, communal meals, and healing activities, three sound sculptures were installed permanently in the landscape, designed to be activated by wind, rain, humidity, dew, and sun — and by the presence of visitors.</p>
-      </div>
-      <div class="en-only">
-        <p>The project was developed in the first months of 2024 at the Wonder Cabinet, with Ibrahim Owais — Palestinian musician and co-founder of Radio alHara — as artistic producer, and Ilaria Speri as project coordinator.</p>
-        <p>The three sculptures resonated with the valley and with each other, creating a living repository of sounds that spoke to the spirits of other environments — close by and on the other side of the world. The work refuses the logic of documentation as extraction: the sounds are not removed from the valley but deposited back into it, altered by encounter.</p>
-        <p><em>Sounds of Places</em> also traveled internationally. An installation and performance edition was presented at Triennale Milano in October 2025 (Spazio VOCE) and at Le Guess Who? 2024 festival.</p>
-      </div>
-    </div>
-
-    <!-- PULL QUOTE -->
-    <blockquote class="prj-quote">
-      <p class="en-only">"A tool of resistance, protection, and preservation of places at risk of becoming inaccessible to their legitimate inhabitants."</p>
-      <p class="ar-only ar" dir="rtl">«أداةٌ للمقاومة والحماية والحفاظ على الأماكن المهدّدة بالانتزاع من أصحابها الشرعيين.»</p>
-    </blockquote>
-
-    <!-- IMAGE SPREAD 1 -->
-    <div class="prj-spread">
-      <figure class="prj-spread-main">
-        <img src="uploads/mothanna-hussein-featured_7c037f96-8519-4f06-9517-1d844dc4dda0.webp"
-             alt="Sound sculpture in Cremisan Valley">
-        <figcaption class="en-only">One of three sound sculptures installed in the Cremisan Valley, activated by wind, rain, and the presence of visitors. Photo: Sofia Lambrou.</figcaption>
+  <div class="sop-inst">
+    <div class="sop-inst-images">
+      <figure>
+        <img src="uploads/sop-yara-asmar-windchime.jpg"
+             alt="Yara Asmar, Wind chime"
+             onerror="this.src='uploads/mothanna-hussein-featured_7c037f96-8519-4f06-9517-1d844dc4dda0.webp'">
+        <figcaption>1. Yara Asmar, Wind chime</figcaption>
       </figure>
-      <div class="prj-spread-stack">
-        <figure>
-          <img src="uploads/mothanna-hussein-featured_7c037f96-8519-4f06-9517-1d844dc4dda0.webp"
-               alt="Cremisan Herbarium workshop">
-          <figcaption class="en-only">Cremisan Herbarium workshop. Sofia Lambrou &amp; Nisreen Tahhan, with Areej Ashhab, Sireen Alawi, Majdi Hadid.</figcaption>
-        </figure>
-        <figure>
-          <img src="uploads/mothanna-hussein-featured_7c037f96-8519-4f06-9517-1d844dc4dda0.webp"
-               alt="Participants at the residency">
-          <figcaption class="en-only">Communal gathering, Cremisan Monastery grounds. Photo: Sofia Lambrou.</figcaption>
-        </figure>
-      </div>
-    </div>
-
-    <hr class="prj-rule">
-
-    <!-- SPECIFIC INSTALLATIONS -->
-    <div class="prj-cols">
-      <div class="en-only">
-        <p><strong>Newton Gaza</strong> (Jad Atoui) — A sound sculpture dedicated to Hussam El Attar, a boy in Gaza who built wind turbines from scrap to generate electricity for his family during the blockade. The sculpture transforms the wind of the Cremisan Valley into an act of solidarity across distance.</p>
-        <p><strong>Cremisan Herbarium</strong> (Sofia Lambrou &amp; Nisreen Tahhan, with Areej Ashhab, Sireen Alawi, Majdi Hadid) — A work that weaves sound, movement, photography, and ecology to capture the valley's essence. Using cyanotype printing and field recording, participants documented the plants and sounds of the landscape, creating passport-shaped herbariums: a form of identity document for a threatened place.</p>
-      </div>
-      <div class="en-only">
-        <p>The project grew into a collective field recording session that drew on the landscape across a wide radius — from the valley itself to the King Hussein Crossing into Jordan — conducted by P KIRN and Sofia Lambrou together with the wider Sounds of Places crew.</p>
-        <p>The recordings from the first edition have been broadcast internationally via Radio alHara and were featured in a special programme produced with Refuge Worldwide. They constitute the beginning of a living archive — to be continued in future editions, in other threatened landscapes.</p>
-      </div>
-    </div>
-
-    <!-- FULL WIDTH IMAGE -->
-    <figure class="prj-full-img">
-      <img src="uploads/mothanna-hussein-featured_7c037f96-8519-4f06-9517-1d844dc4dda0.webp"
-           alt="Cremisan Valley, Bethlehem — the valley floor with olive groves and vineyards">
-      <figcaption class="en-only">The Cremisan Valley floor: olive groves, vineyards, and the monastery buildings. One of the last continuous green landscapes around Bethlehem. Photo: Elias Anastas / AAU Anastas.</figcaption>
-    </figure>
-
-    <hr class="prj-rule">
-
-    <!-- ARTISTS LIST -->
-    <div class="prj-cols">
-      <div class="en-only">
-        <p style="font-size:11px;letter-spacing:.2em;text-transform:uppercase;font-weight:700;opacity:.45;margin-bottom:16px;">Participating Artists &amp; Contributors</p>
-        <p>Abul3ees, Abed Kobeissy, Adan Azzam, Alabaster DePlume, Aref Al-Sayyed, Ayed Arafah, Aseel Qupty, Dana Durr, Jad Atoui, Julmud, Laith Albandak, Laurence Samour, Osama Abu Ali, MAI MAI MAI, Manaal Oomerbhoy, Nadim Smair, Nadir Mauge, Nisreen Tahhan, Peter Kirn (P KIRN), Sami El-Enany, Sary Mousa, Sasha Shadid, Shua, Sofia Lambrou, Studio Collective, Tareq Abboushi, Yara Asmar, Yazan Saleh, Yousif Lama, Ibrahim Owais</p>
-      </div>
-      <div class="en-only">
-        <p style="font-size:11px;letter-spacing:.2em;text-transform:uppercase;font-weight:700;opacity:.45;margin-bottom:16px;">Credits</p>
-        <p><strong>Conceived by</strong><br>Elias Anastas &amp; Yousef Anastas</p>
-        <p><strong>Artistic Producer</strong><br>Ibrahim Owais</p>
-        <p><strong>Project Coordinator</strong><br>Ilaria Speri</p>
-        <p><strong>Photography</strong><br>Sofia Lambrou, Elias Anastas, Tess Janssen (Le Guess Who? 2024)</p>
-        <p><strong>Presented at</strong><br>Wonder Cabinet, Bethlehem · Triennale Milano, October 2025 · Le Guess Who? 2024</p>
-        <p style="margin-top:20px;opacity:.45;font-size:13px;">The Wonder Cabinet building is a recipient of the 2025 Aga Khan Award for Architecture.</p>
-      </div>
-    </div>
-
-    <!-- SECOND IMAGE SPREAD -->
-    <div class="prj-spread">
-      <figure class="prj-spread-main">
-        <img src="uploads/mothanna-hussein-featured_7c037f96-8519-4f06-9517-1d844dc4dda0.webp"
-             alt="Le Guess Who? 2024 performance">
-        <figcaption class="en-only">Sounds of Places at Le Guess Who? festival, Utrecht, November 2024. Photo: Tess Janssen.</figcaption>
+      <figure>
+        <img src="uploads/sop-jad-atoui-newton.jpg"
+             alt="Jad Atoui, Newton Gaza"
+             onerror="this.src='uploads/mothanna-hussein-featured_7c037f96-8519-4f06-9517-1d844dc4dda0.webp'">
+        <figcaption>2. Jad Atoui, Newton Gaza</figcaption>
       </figure>
-      <div class="prj-spread-stack">
-        <figure>
-          <img src="uploads/mothanna-hussein-featured_7c037f96-8519-4f06-9517-1d844dc4dda0.webp"
-               alt="Triennale Milano, Spazio VOCE">
-          <figcaption class="en-only">Sounds of Places: Cremisan Valley, Triennale Milano, Spazio VOCE, October 2025.</figcaption>
-        </figure>
-        <figure>
-          <img src="uploads/mothanna-hussein-featured_7c037f96-8519-4f06-9517-1d844dc4dda0.webp"
-               alt="Field recording session, Cremisan">
-          <figcaption class="en-only">Field recording session, Cremisan Valley. P KIRN &amp; Sofia Lambrou.</figcaption>
-        </figure>
-      </div>
+      <figure>
+        <img src="uploads/sop-tareq-abboushi-mirror.jpg"
+             alt="Tareq Abboushi, Stone sound mirror"
+             onerror="this.src='uploads/mothanna-hussein-featured_7c037f96-8519-4f06-9517-1d844dc4dda0.webp'">
+        <figcaption>3. Tareq Abboushi, Stone sound mirror</figcaption>
+      </figure>
     </div>
-
-    <a class="prj-back" href="index.html">← All Projects</a>
-
+    <div class="sop-inst-text">
+      <p>Three main permanent installation were produced during Sounds of places 2024 in the cremisan valley :</p>
+      <p class="sop-inst-label">1. Yara Asmar, Wind chime</p>
+      <p>Yara Asmar introduced wind chimes into the Cremisan Valley through an installation centered on a nest swing surrounded by large steel chimes. Activated by wind, by visitors striking them, or by the movement of the swing itself, the piece transformed motion into sound. Though pre-tuned the chimes allowed visitors to generate new collective soundscapes. The work also enabled the artist to inhabit the valley in spirit, like a ghost, in landscapes that her body is barred from visiting, for the time being.</p>
+      <p class="sop-inst-label">2. Jad Atoui, Newton Gaza</p>
+      <p>Jad Atoui's installation Newton Gaza transformed wind into a sonic instrument. Inspired by Hussam El Attar, a young boy in Gaza who built wind turbines to generate electricity during the blockade, the work consisted of a string instrument activated by small wind turbines and motors. As the wind moved through the valley, it set the mechanism in motion, causing the strings to vibrate and animate the water contained in a metal pan, producing subtle acoustic resonances.</p>
+      <p class="sop-inst-label">3. Tareq Abboushi, Stone sound mirror</p>
+      <p>Tareq Abboushi's installation unfolded across the Cremisan Valley through a series of parabolic sound mirrors made of stone. Their focal points were geometrically aligned with directional speakers broadcasting Abboushi's compositions, weaving together field recordings from the valley with other sonic materials. By concentrating the emitted sound while reflecting fragments of the surrounding soundscape, the mirrors created a layered listening experience where composed music and the living acoustics of the valley intertwined.</p>
+    </div>
   </div>
+
+  <!-- SECTION 4 — PHOTO COLLAGE / POSTER -->
+  <div class="sop-bar">wonder cabinet : sounds of places</div>
+  <hr class="sop-rule">
+
+  <figure class="sop-collage">
+    <img src="uploads/sop-collage.jpg"
+         alt="Sounds of Places — 24 May to 2 June 2024, Cremisan Valley, Palestine"
+         onerror="this.src='uploads/mothanna-hussein-featured_7c037f96-8519-4f06-9517-1d844dc4dda0.webp'">
+    <figcaption>Sounds of Places · 24 May – 2 June 2024 · Cremisan Valley, Bethlehem, Palestine</figcaption>
+  </figure>
+
+  <a class="sop-back" href="index.html">← All Projects</a>
+
 </article>
 
 <footer class="foot" id="visit">
@@ -246,7 +282,7 @@ try{
   const saved = localStorage.getItem("twc-lang");
   if (saved){ document.documentElement.setAttribute("data-lang", saved); document.querySelectorAll("[data-lang-btn]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.langBtn===saved))); }
 }catch(e){}
-(function(){ const logo = document.querySelector(".tpb-logo .logo"); if (!logo) return; window.addEventListener("scroll", function(){ logo.style.transform = "rotate("+(window.scrollY*.08).toFixed(1)+"deg)"; },{ passive:true }); })();
+(function(){ const logo = document.querySelector(".logo"); if (!logo) return; window.addEventListener("scroll", function(){ logo.style.transform="rotate("+(window.scrollY*.08).toFixed(1)+"deg)"; },{passive:true}); })();
 </script>
 </body>
 </html>
