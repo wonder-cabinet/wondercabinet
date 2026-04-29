@@ -3,35 +3,186 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Yara Mekawei — Artist in Residence · The Wonder Cabinet</title>
+<title>Bethlehem (Christmas in Mourning) · The Wonder Cabinet</title>
 <link rel="stylesheet" href="assets/app.css?v=7">
 <style>
-  body{ background: #0a0a16; }
-  .topbar{ background: #0a0a16; border-bottom-color: rgba(246,243,234,.15); }
-  .topbar .logo{ color: #f6f3ea; }
-  .topbar-right{ color: #f6f3ea; }
-  .topbar-right a{ border-color: #f6f3ea; }
-  .topbar-right a:hover{ background: #f6f3ea; color: #0a0a16; }
-  .lang-toggle{ border-color: #f6f3ea; }
-  .lang-toggle button{ color: #f6f3ea; }
-  .lang-toggle button + button{ border-left-color: #f6f3ea; }
-  .lang-toggle button[aria-pressed="true"]{ background: #f6f3ea; color: #0a0a16; }
-  .brand{ color: #f6f3ea; }
-  .prj-section-label{ color: #f6f3ea; }
+  /* ---- BETHLEHEM page — monospace archival aesthetic ---- */
+  body { background: #fff; color: #0a0a16; }
+
+  .topbar{ background:#fff; border-bottom-color: #0a0a16; }
+  .topbar .logo{ color:#0a0a16; }
+  .topbar-right{ color:#0a0a16; }
+  .topbar-right a{ border-color:#0a0a16; }
+  .topbar-right a:hover{ background:#0a0a16; color:#fff; }
+  .lang-toggle{ border-color:#0a0a16; }
+  .lang-toggle button{ color:#0a0a16; }
+  .lang-toggle button + button{ border-left-color:#0a0a16; }
+  .lang-toggle button[aria-pressed="true"]{ background:#0a0a16; color:#fff; }
+  .brand{ color:#0a0a16; }
+
+  .bthl{ font-family: "Courier New", Courier, monospace; }
+
+  /* Section title bar */
+  .bthl-bar{
+    font-family: "Courier New", Courier, monospace;
+    font-size: 11px; letter-spacing: .28em; text-transform: uppercase;
+    padding: clamp(20px,3vw,36px) clamp(24px,4vw,56px) 0;
+    color: #0a0a16;
+  }
+
+  /* ---- OPENING POSTER ---- */
+  .bthl-poster{
+    position: relative;
+    min-height: calc(100vh - 68px);
+    display: flex; flex-direction: column;
+    justify-content: space-between;
+    padding: clamp(16px,2.5vw,32px) clamp(24px,4vw,56px) clamp(24px,3vw,40px);
+    overflow: hidden;
+  }
+
+  /* Notation background image — full bleed behind everything */
+  .bthl-notation-bg{
+    position: absolute; inset: 0;
+    display: flex; align-items: stretch;
+    pointer-events: none;
+  }
+  .bthl-notation-bg img{
+    width: 100%; height: 100%; object-fit: cover; object-position: center;
+    opacity: .85;
+  }
+
+  /* Performance image — floats left of center */
+  .bthl-poster-image{
+    position: relative; z-index: 2;
+    width: clamp(280px, 44vw, 580px);
+    align-self: flex-start;
+    margin-top: 20px;
+  }
+  .bthl-poster-image img{
+    width: 100%; display: block;
+  }
+
+  /* WC logo — rotated, right edge */
+  .bthl-wc-logo{
+    position: absolute; z-index: 2;
+    right: clamp(16px,3vw,40px); top: 50%;
+    transform: translateY(-50%) rotate(90deg);
+    font-family: "Courier New", Courier, monospace;
+    font-size: 10px; letter-spacing: .14em;
+    opacity: .55; white-space: nowrap;
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+  }
+
+  /* Artists caption at bottom */
+  .bthl-poster-caption{
+    position: relative; z-index: 2;
+    font-family: "Courier New", Courier, monospace;
+    font-size: 11px; letter-spacing: .18em; text-transform: uppercase;
+    color: #0a0a16;
+    padding-top: 24px;
+    border-top: 1px solid #0a0a16;
+    margin-top: auto;
+  }
+
+  /* ---- TEXT BODY ---- */
+  .bthl-text-section{
+    padding: clamp(32px,4vw,60px) clamp(24px,4vw,56px);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(32px,5vw,80px);
+    align-items: start;
+  }
+  .bthl-col p{
+    font-family: "Courier New", Courier, monospace;
+    font-size: clamp(13px,1.4vw,15px); line-height: 1.75;
+    margin: 0 0 1.4em; color: #0a0a16;
+    max-width: 42ch;
+  }
+  .bthl-col p:last-child{ margin-bottom: 0; }
+
+  /* Small image within text column */
+  .bthl-col-img{
+    margin-top: clamp(28px,3vw,44px);
+  }
+  .bthl-col-img img{
+    width: 100%; display: block;
+    max-width: 340px;
+  }
+
+  /* ---- PHOTO SECTIONS ---- */
+  .bthl-photo-section{
+    display: flex;
+    align-items: flex-start;
+    gap: 0;
+    border-top: 1px solid #e0e0e0;
+  }
+
+  /* White margin strip on left */
+  .bthl-photo-margin{
+    flex-shrink: 0;
+    width: clamp(40px, 8vw, 120px);
+  }
+
+  .bthl-photo-section figure{
+    flex: 1; margin: 0;
+  }
+  .bthl-photo-section img{
+    width: 100%; display: block;
+  }
+  .bthl-photo-section figcaption{
+    font-family: "Courier New", Courier, monospace;
+    font-size: 11px; line-height: 1.6;
+    color: #0a0a16; opacity: .65;
+    padding: 10px 0 clamp(28px,3vw,48px);
+  }
+
+  /* Full-bleed dark photo (Nativity column) */
+  .bthl-photo-dark{
+    position: relative;
+    border-top: 1px solid #e0e0e0;
+  }
+  .bthl-photo-dark img{
+    width: 100%; display: block;
+    max-height: 90vh; object-fit: cover;
+  }
+  .bthl-photo-dark figcaption{
+    position: absolute; top: clamp(16px,2vw,28px); left: clamp(16px,2vw,28px);
+    font-family: "Courier New", Courier, monospace;
+    font-size: 11px; line-height: 1.6;
+    color: #fff;
+  }
+
+  /* Back link */
+  .bthl-back{
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: "Courier New", Courier, monospace;
+    font-size: 11px; letter-spacing: .18em; text-transform: uppercase;
+    color: #0a0a16; padding: 8px 14px; border: 1px solid #0a0a16;
+    text-decoration: none; margin: clamp(32px,4vw,56px) clamp(24px,4vw,56px);
+    display: inline-block;
+    transition: background .12s, color .12s;
+  }
+  .bthl-back:hover{ background: #0a0a16; color: #fff; }
+
+  @media (max-width: 680px){
+    .bthl-text-section{ grid-template-columns: 1fr; }
+    .bthl-photo-margin{ width: 20px; }
+    .bthl-poster-image{ width: 80vw; }
+  }
 </style>
 </head>
 <body>
 
-<!-- TOP BAR -->
 <header class="topbar">
   <div class="topbar-inner">
     <a class="brand" href="index.html">
       <img class="logo" src="assets/wc-logo.svg" alt="The Wonder Cabinet" width="34" height="34">
     </a>
     <nav class="topbar-right">
-      <a href="index.html#programme"><span class="en-only">Programme</span><span class="ar-only ar">البرنامج</span></a>
-      <a href="index.html#residencies"><span class="en-only">Residencies</span><span class="ar-only ar">إقامات</span></a>
-      <a href="index.html#visit"><span class="en-only">Visit</span><span class="ar-only ar">زيارة</span></a>
+      <a href="index.html#programme">Programme</a>
+      <a href="index.html#residencies">Residencies</a>
+      <a href="index.html#visit">Visit</a>
       <div class="lang-toggle" role="group" aria-label="Language">
         <button data-lang-btn="en" aria-pressed="true">EN</button>
         <button data-lang-btn="ar" aria-pressed="false">AR</button>
@@ -40,100 +191,116 @@
   </div>
 </header>
 
-<!-- FIXED SECTION LABEL -->
-<div class="prj-section-label en-only">Artist Residency</div>
+<article class="bthl">
 
-<article class="prj prj-dark">
+  <!-- ======================================================
+       SECTION 1 — OPENING POSTER
+       Notation image background + performance photo floating left
+       ====================================================== -->
+  <div class="bthl-bar">Bethlehem</div>
+  <div class="bthl-poster">
 
-  <!-- OPENING SPREAD — image left, giant title right -->
-  <div class="prj-opening">
-    <div class="prj-opening-image">
-      <img src="uploads/mothanna-hussein-featured_7c037f96-8519-4f06-9517-1d844dc4dda0.webp" alt="Yara Mekawei, Bethlehem 2025">
+    <!-- Full-bleed notation background -->
+    <div class="bthl-notation-bg">
+      <img src="uploads/bethlehem-notation.jpg"
+           alt=""
+           onerror="this.style.display='none'">
     </div>
-    <div class="prj-opening-panel">
-      <div class="prj-opening-meta">
-        <span class="en-only">Artist in Residence</span>
-        <span class="ar-only ar">فنانة مقيمة</span>
-        <span class="en-only" style="margin-top:4px;">November 2025 · Bethlehem</span>
-        <span class="ar-only ar" style="margin-top:4px;">نوفمبر ٢٠٢٥ · بيت لحم</span>
-      </div>
-      <div class="prj-opening-title">
-        <h1 class="prj-opening-h1 en-only">Yara<br>Mekawei</h1>
-        <h1 class="prj-opening-h1 ar-only ar" dir="rtl">يارا<br>مكاوي</h1>
-        <div class="prj-opening-sub en-only">Composer · Sound Artist · Vocalist / Cairo</div>
-        <div class="prj-opening-sub ar-only ar">ملحّنة · فنانة صوتية · مغنية / القاهرة</div>
-      </div>
+
+    <!-- Performance photo -->
+    <div class="bthl-poster-image">
+      <img src="uploads/bethlehem-poster.jpg"
+           alt="Laurence Sammour, Sary Moussa, Abed Kobeissy — Bethlehem"
+           onerror="this.src='uploads/mothanna-hussein-featured_7c037f96-8519-4f06-9517-1d844dc4dda0.webp'">
     </div>
+
+    <!-- WC logo rotated right edge -->
+    <div class="bthl-wc-logo">Wonder Cabinet ★★ مجلس العجب</div>
+
+    <!-- Artists caption -->
+    <div class="bthl-poster-caption">
+      Laurence Sammour, Sary Moussa, Abed Kobeissy&nbsp;&nbsp;Makram Aboul Hosn
+    </div>
+
   </div>
 
-  <!-- DARK ARTICLE BODY -->
-  <div class="prj-dark-body">
+  <!-- ======================================================
+       SECTION 2 — TEXT BODY (two columns)
+       ====================================================== -->
+  <div class="bthl-bar">Bethlehem</div>
+  <div class="bthl-text-section">
 
-    <!-- Lead -->
-    <div class="prj-dark-lead">
-      <p class="en-only">
-        Yara Mekawei is an Egyptian composer, sound artist, and vocalist whose practice moves between electronic music, field recording, and the living forms of Arabic vocal tradition. Her month-long residency at the Wonder Cabinet in November 2025 is her first extended period of work in Palestine.
-      </p>
-      <p class="ar-only ar" dir="rtl">
-        يارا مكاوي ملحّنةٌ مصريةٌ وفنانةٌ صوتيةٌ ومغنيةٌ تتنقّل ممارستُها بين الموسيقى الإلكترونية والتسجيل الميداني والأشكال الحيّة للتقليد الصوتي العربي. إقامتُها لمدّة شهرٍ في مجلس العجب في نوفمبر ٢٠٢٥ هي أوّل فترةٍ موسّعةٍ لها في فلسطين.
-      </p>
-    </div>
-
-    <!-- Two columns -->
-    <div class="prj-dark-cols">
-      <div class="en-only">
-        <p>Her work often begins with listening — an extended, patient attention to the specific acoustic conditions of a place. In Bethlehem, she is particularly interested in what she calls the "layered time" of the city's soundscape: the overlapping of the call to prayer and church bells; the sound of stone-cutting from the quarries on the hill; the silence of alleyways in the early morning, broken only by birds and distant traffic.</p>
-        <p>During the residency, Mekawei will be developing a new body of work for voice, electronics, and field recordings — pieces that use the sonic material of Bethlehem as a compositional resource without reducing it to a backdrop or a spectacle.</p>
-        <p>She will work in the Wonder Cabinet's ground floor studio, with access to the space at all hours. She has asked for the residency to be largely private — a period of concentration rather than a public process.</p>
-      </div>
-      <div class="en-only">
-        <p>The residency will conclude with a single public event: an evening performance at the Wonder Cabinet in which Mekawei will present works developed during the month. The programme will include new compositions, improvisations, and a listening session using recordings made across the city.</p>
-        <p>Mekawei has released four albums, most recently <em>Ard</em> (2024), described as "a meditation on belonging, soil, and the voice as a cartographic instrument." She has performed at Haus der Kulturen der Welt (Berlin), the Cairo Jazz Festival, and L'Institut du Monde Arabe (Paris). She studied composition at the Cairo Conservatoire and electronic music at IRCAM.</p>
-        <p>The Wonder Cabinet residency programme supports artists working at the intersection of sound, space, and cultural memory. Residencies are offered for periods of two weeks to two months, with accommodation, studio access, and a production budget.</p>
+    <!-- Left column -->
+    <div class="bthl-col">
+      <p>This electro-acoustic work was created during Christmas 2023, when Bethlehem's Greek Orthodox Church of the Nativity chose to cancel all festive celebrations in response to the era-defining ethnic cleansing taking place in Palestine.</p>
+      <p>In this context, Wonder Cabinet, commissioned a new piece that brought together Lawrence Sammour—head of the Church of the Nativity's choir for over fifty years—with Beirut-based artists and musicians Sary Moussa and Abed Kobeissy.</p>
+      <!-- Small interior photo -->
+      <div class="bthl-col-img">
+        <img src="uploads/bethlehem-interior.jpg"
+             alt="Nativity Church interior"
+             onerror="this.style.opacity='.3';this.src='uploads/mothanna-hussein-featured_7c037f96-8519-4f06-9517-1d844dc4dda0.webp'">
       </div>
     </div>
 
-    <!-- Pull quote -->
-    <blockquote class="prj-dark-quote">
-      <p class="en-only">"I am not interested in documenting a place. I am interested in what the place does to the ear — and what the ear, in attending, does to the place."</p>
-      <p class="ar-only ar" dir="rtl">«لا يعنيني توثيقُ مكانٍ. يعنيني ما يفعلُه المكانُ بالأذن — وما تفعله الأذنُ، حين تُصغي، بالمكان.»</p>
-      <cite>— Yara Mekawei</cite>
-    </blockquote>
+    <!-- Right column -->
+    <div class="bthl-col">
+      <p>Blending sacred choral tradition with experimental electronic music, the work was broadcasted on Christmas Eve 2023, with a re-run on December 27th, via Radio Al-Hara and more than 50 radio stations worldwide, including NTS Radio, Lyl Radio, Radio Flouka, Noods Radio, Radio Atheer, Radio Refuge Worldwide, Stegi Radio, Cashmere Radio, Root Radio, Radio Nopal, and Radio Raheem Milano.</p>
+      <p>A year later, the project had its first live premiere at Le Guess Who? Festival in Utrecht, Netherlands, marking the first in-person meeting of the three collaborators, who had completed the work remotely due to travel restrictions between Palestine and Lebanon. The 32-minute live version was performed together for the first time during the festival.</p>
+      <p>In December 2025, Wonder Cabinet, Radio alHara and the artists presented the work again in Beirut as part of the Beirut and Beyond International Music Festival along with musician Makram Aboul Hosn.</p>
+    </div>
 
-    <!-- Full-width image -->
-    <figure class="prj-dark-image">
-      <img src="uploads/mothanna-hussein-featured_7c037f96-8519-4f06-9517-1d844dc4dda0.webp" alt="Recording in Bethlehem">
-      <figcaption class="en-only">Recording session in Wadi Karkafeh, November 2025. Photography: Mothanna Hussein.</figcaption>
+  </div>
+
+  <!-- ======================================================
+       SECTION 3 — COLOR PERFORMANCE PHOTO
+       (Beirut and Beyond — bassist + electronics)
+       ====================================================== -->
+  <div class="bthl-photo-section">
+    <div class="bthl-photo-margin"></div>
+    <figure>
+      <img src="uploads/bethlehem-beirut-color.jpg"
+           alt="Bethlehem at Beirut and Beyond"
+           onerror="this.src='uploads/mothanna-hussein-featured_7c037f96-8519-4f06-9517-1d844dc4dda0.webp'">
+      <figcaption>
+        Bethlehem at Beirut and Beyond<br>
+        Photo by Tamara Saadé
+      </figcaption>
     </figure>
-
-    <!-- More text columns -->
-    <div class="prj-dark-cols">
-      <div class="en-only">
-        <p>The Wonder Cabinet residency programme was established in 2024 to support artists, researchers, and practitioners working in the cultural fields that the space exists to serve: sound and music, architecture and design, the visual arts, and the literature and oral traditions of the Arab world.</p>
-        <p>Residents are selected through an open call and through direct invitation. The programme welcomes applications from artists based in Palestine and from the broader Arab world. International applications are considered on a case-by-case basis, with preference given to those with established relationships to the region.</p>
-      </div>
-      <div class="en-only">
-        <p>The residency programme is currently funded through a combination of the Wonder Cabinet's operational budget and a small number of individual patrons. We are seeking additional support to expand the number of residencies we can offer each year and to increase the production budgets available to residents.</p>
-        <p>If you are interested in supporting the residency programme, or in applying for a future residency, contact us at <a href="mailto:office@wondercabinet.space" style="color:inherit;border-bottom:1px solid rgba(246,243,234,.4);">office@wondercabinet.space</a>.</p>
-      </div>
-    </div>
-
-    <!-- Image spread -->
-    <div class="prj-dark-spread">
-      <figure>
-        <img src="uploads/mothanna-hussein-featured_7c037f96-8519-4f06-9517-1d844dc4dda0.webp" alt="Studio session">
-        <figcaption class="en-only">Studio session, Wonder Cabinet, November 2025.</figcaption>
-      </figure>
-      <figure>
-        <img src="uploads/mothanna-hussein-featured_7c037f96-8519-4f06-9517-1d844dc4dda0.webp" alt="Old City, Bethlehem">
-        <figcaption class="en-only">Old City, Bethlehem. Recording location.</figcaption>
-      </figure>
-    </div>
-
-    <!-- Back link -->
-    <a class="prj-back" href="index.html" style="color:rgba(246,243,234,.6);border-color:rgba(246,243,234,.3);">← All Projects</a>
-
   </div>
+
+  <!-- ======================================================
+       SECTION 4 — B&W PORTRAIT PHOTO
+       (Laurence Sammour at microphone)
+       ====================================================== -->
+  <div class="bthl-photo-section">
+    <div class="bthl-photo-margin"></div>
+    <figure>
+      <img src="uploads/bethlehem-beirut-bw.jpg"
+           alt="Bethlehem at Beirut and Beyond"
+           onerror="this.src='uploads/mothanna-hussein-featured_7c037f96-8519-4f06-9517-1d844dc4dda0.webp'">
+      <figcaption>
+        Bethlehem at Beirut and Beyond<br>
+        Photo by Tamara Saadé
+      </figcaption>
+    </figure>
+  </div>
+
+  <!-- ======================================================
+       SECTION 5 — NATIVITY CHURCH COLUMN PHOTO
+       (Dark, caption top-left)
+       ====================================================== -->
+  <figure class="bthl-photo-dark">
+    <img src="uploads/bethlehem-nativity-column.jpg"
+         alt="Graffiti on the 12th century stone columns of Nativity Church"
+         onerror="this.src='uploads/mothanna-hussein-featured_7c037f96-8519-4f06-9517-1d844dc4dda0.webp'">
+    <figcaption>
+      Graffiti on the 12th century stone columns<br>
+      of Nativity Church
+    </figcaption>
+  </figure>
+
+  <a class="bthl-back" href="index.html">← All Projects</a>
+
 </article>
 
 <footer class="foot" id="visit">
@@ -161,12 +328,14 @@
         <a href="https://www.instagram.com/wonder.cabinet/" target="_blank" rel="noopener">Instagram</a>
         <a href="https://www.facebook.com/wondercabinetbethlehem" target="_blank" rel="noopener">Facebook</a>
         <a href="https://chat.whatsapp.com/I8ETsHie2Ye87kURhWnZY1" target="_blank">WhatsApp</a>
+        <button class="foot-newsletter-btn">Subscribe to Newsletter</button>
       </div>
     </div>
     <div class="foot-col">
       <div class="foot-col-head">Contact</div>
       <div class="foot-col-body">
         <a href="mailto:office@wondercabinet.space">office@wondercabinet.space</a>
+        <a href="https://radioalhara.net" target="_blank" rel="noopener">Radio Alhara</a>
       </div>
     </div>
   </div>
@@ -177,7 +346,6 @@
 </footer>
 
 <script>
-// Lang toggle
 document.querySelectorAll("[data-lang-btn]").forEach(btn => {
   btn.addEventListener("click", function(){
     const l = this.dataset.langBtn;
@@ -188,11 +356,9 @@ document.querySelectorAll("[data-lang-btn]").forEach(btn => {
 });
 try{
   const saved = localStorage.getItem("twc-lang");
-  if (saved) { document.documentElement.setAttribute("data-lang", saved); document.querySelectorAll("[data-lang-btn]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.langBtn===saved))); }
+  if (saved){ document.documentElement.setAttribute("data-lang", saved); document.querySelectorAll("[data-lang-btn]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.langBtn===saved))); }
 }catch(e){}
-
-// Scroll logo rotation
-(function(){ const logo = document.querySelector(".brand .logo"); if (!logo) return; window.addEventListener("scroll", function(){ logo.style.transform = "rotate(" + (window.scrollY * 0.08).toFixed(1) + "deg)"; }, { passive: true }); })();
+(function(){ const logo = document.querySelector(".brand .logo"); if (!logo) return; window.addEventListener("scroll", function(){ logo.style.transform="rotate("+(window.scrollY*.08).toFixed(1)+"deg)"; },{passive:true}); })();
 </script>
 </body>
 </html>
