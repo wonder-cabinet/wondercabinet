@@ -1,8 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none">
-  <circle cx="100" cy="100" r="92" stroke="currentColor" stroke-width="4"></circle>
-  <path d="M55 85 L70 55 L85 85 L78 85 L70 70 L62 85 Z" fill="currentColor"></path>
-  <path d="M115 85 L130 55 L145 85 L138 85 L130 70 L122 85 Z" fill="currentColor"></path>
-  <text x="100" y="122" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-weight="700" font-size="22" fill="currentColor" letter-spacing="2">W</text>
-  <line x1="86" y1="130" x2="114" y2="130" stroke="currentColor" stroke-width="3"></line>
-  <text x="100" y="154" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-weight="700" font-size="22" fill="currentColor" letter-spacing="2">C</text>
-</svg>
