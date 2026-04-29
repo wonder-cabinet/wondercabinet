@@ -804,7 +804,202 @@ try {
     document.querySelectorAll("[data-lang-btn]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.langBtn===saved)));
   }
 } catch(e){}
+
+/* ============================================================
+   EVENT OVERLAY — type-color panel (right-slide) + fullscreen
+   Panel: standard events. Fullscreen: Opening / featured.
+   ============================================================ */
+const TYPE_COLORS = {
+  Performance: { bg: "#f0507a", ink: "#0a0a16" },
+  Film:        { bg: "#ffe600", ink: "#0a0a16" },
+  Class:       { bg: "#c8a0f0", ink: "#0a0a16" },
+  Workshop:    { bg: "#ff5a00", ink: "#f6f3ea" },
+  Radio:       { bg: "#00d26a", ink: "#0a0a16" },
+  Reading:     { bg: "#ffd6c2", ink: "#0a0a16" },
+  Opening:     { bg: "#0a0a16", ink: "#f6f3ea" },
+};
+
+const _backdrop = document.getElementById("overlay-backdrop");
+const _panel    = document.getElementById("event-panel");
+const _full     = document.getElementById("event-fullscreen");
+
+function _overlayDate(ev){
+  const M = MONTH_NAME_EN;
+  return `${parseInt(ev.day)} ${M[ev.month]} ${ev.year}`;
+}
+
+function openOverlay(id){
+  const ev = window.EVENTS_BY_ID && window.EVENTS_BY_ID[id];
+  if (!ev) return;
+  const isFullscreen = ev.type === "Opening" || ev.featured;
+  if (isFullscreen){
+    _full.innerHTML = _buildFullscreen(ev);
+    _full.classList.add("is-open");
+    _full.querySelector(".efs-close").addEventListener("click", closeOverlay);
+  } else {
+    _panel.innerHTML = _buildPanel(ev);
+    _backdrop.classList.add("is-open");
+    _panel.classList.add("is-open");
+    _panel.querySelector(".ep-close").addEventListener("click", closeOverlay);
+    _panel.scrollTop = 0;
+  }
+  document.body.style.overflow = "hidden";
+  if (!history.state || !history.state.overlay) history.pushState({ overlay: id }, "", `?event=${id}`);
+}
+
+function closeOverlay(){
+  _backdrop.classList.remove("is-open");
+  _panel.classList.remove("is-open");
+  _full.classList.remove("is-open");
+  document.body.style.overflow = "";
+  if (history.state && history.state.overlay) history.back();
+}
+
+function _buildPanel(ev){
+  const tc = TYPE_COLORS[ev.type] || { bg: "#1d24ff", ink: "#f6f3ea" };
+  const typeArLabel = TYPE_AR[ev.type] || ev.type;
+  const venue = (ev.location || "").split("·")[0].trim();
+  const coverHtml = ev.cover
+    ? `<div class="ep-cover"><img src="${ev.cover}" alt="" style="width:100%;height:220px;object-fit:contain;padding:28px;display:block;"></div>`
+    : "";
+  const bodyEn = (ev.body && ev.body.length ? ev.body : ev.short ? [ev.short] : [])
+    .map(p => `<p>${p}</p>`).join("");
+  const bodyAr = (ev.bodyAr && ev.bodyAr.length ? ev.bodyAr : ev.shortAr ? [ev.shortAr] : [])
+    .map(p => `<p>${p}</p>`).join("");
+  const writeupEn = ev.writeup ? `<p class="ep-writeup">${ev.writeup}</p>` : "";
+  const writeupAr = ev.writeupAr ? `<p class="ep-writeup" dir="rtl">${ev.writeupAr}</p>` : "";
+  const cta = ev.register
+    ? `<a href="${ev.register}" class="ep-register" target="_blank"><span class="en-only">Register →</span><span class="ar-only ar">← التسجيل</span></a>`
+    : `<span class="ep-register ep-free"><span class="en-only">Free entry</span><span class="ar-only ar">دخول حرّ</span></span>`;
+
+  return `
+<div class="ep-header" style="background:${tc.bg};color:${tc.ink};">
+  <button class="ep-close" aria-label="Close">✕</button>
+  <div class="ep-meta">
+    <span class="ep-type-tag en-only">${ev.type}</span>
+    <span class="ep-type-tag ar-only ar">${typeArLabel}</span>
+    <span class="en-only">${_overlayDate(ev)}</span>
+    <span class="ar-only ar">${ev.day} ${MONTH_NAME_AR[ev.month]} ${arNum(ev.year)}</span>
+    <span class="ep-time">${ev.start}${ev.end ? " — " + ev.end : ""}</span>
+  </div>
+  <h1 class="ep-title">
+    <span class="en-only">${ev.title}</span>
+    <span class="ar-only ar" dir="rtl">${ev.titleAr || ev.title}</span>
+  </h1>
+  ${ev.subtitle ? `<p class="ep-subtitle en-only">${ev.subtitle}</p>` : ""}
+</div>
+<div class="ep-body">
+  ${coverHtml}
+  <div class="ep-content">
+    ${bodyEn || bodyAr ? `
+    <div class="ep-text">
+      ${bodyEn ? `<div class="en-only">${bodyEn}</div>` : ""}
+      ${writeupEn ? `<div class="en-only">${writeupEn}</div>` : ""}
+      ${bodyAr ? `<div class="ar-only ar" dir="rtl">${bodyAr}</div>` : ""}
+      ${writeupAr ? `<div class="ar-only ar" dir="rtl">${writeupAr}</div>` : ""}
+    </div>` : ""}
+    <div class="ep-facts">
+      <div class="ep-fact">
+        <span class="ef-key"><span class="en-only">Venue</span><span class="ar-only ar">المكان</span></span>
+        <span class="ef-val">${venue || "—"}</span>
+      </div>
+      <div class="ep-fact">
+        <span class="ef-key"><span class="en-only">Time</span><span class="ar-only ar">التوقيت</span></span>
+        <span class="ef-val">${ev.start}${ev.end ? " — " + ev.end : ""}</span>
+      </div>
+      <div class="ep-fact">
+        <span class="ef-key"><span class="en-only">Date</span><span class="ar-only ar">التاريخ</span></span>
+        <span class="ef-val en-only">${_overlayDate(ev)}</span>
+        <span class="ef-val ar-only ar">${ev.day} ${MONTH_NAME_AR[ev.month]}</span>
+      </div>
+      <div class="ep-fact">
+        <span class="ef-key"><span class="en-only">Type</span><span class="ar-only ar">النوع</span></span>
+        <span class="ef-val"><span class="en-only">${ev.type}</span><span class="ar-only ar">${typeArLabel}</span></span>
+      </div>
+    </div>
+    ${cta}
+  </div>
+</div>`;
+}
+
+function _buildFullscreen(ev){
+  const tc = TYPE_COLORS[ev.type] || { bg: "#0a0a16", ink: "#f6f3ea" };
+  const typeArLabel = TYPE_AR[ev.type] || ev.type;
+  const parts = (ev.subtitle || "").split("·").map(s => s.trim()).filter(Boolean);
+  const nameTag = parts.length > 1 ? parts[parts.length - 1] : parts[0] || "";
+  const bodyEn = (ev.body && ev.body.length ? ev.body : ev.writeup ? [ev.writeup] : ev.short ? [ev.short] : [])
+    .map(p => `<p>${p}</p>`).join("");
+  const bodyAr = (ev.bodyAr && ev.bodyAr.length ? ev.bodyAr : ev.writeupAr ? [ev.writeupAr] : ev.shortAr ? [ev.shortAr] : [])
+    .map(p => `<p>${p}</p>`).join("");
+  const coverHtml = ev.cover
+    ? `<div class="efs-image-wrap"><div class="efs-image"><img src="${ev.cover}" alt="${ev.title}"></div></div>`
+    : "";
+  return `
+<div class="efs-inner" style="background:${tc.bg};color:${tc.ink};">
+  <div class="efs-topbar">
+    <span class="efs-type-label"><span class="en-only">${ev.type}</span><span class="ar-only ar">${typeArLabel}</span></span>
+    <button class="efs-close"><span class="en-only">✕ Close</span><span class="ar-only ar">إغلاق ✕</span></button>
+  </div>
+  <div class="efs-hero">
+    <div class="efs-name-col">
+      ${nameTag ? `<div class="efs-name-box">${nameTag}</div>` : ""}
+      <div class="efs-date">
+        <span class="en-only">${_overlayDate(ev)} · ${ev.start}</span>
+        <span class="ar-only ar">${ev.day} ${MONTH_NAME_AR[ev.month]} ${arNum(ev.year)} · ${ev.start}</span>
+      </div>
+    </div>
+    <div class="efs-title-col">
+      <h1 class="efs-title">
+        <span class="en-only">${ev.title}</span>
+        <span class="ar-only ar" dir="rtl">${ev.titleAr || ev.title}</span>
+      </h1>
+      ${ev.short ? `<p class="efs-short en-only">${ev.short}</p>` : ""}
+      ${ev.shortAr ? `<p class="efs-short ar-only ar" dir="rtl">${ev.shortAr}</p>` : ""}
+    </div>
+  </div>
+  ${coverHtml}
+  ${bodyEn || bodyAr ? `
+  <div class="efs-body">
+    ${bodyEn ? `<div class="en-only">${bodyEn}</div>` : ""}
+    ${bodyAr ? `<div class="ar-only ar" dir="rtl">${bodyAr}</div>` : ""}
+  </div>` : ""}
+</div>`;
+}
+
+/* Intercept all event.html links */
+document.addEventListener("click", function(e){
+  const link = e.target.closest('a[href*="event.html"]');
+  if (!link) return;
+  try {
+    const url = new URL(link.href, location.href);
+    const id = url.searchParams.get("id");
+    if (id){ e.preventDefault(); openOverlay(id); }
+  } catch(_){}
+});
+
+_backdrop.addEventListener("click", closeOverlay);
+document.addEventListener("keydown", function(e){ if (e.key === "Escape") closeOverlay(); });
+
+window.addEventListener("popstate", function(e){
+  if (!e.state || !e.state.overlay){
+    _backdrop.classList.remove("is-open");
+    _panel.classList.remove("is-open");
+    _full.classList.remove("is-open");
+    document.body.style.overflow = "";
+  }
+});
+
+/* Open immediately if ?event= in URL on load */
+(function(){
+  const id = new URLSearchParams(location.search).get("event");
+  if (id) openOverlay(id);
+})();
+
 </script>
 
+<!-- EVENT OVERLAY SHELLS — content injected by JS -->
+<div id="overlay-backdrop" class="overlay-backdrop"></div>
+<div id="event-panel" class="event-panel" role="dialog" aria-modal="true" aria-label="Event details"></div>
+<div id="event-fullscreen" class="event-fullscreen" role="dialog" aria-modal="true" aria-label="Event details"></div>
 
 </body></html>
