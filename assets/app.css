@@ -64,14 +64,16 @@ img{ display:block; max-width:100%; }
 }
 .brand .logo{
   width: 38px; height: 38px; color: var(--ink);
-  animation: logo-spin 12s linear infinite;
-}
-@keyframes logo-spin{
-  from{ transform: rotate(0deg); }
-  to  { transform: rotate(360deg); }
+  display: block; flex-shrink: 0;
+  transition: none;
 }
 
-/* Search input */
+.topbar-right a{
+  padding: 5px 12px;
+  border: 2px solid var(--ink);
+  transition: background .15s, color .15s;
+}
+.topbar-right a:hover{ background: var(--ink); color: var(--bg); }
 .topbar-search{
   display: flex; align-items: center;
   width: 100%; max-width: 320px;
@@ -97,8 +99,7 @@ img{ display:block; max-width:100%; }
   font-size: 12px; letter-spacing: .18em; text-transform: uppercase; font-weight: 700;
   color: var(--ink);
 }
-.topbar-right a{ padding-bottom: 3px; border-bottom: 2px solid transparent; }
-.topbar-right a:hover{ border-bottom-color: var(--ink); }
+/* nav link hover handled above */
 .lang-toggle{ display: inline-flex; border: 2px solid var(--ink); }
 .lang-toggle button{
   all: unset; cursor: pointer; padding: 6px 10px;
@@ -404,29 +405,67 @@ img{ display:block; max-width:100%; }
 /* Hide the legacy day-group / event-line markup if any survives */
 .day-group{ display: none; }
 
-/* ---------- FOOTER ---------- */
+/* ---------- FOOTER — Book of Hov column style ---------- */
 .foot{
-  max-width: var(--maxw);
-  margin: clamp(48px, 6vw, 96px) auto 0;
-  padding: clamp(36px, 5vw, 64px) var(--pad);
-  display: grid; grid-template-columns: 1fr 1fr 1fr;
-  gap: clamp(20px, 3vw, 40px);
-  border-top: 3px solid var(--ink);
-  color: var(--ink);
+  background: var(--night);
+  color: var(--paper);
+  margin-top: clamp(48px, 6vw, 96px);
+  font-family: var(--ff-sans);
 }
-.foot .k{
-  font-family: var(--ff-sans); font-size: 12px; letter-spacing: .22em; text-transform: uppercase; font-weight: 700;
+.foot-cols{
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr 1fr;
+  gap: 0;
+  padding: clamp(36px, 5vw, 64px) clamp(24px, 4vw, 56px);
+  border-bottom: 1px solid rgba(246,243,234,.15);
 }
-.foot .v{
-  margin-top: 12px; font-family: var(--ff-sans); font-size: 17px; line-height: 1.5; font-weight: 500;
+.foot-col{
+  padding-right: clamp(20px, 3vw, 48px);
 }
-.foot .v a{ border-bottom: 2px solid var(--ink); padding-bottom: 1px; }
-.foot .brand-foot{
-  display: flex; flex-direction: column; gap: 12px;
-  font-family: var(--ff-sans); font-weight: 700; font-size: 20px; letter-spacing: .1em; text-transform: uppercase;
+.foot-col:last-child{ padding-right: 0; }
+.foot-col-head{
+  font-size: 11px; letter-spacing: .24em; text-transform: uppercase;
+  font-weight: 700; color: var(--paper); opacity: .38;
+  margin-bottom: 18px; line-height: 1;
 }
-.foot .brand-foot .logo{ width: 56px; height: 56px; color: var(--ink); }
-.foot .brand-foot .ar{ font-family: var(--ff-ar); font-size: 26px; letter-spacing: 0; text-transform: none; font-weight: 700; }
+.foot-col-body{
+  display: flex; flex-direction: column; gap: 9px;
+}
+.foot-col-body p{
+  margin: 0;
+  font-size: 13px; line-height: 1.5; font-weight: 400;
+  color: var(--paper); opacity: .75;
+}
+.foot-col-body a{
+  font-size: 13px; font-weight: 700; letter-spacing: .01em;
+  color: var(--paper); text-decoration: underline;
+  text-underline-offset: 3px; text-decoration-thickness: 1px;
+  opacity: .9;
+  transition: opacity .12s;
+}
+.foot-col-body a:hover{ opacity: 1; text-decoration-thickness: 2px; }
+.foot-newsletter-btn{
+  all: unset; cursor: pointer;
+  display: inline-block; margin-top: 8px;
+  font-size: 11px; letter-spacing: .2em; text-transform: uppercase; font-weight: 700;
+  color: var(--paper); padding: 8px 14px; border: 1px solid var(--paper);
+  opacity: .85; transition: background .12s, color .12s, opacity .12s;
+}
+.foot-newsletter-btn:hover{ background: var(--paper); color: var(--night); opacity: 1; }
+.foot-base{
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 18px clamp(24px, 4vw, 56px);
+  font-size: 11px; letter-spacing: .15em; text-transform: uppercase;
+  font-weight: 700; opacity: .35; color: var(--paper);
+}
+.foot-base a{ color: inherit; text-decoration: none; }
+.foot-base a:hover{ opacity: 2; text-decoration: underline; }
+@media (max-width: 860px){
+  .foot-cols{ grid-template-columns: 1fr 1fr; gap: clamp(28px, 4vw, 48px) 0; }
+}
+@media (max-width: 500px){
+  .foot-cols{ grid-template-columns: 1fr; }
+}
 
 /* =========================================================
    DETAIL PAGE

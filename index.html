@@ -254,16 +254,55 @@
 <!-- THE TIMELINE — one continuous flow, grouped by season, sticky shrinking month heads -->
 <section class="timeline" id="timeline"></section>
 <footer class="foot" id="visit">
-  <div>
-    <div class="brand-foot"><span class="en-only">The Wonder Cabinet</span><span class="ar-only ar" dir="rtl">مجلس العجب</span></div>
+  <div class="foot-cols">
+
+    <!-- Col 1 — Identity -->
+    <div class="foot-col">
+      <div class="foot-col-head">The Wonder Cabinet</div>
+      <div class="foot-col-body">
+        <p>Karkafeh Street<br>Bethlehem, Palestine<br>(Next to Arij)</p>
+        <p>Wed – Sun<br>10:00 – 22:00</p>
+        <a href="https://goo.gl/maps/9BhxnnrTfYZZVoMU9" target="_blank" rel="noopener">Google Maps →</a>
+      </div>
+    </div>
+
+    <!-- Col 2 — Programme -->
+    <div class="foot-col">
+      <div class="foot-col-head">Programme</div>
+      <div class="foot-col-body">
+        <a href="#programme">Events</a>
+        <a href="#residencies">Residencies</a>
+        <a href="#">Archive</a>
+        <a href="#">Contribute</a>
+        <a href="#">About</a>
+      </div>
+    </div>
+
+    <!-- Col 3 — Social -->
+    <div class="foot-col">
+      <div class="foot-col-head">Follow</div>
+      <div class="foot-col-body">
+        <a href="https://www.instagram.com/wonder.cabinet/" target="_blank" rel="noopener">Instagram</a>
+        <a href="https://www.facebook.com/wondercabinetbethlehem" target="_blank" rel="noopener">Facebook</a>
+        <a href="https://chat.whatsapp.com/I8ETsHie2Ye87kURhWnZY1" target="_blank" rel="noopener">WhatsApp</a>
+        <button class="foot-newsletter-btn">Subscribe to Newsletter</button>
+      </div>
+    </div>
+
+    <!-- Col 4 — Contact -->
+    <div class="foot-col">
+      <div class="foot-col-head">Contact</div>
+      <div class="foot-col-body">
+        <a href="mailto:office@wondercabinet.space">office@wondercabinet.space</a>
+        <a href="https://radioalhara.net" target="_blank" rel="noopener">Radio Alhara</a>
+        <a href="#">Local Industries</a>
+      </div>
+    </div>
+
   </div>
-  <div>
-    <div class="k">Visit</div>
-    <div class="v">Qaws Zqaq, Bethlehem, Palestine<br><span style="font-family:var(--ff-sans);font-size:12px;letter-spacing:.1em;color:var(--ink-soft);">Wed–Sun · 10:00–22:00</span></div>
-  </div>
-  <div>
-    <div class="k">Correspond</div>
-    <div class="v"><a href="#">days@wondercabinet.space</a><br><a href="#">Newsletter</a><br><a href="#">Instagram</a></div>
+  <div class="foot-base">
+    <span>© The Wonder Cabinet · Bethlehem, Palestine</span>
+    <span><a href="#">مجلس العجب</a></span>
   </div>
 </footer>
 
@@ -778,6 +817,18 @@ function initSplitScroll(){
   update();
 }
 initSplitScroll();
+
+/* ============================================================
+   SCROLL-BASED LOGO ROTATION
+   Logo rotates 1° per 8px scrolled — smooth, no auto-spin.
+   ============================================================ */
+(function initLogoRotation(){
+  const logo = document.querySelector(".brand .logo");
+  if (!logo) return;
+  window.addEventListener("scroll", function(){
+    logo.style.transform = "rotate(" + (window.scrollY * 0.08).toFixed(1) + "deg)";
+  }, { passive: true });
+})();
 
 /* ============================================================
    LANGUAGE TOGGLE
