@@ -835,23 +835,26 @@ function openOverlay(id, forceFullscreen){
   if (isFullscreen){
     _full.innerHTML = _buildFullscreen(ev);
     _full.classList.add("is-open");
+    document.body.style.overflow = "hidden";
     _full.querySelector(".efs-close").addEventListener("click", closeOverlay);
   } else {
     _panel.innerHTML = _buildPanel(ev);
-    _backdrop.classList.add("is-open");
     _panel.classList.add("is-open");
     _panel.querySelector(".ep-close").addEventListener("click", closeOverlay);
     _panel.scrollTop = 0;
+    _initPanelAudio(_panel);
   }
-  document.body.style.overflow = "hidden";
   if (!history.state || !history.state.overlay) history.pushState({ overlay: id }, "", `?event=${id}`);
 }
 
 function closeOverlay(){
+  const wasFullscreen = _full.classList.contains("is-open");
   _backdrop.classList.remove("is-open");
+  const audio = _panel.querySelector(".epa-audio");
+  if (audio) audio.pause();
   _panel.classList.remove("is-open");
   _full.classList.remove("is-open");
-  document.body.style.overflow = "";
+  if (wasFullscreen) document.body.style.overflow = "";
   if (history.state && history.state.overlay) history.back();
 }
 
@@ -923,6 +926,39 @@ function _renderBlocks(content){
   }).join("");
 }
 
+function _findAdjacentEvents(currentId){
+  if (!window.EVENTS) return { prev: null, next: null };
+  const list = window.EVENTS.filter(e => e.type !== "Opening" && !e.featured);
+  const idx = list.findIndex(e => e.id === currentId);
+  if (idx === -1) return { prev: null, next: null };
+  return { prev: idx > 0 ? list[idx - 1] : null, next: idx < list.length - 1 ? list[idx + 1] : null };
+}
+
+function _initPanelAudio(panel){
+  const audio = panel.querySelector(".epa-audio");
+  if (!audio) return;
+  const playBtn   = panel.querySelector(".epa-play");
+  const iconPlay  = panel.querySelector(".epa-icon-play");
+  const iconPause = panel.querySelector(".epa-icon-pause");
+  const fill      = panel.querySelector(".epa-fill");
+  const seek      = panel.querySelector(".epa-seek");
+  const curr      = panel.querySelector(".epa-current");
+  const tot       = panel.querySelector(".epa-total");
+
+  function fmt(s){ if (isNaN(s)||!isFinite(s)) return "--:--"; return Math.floor(s/60)+":"+String(Math.floor(s%60)).padStart(2,"0"); }
+
+  playBtn.addEventListener("click", () => audio.paused ? audio.play() : audio.pause());
+  audio.addEventListener("play",  () => { iconPlay.style.display="none"; iconPause.style.display=""; });
+  audio.addEventListener("pause", () => { iconPlay.style.display="";     iconPause.style.display="none"; });
+  audio.addEventListener("ended", () => { fill.style.width="0%"; seek.value=0; curr.textContent="0:00"; iconPlay.style.display=""; iconPause.style.display="none"; });
+  audio.addEventListener("timeupdate", () => {
+    const pct = audio.duration ? (audio.currentTime/audio.duration)*100 : 0;
+    fill.style.width = pct+"%"; seek.value = pct; curr.textContent = fmt(audio.currentTime);
+  });
+  audio.addEventListener("loadedmetadata", () => { tot.textContent = fmt(audio.duration); });
+  seek.addEventListener("input", () => { if (audio.duration) audio.currentTime = (seek.value/100)*audio.duration; });
+}
+
 function _buildPanel(ev){
   const tc = TYPE_COLORS[ev.type] || { bg: "#1d24ff", ink: "#f6f3ea" };
   const typeArLabel = TYPE_AR[ev.type] || ev.type;
@@ -940,7 +976,41 @@ function _buildPanel(ev){
     ? `<a href="${ev.register}" class="ep-register" target="_blank"><span class="en-only">Register →</span><span class="ar-only ar">← التسجيل</span></a>`
     : `<span class="ep-register ep-free"><span class="en-only">Free entry</span><span class="ar-only ar">دخول حرّ</span></span>`;
 
+  // Audio bar — shown only when a content block has audio with a real src
+  const audioBlock = ev.content && ev.content.find(b => b.type === "audio" && b.src);
+  const audioBar = audioBlock ? `
+<div class="ep-audio-bar">
+  <audio class="epa-audio" src="${audioBlock.src}" preload="metadata"></audio>
+  <button class="epa-play" aria-label="Play / Pause">
+    <svg class="epa-icon-play"  viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M8 5v14l11-7z"/></svg>
+    <svg class="epa-icon-pause" viewBox="0 0 24 24" fill="currentColor" width="20" height="20" style="display:none"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+  </button>
+  <div class="epa-track">
+    <div class="epa-label"><span class="en-only">${audioBlock.titleEn||"Recording"}</span><span class="ar-only ar">${audioBlock.titleAr||audioBlock.titleEn||"تسجيل"}</span></div>
+    <div class="epa-progress-wrap">
+      <div class="epa-progress"><div class="epa-fill"></div></div>
+      <input type="range" class="epa-seek" min="0" max="100" value="0" step="0.1" aria-label="Seek">
+    </div>
+  </div>
+  <div class="epa-time"><span class="epa-current">0:00</span> / <span class="epa-total">${audioBlock.durationMin ? audioBlock.durationMin+":00" : "--:--"}</span></div>
+</div>` : "";
+
+  // Prev / Next navigation bar
+  const { prev, next } = _findAdjacentEvents(ev.id);
+  const navBar = `
+<div class="ep-nav">
+  ${prev ? `<a href="event.html?id=${prev.id}" class="ep-nav-btn ep-nav-prev">
+    <span class="ep-nav-dir"><span class="en-only">← Prev</span><span class="ar-only ar">التالي →</span></span>
+    <span class="ep-nav-name"><span class="en-only">${prev.title}</span><span class="ar-only ar">${prev.titleAr||prev.title}</span></span>
+  </a>` : `<div class="ep-nav-btn ep-nav-empty"></div>`}
+  ${next ? `<a href="event.html?id=${next.id}" class="ep-nav-btn ep-nav-next">
+    <span class="ep-nav-dir"><span class="en-only">Next →</span><span class="ar-only ar">← السابق</span></span>
+    <span class="ep-nav-name"><span class="en-only">${next.title}</span><span class="ar-only ar">${next.titleAr||next.title}</span></span>
+  </a>` : `<div class="ep-nav-btn ep-nav-empty"></div>`}
+</div>`;
+
   return `
+${audioBar}
 <div class="ep-header" style="background:${tc.bg};color:${tc.ink};">
   <button class="ep-close" aria-label="Close">✕</button>
   <div class="ep-meta">
@@ -989,6 +1059,7 @@ function _buildPanel(ev){
     </div>
     ${cta}
   </div>
+  ${navBar}
 </div>`;
 }
 
@@ -1060,9 +1131,13 @@ document.addEventListener("keydown", function(e){ if (e.key === "Escape") closeO
 window.addEventListener("popstate", function(e){
   if (!e.state || !e.state.overlay){
     _backdrop.classList.remove("is-open");
+    const audio = _panel.querySelector(".epa-audio");
+    if (audio) audio.pause();
     _panel.classList.remove("is-open");
-    _full.classList.remove("is-open");
-    document.body.style.overflow = "";
+    if (_full.classList.contains("is-open")){
+      _full.classList.remove("is-open");
+      document.body.style.overflow = "";
+    }
   }
 });
 
