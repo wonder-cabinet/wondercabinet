@@ -11,13 +11,8 @@
 <header class="topbar">
   <div class="topbar-inner">
     <a class="brand" href="index.html">
-      <img class="logo" src="assets/wc-logo.svg" alt="The Wonder Cabinet" width="34" height="34">
+      <img class="logo" src="assets/wc-logo-white1.svg" alt="The Wonder Cabinet" width="34" height="34">
     </a>
-    <div class="topbar-center">
-      <div class="topbar-search">
-        <input type="search" id="site-search" placeholder="Search…" autocomplete="off" spellcheck="false">
-      </div>
-    </div>
     <nav class="topbar-right">
       <a href="#programme"><span class="en-only">Programme</span><span class="ar-only ar">البرنامج</span></a>
       <a href="#residencies"><span class="en-only">Residencies</span><span class="ar-only ar">إقامات</span></a>
@@ -353,6 +348,9 @@ function App(){
 
 ReactDOM.createRoot(document.getElementById("tweaks-root")).render(<App/>);
 </script>
+<div id="overlay-backdrop" class="overlay-backdrop"></div>
+<div id="event-panel" class="event-panel" role="dialog" aria-modal="true" aria-label="Event details"></div>
+<div id="event-fullscreen" class="event-fullscreen" role="dialog" aria-modal="true" aria-label="Event details"></div>
 <script>
 /* ============================================================
    STATE
@@ -568,11 +566,6 @@ function applyTypeFilter(arr){
   return out;
 }
 
-// Search input wiring (runs after DOM ready)
-document.getElementById("site-search").addEventListener("input", function(){
-  STATE.search = this.value.trim();
-  renderTimeline();
-});
 
 function renderTimeline(){
   const tl = document.getElementById("timeline");
@@ -1149,9 +1142,5 @@ window.addEventListener("popstate", function(e){
 
 </script>
 
-<!-- EVENT OVERLAY SHELLS — content injected by JS -->
-<div id="overlay-backdrop" class="overlay-backdrop"></div>
-<div id="event-panel" class="event-panel" role="dialog" aria-modal="true" aria-label="Event details"></div>
-<div id="event-fullscreen" class="event-fullscreen" role="dialog" aria-modal="true" aria-label="Event details"></div>
 
 </body></html>
