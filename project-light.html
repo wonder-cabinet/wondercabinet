@@ -8,13 +8,20 @@
 </head>
 <body>
 
-<header class="topbar">
+<header class="topbar topbar-prj">
   <div class="topbar-inner">
-    <a class="brand" href="index.html">
-      <img class="logo" src="assets/wc-logo.svg" alt="The Wonder Cabinet" width="34" height="34">
+    <a class="tpb-logo" href="index.html">
+      <img class="logo" src="assets/wc-logo-white1.svg" alt="The Wonder Cabinet" width="34" height="34">
     </a>
-    <nav class="topbar-right">
-      <a href="index.html#programme"><span class="en-only">Programme</span><span class="ar-only ar">البرنامج</span></a>
+    <a class="tpb-back" href="index.html">
+      <span class="en-only">← Programme</span>
+      <span class="ar-only ar">البرنامج ←</span>
+    </a>
+    <div class="tpb-label">
+      <span class="en-only">Annual Project · Wonder Cabinet</span>
+      <span class="ar-only ar" dir="rtl">مشروع سنوي · مجلس العجب</span>
+    </div>
+    <nav class="tpb-nav">
       <a href="index.html#residencies"><span class="en-only">Residencies</span><span class="ar-only ar">إقامات</span></a>
       <a href="index.html#visit"><span class="en-only">Visit</span><span class="ar-only ar">زيارة</span></a>
       <div class="lang-toggle" role="group" aria-label="Language">
@@ -24,9 +31,6 @@
     </nav>
   </div>
 </header>
-
-<div class="prj-section-label en-only">Annual Project · Wonder Cabinet</div>
-<div class="prj-section-label ar-only ar">مشروع سنوي · مجلس العجب</div>
 
 <article class="prj prj-light">
 
@@ -242,7 +246,7 @@ try{
   const saved = localStorage.getItem("twc-lang");
   if (saved){ document.documentElement.setAttribute("data-lang", saved); document.querySelectorAll("[data-lang-btn]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.langBtn===saved))); }
 }catch(e){}
-(function(){ const logo = document.querySelector(".brand .logo"); if (!logo) return; window.addEventListener("scroll", function(){ logo.style.transform = "rotate("+(window.scrollY*.08).toFixed(1)+"deg)"; },{ passive:true }); })();
+(function(){ const logo = document.querySelector(".tpb-logo .logo"); if (!logo) return; window.addEventListener("scroll", function(){ logo.style.transform = "rotate("+(window.scrollY*.08).toFixed(1)+"deg)"; },{ passive:true }); })();
 </script>
 </body>
 </html>

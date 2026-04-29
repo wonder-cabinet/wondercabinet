@@ -10,10 +10,10 @@
 
 <header class="topbar">
   <div class="topbar-inner">
-    <a class="brand" href="index.html">
+    <a class="tpb-logo" href="index.html">
       <img class="logo" src="assets/wc-logo-white1.svg" alt="The Wonder Cabinet" width="34" height="34">
     </a>
-    <nav class="topbar-right">
+    <nav class="tpb-nav">
       <a href="#programme"><span class="en-only">Programme</span><span class="ar-only ar">البرنامج</span></a>
       <a href="#residencies"><span class="en-only">Residencies</span><span class="ar-only ar">إقامات</span></a>
       <a href="#visit"><span class="en-only">Visit</span><span class="ar-only ar">زيارة</span></a>
@@ -143,7 +143,7 @@
           <img src="uploads/mothanna-hussein-featured_7c037f96-8519-4f06-9517-1d844dc4dda0.webp" alt="Rast — Tareq Abu Salameh">
         </a>
 
-        <!-- R2 (shown 3rd): Bethlehem — yellow accent -->
+        <!-- R2 (shown 3rd): Bethlehem commission — yellow accent -->
         <a class="fs-box fs-accent" href="project-dark.html" id="residencies">
           <div class="fsb-content">
             <div class="fsb-meta">
@@ -155,8 +155,8 @@
               <span class="ar-only ar" dir="rtl">بيت لحم</span>
             </h2>
             <p class="fsb-desc">
-              <span class="en-only">An electro-acoustic work for Christmas in mourning — Lawrence Sammour, Sary Moussa, Abed Kobeissy.</span>
-              <span class="ar-only ar" dir="rtl">عملٌ كهرو-صوتي لعيد ميلادٍ في حداد — لورانس سمّور، ساري موسى، عابد قبيسي.</span>
+              <span class="en-only">An electro-acoustic work for Christmas in mourning — Sammour, Moussa, Kobeissy.</span>
+              <span class="ar-only ar" dir="rtl">عملٌ كهرو-صوتي لعيد ميلادٍ في حداد — سمّور، موسى، قبيسي.</span>
             </p>
             <div class="fsb-cta">
               <span class="en-only">View project →</span>
@@ -815,7 +815,7 @@ initSplitScroll();
    Logo rotates 1° per 8px scrolled — smooth, no auto-spin.
    ============================================================ */
 (function initLogoRotation(){
-  const logo = document.querySelector(".brand .logo");
+  const logo = document.querySelector(".tpb-logo .logo");
   if (!logo) return;
   window.addEventListener("scroll", function(){
     logo.style.transform = "rotate(" + (window.scrollY * 0.08).toFixed(1) + "deg)";
