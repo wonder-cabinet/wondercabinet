@@ -47,16 +47,18 @@ img{ display:block; max-width:100%; }
 .topbar{
   position: sticky; top: 0; z-index: 50;
   background: var(--bg);
+  border-top: 2px solid var(--ink);
   border-bottom: 2px solid var(--ink);
+  height: 54px;
 }
 .topbar-inner{
-  max-width: var(--maxw);
-  margin: 0 auto;
-  padding: 14px var(--pad);
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  align-items: center;
-  gap: 20px;
+  display: flex;
+  align-items: stretch;
+  flex-wrap: nowrap;
+  height: 100%;
+  padding: 0;
+  max-width: none;
+  gap: 0;
 }
 .brand{
   display: flex; align-items: center;
@@ -67,6 +69,62 @@ img{ display:block; max-width:100%; }
   display: block; flex-shrink: 0;
   transition: none;
 }
+
+/* ── Catalog-bar header cells ── */
+.tpb-logo{
+  display: flex; align-items: center;
+  padding: 0 18px;
+  border-right: 2px solid var(--ink);
+  flex-shrink: 0;
+  color: var(--ink);
+  text-decoration: none;
+}
+.tpb-logo .logo{ width: 34px; height: 34px; display: block; }
+.tpb-back{
+  display: flex; align-items: center;
+  padding: 0 18px;
+  border-right: 2px solid var(--ink);
+  font-family: var(--ff-sans);
+  font-size: 11px; letter-spacing: .18em; text-transform: uppercase; font-weight: 700;
+  color: var(--ink); text-decoration: none;
+  white-space: nowrap; flex-shrink: 0;
+  transition: background .12s, color .12s;
+}
+.tpb-back:hover{ background: var(--ink); color: var(--bg); }
+.tpb-label{
+  flex: 1;
+  display: flex; align-items: center;
+  padding: 0 20px;
+  font-family: var(--ff-sans);
+  font-size: 11px; letter-spacing: .14em; text-transform: uppercase; font-weight: 700;
+  color: var(--ink); opacity: .45;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0;
+}
+.tpb-nav{
+  display: flex; align-items: stretch;
+  margin-left: auto;
+}
+.tpb-nav a{
+  display: flex; align-items: center;
+  padding: 0 18px;
+  border-left: 2px solid var(--ink);
+  font-family: var(--ff-sans);
+  font-size: 11px; letter-spacing: .18em; text-transform: uppercase; font-weight: 700;
+  color: var(--ink); text-decoration: none;
+  white-space: nowrap;
+  transition: background .12s, color .12s;
+}
+.tpb-nav a:hover{ background: var(--ink); color: var(--bg); }
+.tpb-nav .lang-toggle{
+  border: none; border-left: 2px solid var(--ink);
+  border-radius: 0; padding: 0;
+}
+.tpb-nav .lang-toggle button{
+  border-radius: 0; border: none;
+  border-right: 1px solid var(--ink);
+  height: 100%; padding: 0 14px;
+}
+.tpb-nav .lang-toggle button:last-child{ border-right: none; }
 
 .topbar-right a{
   padding: 5px 12px;
@@ -1062,7 +1120,7 @@ html[data-lang="ar"] .ar-only{ direction: rtl; }
 /* ---------- PROGRAMME — sticky full-bleed filter bar ---------- */
 .programme-head{
   position: sticky;
-  top: 68px;
+  top: 54px;
   z-index: 40;
   background: var(--bg);
   border-top: 3px solid var(--ink);
@@ -1485,13 +1543,13 @@ html[data-lang="ar"] .ar-only{ direction: rtl; }
    section height = 4 × (100vh − 68px) → 3 full transitions
    ========================================================= */
 .featured-split{
-  height: calc(400vh - 272px); /* 4 × (100vh - 68px) */
+  height: calc(400vh - 216px); /* 4 × (100vh - 54px) */
   position: relative;
 }
 .fs-inner{
   position: sticky;
-  top: 68px;
-  height: calc(100vh - 68px);
+  top: 54px;
+  height: calc(100vh - 54px);
   display: grid;
   grid-template-columns: 1fr 1fr;
   overflow: hidden;
@@ -1500,7 +1558,7 @@ html[data-lang="ar"] .ar-only{ direction: rtl; }
 .fs-left,
 .fs-right{
   overflow: hidden;
-  height: calc(100vh - 68px);
+  height: calc(100vh - 54px);
   position: relative;
 }
 .fs-right{ border-left: 2px solid var(--ink); }
@@ -1514,8 +1572,8 @@ html[data-lang="ar"] .ar-only{ direction: rtl; }
 
 /* Each box fills exactly one viewport slot */
 .fs-box{
-  flex: 0 0 calc(100vh - 68px);
-  height: calc(100vh - 68px);
+  flex: 0 0 calc(100vh - 54px);
+  height: calc(100vh - 54px);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -2191,7 +2249,7 @@ html[data-lang="ar"] .ar-only{ direction: rtl; }
 /* Opening spread — split: image left, title right */
 .prj-opening{
   display: grid; grid-template-columns: 1fr 1fr;
-  min-height: calc(100vh - 68px);
+  min-height: calc(100vh - 54px);
   border-bottom: 2px solid rgba(246,243,234,.15);
 }
 .prj-opening-image{

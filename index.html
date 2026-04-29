@@ -755,7 +755,7 @@ function initStickyMonths(){
   const heads = Array.from(document.querySelectorAll(".tl-month-head"));
   if (!heads.length) return;
 
-  const TOP_OFFSET = 118; // topbar (68) + filter bar (50)
+  const TOP_OFFSET = 104; // topbar (54) + filter bar (50)
   function update(){
     heads.forEach(h => {
       const body = h.parentElement;
@@ -790,7 +790,7 @@ function initStickyMonths(){
 function initSplitScroll(){
   const section = document.querySelector(".featured-split");
   if (!section) return;
-  const TOPBAR_H = 68;
+  const TOPBAR_H = 54;
   const leftTrack  = section.querySelector(".fs-left-track");
   const rightTrack = section.querySelector(".fs-right-track");
 
