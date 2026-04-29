@@ -79,6 +79,29 @@ window.EVENTS = [
     bodyAr: [
       "راست عرضٌ منفردٌ يستكشف، عبر صوت العود التعبيري، الشكل التقليدي للتقاسيم.",
       "— طارق أبو سلامة (مواليد ١٩٩٠ القدس)، مؤلّف موسيقي فلسطيني يقيم في ميلانو."
+    ],
+    content: [
+      { type: "text",
+        en: [
+          "Rast is a solo performance that, through the expressive voice of the oud, explores the traditional form of taqasim — a distinctive mode of improvisation at the heart of Eastern musical heritage.",
+          "This form is remarkable for its ability to weave together a wide spectrum of musical traditions shared among Turkish, Arab, Persian, Assyrian, Kurdish, and Syriac cultures."
+        ],
+        ar: [
+          "راست عرضٌ منفردٌ يستكشف، عبر صوت العود التعبيري، الشكل التقليدي للتقاسيم — نمطٌ مميّز من الارتجال في قلب التراث الموسيقي الشرقي.",
+          "يتميّز هذا الشكل بقدرته على نسج طيفٍ واسع من الموسيقى المشتركة بين الثقافات التركية والعربية والفارسية والآشورية والكردية والسريانية."
+        ]
+      },
+      { type: "pullquote",
+        en: "Taqasim is the space between the known and the unknown — where the musician becomes a vessel.",
+        ar: "التقاسيم هي الفضاء بين المعروف والمجهول — حيث يصبح الموسيقي وعاءً.",
+        attribution: "Tareq Abu Salameh"
+      },
+      { type: "audio",
+        titleEn: "Recording — Rast, 11 November 2025",
+        titleAr: "تسجيل — راست، ١١ نوفمبر ٢٠٢٥",
+        durationMin: 52,
+        src: null
+      }
     ]
   },
   {
@@ -145,7 +168,25 @@ window.EVENTS = [
       "Bashar Horany \"7orany\" — born and raised in Haifa, graphic designer and owner of a family print shop since 1975.",
       "ADAN — Palestinian curator, architect and DJ from Jerusalem, based in London."
     ],
-    bodyAr: ["بشار حوراني وADAN يقدّمان أسطوانات مباشرة عبر راديو الحارة."]
+    bodyAr: ["بشار حوراني وADAN يقدّمان أسطوانات مباشرة عبر راديو الحارة."],
+    content: [
+      { type: "text",
+        en: [
+          "Bashar Horany followed by ADAN, spinning records live on Radio AlHara from the Wonder Cabinet. A three-hour broadcast.",
+          "Bashar Horany \"7orany\" — born and raised in Haifa, graphic designer and owner of a family print shop since 1975. His sets move through the undocumented edges of Arab music.",
+          "ADAN — Palestinian curator, architect and DJ from Jerusalem, based in London. Her practice is rooted in the intersection of sound, space, and memory."
+        ],
+        ar: [
+          "بشار حوراني ثم ADAN، يبثّان أسطوانات مباشرة عبر راديو الحارة من مجلس العجب. بثٌّ لثلاث ساعات."
+        ]
+      },
+      { type: "audio",
+        titleEn: "Full broadcast — Radio AlHara, 18 November 2025",
+        titleAr: "البثّ الكامل — راديو الحارة، ١٨ نوفمبر ٢٠٢٥",
+        durationMin: 180,
+        src: null
+      }
+    ]
   },
   {
     id: "yoga-nov-20",
@@ -234,7 +275,29 @@ window.EVENTS = [
     writeup: "Two hundred people walked through the doors on the night the Cabinet first opened — neighbours, makers, students, friends from Bethlehem, Ramallah, Jerusalem, Haifa. Tea kept appearing. Three hours in, the courtyard had turned into a small dance floor. Notes from that night still hang on the corkboard upstairs.",
     writeupAr: "في ليلة افتتاح المجلس، عبرت أبوابه نحو مئتين من الأصدقاء والجيران والصنّاع. الشاي لا ينتهي، والساحة تحوّلت بعد ثلاث ساعات إلى حلبة رقص صغيرة.",
     body: [],
-    bodyAr: []
+    bodyAr: [],
+    content: [
+      { type: "text",
+        en: [
+          "Two hundred people walked through the doors on the night the Cabinet first opened — neighbours, makers, students, friends from Bethlehem, Ramallah, Jerusalem, Haifa.",
+          "Tea kept appearing. Three hours in, the courtyard had turned into a small dance floor. Notes from that night still hang on the corkboard upstairs."
+        ],
+        ar: [
+          "في ليلة افتتاح المجلس، عبرت أبوابه نحو مئتين من الأصدقاء والجيران والصنّاع والطلاب، من بيت لحم ورام الله والقدس وحيفا.",
+          "الشاي لا ينتهي. بعد ثلاث ساعات، تحوّلت الساحة إلى حلبة رقص صغيرة. ملاحظات تلك الليلة لا تزال معلّقة على لوحة الفلّين في الطابق العلوي."
+        ]
+      },
+      { type: "image",
+        src: "uploads/mothanna-hussein-featured_7c037f96-8519-4f06-9517-1d844dc4dda0.webp",
+        captionEn: "Opening night, October 2024 — photograph by Mothanna Hussein",
+        captionAr: "ليلة الافتتاح، أكتوبر ٢٠٢٤ — تصوير مثنّى حسين"
+      },
+      { type: "pullquote",
+        en: "We didn't know what to expect. By midnight we knew this was something real.",
+        ar: "لم نكن نعرف ماذا نتوقّع. بحلول منتصف الليل، عرفنا أن هذا شيء حقيقي.",
+        attribution: "From the visitor book"
+      }
+    ]
   },
   {
     id: "archive-bigbus-mar-2025",
@@ -268,7 +331,30 @@ window.EVENTS = [
     writeup: "A choir of twenty-four voices, drawn from villages across Palestine, performed an evening of work songs, lullabies and lament. Recordings of the night were broadcast a week later on Radio AlHara.",
     writeupAr: "جوقة من أربعة وعشرين صوتاً، من قرى متعددة في فلسطين، أدّت أمسية من أغاني العمل والتهليلات والرثاء.",
     body: [],
-    bodyAr: []
+    bodyAr: [],
+    content: [
+      { type: "text",
+        en: [
+          "A choir of twenty-four voices, drawn from villages across Palestine, performed an evening of work songs, lullabies and lament — curated by Dalia Sabbah.",
+          "The programme traced a single thread through the material: the relationship between voice, land, and collective memory. Recordings of the night were broadcast a week later on Radio AlHara."
+        ],
+        ar: [
+          "جوقة من أربعة وعشرين صوتاً، من قرى فلسطينية متعددة، أدّت أمسية من أغاني العمل والتهليلات والرثاء — من إعداد داليا صبّاح.",
+          "رُصدت الليلة صوتياً وبُثّت بعد أسبوع عبر راديو الحارة."
+        ]
+      },
+      { type: "pullquote",
+        en: "The land doesn't disappear when you sing it. It arrives.",
+        ar: "الأرض لا تختفي حين تُغنيها. بل تحضر.",
+        attribution: "Dalia Sabbah, programme note"
+      },
+      { type: "audio",
+        titleEn: "Radio AlHara broadcast — Sumud, May 2025",
+        titleAr: "بثّ راديو الحارة — صمود، مايو ٢٠٢٥",
+        durationMin: 68,
+        src: null
+      }
+    ]
   },
   {
     id: "archive-printclub-jul-2025",
