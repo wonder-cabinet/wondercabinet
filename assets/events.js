@@ -1,13 +1,14 @@
 // Shared events data
 // status: "upcoming" | "past"
 // recurring: true if this is a weekly/recurring event
-// writeup: post-event reflection (for archive)
 
 window.EVENTS = [
-  // ============= UPCOMING =============
+
+  // ============= SPRING 2026 — April =============
+
   {
-    id: "yoga-nov-06",
-    day: "06", month: "Nov", year: 2025,
+    id: "yoga-apr-06",
+    day: "06", month: "Apr", year: 2026,
     dow: "Mon", dowAr: "الاثنين",
     start: "19:00", end: "20:30",
     type: "Class",
@@ -15,13 +16,12 @@ window.EVENTS = [
     titleAr: "يوغا مع ايلدا زغموت",
     subtitle: "Weekly guided practice · Head of Meditation at Tawazon",
     location: "Ground floor",
-    cover: "assets/covers/yoga.svg",
     recurring: true,
     recurringLabel: "Every Monday",
-    status: "upcoming",
+    status: "past",
     register: "https://forms.gle/ykHvYEn1QUo4B3oi7",
     short: "An immersive journey of self-discovery and healing.",
-    shortAr: "رحلة شيقة لاكتشاف الذات.",
+    shortAr: "رحلة شيقة لاكتشاف الذات والشفاء.",
     body: [
       "A regular appointment at the Wonder Cabinet, every Monday Eilda Zaghmout, professional yoga teacher and \"Head of Meditation\" at Tawazon, will continue to guide you through an immersive journey of self discovery and healing.",
       "Cost — 30 NIS per class, or 100 NIS for a four-class package. Mixed classes. Mats and props provided."
@@ -31,9 +31,10 @@ window.EVENTS = [
       "التكلفة: ٣٠ شيكل لكل حصة أو ١٠٠ شيكل لأربعة حصص."
     ]
   },
+
   {
-    id: "soundwaves-nov-08",
-    day: "08", month: "Nov", year: 2025,
+    id: "soundwaves-apr-08",
+    day: "08", month: "Apr", year: 2026,
     dow: "Wed", dowAr: "الأربعاء",
     start: "19:00", end: "20:00",
     type: "Film",
@@ -41,8 +42,7 @@ window.EVENTS = [
     titleAr: "الموجات الصوتية: سيمفونية الفيزياء",
     subtitle: "Making Sound — Part I of II · Dr. Helen Czerski",
     location: "Screening room",
-    cover: "assets/covers/soundwaves.svg",
-    status: "upcoming",
+    status: "past",
     short: "The extraordinary science behind the sounds we know — and those we cannot hear.",
     shortAr: "العلوم المذهلة وراء الأصوات المألوفة، والتي لا نسمعها.",
     body: [
@@ -52,12 +52,14 @@ window.EVENTS = [
     ],
     bodyAr: [
       "تستكشف د. هيلين تشيرسكي العلوم المذهلة وراء الأصوات المألوفة والأصوات التي لا نسمعها عادةً.",
-      "الجزء الأول من جزأين، باللغة الإنجليزية، ساعة واحدة."
+      "الجزء الأول من جزأين — يكشف عن كيفية توليد الصوت، من فيزياء الوتر إلى آليات الكلام.",
+      "بالإنجليزية · ساعة واحدة · دخول مجاني."
     ]
   },
+
   {
-    id: "rast-nov-11",
-    day: "11", month: "Nov", year: 2025,
+    id: "rast-apr-11",
+    day: "11", month: "Apr", year: 2026,
     dow: "Sat", dowAr: "السبت",
     start: "19:00", end: "20:00",
     type: "Performance",
@@ -65,20 +67,20 @@ window.EVENTS = [
     titleAr: "راست",
     subtitle: "A solo performance on the oud · Tareq Abu Salameh",
     location: "Main hall",
-    cover: "assets/covers/rast.svg",
     featured: true,
-    status: "upcoming",
-    register: "#",
+    status: "past",
+    register: "https://forms.gle/ykHvYEn1QUo4B3oi7",
     short: "Through the expressive voice of the oud, tracing the traditional form of taqasim.",
-    shortAr: "عبر صوت العود، استكشاف شكل التقاسيم.",
+    shortAr: "عبر صوت العود التعبيري، استكشاف شكل التقاسيم التقليدي.",
     body: [
       "Rast is a solo performance that, through the expressive voice of the oud, explores the traditional form of taqasim — a distinctive mode of improvisation at the heart of Eastern musical heritage.",
       "This form is remarkable for its ability to weave together a wide spectrum of musical traditions shared among Turkish, Arab, Persian, Assyrian, Kurdish, and Syriac cultures.",
       "— Tareq Abu Salameh (b. 1990, Jerusalem) is a Palestinian composer based in Milan since 2022."
     ],
     bodyAr: [
-      "راست عرضٌ منفردٌ يستكشف، عبر صوت العود التعبيري، الشكل التقليدي للتقاسيم.",
-      "— طارق أبو سلامة (مواليد ١٩٩٠ القدس)، مؤلّف موسيقي فلسطيني يقيم في ميلانو."
+      "راست عرضٌ منفردٌ يستكشف، عبر صوت العود التعبيري، الشكل التقليدي للتقاسيم — نمطٌ مميّز من الارتجال في قلب التراث الموسيقي الشرقي.",
+      "يتميّز هذا الشكل بقدرته على نسج طيفٍ واسع من الموسيقى المشتركة بين الثقافات التركية والعربية والفارسية والآشورية والكردية والسريانية.",
+      "— طارق أبو سلامة (مواليد ١٩٩٠ القدس)، مؤلّف موسيقي فلسطيني يقيم في ميلانو منذ ٢٠٢٢."
     ],
     content: [
       { type: "text",
@@ -97,16 +99,17 @@ window.EVENTS = [
         attribution: "Tareq Abu Salameh"
       },
       { type: "audio",
-        titleEn: "Recording — Rast, 11 November 2025",
-        titleAr: "تسجيل — راست، ١١ نوفمبر ٢٠٢٥",
+        titleEn: "Recording — Rast, 11 April 2026",
+        titleAr: "تسجيل — راست، ١١ أبريل ٢٠٢٦",
         durationMin: 52,
         src: null
       }
     ]
   },
+
   {
-    id: "yoga-nov-13",
-    day: "13", month: "Nov", year: 2025,
+    id: "yoga-apr-13",
+    day: "13", month: "Apr", year: 2026,
     dow: "Mon", dowAr: "الاثنين",
     start: "19:00", end: "20:30",
     type: "Class",
@@ -114,19 +117,19 @@ window.EVENTS = [
     titleAr: "يوغا مع ايلدا زغموت",
     subtitle: "Weekly guided practice",
     location: "Ground floor",
-    cover: "assets/covers/yoga.svg",
     recurring: true,
     recurringLabel: "Every Monday",
-    status: "upcoming",
+    status: "past",
     register: "https://forms.gle/ykHvYEn1QUo4B3oi7",
     short: "Weekly guided practice.",
     shortAr: "الدرس الأسبوعي.",
-    body: ["See 06 November for full details."],
-    bodyAr: ["انظر إلى يوم ٦ نوفمبر."]
+    body: ["See 6 April for full details."],
+    bodyAr: ["انظر إلى يوم ٦ أبريل للتفاصيل الكاملة."]
   },
+
   {
-    id: "dome-nov-15",
-    day: "15", month: "Nov", year: 2025,
+    id: "dome-apr-15",
+    day: "15", month: "Apr", year: 2026,
     dow: "Wed", dowAr: "الأربعاء",
     start: "19:00", end: "20:00",
     type: "Film",
@@ -134,41 +137,44 @@ window.EVENTS = [
     titleAr: "جلسات القُبّة",
     subtitle: "In Resonance Collective · Q&A with Firas El Hallak",
     location: "Screening room",
-    cover: "assets/covers/dome.svg",
-    featured: true,
-    status: "upcoming",
-    short: "Sound and space, emerging from the unfinished dome in Tripoli, Lebanon.",
-    shortAr: "الصوت والمكان، من القبة غير المكتملة في طرابلس.",
+    status: "past",
+    short: "Sound and space, emerging from the unfinished Niemeyer dome in Tripoli, Lebanon.",
+    shortAr: "الصوت والمكان، من القبة غير المكتملة لنيماير في طرابلس.",
     body: [
-      "An exploration of sound and space, emerging from the architectural and acoustic features of the unfinished Dome of the Rachid Karami International Fair in Tripoli.",
-      "Designed by Oscar Niemeyer in 1962. When the Lebanese Civil War began, construction ceased, leaving the Dome acoustically untreated — creating a haunting reverb."
+      "An exploration of sound and space, emerging from the architectural and acoustic features of the unfinished Dome of the Rachid Karami International Fair in Tripoli, Lebanon.",
+      "Designed by Oscar Niemeyer. When the Lebanese Civil War began, construction ceased, leaving the Dome acoustically untreated — creating a haunting reverb.",
+      "Followed by a Q&A with Firas El Hallak. Released on Ruptured Label."
     ],
     bodyAr: [
-      "استكشاف للعلاقة بين الصوت والمكان، من القبة غير المكتملة في طرابلس، لبنان.",
-      "صُمّم الفضاء عام ١٩٦٢ على يد المعماري أوسكار نيماير."
+      "استكشاف للعلاقة بين الصوت والمكان، من القبة غير المكتملة في معرض رشيد كرامي الدولي في طرابلس، لبنان.",
+      "صُمّم الفضاء على يد المعماري أوسكار نيماير. حين اندلعت الحرب الأهلية اللبنانية، توقّف البناء، تاركاً القبة دون معالجة صوتية — مما أنتج صدىً مسحوراً.",
+      "يتبعه حوار مع فراس الحلاق. صدر على Ruptured Label."
     ]
   },
+
   {
-    id: "radio-nov-18",
-    day: "18", month: "Nov", year: 2025,
+    id: "radio-sessions-apr-18",
+    day: "18", month: "Apr", year: 2026,
     dow: "Sat", dowAr: "السبت",
     start: "19:00", end: "22:00",
     type: "Radio",
-    title: "7orany + ADAN",
+    title: "Radio Sessions: 7orany and ADAN",
     titleAr: "جلسات إذاعية: 7orany و ADAN",
-    subtitle: "Radio Session · Live on Radio AlHara",
+    subtitle: "Live on Radio AlHara · Bar open",
     location: "Main hall · Bar open",
-    cover: "assets/covers/radio.svg",
-    featured: true,
-    status: "upcoming",
-    short: "Records spun live from the Cabinet. Three-hour broadcast.",
-    shortAr: "أسطوانات تُبثّ مباشرة. ثلاث ساعات.",
+    status: "past",
+    short: "Bashar Horany followed by ADAN, spinning records live from the Cabinet on Radio AlHara.",
+    shortAr: "بشار حوراني ثم ADAN، يبثّان أسطوانات مباشرة عبر راديو الحارة من مجلس العجب.",
     body: [
-      "Bashar Horany followed by ADAN, spinning records live on Radio AlHara from the Wonder Cabinet.",
-      "Bashar Horany \"7orany\" — born and raised in Haifa, graphic designer and owner of a family print shop since 1975.",
-      "ADAN — Palestinian curator, architect and DJ from Jerusalem, based in London."
+      "Bashar Horany \"7orany\" — born and raised in Haifa, graphic designer and owner of a family print shop since 1975. His sets move through the undocumented edges of Arab music.",
+      "ADAN — Palestinian curator, architect and DJ from Jerusalem, based in London. Her practice is rooted in the intersection of sound, space, and memory.",
+      "Three-hour live broadcast on Radio AlHara."
     ],
-    bodyAr: ["بشار حوراني وADAN يقدّمان أسطوانات مباشرة عبر راديو الحارة."],
+    bodyAr: [
+      "بشار حوراني «7orany» — وُلد وترعرع في حيفا، مصمّم غرافيك وصاحب مطبعة عائلية منذ ١٩٧٥. تجوب مجموعاته أطراف الموسيقى العربية غير الموثّقة.",
+      "ADAN — فنانة فلسطينية من القدس، مقيمة في لندن، ممارسة في تقاطع الصوت والمكان والذاكرة.",
+      "بثٌّ حيّ لثلاث ساعات عبر راديو الحارة."
+    ],
     content: [
       { type: "text",
         en: [
@@ -177,20 +183,23 @@ window.EVENTS = [
           "ADAN — Palestinian curator, architect and DJ from Jerusalem, based in London. Her practice is rooted in the intersection of sound, space, and memory."
         ],
         ar: [
-          "بشار حوراني ثم ADAN، يبثّان أسطوانات مباشرة عبر راديو الحارة من مجلس العجب. بثٌّ لثلاث ساعات."
+          "بشار حوراني ثم ADAN، يبثّان أسطوانات مباشرة عبر راديو الحارة من مجلس العجب. بثٌّ لثلاث ساعات.",
+          "بشار حوراني «7orany» — وُلد وترعرع في حيفا، مصمّم غرافيك وصاحب مطبعة عائلية منذ ١٩٧٥.",
+          "ADAN — فنانة فلسطينية من القدس، مقيمة في لندن."
         ]
       },
       { type: "audio",
-        titleEn: "Full broadcast — Radio AlHara, 18 November 2025",
-        titleAr: "البثّ الكامل — راديو الحارة، ١٨ نوفمبر ٢٠٢٥",
+        titleEn: "Full broadcast — Radio AlHara, 18 April 2026",
+        titleAr: "البثّ الكامل — راديو الحارة، ١٨ أبريل ٢٠٢٦",
         durationMin: 180,
         src: null
       }
     ]
   },
+
   {
-    id: "yoga-nov-20",
-    day: "20", month: "Nov", year: 2025,
+    id: "yoga-apr-20",
+    day: "20", month: "Apr", year: 2026,
     dow: "Mon", dowAr: "الاثنين",
     start: "19:00", end: "20:30",
     type: "Class",
@@ -198,186 +207,140 @@ window.EVENTS = [
     titleAr: "يوغا مع ايلدا زغموت",
     subtitle: "Weekly guided practice",
     location: "Ground floor",
-    cover: "assets/covers/yoga.svg",
-    recurring: true, recurringLabel: "Every Monday",
-    status: "upcoming",
+    recurring: true,
+    recurringLabel: "Every Monday",
+    status: "past",
     register: "https://forms.gle/ykHvYEn1QUo4B3oi7",
-    short: "Weekly guided practice.", shortAr: "الدرس الأسبوعي.",
-    body: ["See 06 November for full details."],
-    bodyAr: ["انظر إلى يوم ٦ نوفمبر."]
+    short: "Weekly guided practice.",
+    shortAr: "الدرس الأسبوعي.",
+    body: ["See 6 April for full details."],
+    bodyAr: ["انظر إلى يوم ٦ أبريل للتفاصيل الكاملة."]
   },
+
   {
-    id: "yoga-nov-27",
-    day: "27", month: "Nov", year: 2025,
-    dow: "Mon", dowAr: "الاثنين",
-    start: "19:00", end: "20:30",
-    type: "Class",
-    title: "Yoga with Eilda Zaghmout",
-    titleAr: "يوغا مع ايلدا زغموت",
-    subtitle: "Weekly guided practice",
-    location: "Ground floor",
-    cover: "assets/covers/yoga.svg",
-    recurring: true, recurringLabel: "Every Monday",
-    status: "upcoming",
-    register: "https://forms.gle/ykHvYEn1QUo4B3oi7",
-    short: "Weekly guided practice.", shortAr: "الدرس الأسبوعي.",
-    body: ["See 06 November for full details."],
-    bodyAr: ["انظر إلى يوم ٦ نوفمبر."]
-  },
-  {
-    id: "soundwaves-2-dec-03",
-    day: "03", month: "Dec", year: 2025,
+    id: "noor-abed-apr-22",
+    day: "22", month: "Apr", year: 2026,
     dow: "Wed", dowAr: "الأربعاء",
     start: "19:00", end: "20:00",
     type: "Film",
-    title: "Sound Waves II: Making Waves",
-    titleAr: "الموجات الصوتية ٢",
-    subtitle: "Part II of II · Dr. Helen Czerski",
+    title: "An Informal Trilogy",
+    titleAr: "ثلاثية غير رسمية",
+    subtitle: "Films by Noor Abed · Double screening",
     location: "Screening room",
-    cover: "assets/covers/soundwaves.svg",
-    status: "upcoming",
-    short: "The second screening in the two-part series.",
-    shortAr: "الجزء الثاني من السلسلة.",
-    body: ["The second of two screenings on the physics of sound."],
-    bodyAr: ["الجزء الثاني من السلسلة."]
-  },
-  {
-    id: "reading-dec-06",
-    day: "06", month: "Dec", year: 2025,
-    dow: "Sat", dowAr: "السبت",
-    start: "18:00", end: "19:30",
-    type: "Reading",
-    title: "Evening Reading Room",
-    titleAr: "غرفة القراءة المسائية",
-    subtitle: "Open readings from the Cabinet library",
-    location: "Library",
-    cover: "assets/covers/reading.svg",
-    status: "upcoming",
-    short: "Bring a book, or borrow one. Tea on the house.",
-    shortAr: "أحضر كتاباً أو استعر كتاباً.",
-    body: ["A quiet, open reading evening."],
-    bodyAr: ["أمسية قراءة هادئة."]
+    featured: true,
+    status: "past",
+    short: "Three films by Noor Abed — a double screening at the Wonder Cabinet and Bayn Al Nakhlaytan, Jericho.",
+    shortAr: "ثلاثة أفلام لنور عابد — عرضٌ مزدوج في مجلس العجب وبين النخلتين، أريحا.",
+    body: [
+      "A double screening of three films by Noor Abed: Penelope (2014), our songs (2021), and A Night We Held Between (2024).",
+      "Simultaneously at the Wonder Cabinet, Bethlehem, and at Bayn Al Nakhlaytan, Jericho."
+    ],
+    bodyAr: [
+      "عرضٌ مزدوج لثلاثة أفلام لنور عابد: بنيلوبي (٢٠١٤)، أغانينا (٢٠٢١)، وليلة احتجزناها بيننا (٢٠٢٤).",
+      "في آنٍ واحد في مجلس العجب، بيت لحم، وفي بين النخلتين، أريحا."
+    ],
+    content: [
+      { type: "text",
+        en: [
+          "A double screening of three films by Noor Abed — simultaneously at the Wonder Cabinet, Bethlehem, and at Bayn Al Nakhlaytan, Jericho.",
+          "Penelope (2014) · our songs (2021) · A Night We Held Between (2024)."
+        ],
+        ar: [
+          "عرضٌ مزدوج لثلاثة أفلام لنور عابد — في آنٍ واحد في مجلس العجب، بيت لحم، وفي بين النخلتين، أريحا.",
+          "بنيلوبي (٢٠١٤) · أغانينا (٢٠٢١) · ليلة احتجزناها بيننا (٢٠٢٤)."
+        ]
+      }
+    ]
   },
 
-  // ============= ARCHIVE (past) =============
   {
-    id: "archive-opening-oct-2024",
-    day: "12", month: "Oct", year: 2024,
-    dow: "Sat", dowAr: "السبت",
-    start: "19:00", end: "23:00",
-    type: "Opening",
-    title: "Cabinet Opening Night",
-    titleAr: "ليلة افتتاح المجلس",
-    subtitle: "The first gathering · 200 friends, neighbours, makers",
-    location: "Whole building",
-    cover: "assets/covers/opening.svg",
+    id: "carhartt-radioalhara-apr-24",
+    day: "24", month: "Apr", year: 2026,
+    dow: "Fri", dowAr: "الجمعة",
+    start: "17:00", end: "22:00",
+    type: "Radio",
+    title: "Carhartt WIP × Radio AlHara",
+    titleAr: "Carhartt WIP × راديو الحارة",
+    subtitle: "Collection Launch · Radio AlHara 6th Anniversary",
+    location: "Main hall · Bar open",
+    featured: true,
     status: "past",
-    writeup: "Two hundred people walked through the doors on the night the Cabinet first opened — neighbours, makers, students, friends from Bethlehem, Ramallah, Jerusalem, Haifa. Tea kept appearing. Three hours in, the courtyard had turned into a small dance floor. Notes from that night still hang on the corkboard upstairs.",
-    writeupAr: "في ليلة افتتاح المجلس، عبرت أبوابه نحو مئتين من الأصدقاء والجيران والصنّاع. الشاي لا ينتهي، والساحة تحوّلت بعد ثلاث ساعات إلى حلبة رقص صغيرة.",
-    body: [],
-    bodyAr: [],
+    short: "YA HU, Aram Sabbah, and Al Nather — live on Radio AlHara's 6th anniversary, with food by Um Alaa.",
+    shortAr: "YA HU وأرام صبّاح والناذر — مباشرةً في الذكرى السادسة لراديو الحارة، مع أكل أم علاء.",
+    body: [
+      "A collection launch event with Radio AlHara to mark their 6th anniversary.",
+      "Music by YA HU, Aram Sabbah, and Al Nather. Food by Um Alaa.",
+      "17:00 – 22:00 · Free entry."
+    ],
+    bodyAr: [
+      "فعالية إطلاق مجموعة مع راديو الحارة بمناسبة ذكراهم السادسة.",
+      "موسيقى: YA HU، أرام صبّاح، والناذر. أكل: أم علاء.",
+      "٥:٠٠ مساءً – ١٠:٠٠ مساءً · دخول مجاني."
+    ],
     content: [
       { type: "text",
         en: [
-          "Two hundred people walked through the doors on the night the Cabinet first opened — neighbours, makers, students, friends from Bethlehem, Ramallah, Jerusalem, Haifa.",
-          "Tea kept appearing. Three hours in, the courtyard had turned into a small dance floor. Notes from that night still hang on the corkboard upstairs."
+          "Carhartt WIP × Radio AlHara: a collection launch event to mark Radio AlHara's 6th anniversary.",
+          "Music by YA HU, Aram Sabbah, and Al Nather. Food by Um Alaa.",
+          "17:00 – 22:00 · Free entry · Bar open."
         ],
         ar: [
-          "في ليلة افتتاح المجلس، عبرت أبوابه نحو مئتين من الأصدقاء والجيران والصنّاع والطلاب، من بيت لحم ورام الله والقدس وحيفا.",
-          "الشاي لا ينتهي. بعد ثلاث ساعات، تحوّلت الساحة إلى حلبة رقص صغيرة. ملاحظات تلك الليلة لا تزال معلّقة على لوحة الفلّين في الطابق العلوي."
+          "Carhartt WIP × راديو الحارة: فعالية إطلاق مجموعة بمناسبة الذكرى السادسة لراديو الحارة.",
+          "موسيقى: YA HU، أرام صبّاح، والناذر. أكل: أم علاء.",
+          "٥:٠٠ مساءً – ١٠:٠٠ مساءً · دخول مجاني · البار مفتوح."
         ]
-      },
-      { type: "image",
-        src: "uploads/mothanna-hussein-featured_7c037f96-8519-4f06-9517-1d844dc4dda0.webp",
-        captionEn: "Opening night, October 2024 — photograph by Mothanna Hussein",
-        captionAr: "ليلة الافتتاح، أكتوبر ٢٠٢٤ — تصوير مثنّى حسين"
-      },
-      { type: "pullquote",
-        en: "We didn't know what to expect. By midnight we knew this was something real.",
-        ar: "لم نكن نعرف ماذا نتوقّع. بحلول منتصف الليل، عرفنا أن هذا شيء حقيقي.",
-        attribution: "From the visitor book"
       }
     ]
   },
+
   {
-    id: "archive-bigbus-mar-2025",
-    day: "22", month: "Mar", year: 2025,
-    dow: "Sat", dowAr: "السبت",
-    start: "16:00", end: "21:00",
-    type: "Workshop",
-    title: "The Big Bus — Building Workshop",
-    titleAr: "ورشة الحافلة الكبيرة",
-    subtitle: "An afternoon of woodwork, soldering and sandwiches",
-    location: "Workshop",
-    cover: "assets/covers/bus.svg",
-    status: "past",
-    writeup: "We tried to convert a 1986 Mercedes coach into a mobile cinema, and mostly succeeded. Three benches, one projector mount, two broken drill bits. The bus is now parked behind the Cabinet, ready for its first screening tour through the West Bank.",
-    writeupAr: "حاولنا تحويل حافلة مرسيدس موديل ١٩٨٦ إلى سينما متنقلة. ثلاثة مقاعد، حامل بروجكتور، ولقمتي ثقب مكسورتين.",
-    body: [],
-    bodyAr: []
+    id: "yoga-apr-27",
+    day: "27", month: "Apr", year: 2026,
+    dow: "Mon", dowAr: "الاثنين",
+    start: "19:00", end: "20:30",
+    type: "Class",
+    title: "Yoga with Eilda Zaghmout",
+    titleAr: "يوغا مع ايلدا زغموت",
+    subtitle: "Weekly guided practice",
+    location: "Ground floor",
+    recurring: true,
+    recurringLabel: "Every Monday",
+    status: "upcoming",
+    register: "https://forms.gle/ykHvYEn1QUo4B3oi7",
+    short: "Weekly guided practice.",
+    shortAr: "الدرس الأسبوعي.",
+    body: ["See 6 April for full details."],
+    bodyAr: ["انظر إلى يوم ٦ أبريل للتفاصيل الكاملة."]
   },
+
   {
-    id: "archive-sumud-may-2025",
-    day: "10", month: "May", year: 2025,
-    dow: "Sat", dowAr: "السبت",
-    start: "19:00", end: "21:00",
-    type: "Performance",
-    title: "Sumud — A Choir for the Land",
-    titleAr: "صمود — جوقة للأرض",
-    subtitle: "Choir performance · curated by Dalia Sabbah",
-    location: "Main hall",
-    cover: "assets/covers/sumud.svg",
-    status: "past",
-    writeup: "A choir of twenty-four voices, drawn from villages across Palestine, performed an evening of work songs, lullabies and lament. Recordings of the night were broadcast a week later on Radio AlHara.",
-    writeupAr: "جوقة من أربعة وعشرين صوتاً، من قرى متعددة في فلسطين، أدّت أمسية من أغاني العمل والتهليلات والرثاء.",
-    body: [],
-    bodyAr: [],
-    content: [
-      { type: "text",
-        en: [
-          "A choir of twenty-four voices, drawn from villages across Palestine, performed an evening of work songs, lullabies and lament — curated by Dalia Sabbah.",
-          "The programme traced a single thread through the material: the relationship between voice, land, and collective memory. Recordings of the night were broadcast a week later on Radio AlHara."
-        ],
-        ar: [
-          "جوقة من أربعة وعشرين صوتاً، من قرى فلسطينية متعددة، أدّت أمسية من أغاني العمل والتهليلات والرثاء — من إعداد داليا صبّاح.",
-          "رُصدت الليلة صوتياً وبُثّت بعد أسبوع عبر راديو الحارة."
-        ]
-      },
-      { type: "pullquote",
-        en: "The land doesn't disappear when you sing it. It arrives.",
-        ar: "الأرض لا تختفي حين تُغنيها. بل تحضر.",
-        attribution: "Dalia Sabbah, programme note"
-      },
-      { type: "audio",
-        titleEn: "Radio AlHara broadcast — Sumud, May 2025",
-        titleAr: "بثّ راديو الحارة — صمود، مايو ٢٠٢٥",
-        durationMin: 68,
-        src: null
-      }
+    id: "hana-elias-apr-29",
+    day: "29", month: "Apr", year: 2026,
+    dow: "Wed", dowAr: "الأربعاء",
+    start: "19:00", end: "20:00",
+    type: "Film",
+    title: "Short Films by Hana Elias",
+    titleAr: "أفلام قصيرة لهنا الياس",
+    subtitle: "Adrift (2025) + Where the Wind Blows (2024)",
+    location: "Screening room",
+    status: "upcoming",
+    short: "Two short films by Hana Elias — with a soundtrack drawing from the Cremisan Valley and Sounds of Places.",
+    shortAr: "فيلمان قصيران لهنا الياس — بموسيقى مستوحاة من وادي كريميزان وأصوات الأماكن.",
+    body: [
+      "Adrift (2025) and Where the Wind Blows (2024) — two short films by Hana Elias.",
+      "The soundtracks draw from field recordings made in the Cremisan Valley during Sounds of Places."
+    ],
+    bodyAr: [
+      "تائه (٢٠٢٥) وحيثما تهبّ الريح (٢٠٢٤) — فيلمان قصيران لهنا الياس.",
+      "تستلهم الموسيقى من التسجيلات الميدانية التي أُجريت في وادي كريميزان خلال مشروع أصوات الأماكن."
     ]
-  },
-  {
-    id: "archive-printclub-jul-2025",
-    day: "05", month: "Jul", year: 2025,
-    dow: "Sat", dowAr: "السبت",
-    start: "11:00", end: "17:00",
-    type: "Workshop",
-    title: "Risograph Print Club",
-    titleAr: "نادي الريزوغراف",
-    subtitle: "Open studio · 12 prints, 6 hours, 2 colours",
-    location: "Studio",
-    cover: "assets/covers/print.svg",
-    status: "past",
-    writeup: "Twelve people walked out with their first risograph prints — fluorescent pink and blue, ink still drying. The two-colour palette became the constraint that shaped half a dozen unexpected collaborations.",
-    writeupAr: "اثنا عشر شخصاً غادروا الستوديو حاملين أوّل أعمالهم بالريزوغراف، بحبر زهري فلوري وأزرق.",
-    body: [],
-    bodyAr: []
   }
+
 ];
 
 
-// Season computation: Northern hemisphere meteorological seasons (Bethlehem)
-// Winter spans Dec→Feb; we anchor it to the December year (e.g. Dec 2025 + Jan/Feb 2026 are all "Winter 2025")
+// Season computation — Northern hemisphere meteorological seasons (Bethlehem)
+// Winter spans Dec→Feb; anchored to the December year (Dec 2025 + Jan/Feb 2026 = "Winter 2025")
 function __twcSeason(month, year){
   if (["Sep","Oct","Nov"].includes(month)) return { key: "autumn-" + year,   name: "Autumn", nameAr: "خريف", year: year };
   if (month === "Dec")                     return { key: "winter-" + year,   name: "Winter", nameAr: "شتاء", year: year };
@@ -390,7 +353,6 @@ window.EVENTS.forEach(e => { e.season = __twcSeason(e.month, e.year); });
 window.SEASONS = (function(){
   const seen = {};
   window.EVENTS.forEach(e => { seen[e.season.key] = e.season; });
-  // sort by year desc, then by season order within year (winter > autumn > summer > spring)
   const order = { winter: 4, autumn: 3, summer: 2, spring: 1 };
   return Object.values(seen).sort((a,b) => {
     if (a.year !== b.year) return b.year - a.year;
