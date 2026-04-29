@@ -2015,3 +2015,326 @@ html[data-lang="ar"] .ar-only{ direction: rtl; }
   border: 0; border-top: 2px solid currentColor;
   margin: 8px 0; opacity: .25;
 }
+
+/* =========================================================
+   PROJECT PAGES — two editorial layouts
+   Type 1 (.prj-light): white/paper bg, mixed imagery, columns
+   Type 2 (.prj-dark): dark opening spread + long-form article
+   ========================================================= */
+
+/* ---- Shared ---- */
+.prj{ color: var(--night); }
+.prj-topbar{ /* inherits .topbar */ }
+
+.prj-section-label{
+  position: fixed; left: 0; top: 50%; z-index: 40;
+  transform: translateY(-50%) rotate(-90deg) translateX(-50%);
+  transform-origin: left center;
+  font-family: var(--ff-sans); font-size: 10px; letter-spacing: .28em;
+  text-transform: uppercase; font-weight: 700;
+  opacity: .35; white-space: nowrap;
+  pointer-events: none;
+}
+
+/* =============================================
+   TYPE 1 — LIGHT EDITORIAL
+   ============================================= */
+.prj-light{
+  background: var(--paper);
+  min-height: 100vh;
+}
+
+/* Hero image — full width, tall */
+.prj-hero{
+  position: relative;
+  width: 100%;
+  max-height: 90vh;
+  overflow: hidden;
+  border-bottom: 2px solid var(--night);
+}
+.prj-hero img{
+  width: 100%; height: 90vh;
+  object-fit: cover; object-position: center;
+  display: block;
+}
+.prj-hero-caption{
+  position: absolute; bottom: 20px; left: var(--pad);
+  font-family: var(--ff-sans); font-size: 11px; letter-spacing: .1em;
+  font-weight: 500; color: var(--paper); opacity: .8;
+  max-width: 340px; line-height: 1.5;
+}
+
+/* Article header */
+.prj-head{
+  max-width: var(--maxw); margin: 0 auto;
+  padding: clamp(40px, 6vw, 80px) var(--pad) clamp(24px, 3vw, 40px);
+  display: grid; grid-template-columns: auto 1fr;
+  gap: clamp(24px, 4vw, 64px); align-items: start;
+  border-bottom: 2px solid var(--night);
+}
+.prj-head-meta{
+  display: flex; flex-direction: column; gap: 10px;
+  padding-top: 8px;
+}
+.prj-category{
+  font-family: var(--ff-sans); font-size: 10px; letter-spacing: .28em;
+  text-transform: uppercase; font-weight: 700;
+  padding: 5px 12px; border: 2px solid var(--night);
+  display: inline-block; white-space: nowrap;
+}
+.prj-date{
+  font-family: var(--ff-sans); font-size: 11px; letter-spacing: .16em;
+  text-transform: uppercase; font-weight: 700; opacity: .45;
+}
+.prj-title-col{ display: flex; flex-direction: column; gap: 16px; }
+.prj-title{
+  font-family: var(--ff-sans); font-weight: 700;
+  font-size: clamp(44px, 7vw, 108px); line-height: .88;
+  letter-spacing: -.04em; text-transform: uppercase;
+  margin: 0;
+}
+.prj-title-ar{
+  font-family: var(--ff-ar); font-size: clamp(36px, 5.5vw, 80px);
+  font-weight: 700; line-height: 1; letter-spacing: 0;
+  direction: rtl; margin: 0;
+}
+.prj-byline{
+  font-family: var(--ff-sans); font-size: 16px; font-weight: 500;
+  line-height: 1.5; max-width: 52ch; margin: 0; opacity: .7;
+}
+
+/* Article body */
+.prj-body{
+  max-width: var(--maxw); margin: 0 auto;
+  padding: 0 var(--pad) clamp(64px, 8vw, 120px);
+}
+
+/* Lead paragraph */
+.prj-lead{
+  padding: clamp(32px, 4vw, 56px) 0 clamp(24px, 3vw, 40px);
+  max-width: 680px;
+}
+.prj-lead p{
+  font-family: var(--ff-sans); font-size: clamp(19px, 2.2vw, 26px);
+  line-height: 1.55; font-weight: 500; margin: 0 0 1em;
+  color: var(--night);
+}
+
+/* Two-column text block */
+.prj-cols{
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: clamp(28px, 4vw, 64px);
+  padding: clamp(24px, 3vw, 40px) 0;
+  border-top: 1px solid rgba(10,10,22,.2);
+}
+.prj-cols p{
+  font-family: var(--ff-sans); font-size: 15px; line-height: 1.7;
+  font-weight: 400; margin: 0 0 1.1em; color: var(--night);
+}
+.prj-cols p:last-child{ margin-bottom: 0; }
+
+/* Pull quote */
+.prj-quote{
+  margin: clamp(32px, 4vw, 56px) 0;
+  padding: 28px 0 28px clamp(20px, 3vw, 40px);
+  border-left: 4px solid var(--night);
+}
+.prj-quote p{
+  font-family: var(--ff-ar); font-style: italic;
+  font-size: clamp(22px, 3vw, 38px); line-height: 1.3;
+  font-weight: 700; margin: 0 0 10px; color: var(--night);
+}
+.prj-quote cite{
+  font-family: var(--ff-sans); font-size: 11px; letter-spacing: .2em;
+  text-transform: uppercase; font-weight: 700; opacity: .45;
+  font-style: normal;
+}
+
+/* Image spread — large + stacked side */
+.prj-spread{
+  display: grid; grid-template-columns: 1.4fr 1fr;
+  gap: 3px; margin: clamp(28px, 4vw, 56px) 0;
+}
+.prj-spread-main{ position: relative; }
+.prj-spread-stack{ display: flex; flex-direction: column; gap: 3px; }
+.prj-spread figure{ margin: 0; position: relative; }
+.prj-spread-main img{ width: 100%; height: 100%; object-fit: cover; display: block; }
+.prj-spread-stack img{ width: 100%; aspect-ratio: 4/3; object-fit: cover; display: block; }
+.prj-spread figcaption{
+  font-family: var(--ff-sans); font-size: 11px; letter-spacing: .08em;
+  line-height: 1.5; font-weight: 500; opacity: .55;
+  padding: 8px 0 0; color: var(--night);
+}
+
+/* Full-width image */
+.prj-full-img{
+  margin: clamp(28px, 4vw, 56px) 0;
+}
+.prj-full-img img{
+  width: 100%; max-height: 70vh; object-fit: cover; display: block;
+}
+.prj-full-img figcaption{
+  font-family: var(--ff-sans); font-size: 11px; letter-spacing: .08em;
+  line-height: 1.5; font-weight: 500; opacity: .55;
+  padding: 8px 0 0; color: var(--night); max-width: 52ch;
+}
+
+/* =============================================
+   TYPE 2 — DARK EDITORIAL
+   ============================================= */
+.prj-dark{
+  background: var(--night);
+  color: var(--paper);
+  min-height: 100vh;
+}
+
+/* Opening spread — split: image left, title right */
+.prj-opening{
+  display: grid; grid-template-columns: 1fr 1fr;
+  min-height: calc(100vh - 68px);
+  border-bottom: 2px solid rgba(246,243,234,.15);
+}
+.prj-opening-image{
+  position: relative; overflow: hidden;
+}
+.prj-opening-image img{
+  width: 100%; height: 100%;
+  object-fit: cover; object-position: center;
+  display: block;
+}
+.prj-opening-panel{
+  background: var(--night);
+  display: flex; flex-direction: column;
+  justify-content: space-between;
+  padding: clamp(28px, 4vw, 52px);
+  border-left: 2px solid rgba(246,243,234,.15);
+}
+.prj-opening-meta{
+  font-family: var(--ff-sans); font-size: 10px; letter-spacing: .28em;
+  text-transform: uppercase; font-weight: 700; color: var(--paper); opacity: .45;
+  display: flex; flex-direction: column; gap: 4px;
+}
+.prj-opening-title{
+  flex: 1; display: flex; flex-direction: column; justify-content: flex-end;
+  padding-bottom: clamp(16px, 2vw, 28px);
+}
+.prj-opening-h1{
+  font-family: var(--ff-ar); font-weight: 700; font-style: italic;
+  font-size: clamp(52px, 8.5vw, 128px); line-height: .88;
+  letter-spacing: -.02em; margin: 0; color: var(--paper);
+  text-transform: none;
+}
+.prj-opening-h1-sans{
+  font-family: var(--ff-sans); font-weight: 700;
+  font-size: clamp(48px, 7.5vw, 112px); line-height: .88;
+  letter-spacing: -.045em; text-transform: uppercase;
+  margin: 0; color: var(--paper);
+}
+.prj-opening-sub{
+  font-family: var(--ff-sans); font-size: 10px; letter-spacing: .22em;
+  text-transform: uppercase; font-weight: 700; color: var(--paper);
+  opacity: .3; margin-top: 20px;
+}
+
+/* Dark article body */
+.prj-dark-body{
+  max-width: var(--maxw); margin: 0 auto;
+  padding: clamp(40px, 5vw, 72px) var(--pad) clamp(64px, 8vw, 120px);
+}
+.prj-dark-lead{
+  max-width: 620px;
+  margin-bottom: clamp(32px, 4vw, 56px);
+  padding-bottom: clamp(24px, 3vw, 40px);
+  border-bottom: 1px solid rgba(246,243,234,.15);
+}
+.prj-dark-lead p{
+  font-family: var(--ff-sans); font-size: clamp(18px, 2vw, 24px);
+  line-height: 1.55; font-weight: 500; margin: 0 0 1em;
+  color: var(--paper); opacity: .9;
+}
+.prj-dark-cols{
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: clamp(28px, 4vw, 64px);
+  padding: clamp(24px, 3vw, 40px) 0;
+  border-top: 1px solid rgba(246,243,234,.12);
+}
+.prj-dark-cols p{
+  font-family: var(--ff-sans); font-size: 15px; line-height: 1.75;
+  font-weight: 400; margin: 0 0 1.1em; color: var(--paper); opacity: .8;
+}
+.prj-dark-cols p:last-child{ margin-bottom: 0; }
+
+/* Dark pull quote */
+.prj-dark-quote{
+  margin: clamp(32px, 4vw, 56px) 0;
+  padding: 28px 0 28px clamp(20px, 3vw, 40px);
+  border-left: 3px solid rgba(246,243,234,.3);
+}
+.prj-dark-quote p{
+  font-family: var(--ff-ar); font-style: italic;
+  font-size: clamp(20px, 2.8vw, 36px); line-height: 1.3;
+  font-weight: 700; margin: 0 0 12px; color: var(--paper);
+}
+.prj-dark-quote cite{
+  font-family: var(--ff-sans); font-size: 11px; letter-spacing: .2em;
+  text-transform: uppercase; font-weight: 700; opacity: .35;
+  font-style: normal; color: var(--paper);
+}
+
+/* Dark full-width image */
+.prj-dark-image{
+  margin: clamp(32px, 4vw, 56px) 0;
+}
+.prj-dark-image img{
+  width: 100%; max-height: 65vh; object-fit: cover; display: block;
+}
+.prj-dark-image figcaption{
+  font-family: var(--ff-sans); font-size: 11px; letter-spacing: .08em;
+  line-height: 1.5; font-weight: 500;
+  padding: 10px 0 0; color: var(--paper); opacity: .4; max-width: 52ch;
+}
+
+/* Dark image spread */
+.prj-dark-spread{
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 3px; margin: clamp(28px, 4vw, 56px) 0;
+}
+.prj-dark-spread figure{ margin: 0; }
+.prj-dark-spread img{
+  width: 100%; aspect-ratio: 3/2; object-fit: cover; display: block;
+}
+.prj-dark-spread figcaption{
+  font-family: var(--ff-sans); font-size: 11px; letter-spacing: .06em;
+  line-height: 1.5; font-weight: 500;
+  padding: 8px 0 0; color: var(--paper); opacity: .4;
+}
+
+/* Section divider */
+.prj-rule{
+  border: 0; border-top: 1px solid rgba(10,10,22,.2);
+  margin: 0;
+}
+.prj-dark .prj-rule{ border-top-color: rgba(246,243,234,.12); }
+
+/* Back link */
+.prj-back{
+  display: inline-flex; align-items: center; gap: 10px;
+  font-family: var(--ff-sans); font-size: 11px; letter-spacing: .22em;
+  text-transform: uppercase; font-weight: 700;
+  color: inherit; padding: 8px 14px; border: 2px solid currentColor;
+  text-decoration: none; opacity: .6;
+  transition: opacity .15s;
+}
+.prj-back:hover{ opacity: 1; }
+
+/* Responsive */
+@media (max-width: 760px){
+  .prj-head{ grid-template-columns: 1fr; }
+  .prj-cols, .prj-dark-cols{ grid-template-columns: 1fr; }
+  .prj-spread{ grid-template-columns: 1fr; }
+  .prj-spread-main img{ height: 60vw; }
+  .prj-opening{ grid-template-columns: 1fr; min-height: auto; }
+  .prj-opening-image{ height: 55vw; }
+  .prj-dark-spread{ grid-template-columns: 1fr; }
+  .prj-section-label{ display: none; }
+}
