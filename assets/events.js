@@ -4,6 +4,112 @@
 
 window.EVENTS = [
 
+  // ============= WINTER 2025 — December =============
+
+  {
+    id: "radio-dec-14",
+    day: "14", month: "Dec", year: 2025,
+    dow: "Sun", dowAr: "الأحد",
+    start: "19:00", end: "22:00",
+    type: "Radio",
+    title: "Radio Alhara — Live from Bethlehem",
+    titleAr: "راديو الحارة — مباشرة من بيت لحم",
+    subtitle: "ABUL3EES BINKHALTI · RUUQ · JULMUD · Dana Durr · Bareetlblad · Alabaster DePlume",
+    location: "Main hall · Bar open",
+    status: "past",
+    short: "Radio Alhara broadcasts live from the Wonder Cabinet, featuring local artists and special guest Alabaster DePlume.",
+    shortAr: "راديو الحارة يبث مباشرة من مجلس العجب، مع فنانين محليين وضيف خاص ألاباستر ديبلوم.",
+    body: [
+      "Radio Alhara broadcasting live from the Wonder Cabinet in Bethlehem. A night of music featuring ABUL3EES BINKHALTI, RUUQ, JULMUD, Dana Durr, and Bareetlblad.",
+      "Special guest: Alabaster DePlume — UK experimental jazz artist who recorded his Cremisan: Prologue To A Blade EP at the Wonder Cabinet during the Sounds of Places residency.",
+      "Broadcast live on NTS Radio."
+    ],
+    bodyAr: [
+      "راديو الحارة يبث مباشرة من مجلس العجب في بيت لحم. أمسية موسيقية مع ABUL3EES BINKHALTI وRUUQ وJULMUD وDana Durr وBareetlblad.",
+      "ضيف خاص: Alabaster DePlume — موسيقي جاز تجريبي بريطاني سجّل ألبومه في وادي كريميزان خلال إقامة أصوات الأماكن.",
+      "بث مباشر على راديو NTS."
+    ]
+  },
+
+  {
+    id: "songs-absent-river-dec-22",
+    day: "22", month: "Dec", year: 2025,
+    dow: "Mon", dowAr: "الاثنين",
+    start: "19:00", end: "21:00",
+    type: "Radio",
+    title: "Songs for the Absent River",
+    titleAr: "أغانٍ للنهر الغائب",
+    subtitle: "Ramsy Kattan · Joseph Schiano Di Lombo · Alabaster DePlume · Jude",
+    location: "Main hall",
+    status: "past",
+    short: "A sonic journey along both banks of the Jordan River's absence — field recordings and Arabic traditional music, live on NTS.",
+    shortAr: "رحلة صوتية على ضفتي غياب نهر الأردن — تسجيلات ميدانية وموسيقى عربية تقليدية، مباشرة على NTS.",
+    body: [
+      "Songs for the Absent River — a sonic journey along the two banks of the Jordan River's absence, featuring field recordings and Arabic traditional music.",
+      "With Ramsy Kattan, Joseph Schiano Di Lombo, Alabaster DePlume, and Jude.",
+      "Recorded live at the Wonder Cabinet and broadcast on NTS Radio."
+    ],
+    bodyAr: [
+      "أغانٍ للنهر الغائب — رحلة صوتية على ضفتي غياب نهر الأردن، تجمع التسجيلات الميدانية والموسيقى العربية التقليدية.",
+      "مع رمزي قطّان وجوزيف شيانو دي لومبو وAlabaster DePlume وJude.",
+      "سُجّل مباشرة في مجلس العجب وبُث على راديو NTS."
+    ]
+  },
+
+  // ============= WINTER 2025 — January 2026 =============
+
+  {
+    id: "radio-alhara-jan-11",
+    day: "11", month: "Jan", year: 2026,
+    dow: "Sun", dowAr: "الأحد",
+    start: "19:00", end: "22:00",
+    type: "Radio",
+    title: "Radio Alhara — Live Session",
+    titleAr: "راديو الحارة — جلسة مباشرة",
+    subtitle: "Radwan Ghazi Moumneh · Anthony Sahyoun & Jad Atoui · Ziad Nawfal · Ali Hamdan",
+    location: "Main hall · Bar open",
+    status: "past",
+    short: "Radio Alhara live from the Wonder Cabinet — experimental, Raï, and electronic music from Lebanese and Palestinian artists.",
+    shortAr: "راديو الحارة مباشرة من مجلس العجب — موسيقى تجريبية وراي وإلكترونية من فنانين لبنانيين وفلسطينيين.",
+    body: [
+      "Radio Alhara broadcasting live from the Wonder Cabinet, Bethlehem.",
+      "Sets by Radwan Ghazi Moumneh, Anthony Sahyoun & Jad Atoui, Ziad Nawfal, and Ali Hamdan.",
+      "Spanning experimental, Raï, electronic, and Arabic traditional music. Broadcast on NTS Radio."
+    ],
+    bodyAr: [
+      "راديو الحارة يبث مباشرة من مجلس العجب، بيت لحم.",
+      "مع رضوان غازي مؤمن وأنتوني صحيون وجاد عطوي وزياد نوفل وعلي حمدان.",
+      "موسيقى تجريبية وراي وإلكترونية وعربية تقليدية. بث على راديو NTS."
+    ]
+  },
+
+  // ============= WINTER 2025 — February 2026 =============
+
+  {
+    id: "radio-alhara-feb-08",
+    day: "08", month: "Feb", year: 2026,
+    dow: "Sun", dowAr: "الأحد",
+    start: "17:00", end: "22:00",
+    type: "Radio",
+    title: "Radio Alhara — Full Day at the Cabinet",
+    titleAr: "راديو الحارة — يوم كامل في المجلس",
+    subtitle: "RUUQ · Pierre Pepe · Artist Conversations",
+    location: "Main hall · Bar open",
+    status: "past",
+    short: "A full afternoon of Radio Alhara programming — music sets by RUUQ and Pierre Pepe, followed by Wonder Cabinet artist conversations.",
+    shortAr: "بعد ظهر كامل من برامج راديو الحارة — موسيقى مع RUUQ وPierre Pepe، ثم محادثات مع فناني المجلس.",
+    body: [
+      "A full afternoon of Radio Alhara programming live from the Wonder Cabinet.",
+      "Music sets by RUUQ (Rap/Hip-Hop) and Pierre Pepe (Hip-Hop/Trap), followed by a talk series featuring Wonder Cabinet resident artists in conversation.",
+      "Broadcast on NTS Radio and Radio Alhara."
+    ],
+    bodyAr: [
+      "بعد ظهر كامل من برامج راديو الحارة مباشرة من مجلس العجب.",
+      "موسيقى مع RUUQ وPierre Pepe، تليها سلسلة محادثات مع فناني مجلس العجب المقيمين.",
+      "بث على راديو NTS وراديو الحارة."
+    ]
+  },
+
   // ============= SPRING 2026 — April =============
 
   {
