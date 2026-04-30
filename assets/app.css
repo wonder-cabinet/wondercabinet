@@ -17,6 +17,8 @@
   --night:     #0a0a16;
   --highlight: #ffe65c;   /* yellow accent (weekend poster) */
   --orange:    #ff3b1d;   /* snake-orange accent */
+  --green-hi:  #00ff41;   /* neon bright green */
+  --pink:      #cc6698;   /* muted rose-pink */
 
   --rule:        var(--ink);
   --rule-strong: var(--ink);
@@ -475,19 +477,19 @@ img{ display:block; max-width:100%; }
 /* Hide the legacy day-group / event-line markup if any survives */
 .day-group{ display: none; }
 
-/* ---------- FOOTER — Book of Hov column style ---------- */
+/* ---------- FOOTER — outlined, no fill ---------- */
 .foot{
-  background: var(--night);
-  color: var(--paper);
+  color: var(--ink);
   margin-top: clamp(48px, 6vw, 96px);
   font-family: var(--ff-sans);
+  border-top: 2px solid var(--ink);
 }
 .foot-cols{
   display: grid;
   grid-template-columns: 1.4fr 1fr 1fr 1fr;
   gap: 0;
   padding: clamp(36px, 5vw, 64px) clamp(24px, 4vw, 56px);
-  border-bottom: 1px solid rgba(246,243,234,.15);
+  border-bottom: 1px solid var(--ink);
 }
 .foot-col{
   padding-right: clamp(20px, 3vw, 48px);
@@ -495,7 +497,7 @@ img{ display:block; max-width:100%; }
 .foot-col:last-child{ padding-right: 0; }
 .foot-col-head{
   font-size: 11px; letter-spacing: .24em; text-transform: uppercase;
-  font-weight: 700; color: var(--paper); opacity: .38;
+  font-weight: 700; color: var(--ink); opacity: .38;
   margin-bottom: 18px; line-height: 1;
 }
 .foot-col-body{
@@ -504,11 +506,11 @@ img{ display:block; max-width:100%; }
 .foot-col-body p{
   margin: 0;
   font-size: 13px; line-height: 1.5; font-weight: 400;
-  color: var(--paper); opacity: .75;
+  color: var(--ink); opacity: .75;
 }
 .foot-col-body a{
   font-size: 13px; font-weight: 700; letter-spacing: .01em;
-  color: var(--paper); text-decoration: underline;
+  color: var(--ink); text-decoration: underline;
   text-underline-offset: 3px; text-decoration-thickness: 1px;
   opacity: .9;
   transition: opacity .12s;
@@ -518,18 +520,18 @@ img{ display:block; max-width:100%; }
   all: unset; cursor: pointer;
   display: inline-block; margin-top: 8px;
   font-size: 11px; letter-spacing: .2em; text-transform: uppercase; font-weight: 700;
-  color: var(--paper); padding: 8px 14px; border: 1px solid var(--paper);
+  color: var(--ink); padding: 8px 14px; border: 1px solid var(--ink);
   opacity: .85; transition: background .12s, color .12s, opacity .12s;
 }
-.foot-newsletter-btn:hover{ background: var(--paper); color: var(--night); opacity: 1; }
+.foot-newsletter-btn:hover{ background: var(--ink); color: var(--bg); opacity: 1; }
 .foot-base{
   display: flex; justify-content: space-between; align-items: center;
   padding: 18px clamp(24px, 4vw, 56px);
   font-size: 11px; letter-spacing: .15em; text-transform: uppercase;
-  font-weight: 700; opacity: .35; color: var(--paper);
+  font-weight: 700; opacity: .35; color: var(--ink);
 }
 .foot-base a{ color: inherit; text-decoration: none; }
-.foot-base a:hover{ opacity: 2; text-decoration: underline; }
+.foot-base a:hover{ opacity: .7; text-decoration: underline; }
 @media (max-width: 860px){
   .foot-cols{ grid-template-columns: 1fr 1fr; gap: clamp(28px, 4vw, 48px) 0; }
 }
@@ -1599,7 +1601,7 @@ html[data-lang="ar"] .ar-only{ direction: rtl; }
 .fs-inverted{ background-color: transparent; color: var(--ink);       border-top: 2px solid currentColor; }
 .fs-normal  { background-color: transparent; color: var(--ink);       border-top: 2px solid currentColor; }
 .fs-accent  { background-color: transparent; color: var(--highlight); border-top: 2px solid currentColor; }
-.fs-pink    { background-color: transparent; color: #f0507a;          border-top: 2px solid currentColor; }
+.fs-pink    { background-color: transparent; color: var(--pink);      border-top: 2px solid currentColor; }
 .fs-image   { background: #0a0a16; }
 .fs-image img{ width:100%; height:100%; object-fit:cover; display:block; }
 

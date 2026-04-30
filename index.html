@@ -177,8 +177,8 @@
           </div>
         </a>
 
-        <!-- R4 (DOM last = shown first): Noor Abed films — pink serif -->
-        <a class="fs-box fs-pink" href="event.html?id=noor-abed-apr-22">
+        <!-- R4 (DOM last = shown first): Noor Abed films — blue/ink -->
+        <a class="fs-box fs-normal" href="event.html?id=noor-abed-apr-22">
           <div class="fsb-content">
             <div class="fsb-meta">
               <span class="en-only">Film · 22 April 2026</span>
@@ -306,12 +306,13 @@ const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
 }/*EDITMODE-END*/;
 
 const PRESETS = {
-  "green-blue": { bg: "#00d26a", ink: "#1d24ff", highlight: "#ffe65c", paper: "#f6f3ea" },
-  "paper-blue": { bg: "#f6f3ea", ink: "#1d24ff", highlight: "#ffe65c", paper: "#f6f3ea" },
-  "paper-ink":  { bg: "#f6f3ea", ink: "#0a0a16", highlight: "#ff3b1d", paper: "#f6f3ea" },
-  "blue-paper": { bg: "#1d24ff", ink: "#f6f3ea", highlight: "#ffe65c", paper: "#1d24ff" },
-  "orange-ink": { bg: "#ffd6c2", ink: "#0a0a16", highlight: "#ff3b1d", paper: "#ffd6c2" },
-  "pink-ink":   { bg: "#f0507a", ink: "#0a0a16", highlight: "#ffe65c", paper: "#fce8ee" }
+  "green-blue":   { bg: "#00d26a", ink: "#1d24ff", highlight: "#ffe65c", paper: "#f6f3ea" },
+  "neon-green":   { bg: "#00ff41", ink: "#0a0a16", highlight: "#1d24ff", paper: "#f6f3ea" },
+  "paper-blue":   { bg: "#f6f3ea", ink: "#1d24ff", highlight: "#ffe65c", paper: "#f6f3ea" },
+  "paper-ink":    { bg: "#f6f3ea", ink: "#0a0a16", highlight: "#ff3b1d", paper: "#f6f3ea" },
+  "blue-paper":   { bg: "#1d24ff", ink: "#f6f3ea", highlight: "#ffe65c", paper: "#1d24ff" },
+  "orange-ink":   { bg: "#ffd6c2", ink: "#0a0a16", highlight: "#ff3b1d", paper: "#ffd6c2" },
+  "rose-ink":     { bg: "#cc6698", ink: "#0a0a16", highlight: "#ffe65c", paper: "#f5e8ef" }
 };
 
 function App(){
@@ -344,13 +345,14 @@ function App(){
       <TweakSection label="Theme" />
       <TweakSelect label="Palette" value={t.preset}
         options={[
-          {value:"green-blue", label:"Green + Blue (default)"},
-          {value:"paper-blue", label:"Paper + Blue"},
-          {value:"paper-ink",  label:"Paper + Ink"},
-          {value:"blue-paper", label:"Blue + Paper (inverted)"},
-          {value:"orange-ink", label:"Apricot + Ink"},
-          {value:"pink-ink",   label:"Pink + Ink"},
-          {value:"custom",     label:"Custom…"}
+          {value:"green-blue",  label:"Green + Blue (default)"},
+          {value:"neon-green",  label:"Neon Green + Ink"},
+          {value:"paper-blue",  label:"Paper + Blue"},
+          {value:"paper-ink",   label:"Paper + Ink"},
+          {value:"blue-paper",  label:"Blue + Paper (inverted)"},
+          {value:"orange-ink",  label:"Apricot + Ink"},
+          {value:"rose-ink",    label:"Rose + Ink"},
+          {value:"custom",      label:"Custom…"}
         ]}
         onChange={(v) => setTweak('preset', v)} />
       {t.preset === "custom" && (<>
@@ -436,7 +438,10 @@ function renderThisWeek(){
     <span class="ar-only ar" dir="rtl">${arNum(s.day)} — ${arNum(e.day)} ${MONTH_NAME_AR[e.month]} ${arNum(e.year)}</span>`;
 
   grid.innerHTML = days.map(d => {
-    const ev = ALL.find(e => e.month === d.month && e.year === d.year && e.day === d.day);
+    // Exact date first, then recurring match by day-of-week
+    let ev = ALL.find(e => e.month === d.month && e.year === d.year && e.day === d.day);
+    const isRecurringMatch = !ev && (ev = ALL.find(e => e.recurring && e.dow === d.dow), !!ev);
+    const displayDay = isRecurringMatch ? d.day : (ev ? ev.day : d.day);
     const cls = "tw-cell" + (d.isToday ? " is-today" : "") + (!ev ? " is-empty" : "");
     if (!ev) {
       return `<div class="${cls}">
@@ -455,7 +460,7 @@ function renderThisWeek(){
     const typeAr = TYPE_AR[ev.type]||ev.type;
     return `<a class="${cls}" href="event.html?id=${ev.id}">
       <div class="tw-date">
-        <span class="tw-day">${ev.day}</span>
+        <span class="tw-day">${displayDay}</span>
         <span class="tw-dow"><span class="en-only">${d.dow}</span><span class="ar-only ar">${d.dowAr}</span></span>
       </div>
       <div class="tw-body">
@@ -836,7 +841,7 @@ try {
    Panel: standard events. Fullscreen: Opening / featured.
    ============================================================ */
 const TYPE_COLORS = {
-  Performance: { bg: "#f0507a", ink: "#0a0a16" },
+  Performance: { bg: "#cc6698", ink: "#0a0a16" },
   Film:        { bg: "#ffe600", ink: "#0a0a16" },
   Class:       { bg: "#c8a0f0", ink: "#0a0a16" },
   Workshop:    { bg: "#ff5a00", ink: "#f6f3ea" },

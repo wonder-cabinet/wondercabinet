@@ -7,18 +7,18 @@ window.EVENTS = [
   // ============= SPRING 2026 — April =============
 
   {
-    id: "yoga-apr-06",
+    id: "yoga-weekly",
     day: "06", month: "Apr", year: 2026,
     dow: "Mon", dowAr: "الاثنين",
     start: "19:00", end: "20:30",
     type: "Class",
     title: "Yoga with Eilda Zaghmout",
     titleAr: "يوغا مع ايلدا زغموت",
-    subtitle: "Weekly guided practice · Head of Meditation at Tawazon",
+    subtitle: "Every Monday · Head of Meditation at Tawazon",
     location: "Ground floor",
     recurring: true,
-    recurringLabel: "Every Monday",
-    status: "past",
+    recurringLabel: "Every Monday · 19:00",
+    status: "upcoming",
     register: "https://forms.gle/ykHvYEn1QUo4B3oi7",
     short: "An immersive journey of self-discovery and healing.",
     shortAr: "رحلة شيقة لاكتشاف الذات والشفاء.",
@@ -107,25 +107,6 @@ window.EVENTS = [
     ]
   },
 
-  {
-    id: "yoga-apr-13",
-    day: "13", month: "Apr", year: 2026,
-    dow: "Mon", dowAr: "الاثنين",
-    start: "19:00", end: "20:30",
-    type: "Class",
-    title: "Yoga with Eilda Zaghmout",
-    titleAr: "يوغا مع ايلدا زغموت",
-    subtitle: "Weekly guided practice",
-    location: "Ground floor",
-    recurring: true,
-    recurringLabel: "Every Monday",
-    status: "past",
-    register: "https://forms.gle/ykHvYEn1QUo4B3oi7",
-    short: "Weekly guided practice.",
-    shortAr: "الدرس الأسبوعي.",
-    body: ["See 6 April for full details."],
-    bodyAr: ["انظر إلى يوم ٦ أبريل للتفاصيل الكاملة."]
-  },
 
   {
     id: "dome-apr-15",
@@ -197,25 +178,6 @@ window.EVENTS = [
     ]
   },
 
-  {
-    id: "yoga-apr-20",
-    day: "20", month: "Apr", year: 2026,
-    dow: "Mon", dowAr: "الاثنين",
-    start: "19:00", end: "20:30",
-    type: "Class",
-    title: "Yoga with Eilda Zaghmout",
-    titleAr: "يوغا مع ايلدا زغموت",
-    subtitle: "Weekly guided practice",
-    location: "Ground floor",
-    recurring: true,
-    recurringLabel: "Every Monday",
-    status: "past",
-    register: "https://forms.gle/ykHvYEn1QUo4B3oi7",
-    short: "Weekly guided practice.",
-    shortAr: "الدرس الأسبوعي.",
-    body: ["See 6 April for full details."],
-    bodyAr: ["انظر إلى يوم ٦ أبريل للتفاصيل الكاملة."]
-  },
 
   {
     id: "noor-abed-apr-22",
@@ -293,25 +255,6 @@ window.EVENTS = [
     ]
   },
 
-  {
-    id: "yoga-apr-27",
-    day: "27", month: "Apr", year: 2026,
-    dow: "Mon", dowAr: "الاثنين",
-    start: "19:00", end: "20:30",
-    type: "Class",
-    title: "Yoga with Eilda Zaghmout",
-    titleAr: "يوغا مع ايلدا زغموت",
-    subtitle: "Weekly guided practice",
-    location: "Ground floor",
-    recurring: true,
-    recurringLabel: "Every Monday",
-    status: "upcoming",
-    register: "https://forms.gle/ykHvYEn1QUo4B3oi7",
-    short: "Weekly guided practice.",
-    shortAr: "الدرس الأسبوعي.",
-    body: ["See 6 April for full details."],
-    bodyAr: ["انظر إلى يوم ٦ أبريل للتفاصيل الكاملة."]
-  },
 
   {
     id: "hana-elias-apr-29",
