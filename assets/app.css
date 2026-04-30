@@ -50,12 +50,14 @@ img{ display:block; max-width:100%; }
   border-top: 2px solid var(--ink);
   border-bottom: 2px solid var(--ink);
   height: 54px;
+  overflow: hidden;
 }
 .topbar-inner{
   display: flex;
   align-items: stretch;
   flex-wrap: nowrap;
   height: 100%;
+  width: 100%;
   padding: 0;
   max-width: none;
   gap: 0;
@@ -64,11 +66,21 @@ img{ display:block; max-width:100%; }
   display: flex; align-items: center;
   color: var(--ink);
 }
-.brand .logo{
-  width: 38px; height: 38px; color: var(--ink);
+
+/* Logo — CSS mask so it inherits --ink color from any theme */
+.logo{
   display: block; flex-shrink: 0;
-  transition: none;
+  background-color: var(--ink);
+  -webkit-mask-image: url(wc-logo-white1.svg);
+  -webkit-mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-image: url(wc-logo-white1.svg);
+  mask-size: contain;
+  mask-repeat: no-repeat;
+  mask-position: center;
 }
+.brand .logo{ width: 38px; height: 38px; transition: none; }
 
 /* ── Catalog-bar header cells ── */
 .tpb-logo{
@@ -79,7 +91,7 @@ img{ display:block; max-width:100%; }
   color: var(--ink);
   text-decoration: none;
 }
-.tpb-logo .logo{ width: 34px; height: 34px; display: block; }
+.tpb-logo .logo{ width: 34px; height: 34px; }
 .tpb-back{
   display: flex; align-items: center;
   padding: 0 18px;
@@ -1583,20 +1595,17 @@ html[data-lang="ar"] .ar-only{ direction: rtl; }
   transition: opacity .18s ease;
 }
 
-/* Box colour variants */
-.fs-inverted{ background: var(--ink);       color: var(--bg);    }
-.fs-normal  { background: var(--bg);        color: var(--ink);   }
-.fs-accent  { background: var(--highlight); color: var(--ink);   }
-.fs-pink    { background: #f0507a;          color: #0a0a16;      }
-.fs-image   { background: #0a0a16;                               }
+/* Box colour variants — border-only, no fill */
+.fs-inverted{ background-color: transparent; color: var(--ink);       border-top: 2px solid currentColor; }
+.fs-normal  { background-color: transparent; color: var(--ink);       border-top: 2px solid currentColor; }
+.fs-accent  { background-color: transparent; color: var(--highlight); border-top: 2px solid currentColor; }
+.fs-pink    { background-color: transparent; color: #f0507a;          border-top: 2px solid currentColor; }
+.fs-image   { background: #0a0a16; }
 .fs-image img{ width:100%; height:100%; object-fit:cover; display:block; }
 
 /* Hover states */
-.fs-inverted:hover{ opacity: .9; }
-.fs-normal:hover  { background: color-mix(in oklab, var(--ink) 6%, var(--bg)); }
-.fs-accent:hover  { background: color-mix(in oklab, var(--ink) 8%, var(--highlight)); }
-.fs-pink:hover    { background: #d93a68; }
-.fs-noise:hover   { opacity: .88; background: none; }
+.fs-inverted:hover, .fs-normal:hover, .fs-accent:hover, .fs-pink:hover { opacity: .82; }
+.fs-noise:hover { opacity: .88; }
 
 /* Box content layout */
 .fsb-content{
