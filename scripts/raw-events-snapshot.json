@@ -1,26 +1,60 @@
 [
   {
-    "title": {"_type":"localeString","ar":"تدفق جماعي: ورشة عمل من ستوديو كوليكتيف بقيادة أسيل قبطي","en":"Collective Flow: A Workshop by Studio Collective led by Aseel Qupty"},
-    "slug": {"_type":"slug","current":"collective-flow-workshop"},
-    "subtitle": {"_type":"localeString","ar":"دخول مجاني، حصص مختلطة، 16 سنة فما فوق، لا داعي لوجود مهارات سابقة","en":"Free entry · Mixed classes · 16+ · No previous skills required"},
+    "title": {
+      "_type": "localeString",
+      "ar": "تدفق جماعي: ورشة عمل من ستوديو كوليكتيف بقيادة أسيل قبطي",
+      "en": "Collective Flow: A Workshop by Studio Collective led by Aseel Qupty"
+    },
+    "slug": {
+      "_type": "slug",
+      "current": "collective-flow-workshop"
+    },
+    "subtitle": {
+      "_type": "localeString",
+      "ar": "دخول مجاني، حصص مختلطة، 16 سنة فما فوق، لا داعي لوجود مهارات سابقة",
+      "en": "Free entry · Mixed classes · 16+ · No previous skills required"
+    },
     "eventType": "Workshop",
     "startDateTime": "2023-12-02T00:00:00+02:00",
     "endDateTime": "2023-12-02T23:59:00+02:00",
     "location": null,
     "featured": false,
     "recurring": true,
-    "recurringLabel": {"_type":"localeString","ar":"","en":"Saturdays"},
+    "recurringLabel": {
+      "_type": "localeString",
+      "ar": "",
+      "en": "Saturdays"
+    },
     "status": "past",
     "registerUrl": "https://forms.gle/GqEsQdp1zftu18xMA",
-    "shortDescription": {"_type":"localeText","ar":"ورشة حركة آمنة للاتصال والتحرر الجسدي.","en":"A movement workshop crafted to provide a safe, rejuvenating space for connection and physical release."},
-    "body": {"_type":"localeText","ar":"في وسط التحديات وعدم اليقين، إن الاتصال مع الجسد ومع الآخرين عبر الحركات الحرة قد يشكل أداة مهمة للعثور على قوتنا الداخلية والجسدية. تم تصميم ورشة \"تدفق جماعي\" لتُوفر مساحة آمنة تركز على الحركات من أجل تحسين التواصل مع أنفسنا والآخرين. ولتعزيز المرونة، رفاهية الجسد والاسترخاء العاطفي.\n\nفي ورشة العمل، ستكتشفون الراحة الجسدية من خلال التحرك بحرية، والتخلص من التوتر الجسدي والعقلي باستخدام ألعاب وتمارين ديناميكية. إن الحركات المستوحاة من المسرح والرقص، ستعزز مهارات الاتصال والتجربة الجماعية، وتُشجع التعبير عن الذات من خلال الارتجال، مما يوفر منصة لمشاركة الأفكار والتأمل في العلاقة المعقدة بين حركات الجسد والمشاعر.","en":"In the midst of challenges and uncertainty, finding moments of connection and physical release can be a powerful tool for finding strength in the collective experience of our bodies. Our workshop, \"Collective Flow,\" is crafted with the intent to provide a safe and rejuvenating space for our community. This movement experience focuses on rebuilding connections, fostering resilience, and promoting physical and emotional well-being.\n\nIn the workshop you will explore physical release by moving in space, releasing tension in the body and mind through dynamic games and exercises. Foster connection through enhanced communication skills and contact exercises. Strengthen the collective experience by developing collaborative tools inspired by elements from theater and dance. Encourage self-expression and reflection through improvisation, providing a platform for sharing thoughts and contemplating the intricate relationship between the physical experience and emotional states throughout the workshop."},
+    "shortDescription": {
+      "_type": "localeText",
+      "ar": "ورشة حركة آمنة للاتصال والتحرر الجسدي.",
+      "en": "A movement workshop crafted to provide a safe, rejuvenating space for connection and physical release."
+    },
+    "body": {
+      "_type": "localeText",
+      "ar": "في وسط التحديات وعدم اليقين، إن الاتصال مع الجسد ومع الآخرين عبر الحركات الحرة قد يشكل أداة مهمة للعثور على قوتنا الداخلية والجسدية. تم تصميم ورشة \"تدفق جماعي\" لتُوفر مساحة آمنة تركز على الحركات من أجل تحسين التواصل مع أنفسنا والآخرين. ولتعزيز المرونة، رفاهية الجسد والاسترخاء العاطفي.\n\nفي ورشة العمل، ستكتشفون الراحة الجسدية من خلال التحرك بحرية، والتخلص من التوتر الجسدي والعقلي باستخدام ألعاب وتمارين ديناميكية. إن الحركات المستوحاة من المسرح والرقص، ستعزز مهارات الاتصال والتجربة الجماعية، وتُشجع التعبير عن الذات من خلال الارتجال، مما يوفر منصة لمشاركة الأفكار والتأمل في العلاقة المعقدة بين حركات الجسد والمشاعر.",
+      "en": "In the midst of challenges and uncertainty, finding moments of connection and physical release can be a powerful tool for finding strength in the collective experience of our bodies. Our workshop, \"Collective Flow,\" is crafted with the intent to provide a safe and rejuvenating space for our community. This movement experience focuses on rebuilding connections, fostering resilience, and promoting physical and emotional well-being.\n\nIn the workshop you will explore physical release by moving in space, releasing tension in the body and mind through dynamic games and exercises. Foster connection through enhanced communication skills and contact exercises. Strengthen the collective experience by developing collaborative tools inspired by elements from theater and dance. Encourage self-expression and reflection through improvisation, providing a platform for sharing thoughts and contemplating the intricate relationship between the physical experience and emotional states throughout the workshop."
+    },
     "writeup": null,
     "coverUrl": null
   },
   {
-    "title": {"_type":"localeString","ar":"كوندوم ليد","en":"Film Screening: Condom Lead"},
-    "slug": {"_type":"slug","current":"condom-lead-dec23"},
-    "subtitle": {"_type":"localeString","ar":"عروض أفلام: سرديات رغم التبرير · الدخول مجاني","en":"Film Screenings: Unprovoked Narratives · Free Entry"},
+    "title": {
+      "_type": "localeString",
+      "ar": "كوندوم ليد",
+      "en": "Film Screening: Condom Lead"
+    },
+    "slug": {
+      "_type": "slug",
+      "current": "condom-lead-dec23"
+    },
+    "subtitle": {
+      "_type": "localeString",
+      "ar": "عروض أفلام: سرديات رغم التبرير · الدخول مجاني",
+      "en": "Film Screenings: Unprovoked Narratives · Free Entry"
+    },
     "eventType": "Film",
     "startDateTime": "2023-12-03T17:00:00+02:00",
     "endDateTime": "2023-12-03T17:30:00+02:00",
@@ -30,15 +64,34 @@
     "recurringLabel": null,
     "status": "past",
     "registerUrl": null,
-    "shortDescription": {"_type":"localeText","ar":"هل هناك مجال لعلاقات حميمة في ظل القصف؟","en":"A dream of the hope for intimacy and love in a brutal, divisive world."},
-    "body": {"_type":"localeText","ar":"\"الرصاص المصبوب\" هو الاسم الذي استخدمته إسرائيل للإشارة لعملياتها العسكرية ضد قطاع غزة في العام 2009: 22 يوما من أصوات القصف – هل هناك مجال لعلاقات حميمة في هذه الظروف؟","en":"A dream of the hope for intimacy and love in a brutal, divisive world. Part of the Unprovoked Narratives film series — for full descriptions of the film selection see palestinefilminstitute.org/en/unprovoked-narratives."},
+    "shortDescription": {
+      "_type": "localeText",
+      "ar": "هل هناك مجال لعلاقات حميمة في ظل القصف؟",
+      "en": "A dream of the hope for intimacy and love in a brutal, divisive world."
+    },
+    "body": {
+      "_type": "localeText",
+      "ar": "\"الرصاص المصبوب\" هو الاسم الذي استخدمته إسرائيل للإشارة لعملياتها العسكرية ضد قطاع غزة في العام 2009: 22 يوما من أصوات القصف – هل هناك مجال لعلاقات حميمة في هذه الظروف؟",
+      "en": "A dream of the hope for intimacy and love in a brutal, divisive world. Part of the Unprovoked Narratives film series — for full descriptions of the film selection see palestinefilminstitute.org/en/unprovoked-narratives."
+    },
     "writeup": null,
     "coverUrl": null
   },
   {
-    "title": {"_type":"localeString","ar":"حبيبي راسك خربان","en":"Film Screening: Habibi"},
-    "slug": {"_type":"slug","current":"habibi-dec23"},
-    "subtitle": {"_type":"localeString","ar":"عروض أفلام: سرديات رغم التبرير · الدخول مجاني","en":"Film Screenings: Unprovoked Narratives · Free Entry"},
+    "title": {
+      "_type": "localeString",
+      "ar": "حبيبي راسك خربان",
+      "en": "Film Screening: Habibi"
+    },
+    "slug": {
+      "_type": "slug",
+      "current": "habibi-dec23"
+    },
+    "subtitle": {
+      "_type": "localeString",
+      "ar": "عروض أفلام: سرديات رغم التبرير · الدخول مجاني",
+      "en": "Film Screenings: Unprovoked Narratives · Free Entry"
+    },
     "eventType": "Film",
     "startDateTime": "2023-12-03T17:30:00+02:00",
     "endDateTime": "2023-12-03T19:00:00+02:00",
@@ -48,51 +101,116 @@
     "recurringLabel": null,
     "status": "past",
     "registerUrl": null,
-    "shortDescription": {"_type":"localeText","ar":"قصة حب ممنوعة تدور أحداثها في غزة.","en":"A fiction feature set in Gaza, a modern retelling of the Sufi parable Majnun Layla."},
-    "body": {"_type":"localeText","ar":"حبيبي، قصة حب ممنوعة، قصة روائية تدور أحداثها في غزة. يُجبر طالبان في الضفة الغربية على العودة إلى ديارهما في غزة، حيث يتحدى حبهما التقاليد. للوصول إلى حبيبته، قيس ينشر جرافيتي الشعر عبر جدران المدينة. حبيبي هو إعادة سرد حديثة للمثل الصوفي القديم الشهير مجنون ليلى.","en":"Habibi, a story of forbidden love, is a fiction feature set in Gaza. Two students in the West Bank are forced to return home to Gaza, where their love defies tradition. To reach his lover, Qays writes graffiti poetry across town. Habibi is a modern re-telling of the famous ancient Sufi parable Majnun Layla. The full Arabic title is 'Habibi Rasak Kharban,' which translates as \"Darling, something's wrong with your head.\" Part of the Unprovoked Narratives film series."},
+    "shortDescription": {
+      "_type": "localeText",
+      "ar": "قصة حب ممنوعة تدور أحداثها في غزة.",
+      "en": "A fiction feature set in Gaza, a modern retelling of the Sufi parable Majnun Layla."
+    },
+    "body": {
+      "_type": "localeText",
+      "ar": "حبيبي، قصة حب ممنوعة، قصة روائية تدور أحداثها في غزة. يُجبر طالبان في الضفة الغربية على العودة إلى ديارهما في غزة، حيث يتحدى حبهما التقاليد. للوصول إلى حبيبته، قيس ينشر جرافيتي الشعر عبر جدران المدينة. حبيبي هو إعادة سرد حديثة للمثل الصوفي القديم الشهير مجنون ليلى.",
+      "en": "Habibi, a story of forbidden love, is a fiction feature set in Gaza. Two students in the West Bank are forced to return home to Gaza, where their love defies tradition. To reach his lover, Qays writes graffiti poetry across town. Habibi is a modern re-telling of the famous ancient Sufi parable Majnun Layla. The full Arabic title is 'Habibi Rasak Kharban,' which translates as \"Darling, something's wrong with your head.\" Part of the Unprovoked Narratives film series."
+    },
     "writeup": null,
     "coverUrl": null
   },
   {
-    "title": {"_type":"localeString","ar":"جلسة استماع مجموعة من ألبومات مكتبة مجلس العجب","en":"Album Listening Session"},
-    "slug": {"_type":"slug","current":"album-listening-session"},
-    "subtitle": {"_type":"localeString","ar":"","en":""},
+    "title": {
+      "_type": "localeString",
+      "ar": "جلسة استماع مجموعة من ألبومات مكتبة مجلس العجب",
+      "en": "Album Listening Session"
+    },
+    "slug": {
+      "_type": "slug",
+      "current": "album-listening-session"
+    },
+    "subtitle": {
+      "_type": "localeString",
+      "ar": "",
+      "en": ""
+    },
     "eventType": "Performance",
     "startDateTime": "2023-12-21T18:30:00+02:00",
     "endDateTime": "2023-12-21T19:30:00+02:00",
     "location": null,
     "featured": false,
     "recurring": true,
-    "recurringLabel": {"_type":"localeString","ar":"","en":"Every Thursday · 18:30"},
+    "recurringLabel": {
+      "_type": "localeString",
+      "ar": "",
+      "en": "Every Thursday · 18:30"
+    },
     "status": "past",
     "registerUrl": null,
-    "shortDescription": {"_type":"localeText","ar":"","en":""},
-    "body": {"_type":"localeText","ar":"","en":""},
+    "shortDescription": {
+      "_type": "localeText",
+      "ar": "",
+      "en": ""
+    },
+    "body": {
+      "_type": "localeText",
+      "ar": "",
+      "en": ""
+    },
     "writeup": null,
     "coverUrl": null
   },
   {
-    "title": {"_type":"localeString","ar":"برنامج مجلس العجب للأطفال","en":"Wonder Cabinet Children Program"},
-    "slug": {"_type":"slug","current":"children-program"},
-    "subtitle": {"_type":"localeString","ar":"","en":""},
+    "title": {
+      "_type": "localeString",
+      "ar": "برنامج مجلس العجب للأطفال",
+      "en": "Wonder Cabinet Children Program"
+    },
+    "slug": {
+      "_type": "slug",
+      "current": "children-program"
+    },
+    "subtitle": {
+      "_type": "localeString",
+      "ar": "",
+      "en": ""
+    },
     "eventType": "Workshop",
     "startDateTime": "2024-01-05T09:30:00+02:00",
     "endDateTime": "2024-01-05T12:30:00+02:00",
     "location": "Wonder Cabinet",
     "featured": false,
     "recurring": true,
-    "recurringLabel": {"_type":"localeString","ar":"","en":"Fridays · 09:30"},
+    "recurringLabel": {
+      "_type": "localeString",
+      "ar": "",
+      "en": "Fridays · 09:30"
+    },
     "status": "past",
     "registerUrl": "https://forms.gle/QqxJVfgjagS74P8m9",
-    "shortDescription": {"_type":"localeText","ar":"مساحة للاكتشاف والخيال للأطفال من خلال الأفلام والأنشطة الفنية.","en":"A space for imagination and exploration through film and creative activities for children."},
-    "body": {"_type":"localeText","ar":"صممنا برنامج الأطفال بعناية فائقة ليشكل تجربة ترفيهية وتعليمية مميزة ويقدم مساحة للاكتشاف والخيال باستخدام أساليب فنية جديدة ومبتكرة. يشمل البرنامج عروض أفلام رسوم متحركة حازت على جوائز عالمية من مهرجان الشارقة ومهرجان نيويورك الدولي لأفلام الأطفال. يتبعه أنشطة متنوعة مع فنانين محليين وعالميين، تعزز الحس الإبداعي للأطفال وتطلق تحديات لآفاق التعلم.\n\nالأعمار: 8 - 11 عام (مواليد عام 2012 - 2015). رسوم الاشتراك لكل يوم (ورشات الفنانين): 20 شيكل، وهناك خصم للإخوة.","en":"The children's program is committed to offering a space for imagination and exploration. The program comprises a curated selection of international, Palestinian and Arab films created to entertain and educate children, including award-winning movies from the Sharjah Festival and the New York International Children's Film Festival, featuring a diverse collection of animation films. Following the screening, activities with different local and international artists each week challenge the children's creativity and broaden their ways of learning.\n\nAges: 8–11 years old (born 2012–2015). Registration fee (workshops): 20 NIS per day, discount for siblings."},
+    "shortDescription": {
+      "_type": "localeText",
+      "ar": "مساحة للاكتشاف والخيال للأطفال من خلال الأفلام والأنشطة الفنية.",
+      "en": "A space for imagination and exploration through film and creative activities for children."
+    },
+    "body": {
+      "_type": "localeText",
+      "ar": "صممنا برنامج الأطفال بعناية فائقة ليشكل تجربة ترفيهية وتعليمية مميزة ويقدم مساحة للاكتشاف والخيال باستخدام أساليب فنية جديدة ومبتكرة. يشمل البرنامج عروض أفلام رسوم متحركة حازت على جوائز عالمية من مهرجان الشارقة ومهرجان نيويورك الدولي لأفلام الأطفال. يتبعه أنشطة متنوعة مع فنانين محليين وعالميين، تعزز الحس الإبداعي للأطفال وتطلق تحديات لآفاق التعلم.\n\nالأعمار: 8 - 11 عام (مواليد عام 2012 - 2015). رسوم الاشتراك لكل يوم (ورشات الفنانين): 20 شيكل، وهناك خصم للإخوة.",
+      "en": "The children's program is committed to offering a space for imagination and exploration. The program comprises a curated selection of international, Palestinian and Arab films created to entertain and educate children, including award-winning movies from the Sharjah Festival and the New York International Children's Film Festival, featuring a diverse collection of animation films. Following the screening, activities with different local and international artists each week challenge the children's creativity and broaden their ways of learning.\n\nAges: 8–11 years old (born 2012–2015). Registration fee (workshops): 20 NIS per day, discount for siblings."
+    },
     "writeup": null,
     "coverUrl": null
   },
   {
-    "title": {"_type":"localeString","ar":"ورشة عمل في تقنية التطريز الفوتوغرافي: ما هو الوطن؟ مع صوفيا لامبرو","en":"Photoembroidery Workshop: What Is Home? With Sofia Lambrou"},
-    "slug": {"_type":"slug","current":"photoembroidery-workshop-sofia-lambrou"},
-    "subtitle": {"_type":"localeString","ar":"المدة: 3 أيام (من 3 إلى 5 ساعات في اليوم)، غير مطلوب معرفة أولية، عدد محدود من المقاعد، 200 شيقل، العربية والإنجليزية","en":"Duration: 3 days (3–5 hours/day) · No previous knowledge required · Limited seats, 200 NIS · Arabic & English"},
+    "title": {
+      "_type": "localeString",
+      "ar": "ورشة عمل في تقنية التطريز الفوتوغرافي: ما هو الوطن؟ مع صوفيا لامبرو",
+      "en": "Photoembroidery Workshop: What Is Home? With Sofia Lambrou"
+    },
+    "slug": {
+      "_type": "slug",
+      "current": "photoembroidery-workshop-sofia-lambrou"
+    },
+    "subtitle": {
+      "_type": "localeString",
+      "ar": "المدة: 3 أيام (من 3 إلى 5 ساعات في اليوم)، غير مطلوب معرفة أولية، عدد محدود من المقاعد، 200 شيقل، العربية والإنجليزية",
+      "en": "Duration: 3 days (3–5 hours/day) · No previous knowledge required · Limited seats, 200 NIS · Arabic & English"
+    },
     "eventType": "Workshop",
     "startDateTime": "2024-01-23T16:00:00+02:00",
     "endDateTime": "2024-01-25T19:00:00+02:00",
@@ -102,14 +220,29 @@
     "recurringLabel": null,
     "status": "past",
     "registerUrl": "https://forms.gle/kwQvC71qGM9dULgE9",
-    "shortDescription": {"_type":"localeText","ar":"تفكير جماعي وفردي في معنى الوطن من خلال التصوير الثابت، يتحول إلى لوحة قماشية مطرزة.","en":"A collective and individual reflection on the subject of home through still-life photography, turned into an embroidered fabric collage."},
-    "body": {"_type":"localeText","ar":"تُعد هذه الورشة فرصة للتفكير الجماعي والفردي في معنى الوطن من خلال اكتشاف مجالات صناعة الصور. بدءًا من المواضيع المختلفة التي تتطرق لها فنانون آخرون حول معنى الوطن عبر الزمن. ستتطلب الورشة مشاركة أفكار، قصص، مشاعر ومراجع من أجل رسم صورة جماعية للوطن بأسلوب خاص. من خلال وجهات النظر المختلفة، سنحول تلك الأفكار إلى مجموعة صور ثابتة ونلتقطها على الفيلم.\n\nسيتم تطوير الصور ومسحها وطباعتها لتشكيل لوحة فنية. سيُدعى كل فرد لأخذ نسخته المطبوعة إلى منزله، وستُسلم اللوحة إلى حرفي تطريز لنسجها في قماش بحجم 100 سم × 150 سم.","en":"The workshop is a chance to collectively and individually reflect on the subject of home through the realms of image making. Starting with the exploration of the different ways in which other artists have approached the subject across time, we will then be invited to share our own thoughts, ideas, stories, feelings and references, to collectively paint the portrait of home in our own terms. As each brings their own perspective, we will turn those thoughts into a still life photography set and capture them on film. Together, we will then develop, scan and print those images to form a collage. We will each be invited to take our print home and the collage will then be handed to an embroidery artisan to weave it into a 100cm x 150cm fabric."},
+    "shortDescription": {
+      "_type": "localeText",
+      "ar": "تفكير جماعي وفردي في معنى الوطن من خلال التصوير الثابت، يتحول إلى لوحة قماشية مطرزة.",
+      "en": "A collective and individual reflection on the subject of home through still-life photography, turned into an embroidered fabric collage."
+    },
+    "body": {
+      "_type": "localeText",
+      "ar": "تُعد هذه الورشة فرصة للتفكير الجماعي والفردي في معنى الوطن من خلال اكتشاف مجالات صناعة الصور. بدءًا من المواضيع المختلفة التي تتطرق لها فنانون آخرون حول معنى الوطن عبر الزمن. ستتطلب الورشة مشاركة أفكار، قصص، مشاعر ومراجع من أجل رسم صورة جماعية للوطن بأسلوب خاص. من خلال وجهات النظر المختلفة، سنحول تلك الأفكار إلى مجموعة صور ثابتة ونلتقطها على الفيلم.\n\nسيتم تطوير الصور ومسحها وطباعتها لتشكيل لوحة فنية. سيُدعى كل فرد لأخذ نسخته المطبوعة إلى منزله، وستُسلم اللوحة إلى حرفي تطريز لنسجها في قماش بحجم 100 سم × 150 سم.",
+      "en": "The workshop is a chance to collectively and individually reflect on the subject of home through the realms of image making. Starting with the exploration of the different ways in which other artists have approached the subject across time, we will then be invited to share our own thoughts, ideas, stories, feelings and references, to collectively paint the portrait of home in our own terms. As each brings their own perspective, we will turn those thoughts into a still life photography set and capture them on film. Together, we will then develop, scan and print those images to form a collage. We will each be invited to take our print home and the collage will then be handed to an embroidery artisan to weave it into a 100cm x 150cm fabric."
+    },
     "writeup": null,
     "coverUrl": null
   },
   {
-    "title": {"_type":"localeString","ar":"جلسة تسجيل مع ماي ماي ماي وأبوالعيس","en":"Mai Mai Mai and Abul3ees Recording Session"},
-    "slug": {"_type":"slug","current":"mai-mai-mai-abul3ees-recording-session"},
+    "title": {
+      "_type": "localeString",
+      "ar": "جلسة تسجيل مع ماي ماي ماي وأبوالعيس",
+      "en": "Mai Mai Mai and Abul3ees Recording Session"
+    },
+    "slug": {
+      "_type": "slug",
+      "current": "mai-mai-mai-abul3ees-recording-session"
+    },
     "subtitle": null,
     "eventType": "Performance",
     "startDateTime": "2024-01-25T18:00:00+02:00",
@@ -120,15 +253,34 @@
     "recurringLabel": null,
     "status": "past",
     "registerUrl": null,
-    "shortDescription": {"_type":"localeText","ar":"تعاون أصلي بين توني وأبو العيس، الرابر والموسيقي المقيم في القدس.","en":"An original collaboration between Toni and Jerusalem-based rapper and musician Abul3ees."},
-    "body": {"_type":"localeText","ar":"تعاون أصلي بين توني وأبو العيس، الرابر والموسيقي المقيم في القدس.","en":"An original collaboration between Toni and Jerusalem-based rapper and musician Abul3ees."},
+    "shortDescription": {
+      "_type": "localeText",
+      "ar": "تعاون أصلي بين توني وأبو العيس، الرابر والموسيقي المقيم في القدس.",
+      "en": "An original collaboration between Toni and Jerusalem-based rapper and musician Abul3ees."
+    },
+    "body": {
+      "_type": "localeText",
+      "ar": "تعاون أصلي بين توني وأبو العيس، الرابر والموسيقي المقيم في القدس.",
+      "en": "An original collaboration between Toni and Jerusalem-based rapper and musician Abul3ees."
+    },
     "writeup": null,
     "coverUrl": null
   },
   {
-    "title": {"_type":"localeString","ar":"عشاء مقدم من قبل توني كوترون - ماي ماي ماي","en":"A Special Dinner Prepared by Toni Cutrone aka Mai Mai Mai"},
-    "slug": {"_type":"slug","current":"dinner-toni-cutrone-mai-mai-mai"},
-    "subtitle": {"_type":"localeString","ar":"لا داعي للتسجيل المسبق.","en":"No registration required."},
+    "title": {
+      "_type": "localeString",
+      "ar": "عشاء مقدم من قبل توني كوترون - ماي ماي ماي",
+      "en": "A Special Dinner Prepared by Toni Cutrone aka Mai Mai Mai"
+    },
+    "slug": {
+      "_type": "slug",
+      "current": "dinner-toni-cutrone-mai-mai-mai"
+    },
+    "subtitle": {
+      "_type": "localeString",
+      "ar": "لا داعي للتسجيل المسبق.",
+      "en": "No registration required."
+    },
     "eventType": "Performance",
     "startDateTime": "2024-01-26T18:00:00+02:00",
     "endDateTime": "2024-01-26T20:00:00+02:00",
@@ -144,8 +296,15 @@
     "coverUrl": null
   },
   {
-    "title": {"_type":"localeString","ar":"حصص دفاع عن النفس مع المركز الوطني للكاراتيه","en":"Self-Defense Classes with National Karate Center"},
-    "slug": {"_type":"slug","current":"self-defense-classes-national-karate-center"},
+    "title": {
+      "_type": "localeString",
+      "ar": "حصص دفاع عن النفس مع المركز الوطني للكاراتيه",
+      "en": "Self-Defense Classes with National Karate Center"
+    },
+    "slug": {
+      "_type": "slug",
+      "current": "self-defense-classes-national-karate-center"
+    },
     "subtitle": null,
     "eventType": "Class",
     "startDateTime": "2024-01-26T19:00:00+02:00",
@@ -153,17 +312,36 @@
     "location": null,
     "featured": false,
     "recurring": true,
-    "recurringLabel": {"_type":"localeString","ar":"","en":"Fridays · 19:00"},
+    "recurringLabel": {
+      "_type": "localeString",
+      "ar": "",
+      "en": "Fridays · 19:00"
+    },
     "status": "past",
     "registerUrl": "https://forms.gle/RdDa8iFTG4buqdY58",
-    "shortDescription": {"_type":"localeText","ar":"حصص دفاع عن النفس مختلطة، 17+.","en":"Mixed self-defense classes, 17+."},
-    "body": {"_type":"localeText","ar":"التكلفة: 30 شيكل لكل حصة أو 100 شيكل لأربعة حصص متتالية. الحصص مختلطة، 17+. الرجاء ارتداء ملابس رياضية ومريحة.","en":"Cost: 30 NIS per class or 100 NIS for a 4-class package. Mixed classes, 17+. Kindly wear athletic or comfortable attire."},
+    "shortDescription": {
+      "_type": "localeText",
+      "ar": "حصص دفاع عن النفس مختلطة، 17+.",
+      "en": "Mixed self-defense classes, 17+."
+    },
+    "body": {
+      "_type": "localeText",
+      "ar": "التكلفة: 30 شيكل لكل حصة أو 100 شيكل لأربعة حصص متتالية. الحصص مختلطة، 17+. الرجاء ارتداء ملابس رياضية ومريحة.",
+      "en": "Cost: 30 NIS per class or 100 NIS for a 4-class package. Mixed classes, 17+. Kindly wear athletic or comfortable attire."
+    },
     "writeup": null,
     "coverUrl": null
   },
   {
-    "title": {"_type":"localeString","ar":"حديث مع ماي ماي ماي","en":"A Conversation with Mai Mai Mai"},
-    "slug": {"_type":"slug","current":"conversation-with-mai-mai-mai"},
+    "title": {
+      "_type": "localeString",
+      "ar": "حديث مع ماي ماي ماي",
+      "en": "A Conversation with Mai Mai Mai"
+    },
+    "slug": {
+      "_type": "slug",
+      "current": "conversation-with-mai-mai-mai"
+    },
     "subtitle": null,
     "eventType": "Reading",
     "startDateTime": "2024-01-26T21:00:00+02:00",
@@ -174,14 +352,29 @@
     "recurringLabel": null,
     "status": "past",
     "registerUrl": null,
-    "shortDescription": {"_type":"localeText","ar":"يتحدث توني عن بحثه حول الآلات الفلسطينية والتقاليد الشعبية الإيثنو-موسيقية.","en":"Toni Cutrone discusses his research on Palestinian instruments and ethno-musical folk traditions."},
-    "body": {"_type":"localeText","ar":"سيتحدث توني عن بحثه حول الآلات الفلسطينية والتقاليد الشعبية الإيثنو-موسيقية، وعن فترة إقامته في فلسطين وتعاوناته مع الفنانين المحليين.","en":"Diving into his residency and collaborations with local artists, Toni Cutrone will talk more about his research on Palestinian instruments and ethno-musical folk traditions."},
+    "shortDescription": {
+      "_type": "localeText",
+      "ar": "يتحدث توني عن بحثه حول الآلات الفلسطينية والتقاليد الشعبية الإيثنو-موسيقية.",
+      "en": "Toni Cutrone discusses his research on Palestinian instruments and ethno-musical folk traditions."
+    },
+    "body": {
+      "_type": "localeText",
+      "ar": "سيتحدث توني عن بحثه حول الآلات الفلسطينية والتقاليد الشعبية الإيثنو-موسيقية، وعن فترة إقامته في فلسطين وتعاوناته مع الفنانين المحليين.",
+      "en": "Diving into his residency and collaborations with local artists, Toni Cutrone will talk more about his research on Palestinian instruments and ethno-musical folk traditions."
+    },
     "writeup": null,
     "coverUrl": null
   },
   {
-    "title": {"_type":"localeString","ar":"استوديو مفتوح مع صوفيا لامبرو","en":"Open Studio with Sofia Lambrou"},
-    "slug": {"_type":"slug","current":"open-studio-sofia-lambrou"},
+    "title": {
+      "_type": "localeString",
+      "ar": "استوديو مفتوح مع صوفيا لامبرو",
+      "en": "Open Studio with Sofia Lambrou"
+    },
+    "slug": {
+      "_type": "slug",
+      "current": "open-studio-sofia-lambrou"
+    },
     "subtitle": null,
     "eventType": "Opening",
     "startDateTime": "2024-01-27T14:00:00+02:00",
@@ -192,14 +385,29 @@
     "recurringLabel": null,
     "status": "past",
     "registerUrl": null,
-    "shortDescription": {"_type":"localeText","ar":"طاولة بحث تعرض مشروع صوفيا لامبرو الجاري \"لاناباس\".","en":"A table-de-recherche showcasing resident Sofia Lambrou's in-progress project L'anabase."},
-    "body": {"_type":"localeText","ar":"اكتشفوا أسطورة عن أيقونة عذراء سافرت من أريحا إلى جزيرة أمورجوس في اليونان للهروب من الثوار في القرن التاسع. تشكل هذه الأسطورة جزءًا من مشروع صوفيا الجاري تنفيذه تحت عنوان \"لاناباس\".","en":"Discover the myth of the icon of a virgin who traveled from Jericho to the island of Amorgos in Greece to escape from the Iconoclasts in the 9th century, in a table-de-recherche showcasing our resident Sofia Lambrou's in-progress project L'anabase."},
+    "shortDescription": {
+      "_type": "localeText",
+      "ar": "طاولة بحث تعرض مشروع صوفيا لامبرو الجاري \"لاناباس\".",
+      "en": "A table-de-recherche showcasing resident Sofia Lambrou's in-progress project L'anabase."
+    },
+    "body": {
+      "_type": "localeText",
+      "ar": "اكتشفوا أسطورة عن أيقونة عذراء سافرت من أريحا إلى جزيرة أمورجوس في اليونان للهروب من الثوار في القرن التاسع. تشكل هذه الأسطورة جزءًا من مشروع صوفيا الجاري تنفيذه تحت عنوان \"لاناباس\".",
+      "en": "Discover the myth of the icon of a virgin who traveled from Jericho to the island of Amorgos in Greece to escape from the Iconoclasts in the 9th century, in a table-de-recherche showcasing our resident Sofia Lambrou's in-progress project L'anabase."
+    },
     "writeup": null,
     "coverUrl": null
   },
   {
-    "title": {"_type":"localeString","ar":"حديث مع صوفيا لامبرو","en":"A Conversation with Sofia Lambrou"},
-    "slug": {"_type":"slug","current":"conversation-with-sofia-lambrou"},
+    "title": {
+      "_type": "localeString",
+      "ar": "حديث مع صوفيا لامبرو",
+      "en": "A Conversation with Sofia Lambrou"
+    },
+    "slug": {
+      "_type": "slug",
+      "current": "conversation-with-sofia-lambrou"
+    },
     "subtitle": null,
     "eventType": "Reading",
     "startDateTime": "2024-01-27T20:00:00+02:00",
@@ -210,14 +418,29 @@
     "recurringLabel": null,
     "status": "past",
     "registerUrl": null,
-    "shortDescription": {"_type":"localeText","ar":"فرصة للتعرف على مشروع صوفيا \"لاناباس\" من خلال تسجيلاتها الميدانية.","en":"A glimpse of Sofia's project L'anabase through her captivating field recordings."},
-    "body": {"_type":"localeText","ar":"فرصة للقاء صوفيا والتعرف على مشروعها \"لاناباس\"، لاستكشاف الأسطورة التي ألهمت عملها، والاستماع إلى تسجيلاتها الميدانية المميزة.","en":"An opportunity to take a glimpse of Sofia's project, 'L'anabase,' delving deeper into the myth that inspired her work as you listen to her captivating field recordings."},
+    "shortDescription": {
+      "_type": "localeText",
+      "ar": "فرصة للتعرف على مشروع صوفيا \"لاناباس\" من خلال تسجيلاتها الميدانية.",
+      "en": "A glimpse of Sofia's project L'anabase through her captivating field recordings."
+    },
+    "body": {
+      "_type": "localeText",
+      "ar": "فرصة للقاء صوفيا والتعرف على مشروعها \"لاناباس\"، لاستكشاف الأسطورة التي ألهمت عملها، والاستماع إلى تسجيلاتها الميدانية المميزة.",
+      "en": "An opportunity to take a glimpse of Sofia's project, 'L'anabase,' delving deeper into the myth that inspired her work as you listen to her captivating field recordings."
+    },
     "writeup": null,
     "coverUrl": null
   },
   {
-    "title": {"_type":"localeString","ar":"جلسة استماع مع توماس تيلاريني","en":"\"Gaza, Tienimi la Mano\" with Thomas Tellarini"},
-    "slug": {"_type":"slug","current":"gaza-tienimi-la-mano-thomas-tellarini"},
+    "title": {
+      "_type": "localeString",
+      "ar": "جلسة استماع مع توماس تيلاريني",
+      "en": "\"Gaza, Tienimi la Mano\" with Thomas Tellarini"
+    },
+    "slug": {
+      "_type": "slug",
+      "current": "gaza-tienimi-la-mano-thomas-tellarini"
+    },
     "subtitle": null,
     "eventType": "Radio",
     "startDateTime": "2024-01-27T21:00:00+02:00",
@@ -228,15 +451,34 @@
     "recurringLabel": null,
     "status": "past",
     "registerUrl": null,
-    "shortDescription": {"_type":"localeText","ar":"","en":"[Gaza, Hold My Hand] A listening session for Radio Alhara."},
-    "body": {"_type":"localeText","ar":"","en":"[Gaza, Hold My Hand] A listening session for Radio Alhara."},
+    "shortDescription": {
+      "_type": "localeText",
+      "ar": "",
+      "en": "[Gaza, Hold My Hand] A listening session for Radio Alhara."
+    },
+    "body": {
+      "_type": "localeText",
+      "ar": "",
+      "en": "[Gaza, Hold My Hand] A listening session for Radio Alhara."
+    },
     "writeup": null,
     "coverUrl": null
   },
   {
-    "title": {"_type":"localeString","ar":"راديو الحارة — مباشرة من بيت لحم","en":"Radio Alhara — Live from Bethlehem"},
-    "slug": {"_type":"slug","current":"radio-dec-14"},
-    "subtitle": {"_type":"localeString","ar":"","en":"ABUL3EES BINKHALTI · RUUQ · JULMUD · Dana Durr · Bareetlblad · Alabaster DePlume"},
+    "title": {
+      "_type": "localeString",
+      "ar": "راديو الحارة — مباشرة من بيت لحم",
+      "en": "Radio Alhara — Live from Bethlehem"
+    },
+    "slug": {
+      "_type": "slug",
+      "current": "radio-dec-14"
+    },
+    "subtitle": {
+      "_type": "localeString",
+      "ar": "",
+      "en": "ABUL3EES BINKHALTI · RUUQ · JULMUD · Dana Durr · Bareetlblad · Alabaster DePlume"
+    },
     "eventType": "Radio",
     "startDateTime": "2025-12-14T19:00:00+02:00",
     "endDateTime": "2025-12-14T22:00:00+02:00",
@@ -246,15 +488,34 @@
     "recurringLabel": null,
     "status": "past",
     "registerUrl": null,
-    "shortDescription": {"_type":"localeText","ar":"راديو الحارة يبث مباشرة من مجلس العجب، مع فنانين محليين وضيف خاص ألاباستر ديبلوم.","en":"Radio Alhara broadcasts live from the Wonder Cabinet, featuring local artists and special guest Alabaster DePlume."},
-    "body": {"_type":"localeText","ar":"راديو الحارة يبث مباشرة من مجلس العجب في بيت لحم. أمسية موسيقية مع ABUL3EES BINKHALTI وRUUQ وJULMUD وDana Durr وBareetlblad.\n\nضيف خاص: Alabaster DePlume — موسيقي جاز تجريبي بريطاني سجّل ألبومه في وادي كريميزان خلال إقامة أصوات الأماكن.\n\nبث مباشر على راديو NTS.","en":"Radio Alhara broadcasting live from the Wonder Cabinet in Bethlehem. A night of music featuring ABUL3EES BINKHALTI, RUUQ, JULMUD, Dana Durr, and Bareetlblad.\n\nSpecial guest: Alabaster DePlume — UK experimental jazz artist who recorded his Cremisan: Prologue To A Blade EP at the Wonder Cabinet during the Sounds of Places residency.\n\nBroadcast live on NTS Radio."},
+    "shortDescription": {
+      "_type": "localeText",
+      "ar": "راديو الحارة يبث مباشرة من مجلس العجب، مع فنانين محليين وضيف خاص ألاباستر ديبلوم.",
+      "en": "Radio Alhara broadcasts live from the Wonder Cabinet, featuring local artists and special guest Alabaster DePlume."
+    },
+    "body": {
+      "_type": "localeText",
+      "ar": "راديو الحارة يبث مباشرة من مجلس العجب في بيت لحم. أمسية موسيقية مع ABUL3EES BINKHALTI وRUUQ وJULMUD وDana Durr وBareetlblad.\n\nضيف خاص: Alabaster DePlume — موسيقي جاز تجريبي بريطاني سجّل ألبومه في وادي كريميزان خلال إقامة أصوات الأماكن.\n\nبث مباشر على راديو NTS.",
+      "en": "Radio Alhara broadcasting live from the Wonder Cabinet in Bethlehem. A night of music featuring ABUL3EES BINKHALTI, RUUQ, JULMUD, Dana Durr, and Bareetlblad.\n\nSpecial guest: Alabaster DePlume — UK experimental jazz artist who recorded his Cremisan: Prologue To A Blade EP at the Wonder Cabinet during the Sounds of Places residency.\n\nBroadcast live on NTS Radio."
+    },
     "writeup": null,
     "coverUrl": null
   },
   {
-    "title": {"_type":"localeString","ar":"أغانٍ للنهر الغائب","en":"Songs for the Absent River"},
-    "slug": {"_type":"slug","current":"songs-absent-river-dec-22"},
-    "subtitle": {"_type":"localeString","ar":"","en":"Ramsy Kattan · Joseph Schiano Di Lombo · Alabaster DePlume · Jude"},
+    "title": {
+      "_type": "localeString",
+      "ar": "أغانٍ للنهر الغائب",
+      "en": "Songs for the Absent River"
+    },
+    "slug": {
+      "_type": "slug",
+      "current": "songs-absent-river-dec-22"
+    },
+    "subtitle": {
+      "_type": "localeString",
+      "ar": "",
+      "en": "Ramsy Kattan · Joseph Schiano Di Lombo · Alabaster DePlume · Jude"
+    },
     "eventType": "Radio",
     "startDateTime": "2025-12-22T19:00:00+02:00",
     "endDateTime": "2025-12-22T21:00:00+02:00",
@@ -264,15 +525,34 @@
     "recurringLabel": null,
     "status": "past",
     "registerUrl": null,
-    "shortDescription": {"_type":"localeText","ar":"رحلة صوتية على ضفتي غياب نهر الأردن — تسجيلات ميدانية وموسيقى عربية تقليدية، مباشرة على NTS.","en":"A sonic journey along both banks of the Jordan River's absence — field recordings and Arabic traditional music, live on NTS."},
-    "body": {"_type":"localeText","ar":"أغانٍ للنهر الغائب — رحلة صوتية على ضفتي غياب نهر الأردن، تجمع التسجيلات الميدانية والموسيقى العربية التقليدية.\n\nمع رمزي قطّان وجوزيف شيانو دي لومبو وAlabaster DePlume وJude.\n\nسُجّل مباشرة في مجلس العجب وبُث على راديو NTS.","en":"Songs for the Absent River — a sonic journey along the two banks of the Jordan River's absence, featuring field recordings and Arabic traditional music.\n\nWith Ramsy Kattan, Joseph Schiano Di Lombo, Alabaster DePlume, and Jude.\n\nRecorded live at the Wonder Cabinet and broadcast on NTS Radio."},
+    "shortDescription": {
+      "_type": "localeText",
+      "ar": "رحلة صوتية على ضفتي غياب نهر الأردن — تسجيلات ميدانية وموسيقى عربية تقليدية، مباشرة على NTS.",
+      "en": "A sonic journey along both banks of the Jordan River's absence — field recordings and Arabic traditional music, live on NTS."
+    },
+    "body": {
+      "_type": "localeText",
+      "ar": "أغانٍ للنهر الغائب — رحلة صوتية على ضفتي غياب نهر الأردن، تجمع التسجيلات الميدانية والموسيقى العربية التقليدية.\n\nمع رمزي قطّان وجوزيف شيانو دي لومبو وAlabaster DePlume وJude.\n\nسُجّل مباشرة في مجلس العجب وبُث على راديو NTS.",
+      "en": "Songs for the Absent River — a sonic journey along the two banks of the Jordan River's absence, featuring field recordings and Arabic traditional music.\n\nWith Ramsy Kattan, Joseph Schiano Di Lombo, Alabaster DePlume, and Jude.\n\nRecorded live at the Wonder Cabinet and broadcast on NTS Radio."
+    },
     "writeup": null,
     "coverUrl": null
   },
   {
-    "title": {"_type":"localeString","ar":"راديو الحارة — جلسة مباشرة","en":"Radio Alhara — Live Session"},
-    "slug": {"_type":"slug","current":"radio-alhara-jan-11"},
-    "subtitle": {"_type":"localeString","ar":"","en":"Radwan Ghazi Moumneh · Anthony Sahyoun & Jad Atoui · Ziad Nawfal · Ali Hamdan"},
+    "title": {
+      "_type": "localeString",
+      "ar": "راديو الحارة — جلسة مباشرة",
+      "en": "Radio Alhara — Live Session"
+    },
+    "slug": {
+      "_type": "slug",
+      "current": "radio-alhara-jan-11"
+    },
+    "subtitle": {
+      "_type": "localeString",
+      "ar": "",
+      "en": "Radwan Ghazi Moumneh · Anthony Sahyoun & Jad Atoui · Ziad Nawfal · Ali Hamdan"
+    },
     "eventType": "Radio",
     "startDateTime": "2026-01-11T19:00:00+02:00",
     "endDateTime": "2026-01-11T22:00:00+02:00",
@@ -282,15 +562,34 @@
     "recurringLabel": null,
     "status": "past",
     "registerUrl": null,
-    "shortDescription": {"_type":"localeText","ar":"راديو الحارة مباشرة من مجلس العجب — موسيقى تجريبية وراي وإلكترونية من فنانين لبنانيين وفلسطينيين.","en":"Radio Alhara live from the Wonder Cabinet — experimental, Raï, and electronic music from Lebanese and Palestinian artists."},
-    "body": {"_type":"localeText","ar":"راديو الحارة يبث مباشرة من مجلس العجب، بيت لحم.\n\nمع رضوان غازي مؤمن وأنتوني صحيون وجاد عطوي وزياد نوفل وعلي حمدان.\n\nموسيقى تجريبية وراي وإلكترونية وعربية تقليدية. بث على راديو NTS.","en":"Radio Alhara broadcasting live from the Wonder Cabinet, Bethlehem.\n\nSets by Radwan Ghazi Moumneh, Anthony Sahyoun & Jad Atoui, Ziad Nawfal, and Ali Hamdan.\n\nSpanning experimental, Raï, electronic, and Arabic traditional music. Broadcast on NTS Radio."},
+    "shortDescription": {
+      "_type": "localeText",
+      "ar": "راديو الحارة مباشرة من مجلس العجب — موسيقى تجريبية وراي وإلكترونية من فنانين لبنانيين وفلسطينيين.",
+      "en": "Radio Alhara live from the Wonder Cabinet — experimental, Raï, and electronic music from Lebanese and Palestinian artists."
+    },
+    "body": {
+      "_type": "localeText",
+      "ar": "راديو الحارة يبث مباشرة من مجلس العجب، بيت لحم.\n\nمع رضوان غازي مؤمن وأنتوني صحيون وجاد عطوي وزياد نوفل وعلي حمدان.\n\nموسيقى تجريبية وراي وإلكترونية وعربية تقليدية. بث على راديو NTS.",
+      "en": "Radio Alhara broadcasting live from the Wonder Cabinet, Bethlehem.\n\nSets by Radwan Ghazi Moumneh, Anthony Sahyoun & Jad Atoui, Ziad Nawfal, and Ali Hamdan.\n\nSpanning experimental, Raï, electronic, and Arabic traditional music. Broadcast on NTS Radio."
+    },
     "writeup": null,
     "coverUrl": null
   },
   {
-    "title": {"_type":"localeString","ar":"راديو الحارة — يوم كامل في المجلس","en":"Radio Alhara — Full Day at the Cabinet"},
-    "slug": {"_type":"slug","current":"radio-alhara-feb-08"},
-    "subtitle": {"_type":"localeString","ar":"","en":"RUUQ · Pierre Pepe · Artist Conversations"},
+    "title": {
+      "_type": "localeString",
+      "ar": "راديو الحارة — يوم كامل في المجلس",
+      "en": "Radio Alhara — Full Day at the Cabinet"
+    },
+    "slug": {
+      "_type": "slug",
+      "current": "radio-alhara-feb-08"
+    },
+    "subtitle": {
+      "_type": "localeString",
+      "ar": "",
+      "en": "RUUQ · Pierre Pepe · Artist Conversations"
+    },
     "eventType": "Radio",
     "startDateTime": "2026-02-08T17:00:00+02:00",
     "endDateTime": "2026-02-08T22:00:00+02:00",
@@ -300,33 +599,75 @@
     "recurringLabel": null,
     "status": "past",
     "registerUrl": null,
-    "shortDescription": {"_type":"localeText","ar":"بعد ظهر كامل من برامج راديو الحارة — موسيقى مع RUUQ وPierre Pepe، ثم محادثات مع فناني المجلس.","en":"A full afternoon of Radio Alhara programming — music sets by RUUQ and Pierre Pepe, followed by Wonder Cabinet artist conversations."},
-    "body": {"_type":"localeText","ar":"بعد ظهر كامل من برامج راديو الحارة مباشرة من مجلس العجب.\n\nموسيقى مع RUUQ وPierre Pepe، تليها سلسلة محادثات مع فناني مجلس العجب المقيمين.\n\nبث على راديو NTS وراديو الحارة.","en":"A full afternoon of Radio Alhara programming live from the Wonder Cabinet.\n\nMusic sets by RUUQ (Rap/Hip-Hop) and Pierre Pepe (Hip-Hop/Trap), followed by a talk series featuring Wonder Cabinet resident artists in conversation.\n\nBroadcast on NTS Radio and Radio Alhara."},
+    "shortDescription": {
+      "_type": "localeText",
+      "ar": "بعد ظهر كامل من برامج راديو الحارة — موسيقى مع RUUQ وPierre Pepe، ثم محادثات مع فناني المجلس.",
+      "en": "A full afternoon of Radio Alhara programming — music sets by RUUQ and Pierre Pepe, followed by Wonder Cabinet artist conversations."
+    },
+    "body": {
+      "_type": "localeText",
+      "ar": "بعد ظهر كامل من برامج راديو الحارة مباشرة من مجلس العجب.\n\nموسيقى مع RUUQ وPierre Pepe، تليها سلسلة محادثات مع فناني مجلس العجب المقيمين.\n\nبث على راديو NTS وراديو الحارة.",
+      "en": "A full afternoon of Radio Alhara programming live from the Wonder Cabinet.\n\nMusic sets by RUUQ (Rap/Hip-Hop) and Pierre Pepe (Hip-Hop/Trap), followed by a talk series featuring Wonder Cabinet resident artists in conversation.\n\nBroadcast on NTS Radio and Radio Alhara."
+    },
     "writeup": null,
     "coverUrl": null
   },
   {
-    "title": {"_type":"localeString","ar":"يوغا مع ايلدا زغموت","en":"Yoga with Eilda Zaghmout"},
-    "slug": {"_type":"slug","current":"yoga-weekly"},
-    "subtitle": {"_type":"localeString","ar":"","en":"Every Monday · Head of Meditation at Tawazon"},
+    "title": {
+      "_type": "localeString",
+      "ar": "يوغا مع ايلدا زغموت",
+      "en": "Yoga with Eilda Zaghmout"
+    },
+    "slug": {
+      "_type": "slug",
+      "current": "yoga-weekly"
+    },
+    "subtitle": {
+      "_type": "localeString",
+      "ar": "",
+      "en": "Every Monday · Head of Meditation at Tawazon"
+    },
     "eventType": "Class",
     "startDateTime": "2026-04-06T19:00:00+03:00",
     "endDateTime": "2026-04-06T20:30:00+03:00",
     "location": "Ground floor",
     "featured": false,
     "recurring": true,
-    "recurringLabel": {"_type":"localeString","ar":"","en":"Every Monday · 19:00"},
+    "recurringLabel": {
+      "_type": "localeString",
+      "ar": "",
+      "en": "Every Monday · 19:00"
+    },
     "status": "upcoming",
     "registerUrl": "https://forms.gle/ykHvYEn1QUo4B3oi7",
-    "shortDescription": {"_type":"localeText","ar":"رحلة شيقة لاكتشاف الذات والشفاء.","en":"An immersive journey of self-discovery and healing."},
-    "body": {"_type":"localeText","ar":"في مجلس العجب، كل يوم اثنين إيلدا زغموت، معلمة اليوغا المحترفة و\"رئيسة التأمل\" في مؤسسة توازن، تقوم في إرشادك خلال رحلة شيقة لاكتشاف الذات.\n\nالتكلفة: ٣٠ شيكل لكل حصة أو ١٠٠ شيكل لأربعة حصص.","en":"A regular appointment at the Wonder Cabinet, every Monday Eilda Zaghmout, professional yoga teacher and \"Head of Meditation\" at Tawazon, will continue to guide you through an immersive journey of self discovery and healing.\n\nCost — 30 NIS per class, or 100 NIS for a four-class package. Mixed classes. Mats and props provided."},
+    "shortDescription": {
+      "_type": "localeText",
+      "ar": "رحلة شيقة لاكتشاف الذات والشفاء.",
+      "en": "An immersive journey of self-discovery and healing."
+    },
+    "body": {
+      "_type": "localeText",
+      "ar": "في مجلس العجب، كل يوم اثنين إيلدا زغموت، معلمة اليوغا المحترفة و\"رئيسة التأمل\" في مؤسسة توازن، تقوم في إرشادك خلال رحلة شيقة لاكتشاف الذات.\n\nالتكلفة: ٣٠ شيكل لكل حصة أو ١٠٠ شيكل لأربعة حصص.",
+      "en": "A regular appointment at the Wonder Cabinet, every Monday Eilda Zaghmout, professional yoga teacher and \"Head of Meditation\" at Tawazon, will continue to guide you through an immersive journey of self discovery and healing.\n\nCost — 30 NIS per class, or 100 NIS for a four-class package. Mixed classes. Mats and props provided."
+    },
     "writeup": null,
     "coverUrl": null
   },
   {
-    "title": {"_type":"localeString","ar":"الموجات الصوتية: سيمفونية الفيزياء","en":"Sound Waves: The Symphony of Physics"},
-    "slug": {"_type":"slug","current":"soundwaves-apr-08"},
-    "subtitle": {"_type":"localeString","ar":"","en":"Making Sound — Part I of II · Dr. Helen Czerski"},
+    "title": {
+      "_type": "localeString",
+      "ar": "الموجات الصوتية: سيمفونية الفيزياء",
+      "en": "Sound Waves: The Symphony of Physics"
+    },
+    "slug": {
+      "_type": "slug",
+      "current": "soundwaves-apr-08"
+    },
+    "subtitle": {
+      "_type": "localeString",
+      "ar": "",
+      "en": "Making Sound — Part I of II · Dr. Helen Czerski"
+    },
     "eventType": "Film",
     "startDateTime": "2026-04-08T19:00:00+03:00",
     "endDateTime": "2026-04-08T20:00:00+03:00",
@@ -336,15 +677,34 @@
     "recurringLabel": null,
     "status": "past",
     "registerUrl": null,
-    "shortDescription": {"_type":"localeText","ar":"العلوم المذهلة وراء الأصوات المألوفة، والتي لا نسمعها.","en":"The extraordinary science behind the sounds we know — and those we cannot hear."},
-    "body": {"_type":"localeText","ar":"تستكشف د. هيلين تشيرسكي العلوم المذهلة وراء الأصوات المألوفة والأصوات التي لا نسمعها عادةً.\n\nالجزء الأول من جزأين — يكشف عن كيفية توليد الصوت، من فيزياء الوتر إلى آليات الكلام.\n\nبالإنجليزية · ساعة واحدة · دخول مجاني.","en":"Dr Helen Czerski investigates the extraordinary science behind the sounds we're familiar with and the sounds that we normally can't hear.\n\nThe first of two screenings — this one unpacking how sound is made, from the physics of a struck string to the mechanics of speech.\n\nIn English · 1 hour · free entry."},
+    "shortDescription": {
+      "_type": "localeText",
+      "ar": "العلوم المذهلة وراء الأصوات المألوفة، والتي لا نسمعها.",
+      "en": "The extraordinary science behind the sounds we know — and those we cannot hear."
+    },
+    "body": {
+      "_type": "localeText",
+      "ar": "تستكشف د. هيلين تشيرسكي العلوم المذهلة وراء الأصوات المألوفة والأصوات التي لا نسمعها عادةً.\n\nالجزء الأول من جزأين — يكشف عن كيفية توليد الصوت، من فيزياء الوتر إلى آليات الكلام.\n\nبالإنجليزية · ساعة واحدة · دخول مجاني.",
+      "en": "Dr Helen Czerski investigates the extraordinary science behind the sounds we're familiar with and the sounds that we normally can't hear.\n\nThe first of two screenings — this one unpacking how sound is made, from the physics of a struck string to the mechanics of speech.\n\nIn English · 1 hour · free entry."
+    },
     "writeup": null,
     "coverUrl": null
   },
   {
-    "title": {"_type":"localeString","ar":"راست","en":"Rast"},
-    "slug": {"_type":"slug","current":"rast-apr-11"},
-    "subtitle": {"_type":"localeString","ar":"","en":"A solo performance on the oud · Tareq Abu Salameh"},
+    "title": {
+      "_type": "localeString",
+      "ar": "راست",
+      "en": "Rast"
+    },
+    "slug": {
+      "_type": "slug",
+      "current": "rast-apr-11"
+    },
+    "subtitle": {
+      "_type": "localeString",
+      "ar": "",
+      "en": "A solo performance on the oud · Tareq Abu Salameh"
+    },
     "eventType": "Performance",
     "startDateTime": "2026-04-11T19:00:00+03:00",
     "endDateTime": "2026-04-11T20:00:00+03:00",
@@ -354,15 +714,34 @@
     "recurringLabel": null,
     "status": "past",
     "registerUrl": "https://forms.gle/ykHvYEn1QUo4B3oi7",
-    "shortDescription": {"_type":"localeText","ar":"عبر صوت العود التعبيري، استكشاف شكل التقاسيم التقليدي.","en":"Through the expressive voice of the oud, tracing the traditional form of taqasim."},
-    "body": {"_type":"localeText","ar":"راست عرضٌ منفردٌ يستكشف، عبر صوت العود التعبيري، الشكل التقليدي للتقاسيم — نمطٌ مميّز من الارتجال في قلب التراث الموسيقي الشرقي.\n\nيتميّز هذا الشكل بقدرته على نسج طيفٍ واسع من الموسيقى المشتركة بين الثقافات التركية والعربية والفارسية والآشورية والكردية والسريانية.\n\n— طارق أبو سلامة (مواليد ١٩٩٠ القدس)، مؤلّف موسيقي فلسطيني يقيم في ميلانو منذ ٢٠٢٢.","en":"Rast is a solo performance that, through the expressive voice of the oud, explores the traditional form of taqasim — a distinctive mode of improvisation at the heart of Eastern musical heritage.\n\nThis form is remarkable for its ability to weave together a wide spectrum of musical traditions shared among Turkish, Arab, Persian, Assyrian, Kurdish, and Syriac cultures.\n\n— Tareq Abu Salameh (b. 1990, Jerusalem) is a Palestinian composer based in Milan since 2022."},
+    "shortDescription": {
+      "_type": "localeText",
+      "ar": "عبر صوت العود التعبيري، استكشاف شكل التقاسيم التقليدي.",
+      "en": "Through the expressive voice of the oud, tracing the traditional form of taqasim."
+    },
+    "body": {
+      "_type": "localeText",
+      "ar": "راست عرضٌ منفردٌ يستكشف، عبر صوت العود التعبيري، الشكل التقليدي للتقاسيم — نمطٌ مميّز من الارتجال في قلب التراث الموسيقي الشرقي.\n\nيتميّز هذا الشكل بقدرته على نسج طيفٍ واسع من الموسيقى المشتركة بين الثقافات التركية والعربية والفارسية والآشورية والكردية والسريانية.\n\n— طارق أبو سلامة (مواليد ١٩٩٠ القدس)، مؤلّف موسيقي فلسطيني يقيم في ميلانو منذ ٢٠٢٢.",
+      "en": "Rast is a solo performance that, through the expressive voice of the oud, explores the traditional form of taqasim — a distinctive mode of improvisation at the heart of Eastern musical heritage.\n\nThis form is remarkable for its ability to weave together a wide spectrum of musical traditions shared among Turkish, Arab, Persian, Assyrian, Kurdish, and Syriac cultures.\n\n— Tareq Abu Salameh (b. 1990, Jerusalem) is a Palestinian composer based in Milan since 2022."
+    },
     "writeup": null,
     "coverUrl": null
   },
   {
-    "title": {"_type":"localeString","ar":"جلسات القُبّة","en":"The Dome Sessions"},
-    "slug": {"_type":"slug","current":"dome-apr-15"},
-    "subtitle": {"_type":"localeString","ar":"","en":"In Resonance Collective · Q&A with Firas El Hallak"},
+    "title": {
+      "_type": "localeString",
+      "ar": "جلسات القُبّة",
+      "en": "The Dome Sessions"
+    },
+    "slug": {
+      "_type": "slug",
+      "current": "dome-apr-15"
+    },
+    "subtitle": {
+      "_type": "localeString",
+      "ar": "",
+      "en": "In Resonance Collective · Q&A with Firas El Hallak"
+    },
     "eventType": "Film",
     "startDateTime": "2026-04-15T19:00:00+03:00",
     "endDateTime": "2026-04-15T20:00:00+03:00",
@@ -372,15 +751,34 @@
     "recurringLabel": null,
     "status": "past",
     "registerUrl": null,
-    "shortDescription": {"_type":"localeText","ar":"الصوت والمكان، من القبة غير المكتملة لنيماير في طرابلس.","en":"Sound and space, emerging from the unfinished Niemeyer dome in Tripoli, Lebanon."},
-    "body": {"_type":"localeText","ar":"استكشاف للعلاقة بين الصوت والمكان، من القبة غير المكتملة في معرض رشيد كرامي الدولي في طرابلس، لبنان.\n\nصُمّم الفضاء على يد المعماري أوسكار نيماير. حين اندلعت الحرب الأهلية اللبنانية، توقّف البناء، تاركاً القبة دون معالجة صوتية — مما أنتج صدىً مسحوراً.\n\nيتبعه حوار مع فراس الحلاق. صدر على Ruptured Label.","en":"An exploration of sound and space, emerging from the architectural and acoustic features of the unfinished Dome of the Rachid Karami International Fair in Tripoli, Lebanon.\n\nDesigned by Oscar Niemeyer. When the Lebanese Civil War began, construction ceased, leaving the Dome acoustically untreated — creating a haunting reverb.\n\nFollowed by a Q&A with Firas El Hallak. Released on Ruptured Label."},
+    "shortDescription": {
+      "_type": "localeText",
+      "ar": "الصوت والمكان، من القبة غير المكتملة لنيماير في طرابلس.",
+      "en": "Sound and space, emerging from the unfinished Niemeyer dome in Tripoli, Lebanon."
+    },
+    "body": {
+      "_type": "localeText",
+      "ar": "استكشاف للعلاقة بين الصوت والمكان، من القبة غير المكتملة في معرض رشيد كرامي الدولي في طرابلس، لبنان.\n\nصُمّم الفضاء على يد المعماري أوسكار نيماير. حين اندلعت الحرب الأهلية اللبنانية، توقّف البناء، تاركاً القبة دون معالجة صوتية — مما أنتج صدىً مسحوراً.\n\nيتبعه حوار مع فراس الحلاق. صدر على Ruptured Label.",
+      "en": "An exploration of sound and space, emerging from the architectural and acoustic features of the unfinished Dome of the Rachid Karami International Fair in Tripoli, Lebanon.\n\nDesigned by Oscar Niemeyer. When the Lebanese Civil War began, construction ceased, leaving the Dome acoustically untreated — creating a haunting reverb.\n\nFollowed by a Q&A with Firas El Hallak. Released on Ruptured Label."
+    },
     "writeup": null,
     "coverUrl": null
   },
   {
-    "title": {"_type":"localeString","ar":"جلسات إذاعية: 7orany و ADAN","en":"Radio Sessions: 7orany and ADAN"},
-    "slug": {"_type":"slug","current":"radio-sessions-apr-18"},
-    "subtitle": {"_type":"localeString","ar":"","en":"Live on Radio AlHara · Bar open"},
+    "title": {
+      "_type": "localeString",
+      "ar": "جلسات إذاعية: 7orany و ADAN",
+      "en": "Radio Sessions: 7orany and ADAN"
+    },
+    "slug": {
+      "_type": "slug",
+      "current": "radio-sessions-apr-18"
+    },
+    "subtitle": {
+      "_type": "localeString",
+      "ar": "",
+      "en": "Live on Radio AlHara · Bar open"
+    },
     "eventType": "Radio",
     "startDateTime": "2026-04-18T19:00:00+03:00",
     "endDateTime": "2026-04-18T22:00:00+03:00",
@@ -390,15 +788,34 @@
     "recurringLabel": null,
     "status": "past",
     "registerUrl": null,
-    "shortDescription": {"_type":"localeText","ar":"بشار حوراني ثم ADAN، يبثّان أسطوانات مباشرة عبر راديو الحارة من مجلس العجب.","en":"Bashar Horany followed by ADAN, spinning records live from the Cabinet on Radio AlHara."},
-    "body": {"_type":"localeText","ar":"بشار حوراني «7orany» — وُلد وترعرع في حيفا، مصمّم غرافيك وصاحب مطبعة عائلية منذ ١٩٧٥. تجوب مجموعاته أطراف الموسيقى العربية غير الموثّقة.\n\nADAN — فنانة فلسطينية من القدس، مقيمة في لندن، ممارسة في تقاطع الصوت والمكان والذاكرة.\n\nبثٌّ حيّ لثلاث ساعات عبر راديو الحارة.","en":"Bashar Horany \"7orany\" — born and raised in Haifa, graphic designer and owner of a family print shop since 1975. His sets move through the undocumented edges of Arab music.\n\nADAN — Palestinian curator, architect and DJ from Jerusalem, based in London. Her practice is rooted in the intersection of sound, space, and memory.\n\nThree-hour live broadcast on Radio AlHara."},
+    "shortDescription": {
+      "_type": "localeText",
+      "ar": "بشار حوراني ثم ADAN، يبثّان أسطوانات مباشرة عبر راديو الحارة من مجلس العجب.",
+      "en": "Bashar Horany followed by ADAN, spinning records live from the Cabinet on Radio AlHara."
+    },
+    "body": {
+      "_type": "localeText",
+      "ar": "بشار حوراني «7orany» — وُلد وترعرع في حيفا، مصمّم غرافيك وصاحب مطبعة عائلية منذ ١٩٧٥. تجوب مجموعاته أطراف الموسيقى العربية غير الموثّقة.\n\nADAN — فنانة فلسطينية من القدس، مقيمة في لندن، ممارسة في تقاطع الصوت والمكان والذاكرة.\n\nبثٌّ حيّ لثلاث ساعات عبر راديو الحارة.",
+      "en": "Bashar Horany \"7orany\" — born and raised in Haifa, graphic designer and owner of a family print shop since 1975. His sets move through the undocumented edges of Arab music.\n\nADAN — Palestinian curator, architect and DJ from Jerusalem, based in London. Her practice is rooted in the intersection of sound, space, and memory.\n\nThree-hour live broadcast on Radio AlHara."
+    },
     "writeup": null,
     "coverUrl": null
   },
   {
-    "title": {"_type":"localeString","ar":"ثلاثية غير رسمية","en":"An Informal Trilogy"},
-    "slug": {"_type":"slug","current":"noor-abed-apr-22"},
-    "subtitle": {"_type":"localeString","ar":"","en":"Films by Noor Abed · Double screening"},
+    "title": {
+      "_type": "localeString",
+      "ar": "ثلاثية غير رسمية",
+      "en": "An Informal Trilogy"
+    },
+    "slug": {
+      "_type": "slug",
+      "current": "noor-abed-apr-22"
+    },
+    "subtitle": {
+      "_type": "localeString",
+      "ar": "",
+      "en": "Films by Noor Abed · Double screening"
+    },
     "eventType": "Film",
     "startDateTime": "2026-04-22T19:00:00+03:00",
     "endDateTime": "2026-04-22T20:00:00+03:00",
@@ -408,15 +825,34 @@
     "recurringLabel": null,
     "status": "past",
     "registerUrl": null,
-    "shortDescription": {"_type":"localeText","ar":"ثلاثة أفلام لنور عابد — عرضٌ مزدوج في مجلس العجب وبين النخلتين، أريحا.","en":"Three films by Noor Abed — a double screening at the Wonder Cabinet and Bayn Al Nakhlaytan, Jericho."},
-    "body": {"_type":"localeText","ar":"عرضٌ مزدوج لثلاثة أفلام لنور عابد: بنيلوبي (٢٠١٤)، أغانينا (٢٠٢١)، وليلة احتجزناها بيننا (٢٠٢٤).\n\nفي آنٍ واحد في مجلس العجب، بيت لحم، وفي بين النخلتين، أريحا.","en":"A double screening of three films by Noor Abed: Penelope (2014), our songs (2021), and A Night We Held Between (2024).\n\nSimultaneously at the Wonder Cabinet, Bethlehem, and at Bayn Al Nakhlaytan, Jericho."},
+    "shortDescription": {
+      "_type": "localeText",
+      "ar": "ثلاثة أفلام لنور عابد — عرضٌ مزدوج في مجلس العجب وبين النخلتين، أريحا.",
+      "en": "Three films by Noor Abed — a double screening at the Wonder Cabinet and Bayn Al Nakhlaytan, Jericho."
+    },
+    "body": {
+      "_type": "localeText",
+      "ar": "عرضٌ مزدوج لثلاثة أفلام لنور عابد: بنيلوبي (٢٠١٤)، أغانينا (٢٠٢١)، وليلة احتجزناها بيننا (٢٠٢٤).\n\nفي آنٍ واحد في مجلس العجب، بيت لحم، وفي بين النخلتين، أريحا.",
+      "en": "A double screening of three films by Noor Abed: Penelope (2014), our songs (2021), and A Night We Held Between (2024).\n\nSimultaneously at the Wonder Cabinet, Bethlehem, and at Bayn Al Nakhlaytan, Jericho."
+    },
     "writeup": null,
     "coverUrl": null
   },
   {
-    "title": {"_type":"localeString","ar":"Carhartt WIP × راديو الحارة","en":"Carhartt WIP × Radio AlHara"},
-    "slug": {"_type":"slug","current":"carhartt-radioalhara-apr-24"},
-    "subtitle": {"_type":"localeString","ar":"","en":"Collection Launch · Radio AlHara 6th Anniversary"},
+    "title": {
+      "_type": "localeString",
+      "ar": "Carhartt WIP × راديو الحارة",
+      "en": "Carhartt WIP × Radio AlHara"
+    },
+    "slug": {
+      "_type": "slug",
+      "current": "carhartt-radioalhara-apr-24"
+    },
+    "subtitle": {
+      "_type": "localeString",
+      "ar": "",
+      "en": "Collection Launch · Radio AlHara 6th Anniversary"
+    },
     "eventType": "Radio",
     "startDateTime": "2026-04-24T17:00:00+03:00",
     "endDateTime": "2026-04-24T22:00:00+03:00",
@@ -426,15 +862,34 @@
     "recurringLabel": null,
     "status": "past",
     "registerUrl": null,
-    "shortDescription": {"_type":"localeText","ar":"YA HU وأرام صبّاح والناذر — مباشرةً في الذكرى السادسة لراديو الحارة، مع أكل أم علاء.","en":"YA HU, Aram Sabbah, and Al Nather — live on Radio AlHara's 6th anniversary, with food by Um Alaa."},
-    "body": {"_type":"localeText","ar":"فعالية إطلاق مجموعة مع راديو الحارة بمناسبة ذكراهم السادسة.\n\nموسيقى: YA HU، أرام صبّاح، والناذر. أكل: أم علاء.\n\n٥:٠٠ مساءً – ١٠:٠٠ مساءً · دخول مجاني.","en":"A collection launch event with Radio AlHara to mark their 6th anniversary.\n\nMusic by YA HU, Aram Sabbah, and Al Nather. Food by Um Alaa.\n\n17:00 – 22:00 · Free entry."},
+    "shortDescription": {
+      "_type": "localeText",
+      "ar": "YA HU وأرام صبّاح والناذر — مباشرةً في الذكرى السادسة لراديو الحارة، مع أكل أم علاء.",
+      "en": "YA HU, Aram Sabbah, and Al Nather — live on Radio AlHara's 6th anniversary, with food by Um Alaa."
+    },
+    "body": {
+      "_type": "localeText",
+      "ar": "فعالية إطلاق مجموعة مع راديو الحارة بمناسبة ذكراهم السادسة.\n\nموسيقى: YA HU، أرام صبّاح، والناذر. أكل: أم علاء.\n\n٥:٠٠ مساءً – ١٠:٠٠ مساءً · دخول مجاني.",
+      "en": "A collection launch event with Radio AlHara to mark their 6th anniversary.\n\nMusic by YA HU, Aram Sabbah, and Al Nather. Food by Um Alaa.\n\n17:00 – 22:00 · Free entry."
+    },
     "writeup": null,
     "coverUrl": null
   },
   {
-    "title": {"_type":"localeString","ar":"أفلام قصيرة لهنا الياس","en":"Short Films by Hana Elias"},
-    "slug": {"_type":"slug","current":"hana-elias-apr-29"},
-    "subtitle": {"_type":"localeString","ar":"","en":"Adrift (2025) + Where the Wind Blows (2024)"},
+    "title": {
+      "_type": "localeString",
+      "ar": "أفلام قصيرة لهنا الياس",
+      "en": "Short Films by Hana Elias"
+    },
+    "slug": {
+      "_type": "slug",
+      "current": "hana-elias-apr-29"
+    },
+    "subtitle": {
+      "_type": "localeString",
+      "ar": "",
+      "en": "Adrift (2025) + Where the Wind Blows (2024)"
+    },
     "eventType": "Film",
     "startDateTime": "2026-04-29T19:00:00+03:00",
     "endDateTime": "2026-04-29T20:00:00+03:00",
@@ -444,8 +899,268 @@
     "recurringLabel": null,
     "status": "upcoming",
     "registerUrl": null,
-    "shortDescription": {"_type":"localeText","ar":"فيلمان قصيران لهنا الياس — بموسيقى مستوحاة من وادي كريميزان وأصوات الأماكن.","en":"Two short films by Hana Elias — with a soundtrack drawing from the Cremisan Valley and Sounds of Places."},
-    "body": {"_type":"localeText","ar":"تائه (٢٠٢٥) وحيثما تهبّ الريح (٢٠٢٤) — فيلمان قصيران لهنا الياس.\n\nتستلهم الموسيقى من التسجيلات الميدانية التي أُجريت في وادي كريميزان خلال مشروع أصوات الأماكن.","en":"Adrift (2025) and Where the Wind Blows (2024) — two short films by Hana Elias.\n\nThe soundtracks draw from field recordings made in the Cremisan Valley during Sounds of Places."},
+    "shortDescription": {
+      "_type": "localeText",
+      "ar": "فيلمان قصيران لهنا الياس — بموسيقى مستوحاة من وادي كريميزان وأصوات الأماكن.",
+      "en": "Two short films by Hana Elias — with a soundtrack drawing from the Cremisan Valley and Sounds of Places."
+    },
+    "body": {
+      "_type": "localeText",
+      "ar": "تائه (٢٠٢٥) وحيثما تهبّ الريح (٢٠٢٤) — فيلمان قصيران لهنا الياس.\n\nتستلهم الموسيقى من التسجيلات الميدانية التي أُجريت في وادي كريميزان خلال مشروع أصوات الأماكن.",
+      "en": "Adrift (2025) and Where the Wind Blows (2024) — two short films by Hana Elias.\n\nThe soundtracks draw from field recordings made in the Cremisan Valley during Sounds of Places."
+    },
+    "writeup": null,
+    "coverUrl": null
+  },
+  {
+    "title": {
+      "en": "Film Screening: Helvetica (2007) by Gary Hustwit",
+      "ar": "عرض فيلم: هيلفيتيكا (٢٠٠٧) لغاري هاستويت"
+    },
+    "slug": {
+      "_type": "slug",
+      "current": "film-screening-helvetica-2026"
+    },
+    "subtitle": null,
+    "eventType": "Film",
+    "startDateTime": "2026-06-17T19:00:00+03:00",
+    "endDateTime": "2026-06-17T20:00:00+03:00",
+    "location": "Screening room",
+    "featured": false,
+    "recurring": false,
+    "recurringLabel": null,
+    "status": "past",
+    "registerUrl": null,
+    "shortDescription": {
+      "en": "A feature documentary on typography, graphic design, and global visual culture.",
+      "ar": "فيلم وثائقي عن الطباعة والتصميم الجرافيكي والثقافة البصرية العالمية."
+    },
+    "body": {
+      "en": "Helvetica traces the spread of one typeface as a way into a larger conversation about how type shapes our lives — through interviews with leading designers and a tour of the urban spaces it inhabits.\n\nDirected by Gary Hustwit (Objectified, Urbanized, Rams).",
+      "ar": "يتتبّع الفيلم انتشار خط واحد من الخطوط كمدخل لحوار أشمل حول تأثير الطباعة على حياتنا، من خلال لقاءات مع مصممين بارزين وجولة في الفضاءات الحضرية التي يسكنها هذا الخط.\n\nإخراج غاري هاستويت (أوبجيكتيفايد، أوربانايزد، رامز)."
+    },
+    "writeup": null,
+    "coverUrl": null
+  },
+  {
+    "title": {
+      "en": "Exhibition Opening: Elegiac Whispers — Lines on Grief",
+      "ar": "افتتاح معرض: هسهسة الرثاء — مدونات عن الحزن"
+    },
+    "slug": {
+      "_type": "slug",
+      "current": "exhibition-opening-lines-on-grief"
+    },
+    "subtitle": null,
+    "eventType": "Opening",
+    "startDateTime": "2026-06-19T18:00:00+03:00",
+    "endDateTime": "2026-06-19T22:00:00+03:00",
+    "location": "Main hall",
+    "featured": false,
+    "recurring": false,
+    "recurringLabel": null,
+    "status": "past",
+    "registerUrl": null,
+    "shortDescription": {
+      "en": "Opening of a discursive exhibition on Arabic poetry and grief, with lettering artists from across the Arab world and its diasporas.",
+      "ar": "افتتاح معرض حواري حول الشعر العربي والحزن، بمشاركة فنانين وفنانات في الخط من العالم العربي والمهجر."
+    },
+    "body": {
+      "en": "Circulated by the A. M. Qattan Foundation and originally curated by Amin Alsaden, the exhibition brings together lettering artists who give visual form to modern and contemporary Arabic poetry on grief.\n\nOpen through July 12, with a program of film screenings, sound, and conversation.",
+      "ar": "بتداول من مؤسسة عبد المحسن القطان وبإشراف القيّم أمين السادن، يجمع المعرض فنانين وفنانات في الخط الفني يمنحون أبياتاً من الشعر العربي الحديث والمعاصر عن الحزن شكلاً بصرياً.\n\nيستمر المعرض حتى ١٢ تموز، ويرافقه برنامج من العروض السينمائية والبرامج الصوتية والحوارات."
+    },
+    "writeup": null,
+    "coverUrl": null
+  },
+  {
+    "title": {
+      "en": "Public Talk: On Archiving Lamentation and Songs of Grief, by Hassan El Sahili",
+      "ar": "حوار عام: في أرشفة النوح والأغاني الحزينة، مع حسن الساحلي"
+    },
+    "slug": {
+      "_type": "slug",
+      "current": "public-talk-hassan-el-sahili"
+    },
+    "subtitle": null,
+    "eventType": "Reading",
+    "startDateTime": "2026-06-19T19:00:00+03:00",
+    "endDateTime": "2026-06-19T20:00:00+03:00",
+    "location": "Main hall",
+    "featured": false,
+    "recurring": false,
+    "recurringLabel": null,
+    "status": "past",
+    "registerUrl": null,
+    "shortDescription": {
+      "en": "Hassan El Sahili on building a digital archive of sorrowful musical traditions, from Shia and Christian mourning rituals to Iraqi and Egyptian tarab.",
+      "ar": "حسن الساحلي يتحدث عن بناء أرشيف رقمي للموسيقى الحزينة، من طقوس الحداد الشيعية والمسيحية إلى الطرب العراقي والمصري."
+    },
+    "body": {
+      "en": "Writer and photographer Hassan El Sahili reflects on archiving sorrowful musical works — departing from his imagined \"International Center for Lamentation and Songs of Grief\" — and what it means to build a real tool for a community living through repeated loss.\n\nPart of the Lines on Grief exhibition program; a selection of lamentation songs played in the space.",
+      "ar": "يتحدث الكاتب والمصور حسن الساحلي عن أرشفة الأعمال الغنائية الحزينة، منطلقاً من \"المركز الدولي للنوح والأغاني الحزينة\" المتخيَّل، وما يعنيه بناء أداة فعلية لمجتمع يعيش تجارب متكررة من الفقد.\n\nجزء من برنامج معرض \"مدونات عن الحزن\"، مع عرض مجموعة من ترانيم الرثاء داخل المساحة."
+    },
+    "writeup": null,
+    "coverUrl": null
+  },
+  {
+    "title": {
+      "en": "Vocal Performance by Dwna Ayyad",
+      "ar": "أداء صوتي لـدُنى عياد"
+    },
+    "slug": {
+      "_type": "slug",
+      "current": "vocal-performance-dwna-ayyad"
+    },
+    "subtitle": null,
+    "eventType": "Performance",
+    "startDateTime": "2026-06-20T19:00:00+03:00",
+    "endDateTime": "2026-06-20T20:00:00+03:00",
+    "location": "Main hall",
+    "featured": false,
+    "recurring": false,
+    "recurringLabel": null,
+    "status": "past",
+    "registerUrl": null,
+    "shortDescription": {
+      "en": "Vocalist Dwna Ayyad leads an improvised vocal tour of the Lines on Grief exhibition's Arabic poems.",
+      "ar": "المغنية دُنى عياد تقود جولة صوتية ارتجالية في قصائد معرض \"مدونات عن الحزن\"."
+    },
+    "body": {
+      "en": "Dwna Ayyad guides the audience through the exhibition with improvised vocalizations of the Arabic poems illustrated by the artists, inviting collective listening.\n\nPart of the Lines on Grief exhibition program.",
+      "ar": "تأخذ دُنى عياد الجمهور في جولة داخل المعرض عبر تأديات صوتية ارتجالية للقصائد العربية التي تجسّدها أعمال الفنانين، في دعوة للإنصات الجماعي.\n\nجزء من برنامج معرض \"مدونات عن الحزن\"."
+    },
+    "writeup": null,
+    "coverUrl": null
+  },
+  {
+    "title": {
+      "en": "NOWNESS Screening 1: Poetics of Grief",
+      "ar": "شعرية الحزن: أفلام قصيرة من NOWNESS"
+    },
+    "slug": {
+      "_type": "slug",
+      "current": "nowness-screening-1-poetics-of-grief"
+    },
+    "subtitle": {
+      "en": "Followed by a conversation with Rohan Ayinde and Tayo Rapoport",
+      "ar": "يعقبه حوار مع الفنانين روهان أيندي وتايو رابوبورت"
+    },
+    "eventType": "Film",
+    "startDateTime": "2026-06-24T19:00:00+03:00",
+    "endDateTime": "2026-06-24T20:00:00+03:00",
+    "location": "Screening room",
+    "featured": false,
+    "recurring": false,
+    "recurringLabel": null,
+    "status": "past",
+    "registerUrl": null,
+    "shortDescription": {
+      "en": "Three short films on grief from NOWNESS's video art archive, followed by a conversation with artists Rohan Ayinde and Tayo Rapoport.",
+      "ar": "ثلاثة أفلام قصيرة عن الحزن من أرشيف NOWNESS، يليها حوار مع الفنانين روهان أيندي وتايو رابوبورت."
+    },
+    "body": {
+      "en": "First in a series of NOWNESS screenings at the Wonder Cabinet: Late on the Planet (Julia Tonon), A Letter to My Grandfather (Razan Alsoghayer), and ęmí: freedomsong (Rohan Ayinde & Tayo Rapoport).\n\nFollowed by a conversation with Ayinde and Rapoport.",
+      "ar": "أول عرض من سلسلة NOWNESS في مجلس العجب: Late on the Planet (جوليا تونون)، A Letter to My Grandfather (رزان الصغيّر)، وęmí: freedomsong (روهان أييندي وتايو رابوبورت).\n\nيليه حوار مع أييندي ورابوبورت."
+    },
+    "writeup": null,
+    "coverUrl": null
+  },
+  {
+    "title": {
+      "en": "The Living Past: A Documentary Photography Workshop by Maen Hammad",
+      "ar": "الماضي الحي: ورشة تصوير وثائقي مع معن حماد"
+    },
+    "slug": {
+      "_type": "slug",
+      "current": "photography-workshop-maen-hammad"
+    },
+    "subtitle": {
+      "en": "On carrying an archive forward",
+      "ar": ""
+    },
+    "eventType": "Workshop",
+    "startDateTime": "2026-06-26T14:00:00+03:00",
+    "endDateTime": "2026-06-26T16:00:00+03:00",
+    "location": "Main hall",
+    "featured": false,
+    "recurring": false,
+    "recurringLabel": null,
+    "status": "past",
+    "registerUrl": "https://forms.gle/ZJ8kJbG6XLxLGv967",
+    "shortDescription": {
+      "en": "Maen Hammad on working with family archives as living material, drawn from his project Amira's Castle. Limited to 25 participants.",
+      "ar": "معن حماد عن التعامل مع الأرشيفات العائلية كمادة حية، استناداً إلى مشروعه \"قلعة أميرة\". العدد محدود بـ٢٥ مشاركاً."
+    },
+    "body": {
+      "en": "Drawing on Amira's Castle — his ongoing project tracing his grandparents' lives alongside his own documentation of the Palestinian present — Maen Hammad opens questions about carrying a family archive forward. Includes a practical scanning session.\n\nParticipants are encouraged to bring an object, photograph, or document from their own family history. Limited to 25 participants, no fee.",
+      "ar": "استناداً إلى مشروع \"قلعة أميرة\" — مشروعه المستمر الذي يتتبّع سيرة جدّيه إلى جانب توثيقه للحاضر الفلسطيني — يفتح معن حماد أسئلة حول المضي بالأرشيف العائلي قدماً، مع جلسة مسح ضوئي عملية.\n\nيُشجَّع المشاركون على إحضار غرض أو صورة أو وثيقة من تاريخهم العائلي. العدد محدود بـ٢٥ مشاركاً، دون رسوم."
+    },
+    "writeup": null,
+    "coverUrl": null
+  },
+  {
+    "title": {
+      "en": "Memories Through Smells: Incense Workshop by Hekayet Turath",
+      "ar": "روائح وذكريات: ورشة البخور مع حكاية تراث"
+    },
+    "slug": {
+      "_type": "slug",
+      "current": "incense-workshop-hekayet-turath"
+    },
+    "subtitle": null,
+    "eventType": "Workshop",
+    "startDateTime": "2026-06-27T16:00:00+03:00",
+    "endDateTime": "2026-06-27T17:30:00+03:00",
+    "location": "Main hall",
+    "featured": false,
+    "recurring": false,
+    "recurringLabel": null,
+    "status": "past",
+    "registerUrl": "https://forms.gle/AcGdz76nS84Xy6rd8",
+    "shortDescription": {
+      "en": "Participants blend their own incense from Jerusalem old-city spices, exploring scent and memory with Hakayet Turath / Pro Terra Sancta.",
+      "ar": "يصنع المشاركون بخورهم الخاص من عطارة القدس القديمة، في استكشاف للرائحة والذكرى مع حكاية تراث / بروتراسنطا."
+    },
+    "body": {
+      "en": "Wonder Cabinet and the Hakayet Turath team (Pro Terra Sancta) invite participants to blend their own incense from spices and fragrances of Jerusalem's old-city souq, alongside a short history of the incense trade route from Yemen to Gaza.\n\n90 minutes. Ages 16+. No fee.",
+      "ar": "يدعو مجلس العجب وفريق حكاية تراث (بروتراسنطا) المشاركين لصنع بخورهم الخاص من عطارة القدس القديمة، إلى جانب عرض قصير عن تاريخ طريق البخور من اليمن إلى غزة.\n\nالمدة: ساعة ونصف. ١٦ سنة فما فوق. دون رسوم."
+    },
+    "writeup": null,
+    "coverUrl": null
+  },
+  {
+    "title": {
+      "en": "Yoga Classes with Eilda Zaghmout",
+      "ar": "حصص يوغا مع إيلدا زغموت"
+    },
+    "slug": {
+      "_type": "slug",
+      "current": "yoga-classes-eilda-zaghmout"
+    },
+    "subtitle": {
+      "en": "Mats and props provided",
+      "ar": ""
+    },
+    "eventType": "Class",
+    "startDateTime": "2026-06-29T18:30:00+03:00",
+    "endDateTime": "2026-06-29T20:00:00+03:00",
+    "location": "Main hall",
+    "featured": false,
+    "recurring": true,
+    "recurringLabel": {
+      "en": "Every Monday",
+      "ar": "كل يوم اثنين"
+    },
+    "status": "upcoming",
+    "registerUrl": "https://forms.gle/ykHvYEn1QUo4B3oi7",
+    "shortDescription": {
+      "en": "A weekly yoga session with Eilda Zaghmout, every Monday at the Wonder Cabinet.",
+      "ar": "حصة يوغا أسبوعية مع إيلدا زغموت، كل يوم اثنين في مجلس العجب."
+    },
+    "body": {
+      "en": "Eilda Zaghmout, yoga teacher and Head of Meditation at Tawazon, leads a weekly session of guided movement and self-discovery.\n\n30 NIS per class, or 100 NIS for a 4-class package. Mixed classes, mats and props provided.",
+      "ar": "تقدّم إيلدا زغموت، معلمة اليوغا و\"رئيسة التأمل\" في مؤسسة توازن، حصة أسبوعية من الحركة الموجَّهة واكتشاف الذات.\n\n30 شيكل للحصة، أو 100 شيكل لأربع حصص. حصص مختلطة، وتوفَّر جميع المعدات."
+    },
     "writeup": null,
     "coverUrl": null
   }

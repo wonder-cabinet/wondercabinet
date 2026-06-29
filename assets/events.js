@@ -1,6 +1,6 @@
 // Shared events data — GENERATED from live Sanity content. Do not hand-edit.
 // Source: Sanity project xdtj605l / dataset production (drafts perspective)
-// Generated: 2026-06-29T16:36:21.224Z
+// Generated: 2026-06-29T17:26:48.812Z
 // status: "upcoming" | "past"
 // recurring: true if this is a weekly/recurring event
 
@@ -569,6 +569,190 @@ window.EVENTS = [
     bodyAr: [
       "تائه (٢٠٢٥) وحيثما تهبّ الريح (٢٠٢٤) — فيلمان قصيران لهنا الياس.",
       "تستلهم الموسيقى من التسجيلات الميدانية التي أُجريت في وادي كريميزان خلال مشروع أصوات الأماكن."
+    ]
+  },
+
+  {
+    id: "film-screening-helvetica-2026",
+    day: "17", month: "Jun", year: 2026,
+    dow: "Wed", dowAr: "الأربعاء",
+    start: "19:00", end: "20:00",
+    type: "Film",
+    title: "Film Screening: Helvetica (2007) by Gary Hustwit",
+    titleAr: "عرض فيلم: هيلفيتيكا (٢٠٠٧) لغاري هاستويت",
+    location: "Screening room",
+    status: "past",
+    short: "A feature documentary on typography, graphic design, and global visual culture.",
+    shortAr: "فيلم وثائقي عن الطباعة والتصميم الجرافيكي والثقافة البصرية العالمية.",
+    body: [
+      "Helvetica traces the spread of one typeface as a way into a larger conversation about how type shapes our lives — through interviews with leading designers and a tour of the urban spaces it inhabits.",
+      "Directed by Gary Hustwit (Objectified, Urbanized, Rams)."
+    ],
+    bodyAr: [
+      "يتتبّع الفيلم انتشار خط واحد من الخطوط كمدخل لحوار أشمل حول تأثير الطباعة على حياتنا، من خلال لقاءات مع مصممين بارزين وجولة في الفضاءات الحضرية التي يسكنها هذا الخط.",
+      "إخراج غاري هاستويت (أوبجيكتيفايد، أوربانايزد، رامز)."
+    ]
+  },
+
+  {
+    id: "exhibition-opening-lines-on-grief",
+    day: "19", month: "Jun", year: 2026,
+    dow: "Fri", dowAr: "الجمعة",
+    start: "18:00", end: "22:00",
+    type: "Opening",
+    title: "Exhibition Opening: Elegiac Whispers — Lines on Grief",
+    titleAr: "افتتاح معرض: هسهسة الرثاء — مدونات عن الحزن",
+    location: "Main hall",
+    status: "past",
+    short: "Opening of a discursive exhibition on Arabic poetry and grief, with lettering artists from across the Arab world and its diasporas.",
+    shortAr: "افتتاح معرض حواري حول الشعر العربي والحزن، بمشاركة فنانين وفنانات في الخط من العالم العربي والمهجر.",
+    body: [
+      "Circulated by the A. M. Qattan Foundation and originally curated by Amin Alsaden, the exhibition brings together lettering artists who give visual form to modern and contemporary Arabic poetry on grief.",
+      "Open through July 12, with a program of film screenings, sound, and conversation."
+    ],
+    bodyAr: [
+      "بتداول من مؤسسة عبد المحسن القطان وبإشراف القيّم أمين السادن، يجمع المعرض فنانين وفنانات في الخط الفني يمنحون أبياتاً من الشعر العربي الحديث والمعاصر عن الحزن شكلاً بصرياً.",
+      "يستمر المعرض حتى ١٢ تموز، ويرافقه برنامج من العروض السينمائية والبرامج الصوتية والحوارات."
+    ]
+  },
+
+  {
+    id: "public-talk-hassan-el-sahili",
+    day: "19", month: "Jun", year: 2026,
+    dow: "Fri", dowAr: "الجمعة",
+    start: "19:00", end: "20:00",
+    type: "Reading",
+    title: "Public Talk: On Archiving Lamentation and Songs of Grief, by Hassan El Sahili",
+    titleAr: "حوار عام: في أرشفة النوح والأغاني الحزينة، مع حسن الساحلي",
+    location: "Main hall",
+    status: "past",
+    short: "Hassan El Sahili on building a digital archive of sorrowful musical traditions, from Shia and Christian mourning rituals to Iraqi and Egyptian tarab.",
+    shortAr: "حسن الساحلي يتحدث عن بناء أرشيف رقمي للموسيقى الحزينة، من طقوس الحداد الشيعية والمسيحية إلى الطرب العراقي والمصري.",
+    body: [
+      "Writer and photographer Hassan El Sahili reflects on archiving sorrowful musical works — departing from his imagined \"International Center for Lamentation and Songs of Grief\" — and what it means to build a real tool for a community living through repeated loss.",
+      "Part of the Lines on Grief exhibition program; a selection of lamentation songs played in the space."
+    ],
+    bodyAr: [
+      "يتحدث الكاتب والمصور حسن الساحلي عن أرشفة الأعمال الغنائية الحزينة، منطلقاً من \"المركز الدولي للنوح والأغاني الحزينة\" المتخيَّل، وما يعنيه بناء أداة فعلية لمجتمع يعيش تجارب متكررة من الفقد.",
+      "جزء من برنامج معرض \"مدونات عن الحزن\"، مع عرض مجموعة من ترانيم الرثاء داخل المساحة."
+    ]
+  },
+
+  {
+    id: "vocal-performance-dwna-ayyad",
+    day: "20", month: "Jun", year: 2026,
+    dow: "Sat", dowAr: "السبت",
+    start: "19:00", end: "20:00",
+    type: "Performance",
+    title: "Vocal Performance by Dwna Ayyad",
+    titleAr: "أداء صوتي لـدُنى عياد",
+    location: "Main hall",
+    status: "past",
+    short: "Vocalist Dwna Ayyad leads an improvised vocal tour of the Lines on Grief exhibition's Arabic poems.",
+    shortAr: "المغنية دُنى عياد تقود جولة صوتية ارتجالية في قصائد معرض \"مدونات عن الحزن\".",
+    body: [
+      "Dwna Ayyad guides the audience through the exhibition with improvised vocalizations of the Arabic poems illustrated by the artists, inviting collective listening.",
+      "Part of the Lines on Grief exhibition program."
+    ],
+    bodyAr: [
+      "تأخذ دُنى عياد الجمهور في جولة داخل المعرض عبر تأديات صوتية ارتجالية للقصائد العربية التي تجسّدها أعمال الفنانين، في دعوة للإنصات الجماعي.",
+      "جزء من برنامج معرض \"مدونات عن الحزن\"."
+    ]
+  },
+
+  {
+    id: "nowness-screening-1-poetics-of-grief",
+    day: "24", month: "Jun", year: 2026,
+    dow: "Wed", dowAr: "الأربعاء",
+    start: "19:00", end: "20:00",
+    type: "Film",
+    title: "NOWNESS Screening 1: Poetics of Grief",
+    titleAr: "شعرية الحزن: أفلام قصيرة من NOWNESS",
+    subtitle: "Followed by a conversation with Rohan Ayinde and Tayo Rapoport",
+    location: "Screening room",
+    status: "past",
+    short: "Three short films on grief from NOWNESS's video art archive, followed by a conversation with artists Rohan Ayinde and Tayo Rapoport.",
+    shortAr: "ثلاثة أفلام قصيرة عن الحزن من أرشيف NOWNESS، يليها حوار مع الفنانين روهان أيندي وتايو رابوبورت.",
+    body: [
+      "First in a series of NOWNESS screenings at the Wonder Cabinet: Late on the Planet (Julia Tonon), A Letter to My Grandfather (Razan Alsoghayer), and ęmí: freedomsong (Rohan Ayinde & Tayo Rapoport).",
+      "Followed by a conversation with Ayinde and Rapoport."
+    ],
+    bodyAr: [
+      "أول عرض من سلسلة NOWNESS في مجلس العجب: Late on the Planet (جوليا تونون)، A Letter to My Grandfather (رزان الصغيّر)، وęmí: freedomsong (روهان أييندي وتايو رابوبورت).",
+      "يليه حوار مع أييندي ورابوبورت."
+    ]
+  },
+
+  {
+    id: "photography-workshop-maen-hammad",
+    day: "26", month: "Jun", year: 2026,
+    dow: "Fri", dowAr: "الجمعة",
+    start: "14:00", end: "16:00",
+    type: "Workshop",
+    title: "The Living Past: A Documentary Photography Workshop by Maen Hammad",
+    titleAr: "الماضي الحي: ورشة تصوير وثائقي مع معن حماد",
+    subtitle: "On carrying an archive forward",
+    location: "Main hall",
+    status: "past",
+    register: "https://forms.gle/ZJ8kJbG6XLxLGv967",
+    short: "Maen Hammad on working with family archives as living material, drawn from his project Amira's Castle. Limited to 25 participants.",
+    shortAr: "معن حماد عن التعامل مع الأرشيفات العائلية كمادة حية، استناداً إلى مشروعه \"قلعة أميرة\". العدد محدود بـ٢٥ مشاركاً.",
+    body: [
+      "Drawing on Amira's Castle — his ongoing project tracing his grandparents' lives alongside his own documentation of the Palestinian present — Maen Hammad opens questions about carrying a family archive forward. Includes a practical scanning session.",
+      "Participants are encouraged to bring an object, photograph, or document from their own family history. Limited to 25 participants, no fee."
+    ],
+    bodyAr: [
+      "استناداً إلى مشروع \"قلعة أميرة\" — مشروعه المستمر الذي يتتبّع سيرة جدّيه إلى جانب توثيقه للحاضر الفلسطيني — يفتح معن حماد أسئلة حول المضي بالأرشيف العائلي قدماً، مع جلسة مسح ضوئي عملية.",
+      "يُشجَّع المشاركون على إحضار غرض أو صورة أو وثيقة من تاريخهم العائلي. العدد محدود بـ٢٥ مشاركاً، دون رسوم."
+    ]
+  },
+
+  {
+    id: "incense-workshop-hekayet-turath",
+    day: "27", month: "Jun", year: 2026,
+    dow: "Sat", dowAr: "السبت",
+    start: "16:00", end: "17:30",
+    type: "Workshop",
+    title: "Memories Through Smells: Incense Workshop by Hekayet Turath",
+    titleAr: "روائح وذكريات: ورشة البخور مع حكاية تراث",
+    location: "Main hall",
+    status: "past",
+    register: "https://forms.gle/AcGdz76nS84Xy6rd8",
+    short: "Participants blend their own incense from Jerusalem old-city spices, exploring scent and memory with Hakayet Turath / Pro Terra Sancta.",
+    shortAr: "يصنع المشاركون بخورهم الخاص من عطارة القدس القديمة، في استكشاف للرائحة والذكرى مع حكاية تراث / بروتراسنطا.",
+    body: [
+      "Wonder Cabinet and the Hakayet Turath team (Pro Terra Sancta) invite participants to blend their own incense from spices and fragrances of Jerusalem's old-city souq, alongside a short history of the incense trade route from Yemen to Gaza.",
+      "90 minutes. Ages 16+. No fee."
+    ],
+    bodyAr: [
+      "يدعو مجلس العجب وفريق حكاية تراث (بروتراسنطا) المشاركين لصنع بخورهم الخاص من عطارة القدس القديمة، إلى جانب عرض قصير عن تاريخ طريق البخور من اليمن إلى غزة.",
+      "المدة: ساعة ونصف. ١٦ سنة فما فوق. دون رسوم."
+    ]
+  },
+
+  {
+    id: "yoga-classes-eilda-zaghmout",
+    day: "29", month: "Jun", year: 2026,
+    dow: "Mon", dowAr: "الاثنين",
+    start: "18:30", end: "20:00",
+    type: "Class",
+    title: "Yoga Classes with Eilda Zaghmout",
+    titleAr: "حصص يوغا مع إيلدا زغموت",
+    subtitle: "Mats and props provided",
+    location: "Main hall",
+    recurring: true,
+    recurringLabel: "Every Monday",
+    status: "upcoming",
+    register: "https://forms.gle/ykHvYEn1QUo4B3oi7",
+    short: "A weekly yoga session with Eilda Zaghmout, every Monday at the Wonder Cabinet.",
+    shortAr: "حصة يوغا أسبوعية مع إيلدا زغموت، كل يوم اثنين في مجلس العجب.",
+    body: [
+      "Eilda Zaghmout, yoga teacher and Head of Meditation at Tawazon, leads a weekly session of guided movement and self-discovery.",
+      "30 NIS per class, or 100 NIS for a 4-class package. Mixed classes, mats and props provided."
+    ],
+    bodyAr: [
+      "تقدّم إيلدا زغموت، معلمة اليوغا و\"رئيسة التأمل\" في مؤسسة توازن، حصة أسبوعية من الحركة الموجَّهة واكتشاف الذات.",
+      "30 شيكل للحصة، أو 100 شيكل لأربع حصص. حصص مختلطة، وتوفَّر جميع المعدات."
     ]
   }
 
