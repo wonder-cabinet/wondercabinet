@@ -1,10 +1,275 @@
-// Shared events data
+// Shared events data — GENERATED from live Sanity content. Do not hand-edit.
+// Source: Sanity project xdtj605l / dataset production (drafts perspective)
+// Generated: 2026-06-29T16:36:21.224Z
 // status: "upcoming" | "past"
 // recurring: true if this is a weekly/recurring event
 
 window.EVENTS = [
 
-  // ============= WINTER 2025 — December =============
+  {
+    id: "collective-flow-workshop",
+    day: "02", month: "Dec", year: 2023,
+    dow: "Sat", dowAr: "السبت",
+    start: "00:00", end: "23:59",
+    type: "Workshop",
+    title: "Collective Flow: A Workshop by Studio Collective led by Aseel Qupty",
+    titleAr: "تدفق جماعي: ورشة عمل من ستوديو كوليكتيف بقيادة أسيل قبطي",
+    subtitle: "Free entry · Mixed classes · 16+ · No previous skills required",
+    recurring: true,
+    recurringLabel: "Saturdays",
+    status: "past",
+    register: "https://forms.gle/GqEsQdp1zftu18xMA",
+    short: "A movement workshop crafted to provide a safe, rejuvenating space for connection and physical release.",
+    shortAr: "ورشة حركة آمنة للاتصال والتحرر الجسدي.",
+    body: [
+      "In the midst of challenges and uncertainty, finding moments of connection and physical release can be a powerful tool for finding strength in the collective experience of our bodies. Our workshop, \"Collective Flow,\" is crafted with the intent to provide a safe and rejuvenating space for our community. This movement experience focuses on rebuilding connections, fostering resilience, and promoting physical and emotional well-being.",
+      "In the workshop you will explore physical release by moving in space, releasing tension in the body and mind through dynamic games and exercises. Foster connection through enhanced communication skills and contact exercises. Strengthen the collective experience by developing collaborative tools inspired by elements from theater and dance. Encourage self-expression and reflection through improvisation, providing a platform for sharing thoughts and contemplating the intricate relationship between the physical experience and emotional states throughout the workshop."
+    ],
+    bodyAr: [
+      "في وسط التحديات وعدم اليقين، إن الاتصال مع الجسد ومع الآخرين عبر الحركات الحرة قد يشكل أداة مهمة للعثور على قوتنا الداخلية والجسدية. تم تصميم ورشة \"تدفق جماعي\" لتُوفر مساحة آمنة تركز على الحركات من أجل تحسين التواصل مع أنفسنا والآخرين. ولتعزيز المرونة، رفاهية الجسد والاسترخاء العاطفي.",
+      "في ورشة العمل، ستكتشفون الراحة الجسدية من خلال التحرك بحرية، والتخلص من التوتر الجسدي والعقلي باستخدام ألعاب وتمارين ديناميكية. إن الحركات المستوحاة من المسرح والرقص، ستعزز مهارات الاتصال والتجربة الجماعية، وتُشجع التعبير عن الذات من خلال الارتجال، مما يوفر منصة لمشاركة الأفكار والتأمل في العلاقة المعقدة بين حركات الجسد والمشاعر."
+    ]
+  },
+
+  {
+    id: "condom-lead-dec23",
+    day: "03", month: "Dec", year: 2023,
+    dow: "Sun", dowAr: "الأحد",
+    start: "17:00", end: "17:30",
+    type: "Film",
+    title: "Film Screening: Condom Lead",
+    titleAr: "كوندوم ليد",
+    subtitle: "Film Screenings: Unprovoked Narratives · Free Entry",
+    status: "past",
+    short: "A dream of the hope for intimacy and love in a brutal, divisive world.",
+    shortAr: "هل هناك مجال لعلاقات حميمة في ظل القصف؟",
+    body: [
+      "A dream of the hope for intimacy and love in a brutal, divisive world. Part of the Unprovoked Narratives film series — for full descriptions of the film selection see palestinefilminstitute.org/en/unprovoked-narratives."
+    ],
+    bodyAr: [
+      "\"الرصاص المصبوب\" هو الاسم الذي استخدمته إسرائيل للإشارة لعملياتها العسكرية ضد قطاع غزة في العام 2009: 22 يوما من أصوات القصف – هل هناك مجال لعلاقات حميمة في هذه الظروف؟"
+    ]
+  },
+
+  {
+    id: "habibi-dec23",
+    day: "03", month: "Dec", year: 2023,
+    dow: "Sun", dowAr: "الأحد",
+    start: "17:30", end: "19:00",
+    type: "Film",
+    title: "Film Screening: Habibi",
+    titleAr: "حبيبي راسك خربان",
+    subtitle: "Film Screenings: Unprovoked Narratives · Free Entry",
+    status: "past",
+    short: "A fiction feature set in Gaza, a modern retelling of the Sufi parable Majnun Layla.",
+    shortAr: "قصة حب ممنوعة تدور أحداثها في غزة.",
+    body: [
+      "Habibi, a story of forbidden love, is a fiction feature set in Gaza. Two students in the West Bank are forced to return home to Gaza, where their love defies tradition. To reach his lover, Qays writes graffiti poetry across town. Habibi is a modern re-telling of the famous ancient Sufi parable Majnun Layla. The full Arabic title is 'Habibi Rasak Kharban,' which translates as \"Darling, something's wrong with your head.\" Part of the Unprovoked Narratives film series."
+    ],
+    bodyAr: [
+      "حبيبي، قصة حب ممنوعة، قصة روائية تدور أحداثها في غزة. يُجبر طالبان في الضفة الغربية على العودة إلى ديارهما في غزة، حيث يتحدى حبهما التقاليد. للوصول إلى حبيبته، قيس ينشر جرافيتي الشعر عبر جدران المدينة. حبيبي هو إعادة سرد حديثة للمثل الصوفي القديم الشهير مجنون ليلى."
+    ]
+  },
+
+  {
+    id: "album-listening-session",
+    day: "21", month: "Dec", year: 2023,
+    dow: "Thu", dowAr: "الخميس",
+    start: "18:30", end: "19:30",
+    type: "Performance",
+    title: "Album Listening Session",
+    titleAr: "جلسة استماع مجموعة من ألبومات مكتبة مجلس العجب",
+    recurring: true,
+    recurringLabel: "Every Thursday · 18:30",
+    status: "past",
+    body: [
+
+    ],
+    bodyAr: [
+
+    ]
+  },
+
+  {
+    id: "children-program",
+    day: "05", month: "Jan", year: 2024,
+    dow: "Fri", dowAr: "الجمعة",
+    start: "09:30", end: "12:30",
+    type: "Workshop",
+    title: "Wonder Cabinet Children Program",
+    titleAr: "برنامج مجلس العجب للأطفال",
+    location: "Wonder Cabinet",
+    recurring: true,
+    recurringLabel: "Fridays · 09:30",
+    status: "past",
+    register: "https://forms.gle/QqxJVfgjagS74P8m9",
+    short: "A space for imagination and exploration through film and creative activities for children.",
+    shortAr: "مساحة للاكتشاف والخيال للأطفال من خلال الأفلام والأنشطة الفنية.",
+    body: [
+      "The children's program is committed to offering a space for imagination and exploration. The program comprises a curated selection of international, Palestinian and Arab films created to entertain and educate children, including award-winning movies from the Sharjah Festival and the New York International Children's Film Festival, featuring a diverse collection of animation films. Following the screening, activities with different local and international artists each week challenge the children's creativity and broaden their ways of learning.",
+      "Ages: 8–11 years old (born 2012–2015). Registration fee (workshops): 20 NIS per day, discount for siblings."
+    ],
+    bodyAr: [
+      "صممنا برنامج الأطفال بعناية فائقة ليشكل تجربة ترفيهية وتعليمية مميزة ويقدم مساحة للاكتشاف والخيال باستخدام أساليب فنية جديدة ومبتكرة. يشمل البرنامج عروض أفلام رسوم متحركة حازت على جوائز عالمية من مهرجان الشارقة ومهرجان نيويورك الدولي لأفلام الأطفال. يتبعه أنشطة متنوعة مع فنانين محليين وعالميين، تعزز الحس الإبداعي للأطفال وتطلق تحديات لآفاق التعلم.",
+      "الأعمار: 8 - 11 عام (مواليد عام 2012 - 2015). رسوم الاشتراك لكل يوم (ورشات الفنانين): 20 شيكل، وهناك خصم للإخوة."
+    ]
+  },
+
+  {
+    id: "photoembroidery-workshop-sofia-lambrou",
+    day: "23", month: "Jan", year: 2024,
+    dow: "Tue", dowAr: "الثلاثاء",
+    start: "16:00", end: "19:00",
+    type: "Workshop",
+    title: "Photoembroidery Workshop: What Is Home? With Sofia Lambrou",
+    titleAr: "ورشة عمل في تقنية التطريز الفوتوغرافي: ما هو الوطن؟ مع صوفيا لامبرو",
+    subtitle: "Duration: 3 days (3–5 hours/day) · No previous knowledge required · Limited seats, 200 NIS · Arabic & English",
+    status: "past",
+    register: "https://forms.gle/kwQvC71qGM9dULgE9",
+    short: "A collective and individual reflection on the subject of home through still-life photography, turned into an embroidered fabric collage.",
+    shortAr: "تفكير جماعي وفردي في معنى الوطن من خلال التصوير الثابت، يتحول إلى لوحة قماشية مطرزة.",
+    body: [
+      "The workshop is a chance to collectively and individually reflect on the subject of home through the realms of image making. Starting with the exploration of the different ways in which other artists have approached the subject across time, we will then be invited to share our own thoughts, ideas, stories, feelings and references, to collectively paint the portrait of home in our own terms. As each brings their own perspective, we will turn those thoughts into a still life photography set and capture them on film. Together, we will then develop, scan and print those images to form a collage. We will each be invited to take our print home and the collage will then be handed to an embroidery artisan to weave it into a 100cm x 150cm fabric."
+    ],
+    bodyAr: [
+      "تُعد هذه الورشة فرصة للتفكير الجماعي والفردي في معنى الوطن من خلال اكتشاف مجالات صناعة الصور. بدءًا من المواضيع المختلفة التي تتطرق لها فنانون آخرون حول معنى الوطن عبر الزمن. ستتطلب الورشة مشاركة أفكار، قصص، مشاعر ومراجع من أجل رسم صورة جماعية للوطن بأسلوب خاص. من خلال وجهات النظر المختلفة، سنحول تلك الأفكار إلى مجموعة صور ثابتة ونلتقطها على الفيلم.",
+      "سيتم تطوير الصور ومسحها وطباعتها لتشكيل لوحة فنية. سيُدعى كل فرد لأخذ نسخته المطبوعة إلى منزله، وستُسلم اللوحة إلى حرفي تطريز لنسجها في قماش بحجم 100 سم × 150 سم."
+    ]
+  },
+
+  {
+    id: "mai-mai-mai-abul3ees-recording-session",
+    day: "25", month: "Jan", year: 2024,
+    dow: "Thu", dowAr: "الخميس",
+    start: "18:00", end: "20:00",
+    type: "Performance",
+    title: "Mai Mai Mai and Abul3ees Recording Session",
+    titleAr: "جلسة تسجيل مع ماي ماي ماي وأبوالعيس",
+    status: "past",
+    short: "An original collaboration between Toni and Jerusalem-based rapper and musician Abul3ees.",
+    shortAr: "تعاون أصلي بين توني وأبو العيس، الرابر والموسيقي المقيم في القدس.",
+    body: [
+      "An original collaboration between Toni and Jerusalem-based rapper and musician Abul3ees."
+    ],
+    bodyAr: [
+      "تعاون أصلي بين توني وأبو العيس، الرابر والموسيقي المقيم في القدس."
+    ]
+  },
+
+  {
+    id: "dinner-toni-cutrone-mai-mai-mai",
+    day: "26", month: "Jan", year: 2024,
+    dow: "Fri", dowAr: "الجمعة",
+    start: "18:00", end: "20:00",
+    type: "Performance",
+    title: "A Special Dinner Prepared by Toni Cutrone aka Mai Mai Mai",
+    titleAr: "عشاء مقدم من قبل توني كوترون - ماي ماي ماي",
+    subtitle: "No registration required.",
+    status: "past",
+    body: [
+
+    ],
+    bodyAr: [
+
+    ]
+  },
+
+  {
+    id: "self-defense-classes-national-karate-center",
+    day: "26", month: "Jan", year: 2024,
+    dow: "Fri", dowAr: "الجمعة",
+    start: "19:00", end: "20:00",
+    type: "Class",
+    title: "Self-Defense Classes with National Karate Center",
+    titleAr: "حصص دفاع عن النفس مع المركز الوطني للكاراتيه",
+    recurring: true,
+    recurringLabel: "Fridays · 19:00",
+    status: "past",
+    register: "https://forms.gle/RdDa8iFTG4buqdY58",
+    short: "Mixed self-defense classes, 17+.",
+    shortAr: "حصص دفاع عن النفس مختلطة، 17+.",
+    body: [
+      "Cost: 30 NIS per class or 100 NIS for a 4-class package. Mixed classes, 17+. Kindly wear athletic or comfortable attire."
+    ],
+    bodyAr: [
+      "التكلفة: 30 شيكل لكل حصة أو 100 شيكل لأربعة حصص متتالية. الحصص مختلطة، 17+. الرجاء ارتداء ملابس رياضية ومريحة."
+    ]
+  },
+
+  {
+    id: "conversation-with-mai-mai-mai",
+    day: "26", month: "Jan", year: 2024,
+    dow: "Fri", dowAr: "الجمعة",
+    start: "21:00", end: "22:00",
+    type: "Reading",
+    title: "A Conversation with Mai Mai Mai",
+    titleAr: "حديث مع ماي ماي ماي",
+    status: "past",
+    short: "Toni Cutrone discusses his research on Palestinian instruments and ethno-musical folk traditions.",
+    shortAr: "يتحدث توني عن بحثه حول الآلات الفلسطينية والتقاليد الشعبية الإيثنو-موسيقية.",
+    body: [
+      "Diving into his residency and collaborations with local artists, Toni Cutrone will talk more about his research on Palestinian instruments and ethno-musical folk traditions."
+    ],
+    bodyAr: [
+      "سيتحدث توني عن بحثه حول الآلات الفلسطينية والتقاليد الشعبية الإيثنو-موسيقية، وعن فترة إقامته في فلسطين وتعاوناته مع الفنانين المحليين."
+    ]
+  },
+
+  {
+    id: "open-studio-sofia-lambrou",
+    day: "27", month: "Jan", year: 2024,
+    dow: "Sat", dowAr: "السبت",
+    start: "14:00", end: "18:00",
+    type: "Opening",
+    title: "Open Studio with Sofia Lambrou",
+    titleAr: "استوديو مفتوح مع صوفيا لامبرو",
+    status: "past",
+    short: "A table-de-recherche showcasing resident Sofia Lambrou's in-progress project L'anabase.",
+    shortAr: "طاولة بحث تعرض مشروع صوفيا لامبرو الجاري \"لاناباس\".",
+    body: [
+      "Discover the myth of the icon of a virgin who traveled from Jericho to the island of Amorgos in Greece to escape from the Iconoclasts in the 9th century, in a table-de-recherche showcasing our resident Sofia Lambrou's in-progress project L'anabase."
+    ],
+    bodyAr: [
+      "اكتشفوا أسطورة عن أيقونة عذراء سافرت من أريحا إلى جزيرة أمورجوس في اليونان للهروب من الثوار في القرن التاسع. تشكل هذه الأسطورة جزءًا من مشروع صوفيا الجاري تنفيذه تحت عنوان \"لاناباس\"."
+    ]
+  },
+
+  {
+    id: "conversation-with-sofia-lambrou",
+    day: "27", month: "Jan", year: 2024,
+    dow: "Sat", dowAr: "السبت",
+    start: "20:00", end: "21:00",
+    type: "Reading",
+    title: "A Conversation with Sofia Lambrou",
+    titleAr: "حديث مع صوفيا لامبرو",
+    status: "past",
+    short: "A glimpse of Sofia's project L'anabase through her captivating field recordings.",
+    shortAr: "فرصة للتعرف على مشروع صوفيا \"لاناباس\" من خلال تسجيلاتها الميدانية.",
+    body: [
+      "An opportunity to take a glimpse of Sofia's project, 'L'anabase,' delving deeper into the myth that inspired her work as you listen to her captivating field recordings."
+    ],
+    bodyAr: [
+      "فرصة للقاء صوفيا والتعرف على مشروعها \"لاناباس\"، لاستكشاف الأسطورة التي ألهمت عملها، والاستماع إلى تسجيلاتها الميدانية المميزة."
+    ]
+  },
+
+  {
+    id: "gaza-tienimi-la-mano-thomas-tellarini",
+    day: "27", month: "Jan", year: 2024,
+    dow: "Sat", dowAr: "السبت",
+    start: "21:00", end: "22:00",
+    type: "Radio",
+    title: "\"Gaza, Tienimi la Mano\" with Thomas Tellarini",
+    titleAr: "جلسة استماع مع توماس تيلاريني",
+    status: "past",
+    short: "[Gaza, Hold My Hand] A listening session for Radio Alhara.",
+    body: [
+      "[Gaza, Hold My Hand] A listening session for Radio Alhara."
+    ],
+    bodyAr: [
+
+    ]
+  },
 
   {
     id: "radio-dec-14",
@@ -56,8 +321,6 @@ window.EVENTS = [
     ]
   },
 
-  // ============= WINTER 2025 — January 2026 =============
-
   {
     id: "radio-alhara-jan-11",
     day: "11", month: "Jan", year: 2026,
@@ -83,8 +346,6 @@ window.EVENTS = [
     ]
   },
 
-  // ============= WINTER 2025 — February 2026 =============
-
   {
     id: "radio-alhara-feb-08",
     day: "08", month: "Feb", year: 2026,
@@ -109,8 +370,6 @@ window.EVENTS = [
       "بث على راديو NTS وراديو الحارة."
     ]
   },
-
-  // ============= SPRING 2026 — April =============
 
   {
     id: "yoga-weekly",
@@ -187,32 +446,8 @@ window.EVENTS = [
       "راست عرضٌ منفردٌ يستكشف، عبر صوت العود التعبيري، الشكل التقليدي للتقاسيم — نمطٌ مميّز من الارتجال في قلب التراث الموسيقي الشرقي.",
       "يتميّز هذا الشكل بقدرته على نسج طيفٍ واسع من الموسيقى المشتركة بين الثقافات التركية والعربية والفارسية والآشورية والكردية والسريانية.",
       "— طارق أبو سلامة (مواليد ١٩٩٠ القدس)، مؤلّف موسيقي فلسطيني يقيم في ميلانو منذ ٢٠٢٢."
-    ],
-    content: [
-      { type: "text",
-        en: [
-          "Rast is a solo performance that, through the expressive voice of the oud, explores the traditional form of taqasim — a distinctive mode of improvisation at the heart of Eastern musical heritage.",
-          "This form is remarkable for its ability to weave together a wide spectrum of musical traditions shared among Turkish, Arab, Persian, Assyrian, Kurdish, and Syriac cultures."
-        ],
-        ar: [
-          "راست عرضٌ منفردٌ يستكشف، عبر صوت العود التعبيري، الشكل التقليدي للتقاسيم — نمطٌ مميّز من الارتجال في قلب التراث الموسيقي الشرقي.",
-          "يتميّز هذا الشكل بقدرته على نسج طيفٍ واسع من الموسيقى المشتركة بين الثقافات التركية والعربية والفارسية والآشورية والكردية والسريانية."
-        ]
-      },
-      { type: "pullquote",
-        en: "Taqasim is the space between the known and the unknown — where the musician becomes a vessel.",
-        ar: "التقاسيم هي الفضاء بين المعروف والمجهول — حيث يصبح الموسيقي وعاءً.",
-        attribution: "Tareq Abu Salameh"
-      },
-      { type: "audio",
-        titleEn: "Recording — Rast, 11 April 2026",
-        titleAr: "تسجيل — راست، ١١ أبريل ٢٠٢٦",
-        durationMin: 52,
-        src: null
-      }
     ]
   },
-
 
   {
     id: "dome-apr-15",
@@ -261,29 +496,8 @@ window.EVENTS = [
       "بشار حوراني «7orany» — وُلد وترعرع في حيفا، مصمّم غرافيك وصاحب مطبعة عائلية منذ ١٩٧٥. تجوب مجموعاته أطراف الموسيقى العربية غير الموثّقة.",
       "ADAN — فنانة فلسطينية من القدس، مقيمة في لندن، ممارسة في تقاطع الصوت والمكان والذاكرة.",
       "بثٌّ حيّ لثلاث ساعات عبر راديو الحارة."
-    ],
-    content: [
-      { type: "text",
-        en: [
-          "Bashar Horany followed by ADAN, spinning records live on Radio AlHara from the Wonder Cabinet. A three-hour broadcast.",
-          "Bashar Horany \"7orany\" — born and raised in Haifa, graphic designer and owner of a family print shop since 1975. His sets move through the undocumented edges of Arab music.",
-          "ADAN — Palestinian curator, architect and DJ from Jerusalem, based in London. Her practice is rooted in the intersection of sound, space, and memory."
-        ],
-        ar: [
-          "بشار حوراني ثم ADAN، يبثّان أسطوانات مباشرة عبر راديو الحارة من مجلس العجب. بثٌّ لثلاث ساعات.",
-          "بشار حوراني «7orany» — وُلد وترعرع في حيفا، مصمّم غرافيك وصاحب مطبعة عائلية منذ ١٩٧٥.",
-          "ADAN — فنانة فلسطينية من القدس، مقيمة في لندن."
-        ]
-      },
-      { type: "audio",
-        titleEn: "Full broadcast — Radio AlHara, 18 April 2026",
-        titleAr: "البثّ الكامل — راديو الحارة، ١٨ أبريل ٢٠٢٦",
-        durationMin: 180,
-        src: null
-      }
     ]
   },
-
 
   {
     id: "noor-abed-apr-22",
@@ -306,18 +520,6 @@ window.EVENTS = [
     bodyAr: [
       "عرضٌ مزدوج لثلاثة أفلام لنور عابد: بنيلوبي (٢٠١٤)، أغانينا (٢٠٢١)، وليلة احتجزناها بيننا (٢٠٢٤).",
       "في آنٍ واحد في مجلس العجب، بيت لحم، وفي بين النخلتين، أريحا."
-    ],
-    content: [
-      { type: "text",
-        en: [
-          "A double screening of three films by Noor Abed — simultaneously at the Wonder Cabinet, Bethlehem, and at Bayn Al Nakhlaytan, Jericho.",
-          "Penelope (2014) · our songs (2021) · A Night We Held Between (2024)."
-        ],
-        ar: [
-          "عرضٌ مزدوج لثلاثة أفلام لنور عابد — في آنٍ واحد في مجلس العجب، بيت لحم، وفي بين النخلتين، أريحا.",
-          "بنيلوبي (٢٠١٤) · أغانينا (٢٠٢١) · ليلة احتجزناها بيننا (٢٠٢٤)."
-        ]
-      }
     ]
   },
 
@@ -344,23 +546,8 @@ window.EVENTS = [
       "فعالية إطلاق مجموعة مع راديو الحارة بمناسبة ذكراهم السادسة.",
       "موسيقى: YA HU، أرام صبّاح، والناذر. أكل: أم علاء.",
       "٥:٠٠ مساءً – ١٠:٠٠ مساءً · دخول مجاني."
-    ],
-    content: [
-      { type: "text",
-        en: [
-          "Carhartt WIP × Radio AlHara: a collection launch event to mark Radio AlHara's 6th anniversary.",
-          "Music by YA HU, Aram Sabbah, and Al Nather. Food by Um Alaa.",
-          "17:00 – 22:00 · Free entry · Bar open."
-        ],
-        ar: [
-          "Carhartt WIP × راديو الحارة: فعالية إطلاق مجموعة بمناسبة الذكرى السادسة لراديو الحارة.",
-          "موسيقى: YA HU، أرام صبّاح، والناذر. أكل: أم علاء.",
-          "٥:٠٠ مساءً – ١٠:٠٠ مساءً · دخول مجاني · البار مفتوح."
-        ]
-      }
     ]
   },
-
 
   {
     id: "hana-elias-apr-29",
