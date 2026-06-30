@@ -297,10 +297,20 @@
 /* ============================================================
    STATE
    ============================================================ */
+function getMonday(d){
+  // Monday of the week containing d, at local midnight.
+  const date = new Date(d);
+  date.setHours(0,0,0,0);
+  const day = date.getDay(); // 0=Sun..6=Sat
+  const diff = (day === 0 ? -6 : 1 - day);
+  date.setDate(date.getDate() + diff);
+  return date;
+}
+
 const STATE = {
   type: "",
   search: "",
-  weekStart: new Date(2026, 3, 27), // Apr 27 2026 — Monday
+  weekStart: getMonday(new Date()), // always the current real-world week
 };
 
 const ALL = window.EVENTS.slice();
