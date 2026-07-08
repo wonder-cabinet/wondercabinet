@@ -86,6 +86,15 @@ export const structure = (S: StructureBuilder) =>
             .defaultOrdering([{field: 'year', direction: 'desc'}])
         ),
 
+      S.listItem()
+        .title('Locations')
+        .schemaType('location')
+        .child(
+          S.documentList()
+            .title('Locations')
+            .filter('_type == "location"')
+        ),
+
       S.divider(),
 
       // ── SETTINGS (singleton) ─────────────────────────

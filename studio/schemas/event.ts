@@ -25,6 +25,13 @@ export const event = defineType({
   fields: [
     defineField({name: 'title', title: 'Title', type: 'localeString'}),
     defineField({
+      name: 'relatedArtists',
+      title: 'Artists',
+      description: 'Pick from existing artists or create a new one directly.',
+      type: 'array',
+      of: [{type: 'reference', to: [{type: 'artist'}]}],
+    }),
+    defineField({
       name: 'slug',
       title: 'Slug',
       type: 'slug',
@@ -53,8 +60,8 @@ export const event = defineType({
     defineField({
       name: 'location',
       title: 'Location',
-      type: 'string',
-      description: 'e.g. "Cinema · Ground floor"',
+      type: 'reference',
+      to: [{type: 'location'}],
     }),
     defineField({name: 'featured', title: 'Featured (fullscreen treatment)', type: 'boolean', initialValue: false}),
     defineField({name: 'recurring', title: 'Recurring', type: 'boolean', initialValue: false}),
@@ -88,12 +95,6 @@ export const event = defineType({
         {type: 'contentGallery'},
         {type: 'contentDivider'},
       ],
-    }),
-    defineField({
-      name: 'relatedArtists',
-      title: 'Related artists',
-      type: 'array',
-      of: [{type: 'reference', to: [{type: 'artist'}]}],
     }),
     defineField({
       name: 'relatedProject',

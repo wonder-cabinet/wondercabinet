@@ -13,6 +13,7 @@ import {
   contentFullBleedPhoto,
   contentPoster,
 } from './objects/contentBlocks'
+import {location} from './location'
 import {event} from './event'
 import {artist} from './artist'
 import {project} from './project'
@@ -36,6 +37,7 @@ export const schemaTypes = [
   contentFullBleedPhoto,
   contentPoster,
   // Documents
+  location,
   event,
   artist,
   project,

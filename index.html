@@ -758,13 +758,17 @@ async function _boot(){
       return { key:`${n.toLowerCase()}-${y}`, name:n, year:y };
     }
 
-    const q = encodeURIComponent('*[_type == "event"] | order(startDateTime desc)');
+    const q = encodeURIComponent('*[_type == "event"] | order(startDateTime desc) { ..., location->{ name } }');
     const res = await fetch(`https://xdtj605l.api.sanity.io/v2024-01-01/data/query/production?query=${q}`);
     const { result } = await res.json();
 
     ALL = (result || []).map(doc => {
       const s = _iso(doc.startDateTime), e = _iso(doc.endDateTime);
       const hasTime = s && (s.getHours() || s.getMinutes());
+      // location is now a reference doc; fall back to string for legacy events
+      const locationName = typeof doc.location === 'object' && doc.location !== null
+        ? (doc.location.name || '')
+        : (doc.location || '');
       return {
         id:       doc.slug?.current || doc._id,
         title:    doc.title?.en || '',
@@ -777,7 +781,7 @@ async function _boot(){
         dowAr:    s ? DWAR[s.getDay()] : '',
         start:    hasTime ? s.toTimeString().slice(0,5) : '',
         end:      e && (e.getHours()||e.getMinutes()) ? e.toTimeString().slice(0,5) : '',
-        location: doc.location || '',
+        location: locationName,
         recurring: !!doc.recurring,
         status:   doc.status || 'upcoming',
         featured: !!doc.featured,

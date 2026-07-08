@@ -5,4 +5,5 @@ export default defineCliConfig({
     projectId: 'xdtj605l',
     dataset: 'production',
   },
+  studioHost: 'wonder-cabinet',
 })
