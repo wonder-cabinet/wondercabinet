@@ -105,20 +105,27 @@
   const params = new URLSearchParams(location.search);
   const id = params.get('id') || '';
 
-  // Fetch the specific event + same-month events in one query
-  const q = encodeURIComponent(
-    `{ "ev": *[_type == "event" && slug.current == "${id}"][0]{ ..., location->{name} },
-       "all": *[_type == "event"] | order(startDateTime asc) { slug, title, titleAr: title.ar, eventType, startDateTime, endDateTime, location->{name} } }`
-  );
+  const BASE = 'https://xdtj605l.api.sanity.io/v2024-01-01/data/query/production?query=';
+
+  async function groq(query) {
+    const res = await fetch(BASE + encodeURIComponent(query));
+    const json = await res.json();
+    return json.result;
+  }
 
   let ev, allEvents = [];
   try {
-    const res = await fetch(`https://xdtj605l.api.sanity.io/v2024-01-01/data/query/production?query=${q}`);
-    const { result } = await res.json();
-    if (result?.ev) ev = docToEv(result.ev);
-    allEvents = (result?.all || []).map(docToEv);
+    const doc = await groq(`*[_type == "event" && slug.current == "${id}"][0]{..., location->{name}}`);
+    if (doc) ev = docToEv(doc);
   } catch(err) {
-    console.warn('[WC] fetch failed', err);
+    console.warn('[WC] event fetch failed', err);
+  }
+
+  if (ev) {
+    try {
+      const more = await groq(`*[_type == "event" && slug.current != "${id}" && dateTime(startDateTime) >= dateTime(now()) - 60*60*24*45][0...8]{slug, title, eventType, startDateTime, location->{name}}`);
+      allEvents = (more || []).map(docToEv);
+    } catch(err) { /* non-critical */ }
   }
 
   if (!ev) {
