@@ -788,8 +788,10 @@ async function _boot(){
         register: doc.registerUrl || '',
         shortDesc: doc.shortDescription?.en || '',
         shortDescAr: doc.shortDescription?.ar || '',
-        body:     doc.body?.en || '',
-        bodyAr:   doc.body?.ar || '',
+        short:    doc.shortDescription?.en || '',
+        shortAr:  doc.shortDescription?.ar || '',
+        body:     doc.body?.en ? doc.body.en.split(/\n\n+/).map(p=>p.trim()).filter(Boolean) : [],
+        bodyAr:   doc.body?.ar ? doc.body.ar.split(/\n\n+/).map(p=>p.trim()).filter(Boolean) : [],
         season:   s ? _season(s) : { key:'unknown', name:'Unknown', year:new Date().getFullYear() },
       };
     });
