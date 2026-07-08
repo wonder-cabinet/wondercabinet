@@ -288,8 +288,6 @@
   </div>
 </footer>
 
-<script src="assets/events.js?v=6"></script>
-
 <div id="overlay-backdrop" class="overlay-backdrop"></div>
 <div id="event-panel" class="event-panel" role="dialog" aria-modal="true" aria-label="Event details"></div>
 <div id="event-fullscreen" class="event-fullscreen" role="dialog" aria-modal="true" aria-label="Event details"></div>
@@ -313,8 +311,8 @@ const STATE = {
   weekStart: getMonday(new Date()), // always the current real-world week
 };
 
-const ALL = window.EVENTS.slice();
-const SEASONS = window.SEASONS;
+let ALL = [];
+let SEASONS = [];
 
 // Helpers
 const MONTH_ORDER = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
@@ -422,12 +420,10 @@ function renderThisWeek(){
     renderThisWeek();
   };
 }
-renderThisWeek();
-
 /* ============================================================
    FILTER BAR — type filters with counts, primary navigation
    ============================================================ */
-(function renderFilters(){
+function renderFilters(){
   const TYPES = ["", "Performance", "Film", "Class", "Workshop", "Radio", "Reading", "Opening"];
   const LABEL_EN = { "":"All", Performance:"Performance", Film:"Film", Class:"Class", Workshop:"Workshop", Radio:"Radio", Reading:"Reading", Opening:"Opening" };
   const LABEL_AR = { "":"الكل", Performance:"عرض", Film:"فيلم", Class:"صف", Workshop:"ورشة", Radio:"إذاعة", Reading:"قراءة", Opening:"افتتاح" };
@@ -452,13 +448,13 @@ renderThisWeek();
     });
   }
   build();
-})();
+}
 
 /* ============================================================
    SEASON RAIL (Programme nav)
    Lists every season with year, click to jump within timeline.
    ============================================================ */
-(function renderSeasonRail(){
+function renderSeasonRail(){
   const rail = document.getElementById("season-rail");
   // Group seasons by year
   const byYear = {};
@@ -479,7 +475,7 @@ renderThisWeek();
   rail.querySelectorAll(".sr-btn").forEach(b => {
     b.addEventListener("click", () => scrollToSeason(b.dataset.season));
   });
-})();
+}
 
 function scrollToSeason(key){
   const el = document.querySelector(`.tl-season[data-season="${key}"]`);
@@ -668,8 +664,6 @@ function renderEventRow(e, day, isFirst){
     </a>`;
 }
 
-renderTimeline();
-
 /* ============================================================
    STICKY-SHRINK MONTH HEADER
    Each .tl-month-head sticks to the top while its body is in view.
@@ -732,19 +726,93 @@ function initSplitScroll(){
   window.addEventListener("resize", update);
   update();
 }
-initSplitScroll();
-
 /* ============================================================
    SCROLL-BASED LOGO ROTATION
    Logo rotates 1° per 8px scrolled — smooth, no auto-spin.
    ============================================================ */
-(function initLogoRotation(){
+function initLogoRotation(){
   const logo = document.querySelector(".tpb-logo .logo");
   if (!logo) return;
   window.addEventListener("scroll", function(){
     logo.style.transform = "rotate(" + (window.scrollY * 0.08).toFixed(1) + "deg)";
   }, { passive: true });
-})();
+}
+
+/* ============================================================
+   BOOT — fetch live events from Sanity, then render everything
+   ============================================================ */
+async function _boot(){
+  try {
+    const MABBR = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+    const DWEN  = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+    const DWAR  = ["الأحد","الاثنين","الثلاثاء","الأربعاء","الخميس","الجمعة","السبت"];
+
+    // Parse ISO string using LOCAL date parts to avoid timezone day-shift on all-day events
+    function _iso(dt){
+      const m = dt && dt.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/);
+      return m ? new Date(+m[1], +m[2]-1, +m[3], +m[4], +m[5]) : null;
+    }
+    function _season(d){
+      const mo = d.getMonth()+1, y = d.getFullYear();
+      const n = mo>=3&&mo<=5?'Spring':mo>=6&&mo<=8?'Summer':mo>=9&&mo<=11?'Autumn':'Winter';
+      return { key:`${n.toLowerCase()}-${y}`, name:n, year:y };
+    }
+
+    const q = encodeURIComponent('*[_type == "event"] | order(startDateTime desc)');
+    const res = await fetch(`https://xdtj605l.api.sanity.io/v2024-01-01/data/query/production?query=${q}`);
+    const { result } = await res.json();
+
+    ALL = (result || []).map(doc => {
+      const s = _iso(doc.startDateTime), e = _iso(doc.endDateTime);
+      const hasTime = s && (s.getHours() || s.getMinutes());
+      return {
+        id:       doc.slug?.current || doc._id,
+        title:    doc.title?.en || '',
+        titleAr:  doc.title?.ar || '',
+        type:     doc.eventType || '',
+        day:      s ? String(s.getDate()).padStart(2,'0') : '01',
+        month:    s ? MABBR[s.getMonth()] : 'Jan',
+        year:     s ? s.getFullYear() : new Date().getFullYear(),
+        dow:      s ? DWEN[s.getDay()] : 'Mon',
+        dowAr:    s ? DWAR[s.getDay()] : '',
+        start:    hasTime ? s.toTimeString().slice(0,5) : '',
+        end:      e && (e.getHours()||e.getMinutes()) ? e.toTimeString().slice(0,5) : '',
+        location: doc.location || '',
+        recurring: !!doc.recurring,
+        status:   doc.status || 'upcoming',
+        featured: !!doc.featured,
+        register: doc.registerUrl || '',
+        shortDesc: doc.shortDescription?.en || '',
+        shortDescAr: doc.shortDescription?.ar || '',
+        body:     doc.body?.en || '',
+        bodyAr:   doc.body?.ar || '',
+        season:   s ? _season(s) : { key:'unknown', name:'Unknown', year:new Date().getFullYear() },
+      };
+    });
+
+    // Build SEASONS list (newest first)
+    const sm = {};
+    ALL.forEach(ev => { if (!sm[ev.season.key]) sm[ev.season.key] = ev.season; });
+    SEASONS = Object.values(sm).sort((a,b) =>
+      a.year !== b.year ? b.year-a.year
+      : ['Autumn','Summer','Spring','Winter'].indexOf(a.name) - ['Autumn','Summer','Spring','Winter'].indexOf(b.name)
+    );
+    window.EVENTS = ALL;
+    window.SEASONS = SEASONS;
+    window.EVENTS_BY_ID = Object.fromEntries(ALL.map(ev => [ev.id, ev]));
+  } catch(err){
+    console.warn('[WC] Sanity fetch failed:', err);
+  }
+
+  // Render all sections
+  renderThisWeek();
+  renderFilters();
+  renderSeasonRail();
+  renderTimeline();
+  initSplitScroll();
+  initLogoRotation();
+}
+_boot();
 
 /* ============================================================
    LANGUAGE TOGGLE
