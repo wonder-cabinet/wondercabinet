@@ -7,30 +7,36 @@
 <link rel="stylesheet" href="assets/app.css?v=2" />
 <style>
   :root { --bg: #ffffff; --ink: #0a0a16; --accent: #1d24ff; --highlight: #1d24ff; }
-  .topbar { background: transparent; }
+
+  /* one flat colour field per event type — no header, no divide */
+  body[data-type="performance"]{ --bg:#E13C6E; --ink:#3E0A1E; }
+  body[data-type="film"]{ --bg:#F0653A; --ink:#4A1B0C; }
+  body[data-type="radio"]{ --bg:#5FA24A; --ink:#173404; }
+  body[data-type="class"]{ --bg:#2A9D8F; --ink:#08312C; }
+  body[data-type="workshop"]{ --bg:#E8A421; --ink:#412402; }
+  body[data-type="reading"]{ --bg:#2233EE; --ink:#EAEBFF; }
+  body[data-type="opening"]{ --bg:#7A5CD6; --ink:#EFEAFC; }
+
+  .ev-lang-toggle{
+    position: fixed; top: 20px; right: 24px; z-index: 50;
+    display: inline-flex; gap: 16px; border: none; background: none;
+  }
+  .ev-lang-toggle button{
+    border: none !important; background: none !important;
+    color: var(--ink) !important; opacity: .5;
+    font-family: var(--ff-sans); font-size: 12px; letter-spacing: .15em; font-weight: 700;
+    padding: 0;
+  }
+  .ev-lang-toggle button + button{ border-left: none !important; }
+  .ev-lang-toggle button[aria-pressed="true"]{ opacity: 1; }
 </style>
 </head>
 <body>
 
-<header class="topbar">
-  <div class="topbar-inner">
-    <a class="tpb-logo" href="index.html">
-      <span class="logo" role="img" aria-label="The Wonder Cabinet"></span>
-    </a>
-    <a class="tpb-back" href="index.html">
-      <span class="en-only">← Programme</span>
-      <span class="ar-only ar">البرنامج ←</span>
-    </a>
-    <nav class="tpb-nav">
-      <a href="index.html#residencies"><span class="en-only">Residencies</span><span class="ar-only ar">إقامات</span></a>
-      <a href="index.html#visit"><span class="en-only">Visit</span><span class="ar-only ar">زيارة</span></a>
-      <div class="lang-toggle" role="group" aria-label="Language">
-        <button data-lang-btn="en" aria-pressed="true">EN</button>
-        <button data-lang-btn="ar" aria-pressed="false">AR</button>
-      </div>
-    </nav>
-  </div>
-</header>
+<div class="ev-lang-toggle lang-toggle" role="group" aria-label="Language">
+  <button data-lang-btn="en" aria-pressed="true">EN</button>
+  <button data-lang-btn="ar" aria-pressed="false">AR</button>
+</div>
 
 <main>
   <article class="detail" id="detail">
@@ -134,6 +140,7 @@
   }
 
   document.title = `${ev.title} · The Wonder Cabinet`;
+  if (ev.type) document.body.dataset.type = ev.type.toLowerCase();
 
   // Head
   const dateStr = [ev.dow, ev.day, ev.month, ev.year].filter(Boolean).join(' ');
@@ -144,14 +151,17 @@
       <span class="sep"></span>
       <span>${dateStr}</span>
       ${timeStr ? `<span class="sep"></span><span>${timeStr}</span>` : ''}
-      ${ev.register ? '<span class="sep"></span><span style="color:var(--accent);">Registration open</span>' : ''}
+      ${ev.register ? '<span class="sep"></span><span style="text-decoration:underline;">Registration open</span>' : ''}
     </div>
     <h1><span class="en-only">${ev.title}</span><span class="ar-only ar" dir="rtl">${ev.titleAr || ev.title}</span></h1>
   `;
 
   // Cover (skip if no image ref)
   if (ev.cover) {
-    const imgId = ev.cover.replace('image-','').replace(/-([a-z0-9]+)$/, '.$1').replace(/-/g, '/');
+    // Sanity asset refs look like "image-<hash>-<W>x<H>-<format>" and map to
+    // a flat CDN filename "<hash>-<W>x<H>.<format>" — only the trailing
+    // "-<format>" becomes a dot, the hash/dimensions hyphen must stay a hyphen.
+    const imgId = ev.cover.replace(/^image-/, '').replace(/-([a-z0-9]+)$/, '.$1');
     document.getElementById('detail-cover').innerHTML = `<img src="https://cdn.sanity.io/images/xdtj605l/production/${imgId}" alt="" />`;
   }
 
@@ -178,7 +188,7 @@
     ['Location', ev.location || 'The Wonder Cabinet'],
   ].filter(Boolean);
   document.getElementById('detail-facts').innerHTML = `
-    ${facts.map(([k,v]) => `<div class="row"><div class="k">${k}</div><div class="v">${v}</div></div>`).join('')}
+    ${facts.map(([k,v]) => `<div class="row"><span class="k">${k}</span><span class="leader"></span><span class="v">${v}</span></div>`).join('')}
     ${ev.register
       ? `<a class="cta" href="${ev.register}" target="_blank" rel="noopener">Register →</a>`
       : `<a class="cta secondary" href="index.html">Back to programme</a>`}
