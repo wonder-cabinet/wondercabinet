@@ -1109,11 +1109,13 @@ ${audioBar}
 <div class="ep-header">
   <button class="ep-close" aria-label="Close">✕</button>
   <div class="ep-meta">
+    <div class="dt-block">
+      <span class="en-only">${_overlayDate(ev)}</span>
+      <span class="ar-only ar">${ev.day} ${MONTH_NAME_AR[ev.month]} ${arNum(ev.year)}</span>
+      <span class="ep-time">${ev.start}${ev.end ? " — " + ev.end : ""}</span>
+    </div>
     <span class="ep-type-tag en-only">${ev.type}</span>
     <span class="ep-type-tag ar-only ar">${typeArLabel}</span>
-    <span class="en-only">${_overlayDate(ev)}</span>
-    <span class="ar-only ar">${ev.day} ${MONTH_NAME_AR[ev.month]} ${arNum(ev.year)}</span>
-    <span class="ep-time">${ev.start}${ev.end ? " — " + ev.end : ""}</span>
   </div>
   <h1 class="ep-title">
     <span class="en-only">${ev.title}</span>
