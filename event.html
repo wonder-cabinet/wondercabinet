@@ -290,17 +290,23 @@
   const fallbackEn = `${_p(ev.shortDesc)}${_p(ev.body)}${ev.writeup ? `<p class="writeup">${ev.writeup}</p>` : ''}`;
   const fallbackAr = `${_p(ev.shortDescAr)}${_p(ev.bodyAr)}${ev.writeupAr ? `<p class="writeup" dir="rtl">${ev.writeupAr}</p>` : ''}`;
 
+  // With authored content[] blocks, the subtitle credit line moves down next
+  // to the other credits (matching the approved reference, which shows
+  // nothing between the title and the pull-quote). Without content blocks,
+  // it stays at the top as before.
   document.getElementById('detail-body').innerHTML = `
     <div class="en-only">
-      ${ev.subtitle ? `<p class="subtitle">${ev.subtitle}</p>` : ''}
+      ${(ev.subtitle && !ev.content.length) ? `<p class="subtitle">${ev.subtitle}</p>` : ''}
       ${ev.content.length ? renderContentBlocks(ev.content) : fallbackEn}
+      ${(ev.subtitle && ev.content.length) ? `<p class="credits-line">${ev.subtitle}</p>` : ''}
       ${artistBiosEn}
       ${creditsEn}
       ${projectEn}
     </div>
     <div class="ar ar-only" dir="rtl">
-      ${ev.subtitleAr ? `<p class="subtitle">${ev.subtitleAr}</p>` : ''}
+      ${(ev.subtitleAr && !ev.content.length) ? `<p class="subtitle">${ev.subtitleAr}</p>` : ''}
       ${ev.content.length ? renderContentBlocks(ev.content) : fallbackAr}
+      ${(ev.subtitleAr && ev.content.length) ? `<p class="credits-line" dir="rtl">${ev.subtitleAr}</p>` : ''}
       ${artistBiosAr}
       ${creditsAr}
     </div>

@@ -571,6 +571,7 @@ img{ display:block; max-width:100%; }
   font-size: clamp(40px, 7vw, 102px); line-height: 1.1; letter-spacing: 0;
   margin: 18px 0 0; text-wrap: balance;
   text-transform: none;
+  text-decoration: underline; text-underline-offset: 6px;
 }
 .detail .h1-ar{
   margin-top: 18px; font-family: var(--ff-ar); direction: rtl;
@@ -1763,6 +1764,7 @@ html[data-lang="ar"] .ar-only{ direction: rtl; }
   margin: 0; font-family: var(--ff-sans); font-weight: 700;
   font-size: clamp(32px,4.4vw,64px); line-height: 1.1;
   letter-spacing: 0; text-transform: none; text-wrap: balance;
+  text-decoration: underline; text-underline-offset: 4px;
 }
 .ep-title .ar{ font-family: var(--ff-ar); letter-spacing: 0; text-transform: none; line-height: 1.2; }
 .ep-subtitle{

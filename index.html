@@ -1124,7 +1124,7 @@ ${audioBar}
     <span class="en-only">${ev.title}</span>
     <span class="ar-only ar" dir="rtl">${ev.titleAr || ev.title}</span>
   </h1>
-  ${ev.subtitle ? `<p class="ep-subtitle en-only">${ev.subtitle}</p>` : ""}
+  ${(ev.subtitle && !(ev.content && ev.content.length)) ? `<p class="ep-subtitle en-only">${ev.subtitle}</p>` : ""}
 </div>
 <div class="ep-body">
   ${coverHtml}
@@ -1138,6 +1138,7 @@ ${audioBar}
       ${bodyAr ? `<div class="ar-only ar" dir="rtl">${bodyAr}</div>` : ""}
       ${writeupAr ? `<div class="ar-only ar" dir="rtl">${writeupAr}</div>` : ""}
     </div>` : "")}
+    ${(ev.subtitle && ev.content && ev.content.length) ? `<p class="ep-subtitle en-only">${ev.subtitle}</p>` : ""}
     <div class="ep-facts">
       <div class="ep-fact">
         <span class="ef-key"><span class="en-only">Venue</span><span class="ar-only ar">المكان</span></span>
