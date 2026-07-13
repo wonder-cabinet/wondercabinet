@@ -3,18 +3,17 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Wonder Cabinet — Grouped scroll, design direction</title>
+<title>Wonder Cabinet — Grouped scroll, design direction v3</title>
 <style>
   :root{
     --ff-sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    --ff-ar:   "Amiri", "Noto Naskh Arabic", "Geeza Pro", serif;
     --paper: #f6f3ea;
-    --ink: #0a0a16;
+    --ink: #1d24ff;
+    --night: #0a0a16;
+    --highlight: #ffe65c;
     --pink: #cc6698;
-    --yellow: #ffe600;
-    --violet: #c8a0f0;
-    --orange: #ff5a00;
     --green: #00d26a;
-    --blue: #1d24ff;
   }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
@@ -26,59 +25,72 @@
   }
 
   .note-bar{
-    position:sticky; top:0; z-index:50;
-    background:var(--ink); color:var(--paper);
+    background:var(--night); color:var(--paper);
     font-size:12px; letter-spacing:.06em;
-    padding:10px 24px;
+    padding:9px 24px;
     display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap;
+    position:relative; z-index:100;
   }
-  .note-bar b{color:var(--yellow);}
+  .note-bar b{color:var(--highlight);}
 
-  .mode-row{
-    display:flex; gap:10px; padding:20px 24px 0;
-    font-size:12px; letter-spacing:.08em; text-transform:uppercase; font-weight:700;
+  header{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:16px 24px; border-bottom:2px solid var(--ink);
+    position:relative; z-index:90; background:var(--paper);
   }
-  .mode-row button{
-    font-family:var(--ff-sans); font-size:12px; letter-spacing:.08em; text-transform:uppercase; font-weight:700;
-    background:none; border:1px solid var(--ink); color:var(--ink);
-    padding:8px 16px; border-radius:100px; cursor:pointer; opacity:.55;
+  .brand{ width:36px; height:36px; border:2px solid var(--ink); border-radius:50%; }
+  nav{ display:flex; }
+  nav a{
+    font-size:12px; letter-spacing:.14em; text-transform:uppercase; font-weight:700;
+    color:var(--ink); text-decoration:none; padding:10px 18px; border-left:2px solid var(--ink);
   }
-  .mode-row button.active{ opacity:1; background:var(--ink); color:var(--paper); }
+  nav a:first-child{ border-left:none; }
+  nav a.current{ background:var(--ink); color:var(--paper); }
 
-  .intro{ padding:16px 24px 40px; max-width:640px; }
-  .intro h1{ font-size:28px; margin:0 0 10px; }
-  .intro p{ font-size:15px; line-height:1.55; opacity:.75; margin:0; }
-
-  .group{ position:relative; display:grid; grid-template-columns:1fr 1fr; }
-  .group-sticky{
-    position:sticky; top:0; align-self:start;
-    height:100vh; display:flex; flex-direction:column; justify-content:center;
-    padding:56px; color:var(--ink);
+  .hs-outer{ position:relative; }
+  .hs-sticky{
+    position:sticky; top:0; height:100vh; overflow:hidden;
+    display:flex; border-bottom:2px solid var(--ink);
   }
-  .g-kicker{ font-size:12px; letter-spacing:.14em; text-transform:uppercase; font-weight:700; opacity:.65; margin-bottom:18px; }
-  .g-title{ font-size:clamp(36px,5vw,68px); font-weight:700; line-height:1.02; margin:0 0 18px; }
-  .g-sub{ font-size:16px; line-height:1.5; max-width:44ch; opacity:.8; margin:0 0 22px; }
-  .g-meta{ display:flex; flex-direction:column; gap:6px; font-size:13px; }
-  .g-meta .row{ display:flex; align-items:baseline; gap:10px; }
-  .g-meta .k{ text-transform:uppercase; letter-spacing:.1em; font-weight:700; opacity:.55; font-size:11px; white-space:nowrap; }
-  .g-meta .leader{ flex:1; border-bottom:1px dotted currentColor; opacity:.35; transform:translateY(-3px); }
-
-  .group-feed{ display:flex; flex-direction:column; }
-  .feed-item{
-    padding:40px 48px; border-top:1px dotted rgba(10,10,22,.18);
-    display:flex; flex-direction:column; gap:8px; background:var(--paper);
+  .hs-rail{
+    flex:0 0 320px; height:100%; border-right:2px solid var(--ink);
+    padding:32px 24px; display:flex; flex-direction:column; gap:14px;
+    background:var(--paper); position:relative; z-index:2;
   }
-  .feed-item:first-child{ border-top:none; }
-  .fi-meta{ font-size:12px; letter-spacing:.1em; text-transform:uppercase; font-weight:700; display:flex; gap:8px; align-items:center; }
-  .fi-chip{ padding:3px 10px; border-radius:100px; font-size:11px; }
-  .fi-title{ font-size:26px; font-weight:700; margin:2px 0 2px; line-height:1.15; }
-  .fi-loc{ font-size:13px; opacity:.65; }
+  .gr-kicker{ font-size:11px; letter-spacing:.2em; text-transform:uppercase; font-weight:700; opacity:.65; }
+  .gr-range{ font-size:clamp(30px,3vw,44px); font-weight:700; line-height:1; letter-spacing:-.02em; }
+  .gr-count{ font-size:14px; opacity:.7; }
+  .gr-hint{ font-size:11px; letter-spacing:.1em; text-transform:uppercase; opacity:.5; margin-top:auto; }
+  .gr-link{ font-size:11px; letter-spacing:.18em; text-transform:uppercase; font-weight:700; text-decoration:none; color:inherit; }
 
-  .chip-performance{ background:var(--pink); color:#3e0a1e; }
-  .chip-film{ background:var(--yellow); color:#41240a; }
-  .chip-class{ background:var(--violet); color:#241b4a; }
-  .chip-workshop{ background:var(--orange); color:#fff; }
-  .chip-radio{ background:var(--green); color:#04231a; }
+  .hs-track{ display:flex; height:100%; will-change:transform; }
+  .card{
+    flex:0 0 min(560px,86vw); height:100%; border-right:2px solid var(--ink);
+    padding:56px 40px; display:flex; flex-direction:column; justify-content:center; gap:14px;
+  }
+  .c-meta{ font-size:11px; letter-spacing:.2em; text-transform:uppercase; font-weight:700; opacity:.65; }
+  .c-title{ font-family:var(--ff-sans); font-weight:700; font-size:clamp(30px,3.4vw,48px); line-height:.95; letter-spacing:-.03em; text-transform:uppercase; margin:0; }
+  .c-title.serif{ font-family:var(--ff-ar); font-style:italic; font-weight:700; font-size:clamp(26px,2.8vw,40px); line-height:1; letter-spacing:0; text-transform:none; }
+  .c-desc{ font-size:15px; line-height:1.5; max-width:38ch; opacity:.85; margin:0; }
+  .c-desc.serif{ font-family:var(--ff-ar); font-style:italic; font-size:16px; }
+  .c-cta{ font-size:11px; letter-spacing:.2em; text-transform:uppercase; font-weight:700; }
+  .c-pink{ color:var(--pink); }
+  .c-green{ color:var(--green); }
+
+  .vsection{ padding:70px 24px; border-top:2px solid var(--ink); }
+  .vsection h2{ font-size:12px; letter-spacing:.2em; text-transform:uppercase; font-weight:700; opacity:.65; margin:0 0 24px; }
+
+  .marquee-wrap{ overflow:hidden; }
+  .marquee{ display:flex; gap:0; will-change:transform; }
+  .m-card{ flex:0 0 320px; padding:32px; border:2px solid var(--ink); margin-right:-2px; min-height:220px; display:flex; flex-direction:column; justify-content:flex-end; gap:8px; }
+  .m-title{ font-weight:700; font-size:22px; text-transform:uppercase; letter-spacing:-.02em; margin:0; }
+  .m-sub{ font-size:12px; opacity:.65; }
+
+  .res-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:0; border:2px solid var(--ink); border-radius:0; }
+  .res-item{ padding:28px; border-right:2px solid var(--ink); }
+  .res-item:last-child{ border-right:none; }
+  .res-item h3{ font-size:18px; margin:0 0 6px; }
+  .res-item p{ font-size:13px; opacity:.7; margin:0; }
 
   .end-note{ padding:60px 24px 120px; text-align:center; font-size:13px; opacity:.5; }
 </style>
@@ -86,109 +98,129 @@
 <body>
 
 <div class="note-bar">
-  <span>Direction study — grouped scroll layout · not final</span>
-  <span>Inspired by HKW's project-grouped homepage: one <b>sticky identity block</b> per group, its events scroll alongside</span>
+  <span>Direction study v3 — horizontal scroll-lock, then vertical into projects/residencies/artists</span>
+  <span><b>Scroll down</b> to move sideways through this week; keep going for the rest</span>
 </div>
 
-<div class="mode-row">
-  <button class="active">By week (default)</button>
-  <button disabled title="Same mechanic, grouped by project instead — ask to see this variant">By project</button>
-  <button disabled title="Same mechanic, grouped by residency instead — ask to see this variant">By residency</button>
-</div>
+<header>
+  <div class="brand"></div>
+  <nav>
+    <a>Programme</a>
+    <a>Residencies</a>
+    <a>Visit</a>
+    <a class="current">EN</a>
+    <a>AR</a>
+  </nav>
+</header>
 
-<div class="intro">
-  <h1>Programme, grouped by week</h1>
-  <p>Scroll down. Each week becomes its own section: the week card pins on the left while that week's events scroll past on the right. When a week runs out of events, its card unpins and the next week's card takes over — same pattern as HKW, rebuilt in Wonder Cabinet's own type and colour system.</p>
-</div>
+<section class="hs-outer" id="hsOuter">
+  <div class="hs-sticky">
+    <div class="hs-rail">
+      <div class="gr-kicker">This week</div>
+      <div class="gr-range">13—19 Jul</div>
+      <div class="gr-count">4 events</div>
+      <div class="gr-hint">Scroll ↓ to move →</div>
+      <a class="gr-link" href="#">View full week →</a>
+    </div>
+    <div class="hs-track" id="hsTrack">
+      <div class="card">
+        <div class="c-meta">Performance · Thu 16 Jul · 17:00</div>
+        <h2 class="c-title">0-0: Dance Performance</h2>
+        <p class="c-desc">Aseel Qupty and Al Amal Dance Company at Wonder Cabinet.</p>
+        <div class="c-cta">View event →</div>
+      </div>
+      <div class="card">
+        <div class="c-meta c-pink">Film · Wed 15 Jul · 19:00</div>
+        <h2 class="c-title serif c-pink">Lines on Cotton</h2>
+        <p class="c-desc serif c-pink">A short-film programme on textile memory.</p>
+        <div class="c-cta c-pink">View event →</div>
+      </div>
+      <div class="card">
+        <div class="c-meta">Workshop · Fri 17 Jul · 11:00</div>
+        <h2 class="c-title">Natural Dye Intensive</h2>
+        <p class="c-desc">A two-day studio workshop led by the current residency cohort.</p>
+        <div class="c-cta">View event →</div>
+      </div>
+      <div class="card">
+        <div class="c-meta c-green">Radio · Sat 18 Jul · 13:00</div>
+        <h2 class="c-title serif c-green">NTS x Wonder Cabinet</h2>
+        <p class="c-desc serif c-green">A live broadcast from the courtyard.</p>
+        <div class="c-cta c-green">View event →</div>
+      </div>
+    </div>
+  </div>
+</section>
 
-<div class="group">
-  <div class="group-sticky">
-    <div class="g-kicker">This week</div>
-    <h2 class="g-title">13—19<br>July</h2>
-    <p class="g-sub">4 events across performance, film and workshop programming this week.</p>
-    <div class="g-meta">
-      <div class="row"><span class="k">Events</span><span class="leader"></span><span>4</span></div>
-      <div class="row"><span class="k">Venue</span><span class="leader"></span><span>Wonder Cabinet</span></div>
+<section class="vsection">
+  <h2>Featured projects</h2>
+  <div class="marquee-wrap">
+    <div class="marquee" id="marqueeA">
+      <div class="m-card"><h3 class="m-title">Sounds of Places</h3><span class="m-sub">Annual project · Cremisan Valley</span></div>
+      <div class="m-card"><h3 class="m-title">Christmas in Mourning</h3><span class="m-sub">Record + book release</span></div>
+      <div class="m-card"><h3 class="m-title">Platform 14</h3><span class="m-sub">Touring showcase</span></div>
+      <div class="m-card"><h3 class="m-title">Bethlehem Frequencies</h3><span class="m-sub">Radio series</span></div>
     </div>
   </div>
-  <div class="group-feed">
-    <div class="feed-item">
-      <div class="fi-meta"><span class="fi-chip chip-performance">Performance</span><span>Thu 16 Jul · 17:00</span></div>
-      <div class="fi-title">0-0: Dance Performance by Aseel Qupty</div>
-      <div class="fi-loc">Wonder Cabinet</div>
-    </div>
-    <div class="feed-item">
-      <div class="fi-meta"><span class="fi-chip chip-film">Film</span><span>Wed 15 Jul · 19:00</span></div>
-      <div class="fi-title">Lines on Cotton</div>
-      <div class="fi-loc">Wonder Cabinet</div>
-    </div>
-    <div class="feed-item">
-      <div class="fi-meta"><span class="fi-chip chip-workshop">Workshop</span><span>Fri 17 Jul · 11:00</span></div>
-      <div class="fi-title">Natural Dye Intensive</div>
-      <div class="fi-loc">Wonder Cabinet, Studio 2</div>
-    </div>
-    <div class="feed-item">
-      <div class="fi-meta"><span class="fi-chip chip-radio">Radio</span><span>Sat 18 Jul · 13:00</span></div>
-      <div class="fi-title">NTS x Wonder Cabinet</div>
-      <div class="fi-loc">Wonder Cabinet</div>
-    </div>
-  </div>
-</div>
+</section>
 
-<div class="group">
-  <div class="group-sticky">
-    <div class="g-kicker">Next week</div>
-    <h2 class="g-title">20—26<br>July</h2>
-    <p class="g-sub">3 events, including the opening of a new residency showcase.</p>
-    <div class="g-meta">
-      <div class="row"><span class="k">Events</span><span class="leader"></span><span>3</span></div>
-      <div class="row"><span class="k">Venue</span><span class="leader"></span><span>Wonder Cabinet</span></div>
-    </div>
+<section class="vsection">
+  <h2>Residencies</h2>
+  <div class="res-grid">
+    <div class="res-item"><h3>Summer cohort</h3><p>6 resident artists · Jun–Aug 2026</p></div>
+    <div class="res-item"><h3>Chef residency</h3><p>Rotating kitchen takeover · monthly</p></div>
+    <div class="res-item"><h3>Sound lab</h3><p>Open call closing 1 Sep 2026</p></div>
   </div>
-  <div class="group-feed">
-    <div class="feed-item">
-      <div class="fi-meta"><span class="fi-chip chip-class">Class</span><span>Mon 20 Jul · 10:00</span></div>
-      <div class="fi-title">Sound Design for Beginners</div>
-      <div class="fi-loc">Wonder Cabinet, Studio 1</div>
-    </div>
-    <div class="feed-item">
-      <div class="fi-meta"><span class="fi-chip chip-performance">Performance</span><span>Wed 22 Jul · 20:00</span></div>
-      <div class="fi-title">Residency Open Studio: Summer Cohort</div>
-      <div class="fi-loc">Wonder Cabinet, Garden</div>
-    </div>
-    <div class="feed-item">
-      <div class="fi-meta"><span class="fi-chip chip-film">Film</span><span>Sat 25 Jul · 19:00</span></div>
-      <div class="fi-title">Shasha Film Club #2</div>
-      <div class="fi-loc">Wonder Cabinet</div>
-    </div>
-  </div>
-</div>
+</section>
 
-<div class="group">
-  <div class="group-sticky">
-    <div class="g-kicker">Week after</div>
-    <h2 class="g-title">27 Jul<br>—2 Aug</h2>
-    <p class="g-sub">2 events currently scheduled — more being confirmed.</p>
-    <div class="g-meta">
-      <div class="row"><span class="k">Events</span><span class="leader"></span><span>2</span></div>
-      <div class="row"><span class="k">Venue</span><span class="leader"></span><span>Wonder Cabinet</span></div>
+<section class="vsection">
+  <h2>Featured artists — scrolling the other way</h2>
+  <div class="marquee-wrap">
+    <div class="marquee" id="marqueeB" style="justify-content:flex-end;">
+      <div class="m-card"><h3 class="m-title">Aseel Qupty</h3><span class="m-sub">Choreographer</span></div>
+      <div class="m-card"><h3 class="m-title">Tareq Abu Salameh</h3><span class="m-sub">Oud</span></div>
+      <div class="m-card"><h3 class="m-title">Noor Abed</h3><span class="m-sub">Filmmaker</span></div>
+      <div class="m-card"><h3 class="m-title">Al Amal Dance Company</h3><span class="m-sub">Ensemble</span></div>
     </div>
   </div>
-  <div class="group-feed">
-    <div class="feed-item">
-      <div class="fi-meta"><span class="fi-chip chip-workshop">Workshop</span><span>Tue 29 Jul · 11:00</span></div>
-      <div class="fi-title">Chef Residency: Community Table</div>
-      <div class="fi-loc">Wonder Cabinet, Kitchen</div>
-    </div>
-    <div class="feed-item">
-      <div class="fi-meta"><span class="fi-chip chip-radio">Radio</span><span>Sat 1 Aug · 14:00</span></div>
-      <div class="fi-title">Bethlehem Frequencies Vol. 3</div>
-      <div class="fi-loc">Wonder Cabinet</div>
-    </div>
-  </div>
-</div>
+</section>
 
-<div class="end-note">End of upcoming programme — this is a scroll/layout study only, not the final visual design.</div>
+<div class="end-note">Layout/interaction study only — direction, easing and pacing are all tunable once approved.</div>
+
+<script>
+(function(){
+  var outer = document.getElementById('hsOuter');
+  var track = document.getElementById('hsTrack');
+  function setup(){
+    var trackWidth = track.scrollWidth - track.parentElement.clientWidth + track.previousElementSibling.getBoundingClientRect().width;
+    var railWidth = document.querySelector('.hs-rail').getBoundingClientRect().width;
+    var visible = window.innerWidth - railWidth;
+    var maxScroll = Math.max(0, track.scrollWidth - visible);
+    outer.style.height = (window.innerHeight + maxScroll) + 'px';
+    outer.dataset.maxScroll = maxScroll;
+  }
+  function onScroll(){
+    var maxScroll = parseFloat(outer.dataset.maxScroll || 0);
+    var top = outer.getBoundingClientRect().top;
+    var progress = Math.min(Math.max(-top, 0), maxScroll);
+    track.style.transform = 'translateX(' + (-progress) + 'px)';
+  }
+  setup();
+  window.addEventListener('resize', setup);
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+})();
+
+(function(){
+  var a = document.getElementById('marqueeA');
+  var b = document.getElementById('marqueeB');
+  function parallax(){
+    var y = window.scrollY;
+    a.style.transform = 'translateX(' + (-(y * 0.06) % 200) + 'px)';
+    b.style.transform = 'translateX(' + ((y * 0.06) % 200) + 'px)';
+  }
+  window.addEventListener('scroll', parallax, { passive: true });
+})();
+</script>
 
 </body>
 </html>
