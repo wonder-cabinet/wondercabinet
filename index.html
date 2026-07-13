@@ -738,6 +738,21 @@ function initLogoRotation(){
   }, { passive: true });
 }
 
+/* Sanity asset ref → CDN URL helpers (shared by _boot and _renderBlocks) */
+function _sanityImg(ref){
+  const r = typeof ref === 'string' ? ref : (ref && ref.asset && ref.asset._ref) || '';
+  if (!r) return '';
+  const id = r.replace(/^image-/, '').replace(/-([a-z0-9]+)$/, '.$1');
+  return `https://cdn.sanity.io/images/xdtj605l/production/${id}`;
+}
+function _sanityFile(ref){
+  const r = typeof ref === 'string' ? ref : (ref && ref.asset && ref.asset._ref) || '';
+  if (!r) return '';
+  const id = r.replace(/^file-/, '').replace(/-([a-z0-9]+)$/, '.$1');
+  return `https://cdn.sanity.io/files/xdtj605l/production/${id}`;
+}
+function _loc(v){ return typeof v === 'object' && v !== null ? (v.en || v.ar || '') : (v || ''); }
+
 /* ============================================================
    BOOT — fetch live events from Sanity, then render everything
    ============================================================ */
@@ -757,8 +772,7 @@ async function _boot(){
       const n = mo>=3&&mo<=5?'Spring':mo>=6&&mo<=8?'Summer':mo>=9&&mo<=11?'Autumn':'Winter';
       return { key:`${n.toLowerCase()}-${y}`, name:n, year:y };
     }
-
-    const q = encodeURIComponent('*[_type == "event"] | order(startDateTime desc) { ..., location->{ name } }');
+    const q = encodeURIComponent('*[_type == "event"] | order(startDateTime desc) { ..., location->{ name }, relatedArtists[]->{name, slug}, relatedProject->{title, slug} }');
     const res = await fetch(`https://xdtj605l.api.sanity.io/v2024-01-01/data/query/production?query=${q}`);
     const { result } = await res.json();
 
@@ -773,6 +787,8 @@ async function _boot(){
         id:       doc.slug?.current || doc._id,
         title:    doc.title?.en || '',
         titleAr:  doc.title?.ar || '',
+        subtitle:   doc.subtitle?.en || '',
+        subtitleAr: doc.subtitle?.ar || '',
         type:     doc.eventType || '',
         day:      s ? String(s.getDate()).padStart(2,'0') : '01',
         month:    s ? MABBR[s.getMonth()] : 'Jan',
@@ -783,6 +799,8 @@ async function _boot(){
         end:      e && (e.getHours()||e.getMinutes()) ? e.toTimeString().slice(0,5) : '',
         location: locationName,
         recurring: !!doc.recurring,
+        recurringLabel:   doc.recurringLabel?.en || '',
+        recurringLabelAr: doc.recurringLabel?.ar || '',
         status:   doc.status || 'upcoming',
         featured: !!doc.featured,
         register: doc.registerUrl || '',
@@ -792,6 +810,12 @@ async function _boot(){
         shortAr:  doc.shortDescription?.ar || '',
         body:     doc.body?.en ? doc.body.en.split(/\n\n+/).map(p=>p.trim()).filter(Boolean) : [],
         bodyAr:   doc.body?.ar ? doc.body.ar.split(/\n\n+/).map(p=>p.trim()).filter(Boolean) : [],
+        writeup:   doc.writeup?.en || '',
+        writeupAr: doc.writeup?.ar || '',
+        cover:    _sanityImg(doc.cover),
+        content:  doc.content || [],
+        relatedArtists: (doc.relatedArtists||[]).map(a => ({ name: _loc(a.name), slug: a.slug?.current || '' })).filter(a => a.name),
+        relatedProject: doc.relatedProject ? { title: _loc(doc.relatedProject.title), slug: doc.relatedProject.slug?.current || '' } : null,
         season:   s ? _season(s) : { key:'unknown', name:'Unknown', year:new Date().getFullYear() },
       };
     });
@@ -901,11 +925,14 @@ function closeOverlay(){
   if (history.state && history.state.overlay) history.back();
 }
 
-/* Renders typed content blocks — text / image / pullquote / audio / video / gallery */
+/* Renders typed content blocks — text / image / pullquote / audio / video / gallery.
+   Sanity block _type is "content<Kind>" (e.g. "contentImage"); fields match
+   the schema (contentImage.image, contentAudio.audioFile, etc). */
 function _renderBlocks(content){
   if (!content || !content.length) return "";
   return content.map(b => {
-    switch(b.type){
+    const kind = (b._type || b.type || '').replace(/^content/, '').toLowerCase();
+    switch(kind){
       case "text": {
         const enHtml = (b.en||[]).map(p=>`<p>${p}</p>`).join("");
         const arHtml = (b.ar||[]).map(p=>`<p>${p}</p>`).join("");
@@ -914,21 +941,25 @@ function _renderBlocks(content){
           ${arHtml ? `<div class="ar-only ar" dir="rtl">${arHtml}</div>` : ""}
         </div>`;
       }
-      case "image":
+      case "image": {
+        const src = _sanityImg(b.image);
+        if (!src) return "";
         return `<div class="cb-image">
-          <img src="${b.src}" alt="${b.captionEn||""}">
+          <img src="${src}" alt="${b.captionEn||""}">
           ${b.captionEn||b.captionAr ? `<div class="cb-caption">
             <span class="en-only">${b.captionEn||""}</span>
             <span class="ar-only ar" dir="rtl">${b.captionAr||""}</span>
           </div>` : ""}
         </div>`;
+      }
       case "pullquote":
         return `<blockquote class="cb-quote">
           ${b.en ? `<p class="en-only">${b.en}</p>` : ""}
           ${b.ar ? `<p class="ar-only ar" dir="rtl">${b.ar}</p>` : ""}
           ${b.attribution ? `<cite>${b.attribution}</cite>` : ""}
         </blockquote>`;
-      case "audio":
+      case "audio": {
+        const src = _sanityFile(b.audioFile) || b.externalUrl || '';
         return `<div class="cb-audio">
           <div class="cb-audio-head">
             <span class="cb-audio-icon">◉</span>
@@ -938,29 +969,30 @@ function _renderBlocks(content){
             </span>
             ${b.durationMin ? `<span class="cb-audio-dur">${b.durationMin} min</span>` : ""}
           </div>
-          ${b.src
-            ? `<audio controls src="${b.src}" style="width:100%;margin-top:10px;"></audio>`
+          ${src
+            ? `<audio controls src="${src}" style="width:100%;margin-top:10px;"></audio>`
             : `<div class="cb-audio-placeholder">
                 <span class="en-only">Recording will appear here after the event</span>
                 <span class="ar-only ar" dir="rtl">سيظهر التسجيل هنا بعد الفعالية</span>
               </div>`}
         </div>`;
-      case "video":
-        return `<div class="cb-video">
-          ${b.embed
-            ? `<div class="cb-video-frame">${b.embed}</div>`
-            : `<div class="cb-video-placeholder">
-                <span class="en-only">${b.titleEn||"Video"}</span>
-                <span class="ar-only ar">${b.titleAr||""}</span>
-              </div>`}
-        </div>`;
+      }
+      case "video": {
+        const src = _sanityFile(b.videoFile) || '';
+        const cap = (b.captionEn||b.captionAr) ? `<div class="cb-caption"><span class="en-only">${b.captionEn||""}</span><span class="ar-only ar" dir="rtl">${b.captionAr||""}</span></div>` : "";
+        if (b.externalUrl) return `<div class="cb-video"><div class="cb-video-frame"><iframe src="${b.externalUrl}" allowfullscreen></iframe></div>${cap}</div>`;
+        if (src) return `<div class="cb-video"><video controls src="${src}" style="width:100%;display:block;border-radius:16px;"></video>${cap}</div>`;
+        return `<div class="cb-video-placeholder">
+            <span class="en-only">Video</span>
+            <span class="ar-only ar">فيديو</span>
+          </div>`;
+      }
       case "gallery": {
-        const imgs = (b.images||[]).map(img=>`
-          <div class="cb-gal-item">
-            <img src="${img.src}" alt="${img.captionEn||""}">
-            ${img.captionEn ? `<div class="cb-caption en-only">${img.captionEn}</div>` : ""}
-          </div>`).join("");
-        return `<div class="cb-gallery">${imgs}</div>`;
+        const imgs = (b.images||[]).map(img=>{
+          const s = _sanityImg(img);
+          return s ? `<div class="cb-gal-item"><img src="${s}" alt=""></div>` : '';
+        }).join("");
+        return imgs ? `<div class="cb-gallery">${imgs}</div>` : "";
       }
       case "divider":
         return `<hr class="cb-divider">`;
@@ -1105,6 +1137,16 @@ ${audioBar}
         <span class="ef-leader"></span>
         <span class="ef-val"><span class="en-only">${ev.type}</span><span class="ar-only ar">${typeArLabel}</span></span>
       </div>
+      ${ev.relatedArtists && ev.relatedArtists.length ? `<div class="ep-fact">
+        <span class="ef-key"><span class="en-only">Artists</span><span class="ar-only ar">فنانون</span></span>
+        <span class="ef-leader"></span>
+        <span class="ef-val">${ev.relatedArtists.map(a=>a.name).join(', ')}</span>
+      </div>` : ""}
+      ${ev.relatedProject ? `<div class="ep-fact">
+        <span class="ef-key"><span class="en-only">Part of</span><span class="ar-only ar">جزء من</span></span>
+        <span class="ef-leader"></span>
+        <span class="ef-val">${ev.relatedProject.title}</span>
+      </div>` : ""}
     </div>
     ${cta}
   </div>

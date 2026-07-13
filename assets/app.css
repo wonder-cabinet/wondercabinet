@@ -608,6 +608,15 @@ img{ display:block; max-width:100%; }
 .detail-body .lang-divider{
   margin: clamp(24px, 3vw, 40px) 0;
 }
+.detail-body p.subtitle:first-child{ font-size: 18px; font-weight: 600; opacity: .8; }
+.detail-body p.writeup{ font-style: italic; opacity: .8; }
+.detail-body p.credits-line{
+  font-size: 14px; opacity: .75; margin-top: -0.4em;
+}
+.detail-body p.credits-line .k{
+  font-size: 11px; text-transform: uppercase; letter-spacing: .16em;
+  font-weight: 700; opacity: .7; margin-right: 8px;
+}
 
 /* Facts — open label / leader / value rows, no card, no box */
 .facts{
@@ -646,9 +655,11 @@ img{ display:block; max-width:100%; }
 .cta:hover{ opacity: .85; }
 .cta.secondary{ background: transparent; color: var(--ink); opacity: .6; padding: 0; }
 .cta.secondary:hover{ opacity: 1; }
-.cta:hover{ background: var(--highlight); color: var(--ink); }
-.cta.secondary{ background: transparent; color: var(--bg); outline: 2px solid var(--bg); outline-offset: -2px; }
-.cta.secondary:hover{ background: var(--bg); color: var(--ink); }
+.cta.free{
+  display: inline-block; background: none; color: var(--ink);
+  font-family: var(--ff-sans); font-size: 12px; letter-spacing: .22em; text-transform: uppercase; font-weight: 700;
+  opacity: .6; margin-top: 28px; padding: 0; width: auto;
+}
 
 /* More events */
 .more{
@@ -2010,11 +2021,11 @@ html[data-lang="ar"] .ar-only{ direction: rtl; }
   font-size: 19px; line-height: 1.9; font-weight: 400;
 }
 
-/* Image block */
+/* Image block — open, no outline, soft rounded corners */
 .cb-image{ display: flex; flex-direction: column; gap: 10px; }
 .cb-image img{
   display: block; width: 100%; max-width: 720px;
-  outline: 2px solid currentColor; outline-offset: -2px;
+  border-radius: 16px;
 }
 .cb-caption{
   font-family: var(--ff-sans); font-size: 12px; letter-spacing: .12em;
@@ -2022,11 +2033,10 @@ html[data-lang="ar"] .ar-only{ direction: rtl; }
 }
 .efs-content-blocks .cb-image img{ max-width: 100%; }
 
-/* Pull quote */
+/* Pull quote — no rule, just scale + italic to carry the emphasis */
 .cb-quote{
   margin: 0;
-  padding: clamp(16px,2.5vw,28px) clamp(16px,2.5vw,28px) clamp(16px,2.5vw,28px) clamp(20px,3vw,36px);
-  border-left: 4px solid currentColor;
+  padding: 0;
 }
 .cb-quote p{
   font-family: var(--ff-ar); font-style: italic;
@@ -2041,9 +2051,10 @@ html[data-lang="ar"] .ar-only{ direction: rtl; }
   font-style: normal; margin-top: 6px;
 }
 
-/* Audio block */
+/* Audio block — soft tint instead of a hard border */
 .cb-audio{
-  border: 2px solid currentColor;
+  background: rgba(127,127,127,.1);
+  border-radius: 12px;
   padding: 18px 20px;
   display: flex; flex-direction: column; gap: 10px;
 }
@@ -2063,15 +2074,15 @@ html[data-lang="ar"] .ar-only{ direction: rtl; }
   font-family: var(--ff-sans); font-size: 12px; letter-spacing: .12em;
   text-transform: uppercase; font-weight: 700; opacity: .38;
   padding: 10px 0;
-  border-top: 1px dashed currentColor;
 }
 
 /* Video block */
-.cb-video-frame{ position: relative; aspect-ratio: 16/9; overflow: hidden; }
+.cb-video-frame{ position: relative; aspect-ratio: 16/9; overflow: hidden; border-radius: 16px; }
 .cb-video-frame iframe{ position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
 .cb-video-placeholder{
   aspect-ratio: 16/9;
-  border: 2px dashed currentColor;
+  background: rgba(127,127,127,.1);
+  border-radius: 16px;
   display: flex; align-items: center; justify-content: center;
   font-family: var(--ff-sans); font-size: 13px; letter-spacing: .18em;
   text-transform: uppercase; font-weight: 700; opacity: .38;
@@ -2081,17 +2092,18 @@ html[data-lang="ar"] .ar-only{ direction: rtl; }
 .cb-gallery{
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 2px;
+  gap: 8px;
 }
 .cb-gal-item img{
   display: block; width: 100%; aspect-ratio: 4/3; object-fit: cover;
+  border-radius: 12px;
 }
 .cb-gal-item .cb-caption{ margin-top: 4px; }
 
-/* Divider */
+/* Divider — hairline, not a bold rule */
 .cb-divider{
-  border: 0; border-top: 2px solid currentColor;
-  margin: 8px 0; opacity: .25;
+  border: 0; border-top: 1px dotted currentColor;
+  margin: 8px 0; opacity: .3;
 }
 
 /* =========================================================

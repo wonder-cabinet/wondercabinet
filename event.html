@@ -74,10 +74,79 @@
 (async function(){
   const MABBR = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
   const DWEN  = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+  const SANITY_PROJECT = 'xdtj605l', SANITY_DATASET = 'production';
 
   function _iso(dt){
     const m = dt && dt.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/);
     return m ? new Date(+m[1], +m[2]-1, +m[3], +m[4], +m[5]) : null;
+  }
+
+  // Sanity asset refs look like "image-<hash>-<W>x<H>-<format>" / "file-<hash>-<format>"
+  // and map to a flat CDN filename "<hash>-<W>x<H>.<format>" — only the trailing
+  // "-<format>" becomes a dot, the hash/dimensions hyphen must stay a hyphen.
+  function _sanityImg(ref){
+    const r = typeof ref === 'string' ? ref : (ref && ref.asset && ref.asset._ref) || '';
+    if (!r) return '';
+    const id = r.replace(/^image-/, '').replace(/-([a-z0-9]+)$/, '.$1');
+    return `https://cdn.sanity.io/images/${SANITY_PROJECT}/${SANITY_DATASET}/${id}`;
+  }
+  function _sanityFile(ref){
+    const r = typeof ref === 'string' ? ref : (ref && ref.asset && ref.asset._ref) || '';
+    if (!r) return '';
+    const id = r.replace(/^file-/, '').replace(/-([a-z0-9]+)$/, '.$1');
+    return `https://cdn.sanity.io/files/${SANITY_PROJECT}/${SANITY_DATASET}/${id}`;
+  }
+  function _loc(v){ return typeof v === 'object' && v !== null ? (v.en || v.ar || '') : (v || ''); }
+
+  // Split a plain-text field into paragraphs on blank lines, keeping single
+  // line breaks (e.g. a "Dancers:\nName\nName" list) as <br> within a paragraph.
+  function _paras(text){
+    if (!text) return [];
+    return text.split(/\n\n+/).map(s => s.trim()).filter(Boolean);
+  }
+  function _p(text){
+    return _paras(text).map(s => `<p>${s.replace(/\n/g,'<br>')}</p>`).join('');
+  }
+
+  // Renders the event's rich "content" blocks (contentText / contentImage /
+  // contentPullquote / contentAudio / contentVideo / contentGallery / contentDivider)
+  function renderContentBlocks(blocks){
+    if (!blocks || !blocks.length) return '';
+    return blocks.map(b => {
+      const kind = (b._type || '').replace(/^content/, '').toLowerCase();
+      switch (kind){
+        case 'text': {
+          const enHtml = (b.en||[]).map(p=>`<p>${p}</p>`).join('');
+          const arHtml = (b.ar||[]).map(p=>`<p>${p}</p>`).join('');
+          return `<div class="cb-text">${enHtml?`<div class="en-only">${enHtml}</div>`:''}${arHtml?`<div class="ar-only ar" dir="rtl">${arHtml}</div>`:''}</div>`;
+        }
+        case 'image': {
+          const src = _sanityImg(b.image);
+          if (!src) return '';
+          return `<figure class="cb-image"><img src="${src}" alt="${b.captionEn||''}">${(b.captionEn||b.captionAr)?`<figcaption class="cb-caption"><span class="en-only">${b.captionEn||''}</span><span class="ar-only ar" dir="rtl">${b.captionAr||''}</span></figcaption>`:''}</figure>`;
+        }
+        case 'pullquote':
+          return `<blockquote class="cb-quote">${b.en?`<p class="en-only">${b.en}</p>`:''}${b.ar?`<p class="ar-only ar" dir="rtl">${b.ar}</p>`:''}${b.attribution?`<cite>${b.attribution}</cite>`:''}</blockquote>`;
+        case 'audio': {
+          const src = _sanityFile(b.audioFile) || b.externalUrl || '';
+          return `<div class="cb-audio"><div class="cb-audio-head"><span class="cb-audio-title"><span class="en-only">${b.titleEn||'Audio'}</span><span class="ar-only ar">${b.titleAr||b.titleEn||''}</span></span>${b.durationMin?`<span class="cb-audio-dur">${b.durationMin} min</span>`:''}</div>${src?`<audio controls src="${src}" style="width:100%"></audio>`:''}</div>`;
+        }
+        case 'video': {
+          const src = _sanityFile(b.videoFile) || '';
+          const cap = (b.captionEn||b.captionAr) ? `<div class="cb-caption"><span class="en-only">${b.captionEn||''}</span><span class="ar-only ar" dir="rtl">${b.captionAr||''}</span></div>` : '';
+          if (b.externalUrl) return `<div class="cb-video"><div class="cb-video-frame"><iframe src="${b.externalUrl}" allowfullscreen></iframe></div>${cap}</div>`;
+          if (src) return `<div class="cb-video"><video controls src="${src}" style="width:100%;display:block;border-radius:16px;"></video>${cap}</div>`;
+          return '';
+        }
+        case 'gallery': {
+          const imgs = (b.images||[]).map(img => { const s=_sanityImg(img); return s ? `<div class="cb-gal-item"><img src="${s}" alt=""></div>` : ''; }).join('');
+          return imgs ? `<div class="cb-gallery">${imgs}</div>` : '';
+        }
+        case 'divider':
+          return `<hr class="cb-divider">`;
+        default: return '';
+      }
+    }).join('');
   }
 
   function docToEv(doc){
@@ -105,14 +174,22 @@
       shortDescAr: doc.shortDescription?.ar || '',
       body:        doc.body?.en || '',
       bodyAr:      doc.body?.ar || '',
+      writeup:     doc.writeup?.en || '',
+      writeupAr:   doc.writeup?.ar || '',
       cover:       doc.cover?.asset?._ref || '',
+      content:     doc.content || [],
+      recurring:   !!doc.recurring,
+      recurringLabel:   doc.recurringLabel?.en || '',
+      recurringLabelAr: doc.recurringLabel?.ar || '',
+      relatedArtists: (doc.relatedArtists||[]).map(a => ({ name: _loc(a.name), slug: a.slug?.current || '' })).filter(a => a.name),
+      relatedProject: doc.relatedProject ? { title: _loc(doc.relatedProject.title), slug: doc.relatedProject.slug?.current || '' } : null,
     };
   }
 
   const params = new URLSearchParams(location.search);
   const id = params.get('id') || '';
 
-  const BASE = 'https://xdtj605l.api.sanity.io/v2024-01-01/data/query/production?query=';
+  const BASE = `https://${SANITY_PROJECT}.api.sanity.io/v2024-01-01/data/query/${SANITY_DATASET}?query=`;
 
   async function groq(query) {
     const res = await fetch(BASE + encodeURIComponent(query));
@@ -122,7 +199,12 @@
 
   let ev, allEvents = [];
   try {
-    const doc = await groq(`*[_type == "event" && slug.current == "${id}"][0]{..., location->{name}}`);
+    const doc = await groq(`*[_type == "event" && slug.current == "${id}"][0]{
+      ...,
+      location->{name},
+      relatedArtists[]->{name, slug},
+      relatedProject->{title, slug}
+    }`);
     if (doc) ev = docToEv(doc);
   } catch(err) {
     console.warn('[WC] event fetch failed', err);
@@ -152,6 +234,7 @@
       <span class="sep"></span>
       <span>${dateStr}</span>
       ${timeStr ? `<span class="sep"></span><span>${timeStr}</span>` : ''}
+      ${ev.recurringLabel ? `<span class="sep"></span><span class="en-only">${ev.recurringLabel}</span><span class="sep ar-only"></span><span class="ar-only ar">${ev.recurringLabelAr||ev.recurringLabel}</span>` : ''}
       ${ev.register ? '<span class="sep"></span><span style="text-decoration:underline;">Registration open</span>' : ''}
     </div>
     <h1><span class="en-only">${ev.title}</span><span class="ar-only ar" dir="rtl">${ev.titleAr || ev.title}</span></h1>
@@ -159,26 +242,30 @@
 
   // Cover (skip if no image ref)
   if (ev.cover) {
-    // Sanity asset refs look like "image-<hash>-<W>x<H>-<format>" and map to
-    // a flat CDN filename "<hash>-<W>x<H>.<format>" — only the trailing
-    // "-<format>" becomes a dot, the hash/dimensions hyphen must stay a hyphen.
-    const imgId = ev.cover.replace(/^image-/, '').replace(/-([a-z0-9]+)$/, '.$1');
-    document.getElementById('detail-cover').innerHTML = `<img src="https://cdn.sanity.io/images/xdtj605l/production/${imgId}" alt="" />`;
+    document.getElementById('detail-cover').innerHTML = `<img src="${_sanityImg(ev.cover)}" alt="" />`;
   }
 
-  // Body
+  // Body — prefer authored "content" blocks; otherwise fall back to the
+  // plain subtitle / short description / body text fields.
+  const creditsEn = ev.relatedArtists.length ? `<p class="credits-line"><span class="k">Artists</span> ${ev.relatedArtists.map(a=>a.name).join(', ')}</p>` : '';
+  const creditsAr = ev.relatedArtists.length ? `<p class="credits-line" dir="rtl"><span class="k">فنانون</span> ${ev.relatedArtists.map(a=>a.name).join('، ')}</p>` : '';
+  const projectEn = ev.relatedProject ? `<p class="credits-line"><span class="k">Part of</span> ${ev.relatedProject.title}</p>` : '';
+
+  const fallbackEn = `${_p(ev.shortDesc)}${_p(ev.body)}${ev.writeup ? `<p class="writeup">${ev.writeup}</p>` : ''}`;
+  const fallbackAr = `${_p(ev.shortDescAr)}${_p(ev.bodyAr)}${ev.writeupAr ? `<p class="writeup" dir="rtl">${ev.writeupAr}</p>` : ''}`;
+
   document.getElementById('detail-body').innerHTML = `
     <div class="en-only">
-      ${ev.subtitle ? `<p><em>${ev.subtitle}</em></p>` : ''}
-      ${ev.shortDesc ? `<p>${ev.shortDesc}</p>` : ''}
-      ${ev.body ? `<p>${ev.body}</p>` : ''}
+      ${ev.subtitle ? `<p class="subtitle"><em>${ev.subtitle}</em></p>` : ''}
+      ${ev.content.length ? renderContentBlocks(ev.content) : fallbackEn}
+      ${creditsEn}
+      ${projectEn}
     </div>
-    ${ev.bodyAr || ev.shortDescAr ? `<div class="lang-divider en-only"></div>
     <div class="ar ar-only" dir="rtl">
-      ${ev.subtitleAr ? `<p><em>${ev.subtitleAr}</em></p>` : ''}
-      ${ev.shortDescAr ? `<p>${ev.shortDescAr}</p>` : ''}
-      ${ev.bodyAr ? `<p>${ev.bodyAr}</p>` : ''}
-    </div>` : ''}
+      ${ev.subtitleAr ? `<p class="subtitle"><em>${ev.subtitleAr}</em></p>` : ''}
+      ${ev.content.length ? renderContentBlocks(ev.content) : fallbackAr}
+      ${creditsAr}
+    </div>
   `;
 
   // Facts sidebar
@@ -192,7 +279,7 @@
     ${facts.map(([k,v]) => `<div class="row"><span class="k">${k}</span><span class="leader"></span><span class="v">${v}</span></div>`).join('')}
     ${ev.register
       ? `<a class="cta" href="${ev.register}" target="_blank" rel="noopener">Register →</a>`
-      : `<a class="cta secondary" href="index.html">Back to programme</a>`}
+      : `<span class="cta free">Free entry</span>`}
   `;
 
   // More this month
