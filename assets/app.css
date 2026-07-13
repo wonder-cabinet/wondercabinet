@@ -2000,7 +2000,7 @@ html[data-lang="ar"] .ar-only{ direction: rtl; }
   display: flex; flex-direction: column;
 }
 .ep-content-blocks{
-  padding: clamp(22px,3.2vw,44px);
+  padding: 0;
   gap: 32px;
   color: var(--night);
 }
@@ -2027,7 +2027,7 @@ html[data-lang="ar"] .ar-only{ direction: rtl; }
 /* Image block — open, no outline, soft rounded corners */
 .cb-image{ display: flex; flex-direction: column; gap: 10px; }
 .cb-image img{
-  display: block; width: 100%; max-width: 720px;
+  display: block; width: 100%; max-width: 100%;
   border-radius: 0;
 }
 .cb-caption{
