@@ -1573,131 +1573,93 @@ html[data-lang="ar"] .ar-only{ direction: rtl; }
 }
 
 /* =========================================================
-   FEATURED SPLIT — opposing dual-column scroll
-   Left track scrolls up, right track scrolls down.
-   section height = 4 × (100vh − 68px) → 3 full transitions
+   GROUPED SCROLL — this week (horizontal scroll-lock rail) →
+   Featured projects → Residencies → Featured artists.
+   Replaces the old opposing dual-column featured-split.
+   Everything here is driven only by native scroll position.
    ========================================================= */
-.featured-split{
-  height: calc(400vh - 216px); /* 4 × (100vh - 54px) */
-  position: relative;
+.gs-mode-row{
+  display: flex; gap: 8px; flex-wrap: wrap;
+  padding: 16px 24px;
+  border-bottom: 2px solid var(--ink);
 }
-.fs-inner{
-  position: sticky;
-  top: 54px;
-  height: calc(100vh - 54px);
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  overflow: hidden;
-  border-bottom: 3px solid var(--ink);
+.gs-mode{
+  font-family: var(--ff-sans); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; font-weight: 700;
+  background: none; border: 1px solid var(--ink); color: var(--ink);
+  padding: 9px 18px; border-radius: 100px; cursor: pointer; opacity: .5;
 }
-.fs-left,
-.fs-right{
-  overflow: hidden;
-  height: calc(100vh - 54px);
-  position: relative;
-}
-.fs-right{ border-left: 2px solid var(--ink); }
+.gs-mode.active{ opacity: 1; background: var(--ink); color: var(--bg); }
 
-.fs-left-track,
-.fs-right-track{
-  will-change: transform;
-  display: flex;
-  flex-direction: column;
+.gs-outer{ position: relative; }
+.gs-sticky{
+  --gs-bg: var(--paper); --gs-fg: var(--ink);
+  position: sticky; top: 0; height: 100vh; overflow: hidden;
+  display: flex; border-bottom: 2px solid var(--ink);
+  background: var(--gs-bg); color: var(--gs-fg);
+  transition: background .35s ease, color .35s ease;
 }
+.gs-rail{
+  flex: 0 0 320px; height: 100%; border-right: 2px solid var(--gs-fg);
+  padding: 32px 24px; display: flex; flex-direction: column; gap: 14px;
+  background: var(--gs-bg); color: var(--gs-fg); position: relative; z-index: 2;
+  transition: background .35s ease, color .35s ease, border-color .35s ease;
+}
+.gs-kicker{ font-family: var(--ff-sans); font-size: 11px; letter-spacing: .2em; text-transform: uppercase; font-weight: 700; opacity: .65; }
+.gs-range{ font-family: var(--ff-sans); font-size: clamp(28px, 2.8vw, 42px); font-weight: 700; line-height: 1; letter-spacing: -.02em; }
+.gs-count{ font-family: var(--ff-sans); font-size: 14px; opacity: .7; }
+.gs-hint{ font-family: var(--ff-sans); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; opacity: .55; margin-top: auto; }
+.gs-link{ font-family: var(--ff-sans); font-size: 11px; letter-spacing: .18em; text-transform: uppercase; font-weight: 700; text-decoration: none; color: inherit; }
 
-/* Each box fills exactly one viewport slot */
-.fs-box{
-  flex: 0 0 calc(100vh - 54px);
-  height: calc(100vh - 54px);
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  position: relative;
-  text-decoration: none;
-  color: var(--ink);
-  transition: opacity .18s ease;
+.gs-track{ display: flex; height: 100%; will-change: transform; }
+.gs-card{
+  flex: 0 0 min(520px, 86vw); height: 100%; border-right: 2px solid var(--gs-fg);
+  padding: 56px 40px; display: flex; flex-direction: column; justify-content: center; gap: 14px;
+  text-decoration: none; color: inherit;
 }
+.gs-card-empty{ opacity: .8; justify-content: center; }
+.gs-c-meta{ font-family: var(--ff-sans); font-size: 11px; letter-spacing: .2em; text-transform: uppercase; font-weight: 700; opacity: .65; }
+.gs-c-title{ font-family: var(--ff-sans); font-weight: 700; font-size: clamp(28px, 3vw, 44px); line-height: .98; letter-spacing: -.03em; text-transform: uppercase; margin: 0; }
+.gs-c-title .ar{ font-family: var(--ff-ar); font-style: italic; letter-spacing: 0; text-transform: none; line-height: 1.1; }
+.gs-c-desc{ font-family: var(--ff-sans); font-size: 15px; line-height: 1.5; max-width: 38ch; opacity: .85; margin: 0; }
+.gs-c-cta{ font-family: var(--ff-sans); font-size: 11px; letter-spacing: .2em; text-transform: uppercase; font-weight: 700; }
 
-/* Box colour variants — border-only, no fill */
-.fs-inverted{ background-color: transparent; color: var(--ink);       border-top: 2px solid currentColor; }
-.fs-normal  { background-color: transparent; color: var(--ink);       border-top: 2px solid currentColor; }
-.fs-accent  { background-color: transparent; color: var(--highlight); border-top: 2px solid currentColor; }
-.fs-pink    { background-color: transparent; color: var(--pink);      border-top: 2px solid currentColor; }
-.fs-image   { background: #0a0a16; }
-.fs-image img{ width:100%; height:100%; object-fit:cover; display:block; }
+/* Featured projects / Residencies / Featured artists */
+.gs-vsection{ padding: 70px 24px; border-top: 2px solid var(--ink); }
+.gs-vsection h2{ font-family: var(--ff-sans); font-size: 12px; letter-spacing: .2em; text-transform: uppercase; font-weight: 700; opacity: .65; margin: 0 0 24px; }
+.gs-vsection.gs-tint{ background: #c8a0f0; color: #241b4a; }
+.gs-vsection.gs-tint h2{ opacity: .7; }
 
-/* Hover states */
-.fs-inverted:hover, .fs-normal:hover, .fs-accent:hover, .fs-pink:hover { opacity: .82; }
-.fs-noise:hover { opacity: .88; }
+.gs-marquee-wrap{ overflow: hidden; }
+.gs-marquee{ display: flex; gap: 0; will-change: transform; }
+.gs-m-card{
+  flex: 0 0 300px; padding: 30px; border: 2px solid currentColor; margin-right: -2px; min-height: 200px;
+  display: flex; flex-direction: column; justify-content: flex-end; gap: 8px;
+  text-decoration: none; color: inherit;
+}
+.gs-m-card-static{ cursor: default; }
+.gs-m-title{ font-family: var(--ff-sans); font-weight: 700; font-size: 20px; text-transform: uppercase; letter-spacing: -.02em; margin: 0; }
+.gs-m-sub{ font-family: var(--ff-sans); font-size: 12px; opacity: .65; }
 
-/* Box content layout */
-.fsb-content{
-  padding: clamp(28px, 4vw, 56px);
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  height: 100%;
-}
-.fsb-meta{
-  font-family: var(--ff-sans);
-  font-size: 11px; letter-spacing: .22em; text-transform: uppercase; font-weight: 700;
-  opacity: .7;
-}
-/* Sans-serif large title */
-.fsb-title{
-  font-family: var(--ff-sans); font-weight: 700;
-  font-size: clamp(48px, 6.5vw, 100px); line-height: .88;
-  letter-spacing: -.045em; text-transform: uppercase;
-  margin: 0; text-wrap: balance;
-}
-/* Amiri italic serif title — magazine pink style */
-.fsb-title-serif{
-  font-family: var(--ff-ar);
-  font-style: italic; font-weight: 700;
-  font-size: clamp(38px, 5vw, 80px); line-height: .92;
-  letter-spacing: -.01em; text-transform: none;
-  margin: 0; text-wrap: balance;
-}
-.fsb-desc{
-  font-family: var(--ff-sans); font-size: 16px; line-height: 1.5;
-  font-weight: 500; max-width: 40ch; margin: 0; opacity: .85;
-}
-.fsb-desc-serif{
-  font-family: var(--ff-ar);
-  font-style: italic; font-weight: 400;
-  font-size: 18px; line-height: 1.6;
-  max-width: 40ch; margin: 0; opacity: .9;
-}
-.fsb-cta{
-  margin-top: auto; padding-top: 8px;
-  font-family: var(--ff-sans); font-size: 11px; letter-spacing: .22em;
-  text-transform: uppercase; font-weight: 700;
-}
-.fsb-graphic{
-  flex: 1;
-  display: flex; align-items: center; justify-content: center;
-}
-.fsb-graphic svg{
-  width: clamp(80px, 11vw, 160px);
-  height: auto; color: inherit; opacity: .45;
+.gs-res-grid{ display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; border: 2px solid currentColor; }
+.gs-res-item{ padding: 28px; border-right: 2px solid currentColor; }
+.gs-res-item:last-child{ border-right: none; }
+.gs-res-item h3{ font-family: var(--ff-sans); font-size: 18px; margin: 0 0 6px; }
+.gs-res-item p{ font-family: var(--ff-sans); font-size: 13px; opacity: .7; margin: 0; }
+.gs-res-empty{
+  font-family: var(--ff-sans); font-size: 14px; opacity: .65;
+  border: 2px solid currentColor; padding: 28px;
 }
 
-/* Responsive — stack columns, disable scroll effect */
+/* Responsive — stack, disable the scroll-lock */
 @media (max-width: 700px){
-  .featured-split{ height: auto; }
-  .fs-inner{
-    position: static;
-    height: auto;
-    grid-template-columns: 1fr;
-    overflow: visible;
-  }
-  .fs-left, .fs-right{
-    overflow: visible;
-    height: auto;
-  }
-  .fs-right{ border-left: 0; border-top: 2px solid var(--ink); }
-  .fs-left-track, .fs-right-track{ transform: none !important; }
-  .fs-box{ flex: none; height: clamp(320px, 50vh, 520px); }
+  .gs-outer{ height: auto !important; }
+  .gs-sticky{ position: static; height: auto; flex-direction: column; }
+  .gs-rail{ border-right: 0; border-bottom: 2px solid var(--gs-fg); }
+  .gs-track{ flex-direction: column; transform: none !important; height: auto; }
+  .gs-card{ flex: none; height: auto; border-right: 0; border-bottom: 2px solid var(--gs-fg); }
+  .gs-res-grid{ grid-template-columns: 1fr; }
+  .gs-res-item{ border-right: 0; border-bottom: 2px solid currentColor; }
+  .gs-res-item:last-child{ border-bottom: 0; }
 }
 
 /* =========================================================

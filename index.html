@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Programme · The Wonder Cabinet</title>
-<link rel="stylesheet" href="assets/app.css?v=7">
+<link rel="stylesheet" href="assets/app.css?v=8">
 </head>
 <body data-view="list">
 
@@ -25,184 +25,56 @@
   </div>
 </header>
 
-<!-- FEATURED SPLIT — opposing dual-column scroll
-     Left track scrolls UP through 4 boxes; right track scrolls DOWN (DOM reversed).
-     Section height = 4 × (100vh − 68px) gives the scroll room. -->
-<section class="featured-split">
-  <div class="fs-inner">
+<!-- GROUPED SCROLL — this week (horizontal scroll-lock, sticky rail) →
+     Featured projects marquee → Residencies → Featured artists marquee.
+     Replaces the old static featured-split section; fully Sanity-driven. -->
+<section class="gscroll" id="gscroll">
 
-    <!-- LEFT — scrolls up: L1→L4 as user scrolls -->
-    <div class="fs-left">
-      <div class="fs-left-track">
-
-        <!-- L1 (shown first): RAST — inverted palette -->
-        <a class="fs-box fs-inverted" href="event.html?id=rast-apr-11">
-          <div class="fsb-content">
-            <div class="fsb-meta">
-              <span class="en-only">Featured Event · 11 April 2026</span>
-              <span class="ar-only ar" dir="rtl">فعالية مميّزة · ١١ أبريل ٢٠٢٦</span>
-            </div>
-            <h2 class="fsb-title">
-              <span class="en-only">Rast</span>
-              <span class="ar-only ar" dir="rtl">راست</span>
-            </h2>
-            <p class="fsb-desc">
-              <span class="en-only">A solo performance on the oud by Tareq Abu Salameh — tracing the traditional form of taqasim.</span>
-              <span class="ar-only ar" dir="rtl">عرضٌ منفردٌ على العود من طارق أبو سلامة — استكشاف شكل التقاسيم التقليدي.</span>
-            </p>
-            <div class="fsb-cta">
-              <span class="en-only">View event →</span>
-              <span class="ar-only ar" dir="rtl">← عرض الفعالية</span>
-            </div>
-          </div>
-        </a>
-
-        <!-- L2: Sounds of Places — noise GIF background -->
-        <a class="fs-box fs-normal fs-noise" href="project-light.html"
-           style="background-image: url('https://www.sulki-min.com/wp/sm-images/bg-noise-new.gif'); background-size: cover; background-position: center;">
-          <div class="fsb-content">
-            <div class="fsb-meta">
-              <span class="en-only">Annual Project · 24 May – 2 June 2024</span>
-              <span class="ar-only ar" dir="rtl">مشروع سنوي · ٢٤ مايو – ٢ يونيو ٢٠٢٤</span>
-            </div>
-            <h2 class="fsb-title">
-              <span class="en-only">Sounds<br>of Places</span>
-              <span class="ar-only ar" dir="rtl">أصوات<br>الأماكن</span>
-            </h2>
-            <p class="fsb-desc">
-              <span class="en-only">An annual residency-based sound gathering that focuses on the sonic aesthetics of place. Cremisan Valley, Bethlehem.</span>
-              <span class="ar-only ar" dir="rtl">تجمّعٌ صوتيٌّ سنويٌّ قائمٌ على الإقامة، مكرّسٌ للهوية الصوتية للأماكن. وادي كريميزان، بيت لحم.</span>
-            </p>
-          </div>
-        </a>
-
-        <!-- L3: Sound Waves Film — pink serif -->
-        <a class="fs-box fs-pink" href="event.html?id=soundwaves-apr-08">
-          <div class="fsb-content">
-            <div class="fsb-meta">
-              <span class="en-only">Film Screening · 8 April 2026</span>
-              <span class="ar-only ar" dir="rtl">عرض فيلم · ٨ أبريل ٢٠٢٦</span>
-            </div>
-            <h2 class="fsb-title-serif">
-              <span class="en-only">Sound Waves:<br>The Symphony of Physics</span>
-              <span class="ar-only ar" dir="rtl">الموجات الصوتية:<br>سيمفونية الفيزياء</span>
-            </h2>
-            <p class="fsb-desc-serif">
-              <span class="en-only">Dr Helen Czerski investigates the extraordinary science behind the sounds we know — and those we cannot hear.</span>
-              <span class="ar-only ar" dir="rtl">د. هيلين تشيرسكي تستكشف العلوم المذهلة وراء الأصوات المألوفة، والتي لا نسمعها.</span>
-            </p>
-            <div class="fsb-cta">
-              <span class="en-only">View event →</span>
-              <span class="ar-only ar" dir="rtl">← عرض الفعالية</span>
-            </div>
-          </div>
-        </a>
-
-        <!-- L4 (shown last): Radio Sessions — pink serif -->
-        <a class="fs-box fs-pink" href="event.html?id=radio-sessions-apr-18">
-          <div class="fsb-content">
-            <div class="fsb-meta">
-              <span class="en-only">Radio · 18 April 2026</span>
-              <span class="ar-only ar" dir="rtl">إذاعة · ١٨ أبريل ٢٠٢٦</span>
-            </div>
-            <h2 class="fsb-title-serif">
-              <span class="en-only">Radio Sessions:<br>7orany and ADAN</span>
-              <span class="ar-only ar" dir="rtl">جلسات إذاعية:<br>7orany و ADAN</span>
-            </h2>
-            <p class="fsb-desc-serif">
-              <span class="en-only">Bashar Horany followed by ADAN, spinning records live from the Cabinet on Radio AlHara.</span>
-              <span class="ar-only ar" dir="rtl">بشار حوراني ثم ADAN، أسطوانات مباشرة من المجلس عبر راديو الحارة.</span>
-            </p>
-            <div class="fsb-cta">
-              <span class="en-only">View event →</span>
-              <span class="ar-only ar" dir="rtl">← عرض الفعالية</span>
-            </div>
-          </div>
-        </a>
-
-      </div>
-    </div><!-- /.fs-left -->
-
-    <!-- RIGHT — scrolls down (DOM R1→R4, but shown R4→R1 due to initial offset).
-         At scroll-start, user sees R4 (Sumud); at scroll-end, user sees R1 (RAST photo). -->
-    <div class="fs-right">
-      <div class="fs-right-track">
-
-        <!-- R1 (DOM first = shown last): RAST photo -->
-        <a class="fs-box fs-image" href="event.html?id=rast-apr-11">
-          <img src="uploads/mothanna-hussein-featured_7c037f96-8519-4f06-9517-1d844dc4dda0.webp" alt="Rast — Tareq Abu Salameh">
-        </a>
-
-        <!-- R2 (shown 3rd): Bethlehem commission — yellow accent -->
-        <a class="fs-box fs-accent" href="project-dark.html" id="residencies">
-          <div class="fsb-content">
-            <div class="fsb-meta">
-              <span class="en-only">Commission · Christmas 2023</span>
-              <span class="ar-only ar" dir="rtl">عمل مُكلَّف · كريسماس ٢٠٢٣</span>
-            </div>
-            <h2 class="fsb-title">
-              <span class="en-only">Bethlehem</span>
-              <span class="ar-only ar" dir="rtl">بيت لحم</span>
-            </h2>
-            <p class="fsb-desc">
-              <span class="en-only">An electro-acoustic work for Christmas in mourning — Sammour, Moussa, Kobeissy.</span>
-              <span class="ar-only ar" dir="rtl">عملٌ كهرو-صوتي لعيد ميلادٍ في حداد — سمّور، موسى، قبيسي.</span>
-            </p>
-            <div class="fsb-cta">
-              <span class="en-only">View project →</span>
-              <span class="ar-only ar" dir="rtl">← عرض المشروع</span>
-            </div>
-          </div>
-        </a>
-
-        <!-- R3 (shown 2nd): Carhartt × Radio AlHara — pink serif -->
-        <a class="fs-box fs-pink" href="event.html?id=carhartt-radioalhara-apr-24">
-          <div class="fsb-content">
-            <div class="fsb-meta">
-              <span class="en-only">Radio · 24 April 2026</span>
-              <span class="ar-only ar" dir="rtl">إذاعة · ٢٤ أبريل ٢٠٢٦</span>
-            </div>
-            <h2 class="fsb-title-serif">
-              <span class="en-only">Carhartt WIP ×<br>Radio AlHara</span>
-              <span class="ar-only ar" dir="rtl">Carhartt WIP ×<br>راديو الحارة</span>
-            </h2>
-            <p class="fsb-desc-serif">
-              <span class="en-only">Collection launch. YA HU, Aram Sabbah, and Al Nather — live on Radio AlHara's 6th anniversary.</span>
-              <span class="ar-only ar" dir="rtl">إطلاق مجموعة. YA HU وأرام صبّاح والناذر — مباشرةً في الذكرى السادسة لراديو الحارة.</span>
-            </p>
-            <div class="fsb-cta">
-              <span class="en-only">View event →</span>
-              <span class="ar-only ar" dir="rtl">← عرض الفعالية</span>
-            </div>
-          </div>
-        </a>
-
-        <!-- R4 (DOM last = shown first): Noor Abed films — blue/ink -->
-        <a class="fs-box fs-normal" href="event.html?id=noor-abed-apr-22">
-          <div class="fsb-content">
-            <div class="fsb-meta">
-              <span class="en-only">Film · 22 April 2026</span>
-              <span class="ar-only ar" dir="rtl">فيلم · ٢٢ أبريل ٢٠٢٦</span>
-            </div>
-            <h2 class="fsb-title-serif">
-              <span class="en-only">An Informal<br>Trilogy</span>
-              <span class="ar-only ar" dir="rtl">ثلاثية<br>غير رسمية</span>
-            </h2>
-            <p class="fsb-desc-serif">
-              <span class="en-only">Three films by Noor Abed — double screening at the Wonder Cabinet and Bayn Al Nakhlaytan, Jericho.</span>
-              <span class="ar-only ar" dir="rtl">ثلاثة أفلام لنور عابد — عرضٌ مزدوج في مجلس العجب وبين النخلتين، أريحا.</span>
-            </p>
-            <div class="fsb-cta">
-              <span class="en-only">View event →</span>
-              <span class="ar-only ar" dir="rtl">← عرض الفعالية</span>
-            </div>
-          </div>
-        </a>
-
-      </div>
-    </div><!-- /.fs-right -->
-
+  <div class="gs-mode-row">
+    <button class="gs-mode active" data-mode="week">
+      <span class="en-only">This week</span><span class="ar-only ar" dir="rtl">هذا الأسبوع</span>
+    </button>
+    <button class="gs-mode" data-mode="project" id="gs-mode-project" hidden>
+      <span class="en-only">Featured project</span><span class="ar-only ar" dir="rtl">مشروع مميز</span>
+    </button>
+    <button class="gs-mode" data-mode="residency" id="gs-mode-residency" hidden>
+      <span class="en-only">Residency</span><span class="ar-only ar" dir="rtl">إقامة</span>
+    </button>
   </div>
+
+  <div class="gs-outer" id="gs-outer">
+    <div class="gs-sticky" id="gs-sticky">
+      <div class="gs-rail">
+        <div class="gs-kicker" id="gs-kicker"></div>
+        <div class="gs-range" id="gs-range"></div>
+        <div class="gs-count" id="gs-count"></div>
+        <div class="gs-hint"><span class="en-only">Scroll ↓ to move →</span><span class="ar-only ar" dir="rtl">مرر للأسفل للتنقل →</span></div>
+        <a class="gs-link" href="#this-week" id="gs-link"></a>
+      </div>
+      <div class="gs-track" id="gs-track"></div>
+    </div>
+  </div>
+
+  <section class="gs-vsection" id="gs-projects-section" hidden>
+    <h2><span class="en-only">Featured projects</span><span class="ar-only ar" dir="rtl">مشاريع مميزة</span></h2>
+    <div class="gs-marquee-wrap"><div class="gs-marquee" id="gs-marquee-projects"></div></div>
+  </section>
+
+  <section class="gs-vsection gs-tint" id="residencies">
+    <h2><span class="en-only">Residencies</span><span class="ar-only ar" dir="rtl">إقامات</span></h2>
+    <div class="gs-res-grid" id="gs-res-grid">
+      <div class="gs-res-empty">
+        <span class="en-only">New residencies will be announced here.</span>
+        <span class="ar-only ar" dir="rtl">ستُعلن الإقامات الجديدة هنا قريباً.</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="gs-vsection" id="gs-artists-section" hidden>
+    <h2><span class="en-only">Featured artists</span><span class="ar-only ar" dir="rtl">فنانون مميزون</span></h2>
+    <div class="gs-marquee-wrap"><div class="gs-marquee" id="gs-marquee-artists" style="justify-content:flex-end;"></div></div>
+  </section>
+
 </section>
 
 <!-- THIS WEEK — the headline. Big. -->
@@ -313,6 +185,9 @@ const STATE = {
 
 let ALL = [];
 let SEASONS = [];
+let PROJECTS = [];
+let RESIDENCIES = [];
+let ARTISTS = [];
 
 // Helpers
 const MONTH_ORDER = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
@@ -700,31 +575,189 @@ function initStickyMonths(){
 }
 
 /* ============================================================
-   SPLIT SCROLL — featured section
-   Left track: translateY(0 → -totalScroll) as progress 0→1
-   Right track: translateY(-totalScroll → 0) — opposing direction
-   DOM order of right column is reversed so R4 appears first visually.
+   GROUPED SCROLL — this week (horizontal scroll-lock rail) +
+   Featured projects / Residencies / Featured artists.
+   Replaces the old opposing dual-column featured-split.
+   Everything here is driven only by native scroll position —
+   nothing animates on its own.
    ============================================================ */
-function initSplitScroll(){
-  const section = document.querySelector(".featured-split");
-  if (!section) return;
-  const TOPBAR_H = 54;
-  const leftTrack  = section.querySelector(".fs-left-track");
-  const rightTrack = section.querySelector(".fs-right-track");
+const PROJECT_PAGES = {
+  "sounds-of-places": "project-light.html",
+  "bethlehem-christmas-in-mourning": "project-dark.html",
+};
+function _gsWeekEvents(start){
+  const end = new Date(start); end.setDate(start.getDate() + 6); end.setHours(23,59,59,999);
+  return ALL.filter(ev => {
+    const d = new Date(ev.year, MONTH_ORDER.indexOf(ev.month), parseInt(ev.day,10));
+    return d >= start && d <= end;
+  }).sort((a,b) => eventTimestamp(a) - eventTimestamp(b));
+}
 
-  function update(){
-    const boxH        = window.innerHeight - TOPBAR_H;
-    const totalScroll = 3 * boxH;
-    const r           = section.getBoundingClientRect();
-    const scrolled    = Math.max(0, TOPBAR_H - r.top);
-    const p           = Math.min(1, scrolled / totalScroll);
-    if (leftTrack)  leftTrack.style.transform  = `translateY(${-(p * totalScroll).toFixed(2)}px)`;
-    if (rightTrack) rightTrack.style.transform = `translateY(${-((1 - p) * totalScroll).toFixed(2)}px)`;
+function _gsEventCard(ev){
+  const typeAr = TYPE_AR[ev.type] || ev.type;
+  return `<a class="gs-card" href="event.html?id=${ev.id}">
+    <div class="gs-c-meta">
+      <span class="en-only">${ev.type}${ev.dow ? " · " + ev.dow + " " + parseInt(ev.day,10) + " " + ev.month : ""}${ev.start ? " · " + ev.start : ""}</span>
+      <span class="ar-only ar" dir="rtl">${typeAr}${ev.dowAr ? " · " + ev.dowAr : ""}${ev.start ? " · " + ev.start : ""}</span>
+    </div>
+    <h3 class="gs-c-title">
+      <span class="en-only">${ev.title}</span>
+      <span class="ar-only ar" dir="rtl">${ev.titleAr || ev.title}</span>
+    </h3>
+    ${ev.shortDesc ? `<p class="gs-c-desc">
+      <span class="en-only">${ev.shortDesc}</span>
+      ${ev.shortDescAr ? `<span class="ar-only ar" dir="rtl">${ev.shortDescAr}</span>` : ""}
+    </p>` : ""}
+    <div class="gs-c-cta"><span class="en-only">View event →</span><span class="ar-only ar" dir="rtl">← عرض الفعالية</span></div>
+  </a>`;
+}
+
+function _gsEmptyCard(en, ar){
+  return `<div class="gs-card gs-card-empty">
+    <p class="gs-c-desc"><span class="en-only">${en}</span><span class="ar-only ar" dir="rtl">${ar}</span></p>
+  </div>`;
+}
+
+function renderFeatured(){
+  const outer  = document.getElementById("gs-outer");
+  const sticky = document.getElementById("gs-sticky");
+  const track  = document.getElementById("gs-track");
+  const kicker = document.getElementById("gs-kicker");
+  const range  = document.getElementById("gs-range");
+  const count  = document.getElementById("gs-count");
+  const link   = document.getElementById("gs-link");
+  if (!outer || !sticky || !track) return;
+
+  const btnProject   = document.getElementById("gs-mode-project");
+  const btnResidency = document.getElementById("gs-mode-residency");
+  if (btnProject)   btnProject.hidden   = PROJECTS.length === 0;
+  if (btnResidency) btnResidency.hidden = RESIDENCIES.length === 0;
+
+  function setup(){
+    const railWidth = document.querySelector(".gs-rail").getBoundingClientRect().width;
+    const visible   = window.innerWidth - railWidth;
+    const maxScroll = Math.max(0, track.scrollWidth - visible);
+    outer.style.height = (window.innerHeight + maxScroll) + "px";
+    outer.dataset.maxScroll = maxScroll;
+  }
+  function onScroll(){
+    const maxScroll = parseFloat(outer.dataset.maxScroll || 0);
+    const top = outer.getBoundingClientRect().top;
+    const progress = Math.min(Math.max(-top, 0), maxScroll);
+    track.style.transform = `translateX(${-progress}px)`;
   }
 
-  window.addEventListener("scroll", update, { passive: true });
-  window.addEventListener("resize", update);
-  update();
+  function renderWeekMode(){
+    const start = getMonday(new Date());
+    const end = new Date(start); end.setDate(start.getDate() + 6);
+    const evs = _gsWeekEvents(start);
+    sticky.style.setProperty("--gs-bg", "var(--paper)");
+    sticky.style.setProperty("--gs-fg", "var(--ink)");
+    kicker.innerHTML = `<span class="en-only">This week</span><span class="ar-only ar" dir="rtl">هذا الأسبوع</span>`;
+    range.innerHTML = `<span class="en-only">${start.getDate()}—${end.getDate()} ${MONTH_NAME_EN[MABBR_G[end.getMonth()]]}</span><span class="ar-only ar" dir="rtl">${arNum(start.getDate())}—${arNum(end.getDate())} ${MONTH_NAME_AR[MABBR_G[end.getMonth()]]}</span>`;
+    count.innerHTML = `<span class="en-only">${evs.length} ${evs.length === 1 ? "event" : "events"}</span><span class="ar-only ar" dir="rtl">${arNum(evs.length)} فعاليات</span>`;
+    link.innerHTML = `<span class="en-only">View full week →</span><span class="ar-only ar" dir="rtl">← عرض الأسبوع كاملاً</span>`;
+    link.href = "#this-week";
+    track.innerHTML = evs.length
+      ? evs.map(_gsEventCard).join("")
+      : _gsEmptyCard("Nothing scheduled this week — check the full programme.", "لا توجد فعاليات هذا الأسبوع — راجع البرنامج كاملاً.");
+  }
+
+  function renderProjectMode(){
+    const p = PROJECTS[0];
+    if (!p) return renderWeekMode();
+    const evs = ALL.filter(ev => ev.relatedProject && ev.relatedProject.slug === p.slug);
+    sticky.style.setProperty("--gs-bg", "#c8a0f0");
+    sticky.style.setProperty("--gs-fg", "#241b4a");
+    kicker.innerHTML = `<span class="en-only">Featured project</span><span class="ar-only ar" dir="rtl">مشروع مميز</span>`;
+    range.textContent = p.title;
+    count.innerHTML = evs.length
+      ? `<span class="en-only">${evs.length} linked ${evs.length === 1 ? "event" : "events"}</span><span class="ar-only ar" dir="rtl">${arNum(evs.length)} فعاليات مرتبطة</span>`
+      : `<span class="en-only">${p.year || ""}</span>`;
+    link.innerHTML = `<span class="en-only">View project →</span><span class="ar-only ar" dir="rtl">← عرض المشروع</span>`;
+    link.href = PROJECT_PAGES[p.slug] || "#gscroll";
+    track.innerHTML = evs.length
+      ? evs.map(_gsEventCard).join("")
+      : _gsEmptyCard(p.desc || "More on this project soon.", "قريباً المزيد حول هذا المشروع.");
+  }
+
+  function renderResidencyMode(){
+    const r = RESIDENCIES[0];
+    if (!r) return renderWeekMode();
+    sticky.style.setProperty("--gs-bg", "#00d26a");
+    sticky.style.setProperty("--gs-fg", "#04231a");
+    kicker.innerHTML = `<span class="en-only">Residency</span><span class="ar-only ar" dir="rtl">إقامة</span>`;
+    range.textContent = r.title;
+    count.innerHTML = `<span class="en-only">${r.year || ""}</span>`;
+    link.innerHTML = `<span class="en-only">View residency →</span><span class="ar-only ar" dir="rtl">← عرض الإقامة</span>`;
+    link.href = "#residencies";
+    track.innerHTML = _gsEmptyCard(r.desc || "More on this residency soon.", "قريباً المزيد حول هذه الإقامة.");
+  }
+
+  const MABBR_G = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  const MODE_FN = { week: renderWeekMode, project: renderProjectMode, residency: renderResidencyMode };
+
+  document.querySelectorAll(".gs-mode").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".gs-mode").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      (MODE_FN[btn.dataset.mode] || renderWeekMode)();
+      setup();
+      onScroll();
+      document.getElementById("gscroll").scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  });
+
+  renderWeekMode();
+  setup();
+  window.addEventListener("resize", setup);
+  window.addEventListener("scroll", onScroll, { passive: true });
+  onScroll();
+
+  // Featured projects marquee
+  const projectsSection = document.getElementById("gs-projects-section");
+  const marqueeProjects = document.getElementById("gs-marquee-projects");
+  if (PROJECTS.length){
+    projectsSection.hidden = false;
+    marqueeProjects.innerHTML = PROJECTS.map(p => {
+      const href = PROJECT_PAGES[p.slug] || "#gscroll";
+      return `<a class="gs-m-card" href="${href}">
+        <h3 class="gs-m-title">${p.title}</h3>
+        <span class="gs-m-sub">${p.year || ""}</span>
+      </a>`;
+    }).join("");
+  }
+
+  // Residencies grid
+  const resGrid = document.getElementById("gs-res-grid");
+  if (RESIDENCIES.length){
+    resGrid.innerHTML = RESIDENCIES.map(r => `
+      <div class="gs-res-item">
+        <h3>${r.title}</h3>
+        <p>${r.desc ? r.desc.slice(0,90) : (r.year || "")}</p>
+      </div>`).join("");
+  }
+
+  // Featured artists marquee
+  const artistsSection = document.getElementById("gs-artists-section");
+  const marqueeArtists = document.getElementById("gs-marquee-artists");
+  if (ARTISTS.length){
+    artistsSection.hidden = false;
+    marqueeArtists.innerHTML = ARTISTS.map(a => {
+      const inner = `<h3 class="gs-m-title">${a.name}</h3><span class="gs-m-sub">${a.discipline || ""}</span>`;
+      return a.slug
+        ? `<a class="gs-m-card" href="#">${inner}</a>`
+        : `<div class="gs-m-card gs-m-card-static">${inner}</div>`;
+    }).join("");
+  }
+
+  // Scroll-linked (not autonomous) parallax for the two marquees, opposite directions
+  function parallax(){
+    const y = window.scrollY;
+    if (marqueeProjects) marqueeProjects.style.transform = `translateX(${(-(y * 0.05) % 200)}px)`;
+    if (marqueeArtists)  marqueeArtists.style.transform  = `translateX(${((y * 0.05) % 200)}px)`;
+  }
+  window.addEventListener("scroll", parallax, { passive: true });
 }
 /* ============================================================
    SCROLL-BASED LOGO ROTATION
@@ -778,11 +811,16 @@ async function _boot(){
       const n = mo>=3&&mo<=5?'Spring':mo>=6&&mo<=8?'Summer':mo>=9&&mo<=11?'Autumn':'Winter';
       return { key:`${n.toLowerCase()}-${y}`, name:n, year:y };
     }
-    const q = encodeURIComponent('*[_type == "event"] | order(startDateTime desc) { ..., location->{ name }, relatedArtists[]->{name, slug}, relatedProject->{title, slug} }');
+    const q = encodeURIComponent(`{
+      "events": *[_type == "event"] | order(startDateTime desc) { ..., location->{ name }, relatedArtists[]->{name, slug}, relatedProject->{title, slug} },
+      "projects": *[_type == "project"] | order(year desc) { title, "slug": slug.current, description, year, coverImage },
+      "residencies": *[_type == "residency"] | order(year desc) { title, "slug": slug.current, description, year, coverImage },
+      "artists": *[_type == "artist"] { name, "slug": slug.current, discipline, photo }
+    }`);
     const res = await fetch(`https://xdtj605l.api.sanity.io/v2024-01-01/data/query/production?query=${q}`);
     const { result } = await res.json();
 
-    ALL = (result || []).map(doc => {
+    ALL = ((result && result.events) || []).map(doc => {
       const s = _iso(doc.startDateTime), e = _iso(doc.endDateTime);
       const hasTime = s && (s.getHours() || s.getMinutes());
       // location is now a reference doc; fall back to string for legacy events
@@ -840,6 +878,19 @@ async function _boot(){
     window.EVENTS = ALL;
     window.SEASONS = SEASONS;
     window.EVENTS_BY_ID = Object.fromEntries(ALL.map(ev => [ev.id, ev]));
+
+    PROJECTS = ((result && result.projects) || []).map(p => ({
+      title: _loc(p.title), slug: p.slug || '', desc: _loc(p.description), year: p.year || 0, cover: _sanityImg(p.coverImage),
+    }));
+    RESIDENCIES = ((result && result.residencies) || []).map(r => ({
+      title: _loc(r.title), slug: r.slug || '', desc: _loc(r.description), year: r.year || 0, cover: _sanityImg(r.coverImage),
+    }));
+    ARTISTS = ((result && result.artists) || []).map(a => ({
+      name: _loc(a.name), slug: a.slug || '', discipline: (a.discipline || []).join(', '), photo: _sanityImg(a.photo),
+    })).filter(a => a.name);
+    window.PROJECTS = PROJECTS;
+    window.RESIDENCIES = RESIDENCIES;
+    window.ARTISTS = ARTISTS;
   } catch(err){
     console.warn('[WC] Sanity fetch failed:', err);
   }
@@ -849,7 +900,7 @@ async function _boot(){
   renderFilters();
   renderSeasonRail();
   renderTimeline();
-  initSplitScroll();
+  renderFeatured();
   initLogoRotation();
 }
 _boot().then(function(){
@@ -1236,7 +1287,7 @@ function _buildFullscreen(ev){
 }
 
 /* Intercept all event.html links.
-   Clicks originating inside .featured-split always open fullscreen. */
+   Clicks originating inside .gscroll (the homepage teaser) always open fullscreen. */
 document.addEventListener("click", function(e){
   const link = e.target.closest('a[href*="event.html"]');
   if (!link) return;
@@ -1245,7 +1296,7 @@ document.addEventListener("click", function(e){
     const id = url.searchParams.get("id");
     if (id){
       e.preventDefault();
-      const forceFullscreen = !!e.target.closest(".featured-split");
+      const forceFullscreen = !!e.target.closest(".gscroll");
       openOverlay(id, forceFullscreen);
     }
   } catch(_){}
