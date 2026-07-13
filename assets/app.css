@@ -1732,16 +1732,15 @@ html[data-lang="ar"] .ar-only{ direction: rtl; }
 .event-panel.is-open{ transform: translateX(0); }
 
 /* Panel header — one continuous field with the body, colour set on
-   .event-panel itself by JS, no divide, no boxed close button.
-   45px margin on every edge, matching the approved design spec. */
+   .event-panel itself by JS, no divide, no boxed close button. */
 .ep-header{
   position: relative;
-  padding: 45px 45px 0;
+  padding: 15px 15px 0;
   display: flex; flex-direction: column; gap: 12px;
 }
 .ep-close{
   all: unset; cursor: pointer;
-  position: absolute; top: 45px; right: 45px;
+  position: absolute; top: 15px; right: 15px;
   width: 24px; height: 24px;
   display: grid; place-items: center;
   font-size: 16px; font-weight: 700;
@@ -1750,13 +1749,13 @@ html[data-lang="ar"] .ar-only{ direction: rtl; }
 .ep-close:hover{ opacity: 1; }
 
 .ep-meta{
-  font-family: var(--ff-sans); font-size: clamp(14px, 1.4vw, 18px); font-weight: 400;
+  font-family: var(--ff-sans); font-weight: 400;
   letter-spacing: 0; text-transform: none; opacity: 1;
   display: flex; justify-content: space-between; align-items: flex-start; gap: 16px;
   padding-right: 40px;
 }
-.ep-meta .dt-block{ display: flex; flex-direction: column; gap: 2px; line-height: 1.4; }
-.ep-type-tag{ letter-spacing: 0; font-weight: 400; }
+.ep-meta .dt-block{ display: flex; flex-direction: column; gap: 2px; line-height: 1.4; font-size: 40px; }
+.ep-type-tag{ letter-spacing: 0; font-weight: 400; font-size: 40px; }
 .ep-time{ font-variant-numeric: tabular-nums; }
 
 .ep-title{
@@ -1776,7 +1775,7 @@ html[data-lang="ar"] .ar-only{ direction: rtl; }
 .ep-cover img{ display: block; width: 100%; }
 
 .ep-content{
-  padding: 32px 45px 45px;
+  padding: 35px 15px 15px;
   display: flex; flex-direction: column; gap: 24px;
   flex: 1;
 }
