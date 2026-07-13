@@ -1056,7 +1056,10 @@ function _buildPanel(ev){
   const tc = _colorFor(ev, { bg: "#1d24ff", ink: "#f6f3ea" });
   const typeArLabel = TYPE_AR[ev.type] || ev.type;
   const venue = (ev.location || "").split("·")[0].trim();
-  const coverHtml = ev.cover
+  // Skip the standalone cover slot when authored content[] blocks exist —
+  // their own contentImage block (if any) carries the photo in the right
+  // reading-order position instead of duplicating it up top.
+  const coverHtml = (ev.cover && !(ev.content && ev.content.length))
     ? `<div class="ep-cover"><img src="${ev.cover}" alt="" style="width:100%;height:220px;object-fit:contain;padding:28px;display:block;"></div>`
     : "";
   // Short description + full body are separate fields — show both, short first,
