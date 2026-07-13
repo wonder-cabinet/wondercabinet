@@ -818,7 +818,13 @@ async function _boot(){
   initSplitScroll();
   initLogoRotation();
 }
-_boot();
+_boot().then(function(){
+  // Open immediately if ?event= is in the URL — must wait for _boot() to
+  // finish fetching EVENTS_BY_ID, otherwise a direct/shared link to
+  // ?event=<id> silently does nothing on a fresh page load.
+  const id = new URLSearchParams(location.search).get("event");
+  if (id) openOverlay(id);
+});
 
 /* ============================================================
    LANGUAGE TOGGLE
@@ -1182,11 +1188,6 @@ window.addEventListener("popstate", function(e){
   }
 });
 
-/* Open immediately if ?event= in URL on load */
-(function(){
-  const id = new URLSearchParams(location.search).get("event");
-  if (id) openOverlay(id);
-})();
 
 </script>
 
