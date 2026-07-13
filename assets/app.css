@@ -543,9 +543,9 @@ img{ display:block; max-width:100%; }
    DETAIL PAGE
    ========================================================= */
 .detail{
-  max-width: 1100px;
+  max-width: 1428px;
   margin: 0 auto;
-  padding: clamp(24px, 4vw, 48px) var(--pad) 0;
+  padding: 35px 35px 0;
 }
 .back{
   display: inline-flex; align-items: center; gap: 8px;
@@ -556,20 +556,21 @@ img{ display:block; max-width:100%; }
 .back:hover{ opacity: 1; }
 
 .detail-kicker{
-  margin-top: clamp(20px, 3vw, 36px);
-  font-family: var(--ff-sans); font-size: 12px; letter-spacing: .24em; text-transform: uppercase; font-weight: 700;
-  display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
+  margin-top: clamp(16px, 2.5vw, 28px);
+  font-family: var(--ff-sans); font-size: clamp(16px, 1.6vw, 20px); font-weight: 400;
+  letter-spacing: 0; text-transform: none;
+  display: flex; justify-content: space-between; align-items: flex-start; gap: 24px; flex-wrap: wrap;
 }
-.detail-kicker .type{ opacity: .85; }
-.detail-kicker .sep{ opacity: .35; }
-.detail-kicker .sep::before{ content: "\00b7"; }
+.detail-kicker .dt-block{ display:flex; flex-direction:column; gap:2px; line-height:1.4; }
+.detail-kicker .type{ font-weight: 400; }
+.detail-kicker .sep{ display:none; }
 .detail-kicker .pill{ opacity: .7; }
 
 .detail h1{
   font-family: var(--ff-sans); font-weight: 700;
-  font-size: clamp(52px, 9vw, 144px); line-height: .88; letter-spacing: -.045em;
+  font-size: clamp(40px, 7vw, 102px); line-height: 1.1; letter-spacing: 0;
   margin: 18px 0 0; text-wrap: balance;
-  text-transform: uppercase;
+  text-transform: none;
 }
 .detail .h1-ar{
   margin-top: 18px; font-family: var(--ff-ar); direction: rtl;
@@ -608,7 +609,7 @@ img{ display:block; max-width:100%; }
 .detail-body .lang-divider{
   margin: clamp(24px, 3vw, 40px) 0;
 }
-.detail-body p.subtitle:first-child{ font-size: 18px; font-weight: 600; opacity: .8; }
+.detail-body p.subtitle:first-child{ font-size: 16px; font-weight: 500; opacity: .65; }
 .detail-body p.writeup{ font-style: italic; opacity: .8; }
 .detail-body p.credits-line{
   font-size: 14px; opacity: .75; margin-top: -0.4em;

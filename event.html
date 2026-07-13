@@ -6,17 +6,19 @@
 <title>Event · The Wonder Cabinet</title>
 <link rel="stylesheet" href="assets/app.css?v=2" />
 <style>
-  :root { --bg: #ffffff; --ink: #0a0a16; --accent: #1d24ff; --highlight: #1d24ff; }
+  :root { --bg: #f6f3ea; --ink: #0a0a16; --accent: #1d24ff; --highlight: #1d24ff; }
 
-  /* one flat colour field per event type — no header, no divide.
-     Same TYPE_COLORS as the homepage overlay panel (index.html). */
-  body[data-type="performance"]{ --bg:#cc6698; --ink:#0a0a16; }
-  body[data-type="film"]{ --bg:#ffe600; --ink:#0a0a16; }
-  body[data-type="class"]{ --bg:#c8a0f0; --ink:#0a0a16; }
-  body[data-type="workshop"]{ --bg:#ff5a00; --ink:#f6f3ea; }
-  body[data-type="radio"]{ --bg:#00d26a; --ink:#0a0a16; }
-  body[data-type="reading"]{ --bg:#ffd6c2; --ink:#0a0a16; }
-  body[data-type="opening"]{ --bg:#0a0a16; --ink:#f6f3ea; }
+  /* Colour field per event — admin-controlled from Sanity (colorTheme
+     override field, falling back to the event's Type). "paper" is the
+     new plain white/paper option matching the current design spec. */
+  body[data-color="performance"]{ --bg:#cc6698; --ink:#0a0a16; }
+  body[data-color="film"]{ --bg:#ffe600; --ink:#0a0a16; }
+  body[data-color="class"]{ --bg:#c8a0f0; --ink:#0a0a16; }
+  body[data-color="workshop"]{ --bg:#ff5a00; --ink:#f6f3ea; }
+  body[data-color="radio"]{ --bg:#00d26a; --ink:#0a0a16; }
+  body[data-color="reading"]{ --bg:#ffd6c2; --ink:#0a0a16; }
+  body[data-color="opening"]{ --bg:#0a0a16; --ink:#f6f3ea; }
+  body[data-color="paper"]{ --bg:#f6f3ea; --ink:#0a0a16; }
 
   .ev-lang-toggle{
     position: fixed; top: 20px; right: 24px; z-index: 50;
@@ -85,7 +87,14 @@
 (async function(){
   const MABBR = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
   const DWEN  = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+  const MFULL = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+  const DWFULL = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
   const SANITY_PROJECT = 'xdtj605l', SANITY_DATASET = 'production';
+
+  function _ordinal(n){
+    const s = ["th","st","nd","rd"], v = n % 100;
+    return n + (s[(v-20)%10] || s[v] || s[0]);
+  }
 
   function _iso(dt){
     const m = dt && dt.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/);
@@ -173,10 +182,14 @@
       subtitle:    doc.subtitle?.en || '',
       subtitleAr:  doc.subtitle?.ar || '',
       type:        doc.eventType || '',
+      colorTheme:  doc.colorTheme || '',
       day:         s ? String(s.getDate()).padStart(2,'0') : '',
       month:       s ? MABBR[s.getMonth()] : '',
       year:        s ? s.getFullYear() : '',
       dow:         s ? DWEN[s.getDay()] : '',
+      dowFull:     s ? DWFULL[s.getDay()] : '',
+      monthFull:   s ? MFULL[s.getMonth()] : '',
+      dayOrdinal:  s ? _ordinal(s.getDate()) : '',
       start:       hasTime ? s.toTimeString().slice(0,5) : '',
       end:         e && (e.getHours()||e.getMinutes()) ? e.toTimeString().slice(0,5) : '',
       location:    locationName,
@@ -235,18 +248,21 @@
 
   document.title = `${ev.title} · The Wonder Cabinet`;
   if (ev.type) document.body.dataset.type = ev.type.toLowerCase();
+  document.body.dataset.color = ev.colorTheme || (ev.type ? ev.type.toLowerCase() : '');
 
   // Head
   const dateStr = [ev.dow, ev.day, ev.month, ev.year].filter(Boolean).join(' ');
+  const dateStrFull = ev.dowFull ? `${ev.dowFull}<br>${ev.monthFull} ${ev.dayOrdinal}, ${ev.year}` : dateStr;
   const timeStr = ev.start ? (ev.end ? `${ev.start} — ${ev.end}` : ev.start) : '';
   document.getElementById('detail-head').innerHTML = `
     <div class="detail-kicker">
+      <div class="dt-block">
+        <span>${dateStrFull}</span>
+        ${timeStr ? `<span>${timeStr}</span>` : ''}
+        ${ev.recurringLabel ? `<span class="en-only">${ev.recurringLabel}</span><span class="ar-only ar">${ev.recurringLabelAr||ev.recurringLabel}</span>` : ''}
+        ${ev.register ? '<span style="text-decoration:underline;">Registration open</span>' : ''}
+      </div>
       <span class="type">${ev.type}</span>
-      <span class="sep"></span>
-      <span>${dateStr}</span>
-      ${timeStr ? `<span class="sep"></span><span>${timeStr}</span>` : ''}
-      ${ev.recurringLabel ? `<span class="sep"></span><span class="en-only">${ev.recurringLabel}</span><span class="sep ar-only"></span><span class="ar-only ar">${ev.recurringLabelAr||ev.recurringLabel}</span>` : ''}
-      ${ev.register ? '<span class="sep"></span><span style="text-decoration:underline;">Registration open</span>' : ''}
     </div>
     <h1><span class="en-only">${ev.title}</span><span class="ar-only ar" dir="rtl">${ev.titleAr || ev.title}</span></h1>
   `;
@@ -276,14 +292,14 @@
 
   document.getElementById('detail-body').innerHTML = `
     <div class="en-only">
-      ${ev.subtitle ? `<p class="subtitle"><em>${ev.subtitle}</em></p>` : ''}
+      ${ev.subtitle ? `<p class="subtitle">${ev.subtitle}</p>` : ''}
       ${ev.content.length ? renderContentBlocks(ev.content) : fallbackEn}
       ${artistBiosEn}
       ${creditsEn}
       ${projectEn}
     </div>
     <div class="ar ar-only" dir="rtl">
-      ${ev.subtitleAr ? `<p class="subtitle"><em>${ev.subtitleAr}</em></p>` : ''}
+      ${ev.subtitleAr ? `<p class="subtitle">${ev.subtitleAr}</p>` : ''}
       ${ev.content.length ? renderContentBlocks(ev.content) : fallbackAr}
       ${artistBiosAr}
       ${creditsAr}

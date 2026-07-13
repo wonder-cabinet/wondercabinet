@@ -790,6 +790,7 @@ async function _boot(){
         subtitle:   doc.subtitle?.en || '',
         subtitleAr: doc.subtitle?.ar || '',
         type:     doc.eventType || '',
+        colorTheme: doc.colorTheme || '',
         day:      s ? String(s.getDate()).padStart(2,'0') : '01',
         month:    s ? MABBR[s.getMonth()] : 'Jan',
         year:     s ? s.getFullYear() : new Date().getFullYear(),
@@ -882,6 +883,23 @@ const TYPE_COLORS = {
   Reading:     { bg: "#ffd6c2", ink: "#0a0a16" },
   Opening:     { bg: "#0a0a16", ink: "#f6f3ea" },
 };
+// Admin-selectable overrides (Sanity `colorTheme` field) — keyed lowercase.
+// "paper" is the new plain white/paper option; others mirror TYPE_COLORS
+// so an editor can pin any event to any palette colour regardless of Type.
+const COLOR_THEME_OVERRIDES = {
+  performance: TYPE_COLORS.Performance,
+  film:        TYPE_COLORS.Film,
+  class:       TYPE_COLORS.Class,
+  workshop:    TYPE_COLORS.Workshop,
+  radio:       TYPE_COLORS.Radio,
+  reading:     TYPE_COLORS.Reading,
+  opening:     TYPE_COLORS.Opening,
+  paper:       { bg: "#f6f3ea", ink: "#0a0a16" },
+};
+function _colorFor(ev, fallback){
+  if (ev.colorTheme && COLOR_THEME_OVERRIDES[ev.colorTheme]) return COLOR_THEME_OVERRIDES[ev.colorTheme];
+  return TYPE_COLORS[ev.type] || fallback;
+}
 
 const _backdrop = document.getElementById("overlay-backdrop");
 const _panel    = document.getElementById("event-panel");
@@ -902,7 +920,7 @@ function openOverlay(id, forceFullscreen){
     document.body.style.overflow = "hidden";
     _full.querySelector(".efs-close").addEventListener("click", closeOverlay);
   } else {
-    const tc = TYPE_COLORS[ev.type] || { bg: "#1d24ff", ink: "#f6f3ea" };
+    const tc = _colorFor(ev, { bg: "#1d24ff", ink: "#f6f3ea" });
     _panel.style.background = tc.bg;
     _panel.style.color = tc.ink;
     _panel.innerHTML = _buildPanel(ev);
@@ -1035,7 +1053,7 @@ function _initPanelAudio(panel){
 }
 
 function _buildPanel(ev){
-  const tc = TYPE_COLORS[ev.type] || { bg: "#1d24ff", ink: "#f6f3ea" };
+  const tc = _colorFor(ev, { bg: "#1d24ff", ink: "#f6f3ea" });
   const typeArLabel = TYPE_AR[ev.type] || ev.type;
   const venue = (ev.location || "").split("·")[0].trim();
   const coverHtml = ev.cover
@@ -1155,7 +1173,7 @@ ${audioBar}
 }
 
 function _buildFullscreen(ev){
-  const tc = TYPE_COLORS[ev.type] || { bg: "#0a0a16", ink: "#f6f3ea" };
+  const tc = _colorFor(ev, { bg: "#0a0a16", ink: "#f6f3ea" });
   const typeArLabel = TYPE_AR[ev.type] || ev.type;
   const parts = (ev.subtitle || "").split("·").map(s => s.trim()).filter(Boolean);
   const nameTag = parts.length > 1 ? parts[parts.length - 1] : parts[0] || "";
