@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Wonder Cabinet — Grouped scroll, design direction v4</title>
+<title>Wonder Cabinet — Grouped scroll, design direction v5</title>
 <style>
   :root{
     --ff-sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
@@ -52,7 +52,7 @@
 
   .mode-row{
     display:flex; gap:8px; padding:16px 24px; border-bottom:2px solid var(--ink);
-    background:var(--paper); flex-wrap:wrap;
+    background:var(--paper); flex-wrap:wrap; position:relative; z-index:80;
   }
   .mode-row button{
     font-family:var(--ff-sans); font-size:11px; letter-spacing:.1em; text-transform:uppercase; font-weight:700;
@@ -62,37 +62,43 @@
   .mode-row button.active{ opacity:1; background:var(--ink); color:var(--paper); }
   .mode-row .hint{ margin-left:auto; align-self:center; font-size:11px; opacity:.5; letter-spacing:.04em; }
 
-  /* ---- horizontal scroll-lock group ---- */
-  .hs-outer{ position:relative; }
-  .hs-sticky{
-    position:sticky; top:0; height:100vh; overflow:hidden;
-    display:flex; border-bottom:2px solid var(--ink);
+  /* ---- sticky identity block + scrolling feed ---- */
+  .group{ position:relative; }
+  .group-inner{ display:grid; grid-template-columns:1fr 1fr; }
+
+  .group-media{
+    position:sticky; top:0; align-self:start; height:100vh;
+    padding:56px; display:flex; flex-direction:column;
     background:var(--bg); color:var(--fg);
     transition:background .35s ease, color .35s ease;
+    overflow:hidden;
   }
-  .hs-rail{
-    flex:0 0 320px; height:100%; border-right:2px solid var(--fg);
-    padding:32px 24px; display:flex; flex-direction:column; gap:14px;
-    background:var(--bg); color:var(--fg); position:relative; z-index:2;
-    transition:background .35s ease, color .35s ease, border-color .35s ease;
+  .gm-kicker{ font-size:12px; letter-spacing:.18em; text-transform:uppercase; font-weight:700; opacity:.65; margin-bottom:18px; }
+  .gm-title{ font-weight:700; text-transform:uppercase; font-size:clamp(44px,6.4vw,100px); line-height:.92; letter-spacing:-.02em; margin:0 0 22px; }
+  .gm-desc{ font-size:16px; line-height:1.55; max-width:38ch; opacity:.85; margin:0 0 28px; }
+  .gm-image{
+    flex:1; min-height:80px;
+    background-color:rgba(0,0,0,.05);
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+    background-size:220px 220px;
+    opacity:.55; mix-blend-mode:multiply;
+    border-top:2px solid var(--fg);
   }
-  .gr-kicker{ font-size:11px; letter-spacing:.2em; text-transform:uppercase; font-weight:700; opacity:.65; }
-  .gr-range{ font-size:clamp(30px,3vw,44px); font-weight:700; line-height:1; letter-spacing:-.02em; }
-  .gr-count{ font-size:14px; opacity:.7; }
-  .gr-hint{ font-size:11px; letter-spacing:.1em; text-transform:uppercase; opacity:.55; margin-top:auto; }
-  .gr-link{ font-size:11px; letter-spacing:.18em; text-transform:uppercase; font-weight:700; text-decoration:none; color:inherit; }
 
-  .hs-track{ display:flex; height:100%; will-change:transform; }
-  .card{
-    flex:0 0 min(560px,86vw); height:100%; border-right:2px solid var(--fg);
-    padding:56px 40px; display:flex; flex-direction:column; justify-content:center; gap:14px;
+  .group-feed{ display:flex; flex-direction:column; border-left:2px solid var(--ink); }
+  .gf-top{ padding:30px 48px 56px; }
+  .gf-link{ font-size:12px; letter-spacing:.16em; text-transform:uppercase; font-weight:700; text-decoration:none; color:#a8790a; }
+
+  .feed-item{
+    padding:34px 48px; border-top:1px solid rgba(29,36,255,.15);
+    display:flex; flex-direction:column; gap:10px;
   }
-  .c-meta{ font-size:11px; letter-spacing:.2em; text-transform:uppercase; font-weight:700; opacity:.65; }
-  .c-title{ font-family:var(--ff-sans); font-weight:700; font-size:clamp(30px,3.4vw,48px); line-height:.95; letter-spacing:-.03em; text-transform:uppercase; margin:0; }
-  .c-title.serif{ font-family:var(--ff-ar); font-style:italic; font-weight:700; font-size:clamp(26px,2.8vw,40px); line-height:1; letter-spacing:0; text-transform:none; }
-  .c-desc{ font-size:15px; line-height:1.5; max-width:38ch; opacity:.85; margin:0; }
-  .c-desc.serif{ font-family:var(--ff-ar); font-style:italic; font-size:16px; }
-  .c-cta{ font-size:11px; letter-spacing:.2em; text-transform:uppercase; font-weight:700; }
+  .feed-item:first-of-type{ border-top:1px solid rgba(29,36,255,.15); }
+  .fi-meta{ font-size:11px; letter-spacing:.16em; text-transform:uppercase; font-weight:700; opacity:.75; }
+  .fi-title{ font-weight:700; font-size:clamp(22px,2.2vw,32px); line-height:1.12; margin:0; }
+  .fi-title.serif{ font-family:var(--ff-ar); font-style:italic; font-weight:700; letter-spacing:0; }
+  .fi-desc{ font-size:14px; line-height:1.55; opacity:.8; max-width:46ch; margin:0; }
+  .fi-desc.serif{ font-family:var(--ff-ar); font-style:italic; }
 
   /* ---- handoff into the real existing Programme section ---- */
   .handoff-note{
@@ -124,13 +130,19 @@
   .mini-tl-venue{ font-size:12px; opacity:.6; text-align:right; }
 
   .end-note{ padding:0 24px 110px; text-align:center; font-size:12px; opacity:.45; max-width:640px; margin:0 auto; }
+
+  @media (max-width:820px){
+    .group-inner{ grid-template-columns:1fr; }
+    .group-media{ position:relative; height:auto; min-height:60vh; }
+    .group-feed{ border-left:none; border-top:2px solid var(--ink); }
+  }
 </style>
 </head>
 <body>
 
 <div class="note-bar">
-  <span>Direction study v4 — horizontal scroll-lock replaces the old featured-split, then hands off into the real Programme section</span>
-  <span><b>Scroll down</b> to move sideways through this week — nothing here moves on its own</span>
+  <span>Direction study v5 — sticky identity block (image · title · description) per group, feed scrolls beside it; hands off into the real Programme section</span>
+  <span>Scroll to move through the list — nothing here moves on its own</span>
 </div>
 
 <header>
@@ -151,17 +163,17 @@
   <span class="hint">Each mode can carry its own background colour — try the buttons</span>
 </div>
 
-<section class="hs-outer" id="hsOuter">
-  <div class="hs-sticky" id="hsSticky">
-    <div class="hs-rail">
-      <div class="gr-kicker" id="railKicker">This week</div>
-      <div class="gr-range" id="railRange">13—19 Jul</div>
-      <div class="gr-count" id="railCount">4 events</div>
-      <div class="gr-hint">Scroll ↓ to move →</div>
-      <a class="gr-link" href="#" id="railLink">View full week →</a>
+<section class="group" id="group">
+  <div class="group-inner">
+    <div class="group-media" id="groupMedia">
+      <div class="gm-kicker" id="gmKicker">This week</div>
+      <h2 class="gm-title" id="gmTitle">13—19<br>JUL</h2>
+      <p class="gm-desc" id="gmDesc">4 events across performance, film and workshop programming this week.</p>
+      <div class="gm-image"></div>
     </div>
-    <div class="hs-track" id="hsTrack">
-      <!-- cards injected per mode -->
+    <div class="group-feed">
+      <div class="gf-top"><a class="gf-link" href="#" id="gfLink">View full week →</a></div>
+      <div id="feedList"></div>
     </div>
   </div>
 </section>
@@ -197,82 +209,77 @@
 
 <script>
 (function(){
+  var ACCENTS = {
+    performance: '#cc6698',
+    film:        '#a8790a',
+    class:       '#7a4fc4',
+    workshop:    '#ff5a00',
+    radio:       '#04955a',
+    reading:     '#c96a3e',
+    opening:     '#0a0a16'
+  };
+
   var MODES = {
     week: {
-      bg: '#f6f3ea', fg: '#1d24ff',
-      kicker: 'This week', range: '13—19 Jul', count: '4 events', link: 'View full week →',
-      cards: [
-        {meta:'Performance · Thu 16 Jul · 17:00', title:'0-0: Dance Performance', serif:false, desc:'Aseel Qupty and Al Amal Dance Company at Wonder Cabinet.'},
-        {meta:'Film · Wed 15 Jul · 19:00', title:'Lines on Cotton', serif:true, desc:'A short-film programme on textile memory.'},
-        {meta:'Workshop · Fri 17 Jul · 11:00', title:'Natural Dye Intensive', serif:false, desc:'A two-day studio workshop led by the current residency cohort.'},
-        {meta:'Radio · Sat 18 Jul · 13:00', title:'NTS x Wonder Cabinet', serif:true, desc:'A live broadcast from the courtyard.'}
+      bg:'#f6f3ea', fg:'#1d24ff',
+      kicker:'This week', title:'13—19<br>JUL',
+      desc:'4 events across performance, film and workshop programming this week.',
+      link:'View full week →',
+      items:[
+        {type:'performance', meta:'Performance · Thu 16 Jul · 17:00', title:'0-0: Dance Performance', serif:false, desc:'Aseel Qupty and Al Amal Dance Company at Wonder Cabinet.'},
+        {type:'film', meta:'Film · Wed 15 Jul · 19:00', title:'Lines on Cotton', serif:true, desc:'A short-film programme on textile memory.'},
+        {type:'workshop', meta:'Workshop · Fri 17 Jul · 11:00', title:'Natural Dye Intensive', serif:false, desc:'A two-day studio workshop led by the current residency cohort.'},
+        {type:'radio', meta:'Radio · Sat 18 Jul · 13:00', title:'NTS x Wonder Cabinet', serif:true, desc:'A live broadcast from the courtyard.'}
       ]
     },
     project: {
-      bg: '#c8a0f0', fg: '#241b4a',
-      kicker: 'Featured project', range: 'Sounds of Places', count: '5 linked events', link: 'View project →',
-      cards: [
-        {meta:'Field recording · Ongoing', title:'Cremisan Valley Sessions', serif:false, desc:'The recording thread that anchors this project.'},
-        {meta:'Release · Sep 2026', title:'Sounds of Places Vol. 1', serif:true, desc:'First record release from the project.'},
-        {meta:'Talk · 24 Jul', title:'Listening as Method', serif:false, desc:'A conversation with the project\'s contributing artists.'}
+      bg:'#c8a0f0', fg:'#241b4a',
+      kicker:'Featured project', title:'SOUNDS<br>OF PLACES',
+      desc:'An annual residency-based sound gathering that focuses on the sonic aesthetics of place. Cremisan Valley, Bethlehem.',
+      link:'View project →',
+      items:[
+        {type:'radio', meta:'Radio · 24 Apr 2026', title:'Carhartt WIP × Radio AlHara', serif:true, desc:'Collection launch. YA HU, Aram Sabbah, and Al Nather — live on Radio AlHara’s 6th anniversary.'},
+        {type:'film', meta:'Film screening · 8 Apr 2026', title:'Cremisan Valley Sessions', serif:false, desc:'The field-recording thread that anchors this project.'},
+        {type:'performance', meta:'Release · Sep 2026', title:'Sounds of Places Vol. 1', serif:true, desc:'First record release from the project.'}
       ]
     },
     residency: {
-      bg: '#00d26a', fg: '#04231a',
-      kicker: 'Residency', range: 'Summer Cohort', count: '6 resident artists', link: 'View residency →',
-      cards: [
-        {meta:'Open studio · 22 Jul', title:'Residency Open Studio', serif:false, desc:'Public showing of work-in-progress from the summer cohort.'},
-        {meta:'Chef residency · monthly', title:'Community Table', serif:true, desc:'Rotating kitchen takeover tied to the residency calendar.'},
-        {meta:'Open call · closes 1 Sep', title:'Sound Lab', serif:false, desc:'Applications open for the next resident cohort.'}
+      bg:'#00d26a', fg:'#04231a',
+      kicker:'Residency', title:'SUMMER<br>COHORT',
+      desc:'6 resident artists working across sound, food and performance, June–August 2026.',
+      link:'View residency →',
+      items:[
+        {type:'workshop', meta:'Open studio · 22 Jul', title:'Residency Open Studio', serif:false, desc:'Public showing of work-in-progress from the summer cohort.'},
+        {type:'performance', meta:'Chef residency · monthly', title:'Community Table', serif:true, desc:'Rotating kitchen takeover tied to the residency calendar.'},
+        {type:'radio', meta:'Open call · closes 1 Sep', title:'Sound Lab', serif:false, desc:'Applications open for the next resident cohort.'}
       ]
     }
   };
 
-  var outer = document.getElementById('hsOuter');
-  var sticky = document.getElementById('hsSticky');
-  var track = document.getElementById('hsTrack');
-  var railKicker = document.getElementById('railKicker');
-  var railRange = document.getElementById('railRange');
-  var railCount = document.getElementById('railCount');
-  var railLink = document.getElementById('railLink');
+  var media = document.getElementById('groupMedia');
+  var kicker = document.getElementById('gmKicker');
+  var title = document.getElementById('gmTitle');
+  var desc = document.getElementById('gmDesc');
+  var link = document.getElementById('gfLink');
+  var feedList = document.getElementById('feedList');
 
   function renderMode(key){
     var m = MODES[key];
-    sticky.style.setProperty('--bg', m.bg);
-    sticky.style.setProperty('--fg', m.fg);
-    railKicker.textContent = m.kicker;
-    railRange.textContent = m.range;
-    railCount.textContent = m.count;
-    railLink.textContent = m.link;
-    track.innerHTML = m.cards.map(function(c){
-      return '<div class="card">' +
-        '<div class="c-meta">' + c.meta + '</div>' +
-        '<h2 class="c-title' + (c.serif ? ' serif' : '') + '">' + c.title + '</h2>' +
-        '<p class="c-desc' + (c.serif ? ' serif' : '') + '">' + c.desc + '</p>' +
-        '<div class="c-cta">View event →</div>' +
+    media.style.setProperty('--bg', m.bg);
+    media.style.setProperty('--fg', m.fg);
+    kicker.textContent = m.kicker;
+    title.innerHTML = m.title;
+    desc.textContent = m.desc;
+    link.textContent = m.link;
+    feedList.innerHTML = m.items.map(function(it){
+      var c = ACCENTS[it.type] || '#1d24ff';
+      return '<div class="feed-item" style="border-top-color:' + c + '33">' +
+        '<div class="fi-meta" style="color:' + c + '">' + it.meta + '</div>' +
+        '<h3 class="fi-title' + (it.serif ? ' serif' : '') + '" style="color:' + c + '">' + it.title + '</h3>' +
+        '<p class="fi-desc' + (it.serif ? ' serif' : '') + '">' + it.desc + '</p>' +
       '</div>';
     }).join('');
-    setup();
-    onScroll();
   }
-
-  function setup(){
-    var trackWidth = track.scrollWidth;
-    var railWidth = document.querySelector('.hs-rail').getBoundingClientRect().width;
-    var visible = window.innerWidth - railWidth;
-    var maxScroll = Math.max(0, trackWidth - visible);
-    outer.style.height = (window.innerHeight + maxScroll) + 'px';
-    outer.dataset.maxScroll = maxScroll;
-  }
-  function onScroll(){
-    var maxScroll = parseFloat(outer.dataset.maxScroll || 0);
-    var top = outer.getBoundingClientRect().top;
-    var progress = Math.min(Math.max(-top, 0), maxScroll);
-    track.style.transform = 'translateX(' + (-progress) + 'px)';
-  }
-
-  window.addEventListener('resize', setup);
-  window.addEventListener('scroll', onScroll, { passive: true });
 
   var buttons = document.querySelectorAll('.mode-row button');
   buttons.forEach(function(btn){
@@ -280,7 +287,7 @@
       buttons.forEach(function(b){ b.classList.remove('active'); });
       btn.classList.add('active');
       renderMode(btn.dataset.mode);
-      window.scrollTo({top: outer.offsetTop, behavior:'smooth'});
+      document.getElementById('group').scrollIntoView({behavior:'smooth', block:'start'});
     });
   });
 
