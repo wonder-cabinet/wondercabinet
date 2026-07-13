@@ -1009,10 +1009,12 @@ function _buildPanel(ev){
   const coverHtml = ev.cover
     ? `<div class="ep-cover"><img src="${ev.cover}" alt="" style="width:100%;height:220px;object-fit:contain;padding:28px;display:block;"></div>`
     : "";
-  const bodyEn = (ev.body && ev.body.length ? ev.body : ev.short ? [ev.short] : [])
-    .map(p => `<p>${p}</p>`).join("");
-  const bodyAr = (ev.bodyAr && ev.bodyAr.length ? ev.bodyAr : ev.shortAr ? [ev.shortAr] : [])
-    .map(p => `<p>${p}</p>`).join("");
+  // Short description + full body are separate fields — show both, short first,
+  // rather than letting body silently hide it when both are filled in.
+  const bodyEnParts = [...(ev.short ? [ev.short] : []), ...(ev.body && ev.body.length ? ev.body : [])];
+  const bodyArParts = [...(ev.shortAr ? [ev.shortAr] : []), ...(ev.bodyAr && ev.bodyAr.length ? ev.bodyAr : [])];
+  const bodyEn = bodyEnParts.map(p => `<p>${p}</p>`).join("");
+  const bodyAr = bodyArParts.map(p => `<p>${p}</p>`).join("");
   const writeupEn = ev.writeup ? `<p class="ep-writeup">${ev.writeup}</p>` : "";
   const writeupAr = ev.writeupAr ? `<p class="ep-writeup" dir="rtl">${ev.writeupAr}</p>` : "";
   const cta = ev.register
@@ -1115,10 +1117,12 @@ function _buildFullscreen(ev){
   const typeArLabel = TYPE_AR[ev.type] || ev.type;
   const parts = (ev.subtitle || "").split("·").map(s => s.trim()).filter(Boolean);
   const nameTag = parts.length > 1 ? parts[parts.length - 1] : parts[0] || "";
-  const bodyEn = (ev.body && ev.body.length ? ev.body : ev.writeup ? [ev.writeup] : ev.short ? [ev.short] : [])
-    .map(p => `<p>${p}</p>`).join("");
-  const bodyAr = (ev.bodyAr && ev.bodyAr.length ? ev.bodyAr : ev.writeupAr ? [ev.writeupAr] : ev.shortAr ? [ev.shortAr] : [])
-    .map(p => `<p>${p}</p>`).join("");
+  // Short description + full body + retrospective write-up are separate
+  // fields — show all that are filled in, rather than the first one found.
+  const bodyEnParts = [...(ev.short ? [ev.short] : []), ...(ev.body && ev.body.length ? ev.body : []), ...(ev.writeup ? [ev.writeup] : [])];
+  const bodyArParts = [...(ev.shortAr ? [ev.shortAr] : []), ...(ev.bodyAr && ev.bodyAr.length ? ev.bodyAr : []), ...(ev.writeupAr ? [ev.writeupAr] : [])];
+  const bodyEn = bodyEnParts.map(p => `<p>${p}</p>`).join("");
+  const bodyAr = bodyArParts.map(p => `<p>${p}</p>`).join("");
   const coverHtml = ev.cover
     ? `<div class="efs-image-wrap"><div class="efs-image"><img src="${ev.cover}" alt="${ev.title}"></div></div>`
     : "";
