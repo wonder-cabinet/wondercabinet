@@ -2014,7 +2014,7 @@ html[data-lang="ar"] .ar-only{ direction: rtl; }
 /* Text block */
 .cb-text p{
   font-family: var(--ff-sans); font-size: 17px; line-height: 1.6;
-  margin: 0 0 .9em; font-weight: 500; max-width: 62ch;
+  margin: 0 0 .9em; font-weight: 500;
 }
 .cb-text p:first-child{ font-size: 19px; font-weight: 600; }
 .efs-content-blocks .cb-text p{ font-size: 18px; line-height: 1.65; }
