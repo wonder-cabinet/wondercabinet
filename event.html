@@ -30,6 +30,17 @@
   }
   .ev-lang-toggle button + button{ border-left: none !important; }
   .ev-lang-toggle button[aria-pressed="true"]{ opacity: 1; }
+
+  .cta-inline-link{
+    display: inline-block;
+    margin-top: 10px;
+    font-weight: 700;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    color: inherit;
+  }
+  .artist-bio{ margin-top: 8px; }
+  .artist-bio p:first-child{ margin-top: 0; }
 </style>
 </head>
 <body>
@@ -181,7 +192,7 @@
       recurring:   !!doc.recurring,
       recurringLabel:   doc.recurringLabel?.en || '',
       recurringLabelAr: doc.recurringLabel?.ar || '',
-      relatedArtists: (doc.relatedArtists||[]).map(a => ({ name: _loc(a.name), slug: a.slug?.current || '' })).filter(a => a.name),
+      relatedArtists: (doc.relatedArtists||[]).map(a => ({ name: _loc(a.name), slug: a.slug?.current || '', bioEn: a.bio?.en || '', bioAr: a.bio?.ar || '' })).filter(a => a.name),
       relatedProject: doc.relatedProject ? { title: _loc(doc.relatedProject.title), slug: doc.relatedProject.slug?.current || '' } : null,
     };
   }
@@ -202,7 +213,7 @@
     const doc = await groq(`*[_type == "event" && slug.current == "${id}"][0]{
       ...,
       location->{name},
-      relatedArtists[]->{name, slug},
+      relatedArtists[]->{name, slug, bio},
       relatedProject->{title, slug}
     }`);
     if (doc) ev = docToEv(doc);
@@ -240,8 +251,10 @@
     <h1><span class="en-only">${ev.title}</span><span class="ar-only ar" dir="rtl">${ev.titleAr || ev.title}</span></h1>
   `;
 
-  // Cover (skip if no image ref)
-  if (ev.cover) {
+  // Cover — only render the standalone cover block when there are no authored
+  // content blocks. When content[] is present, its own contentImage block
+  // (if any) carries the photo at the right point in the reading order.
+  if (ev.cover && !ev.content.length) {
     document.getElementById('detail-cover').innerHTML = `<img src="${_sanityImg(ev.cover)}" alt="" />`;
   }
 
@@ -251,6 +264,11 @@
   const creditsAr = ev.relatedArtists.length ? `<p class="credits-line" dir="rtl"><span class="k">فنانون</span> ${ev.relatedArtists.map(a=>a.name).join('، ')}</p>` : '';
   const projectEn = ev.relatedProject ? `<p class="credits-line"><span class="k">Part of</span> ${ev.relatedProject.title}</p>` : '';
 
+  // Artist bios — pulled live from the referenced artist documents, not
+  // duplicated into the event's own text.
+  const artistBiosEn = ev.relatedArtists.filter(a=>a.bioEn).map(a=>`<div class="artist-bio">${_p(a.bioEn)}</div>`).join('');
+  const artistBiosAr = ev.relatedArtists.filter(a=>a.bioAr).map(a=>`<div class="artist-bio" dir="rtl">${_p(a.bioAr)}</div>`).join('');
+
   const fallbackEn = `${_p(ev.shortDesc)}${_p(ev.body)}${ev.writeup ? `<p class="writeup">${ev.writeup}</p>` : ''}`;
   const fallbackAr = `${_p(ev.shortDescAr)}${_p(ev.bodyAr)}${ev.writeupAr ? `<p class="writeup" dir="rtl">${ev.writeupAr}</p>` : ''}`;
 
@@ -258,12 +276,14 @@
     <div class="en-only">
       ${ev.subtitle ? `<p class="subtitle"><em>${ev.subtitle}</em></p>` : ''}
       ${ev.content.length ? renderContentBlocks(ev.content) : fallbackEn}
+      ${artistBiosEn}
       ${creditsEn}
       ${projectEn}
     </div>
     <div class="ar ar-only" dir="rtl">
       ${ev.subtitleAr ? `<p class="subtitle"><em>${ev.subtitleAr}</em></p>` : ''}
       ${ev.content.length ? renderContentBlocks(ev.content) : fallbackAr}
+      ${artistBiosAr}
       ${creditsAr}
     </div>
   `;
