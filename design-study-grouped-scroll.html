@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Wonder Cabinet — Grouped scroll, design direction v4</title>
+<title>Wonder Cabinet — Grouped scroll, design direction v6</title>
 <style>
   :root{
     --ff-sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
@@ -94,43 +94,32 @@
   .c-desc.serif{ font-family:var(--ff-ar); font-style:italic; font-size:16px; }
   .c-cta{ font-size:11px; letter-spacing:.2em; text-transform:uppercase; font-weight:700; }
 
-  /* ---- handoff into the real existing Programme section ---- */
-  .handoff-note{
-    text-align:center; padding:40px 24px 8px; font-size:12px; letter-spacing:.08em; text-transform:uppercase;
-    font-weight:700; opacity:.55;
-  }
-  .handoff{ padding:24px 24px 90px; border-top:2px solid var(--ink); }
-  .handoff-inner{ max-width:1080px; margin:0 auto; }
-  .handoff-label{
-    font-size:11px; letter-spacing:.2em; text-transform:uppercase; font-weight:700; opacity:.5; margin-bottom:18px;
-  }
+  /* ---- Featured projects / Residencies / Featured artists ---- */
+  .vsection{ padding:70px 24px; border-top:2px solid var(--ink); }
+  .vsection h2{ font-size:12px; letter-spacing:.2em; text-transform:uppercase; font-weight:700; opacity:.65; margin:0 0 24px; }
+  .vsection.v-tint{ background:var(--violet); color:#241b4a; }
+  .vsection.v-tint h2{ opacity:.7; }
 
-  .mini-tw-head{ display:flex; justify-content:space-between; align-items:baseline; padding-bottom:14px; border-bottom:2px solid var(--ink); margin-bottom:0; }
-  .mini-tw-eyebrow{ font-size:12px; letter-spacing:.14em; text-transform:uppercase; font-weight:700; }
-  .mini-tw-range{ font-size:22px; font-weight:700; }
-  .mini-tw-grid{ display:grid; grid-template-columns:repeat(4,1fr); }
-  .mini-tw-cell{ border-right:2px solid var(--ink); border-bottom:2px solid var(--ink); padding:18px; min-height:120px; display:flex; flex-direction:column; justify-content:space-between; gap:8px; }
-  .mini-tw-cell:last-child{ border-right:none; }
-  .mini-tw-day{ font-size:12px; font-weight:700; opacity:.6; }
-  .mini-tw-title{ font-size:14px; font-weight:700; line-height:1.2; }
+  .marquee-wrap{ overflow:hidden; }
+  .marquee{ display:flex; gap:0; will-change:transform; }
+  .m-card{ flex:0 0 320px; padding:32px; border:2px solid currentColor; margin-right:-2px; min-height:220px; display:flex; flex-direction:column; justify-content:flex-end; gap:8px; }
+  .m-title{ font-weight:700; font-size:22px; text-transform:uppercase; letter-spacing:-.02em; margin:0; }
+  .m-sub{ font-size:12px; opacity:.65; }
 
-  .mini-ph{ display:flex; align-items:center; gap:16px; padding:14px 0; margin-top:26px; border-top:2px solid var(--ink); border-bottom:2px solid var(--ink); font-size:11px; letter-spacing:.1em; text-transform:uppercase; font-weight:700; opacity:.7; }
-  .mini-ph span{ padding:4px 10px; border:1px solid var(--ink); border-radius:100px; opacity:.6; }
-  .mini-ph span.on{ opacity:1; background:var(--ink); color:var(--paper); }
+  .res-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:0; border:2px solid currentColor; }
+  .res-item{ padding:28px; border-right:2px solid currentColor; }
+  .res-item:last-child{ border-right:none; }
+  .res-item h3{ font-size:18px; margin:0 0 6px; }
+  .res-item p{ font-size:13px; opacity:.7; margin:0; }
 
-  .mini-tl-row{ display:grid; grid-template-columns:70px 1fr 140px; gap:16px; padding:16px 0; border-bottom:1px dotted rgba(29,36,255,.25); align-items:baseline; }
-  .mini-tl-day{ font-size:22px; font-weight:700; }
-  .mini-tl-title{ font-size:16px; font-weight:700; }
-  .mini-tl-venue{ font-size:12px; opacity:.6; text-align:right; }
-
-  .end-note{ padding:0 24px 110px; text-align:center; font-size:12px; opacity:.45; max-width:640px; margin:0 auto; }
+  .end-note{ padding:60px 24px 120px; text-align:center; font-size:13px; opacity:.5; }
 </style>
 </head>
 <body>
 
 <div class="note-bar">
-  <span>Direction study v4 — horizontal scroll-lock replaces the old featured-split, then hands off into the real Programme section</span>
-  <span><b>Scroll down</b> to move sideways through this week — nothing here moves on its own</span>
+  <span>Direction study v6 — horizontal scroll-lock this-week, then Featured projects / Residencies / Featured artists</span>
+  <span><b>Scroll down</b> to move sideways through this week; keep going for the rest — nothing moves on its own</span>
 </div>
 
 <header>
@@ -166,34 +155,40 @@
   </div>
 </section>
 
-<div class="handoff-note">↓ from here, this is the site's existing Programme section — unchanged</div>
-
-<section class="handoff">
-  <div class="handoff-inner">
-    <div class="handoff-label">Already live on the site today</div>
-
-    <div class="mini-tw-head">
-      <div class="mini-tw-eyebrow">This week</div>
-      <div class="mini-tw-range">13—19 Jul</div>
+<section class="vsection">
+  <h2>Featured projects</h2>
+  <div class="marquee-wrap">
+    <div class="marquee" id="marqueeA">
+      <div class="m-card"><h3 class="m-title">Sounds of Places</h3><span class="m-sub">Annual project · Cremisan Valley</span></div>
+      <div class="m-card"><h3 class="m-title">Christmas in Mourning</h3><span class="m-sub">Record + book release</span></div>
+      <div class="m-card"><h3 class="m-title">Platform 14</h3><span class="m-sub">Touring showcase</span></div>
+      <div class="m-card"><h3 class="m-title">Bethlehem Frequencies</h3><span class="m-sub">Radio series</span></div>
     </div>
-    <div class="mini-tw-grid">
-      <div class="mini-tw-cell"><div class="mini-tw-day">Thu 16</div><div class="mini-tw-title">0-0: Dance Performance</div></div>
-      <div class="mini-tw-cell"><div class="mini-tw-day">Wed 15</div><div class="mini-tw-title">Lines on Cotton</div></div>
-      <div class="mini-tw-cell"><div class="mini-tw-day">Fri 17</div><div class="mini-tw-title">Natural Dye Intensive</div></div>
-      <div class="mini-tw-cell"><div class="mini-tw-day">Sat 18</div><div class="mini-tw-title">NTS x Wonder Cabinet</div></div>
-    </div>
-
-    <div class="mini-ph">
-      <span class="on">All</span><span>Performance</span><span>Film</span><span>Workshop</span><span>Radio</span>
-    </div>
-
-    <div class="mini-tl-row"><div class="mini-tl-day">16<br>Jul</div><div class="mini-tl-title">0-0: Dance Performance by Aseel Qupty</div><div class="mini-tl-venue">Wonder Cabinet</div></div>
-    <div class="mini-tl-row"><div class="mini-tl-day">15<br>Jul</div><div class="mini-tl-title">Lines on Cotton</div><div class="mini-tl-venue">Wonder Cabinet</div></div>
-    <div class="mini-tl-row"><div class="mini-tl-day">17<br>Jul</div><div class="mini-tl-title">Natural Dye Intensive</div><div class="mini-tl-venue">Studio 2</div></div>
   </div>
 </section>
 
-<div class="end-note">Layout/interaction study only. Everything above the "already live" label is new; everything below it is the site's real This-week grid and Programme timeline, untouched.</div>
+<section class="vsection v-tint">
+  <h2>Residencies</h2>
+  <div class="res-grid">
+    <div class="res-item"><h3>Summer cohort</h3><p>6 resident artists · Jun–Aug 2026</p></div>
+    <div class="res-item"><h3>Chef residency</h3><p>Rotating kitchen takeover · monthly</p></div>
+    <div class="res-item"><h3>Sound lab</h3><p>Open call closing 1 Sep 2026</p></div>
+  </div>
+</section>
+
+<section class="vsection">
+  <h2>Featured artists — scrolling the other way</h2>
+  <div class="marquee-wrap">
+    <div class="marquee" id="marqueeB" style="justify-content:flex-end;">
+      <div class="m-card"><h3 class="m-title">Aseel Qupty</h3><span class="m-sub">Choreographer</span></div>
+      <div class="m-card"><h3 class="m-title">Tareq Abu Salameh</h3><span class="m-sub">Oud</span></div>
+      <div class="m-card"><h3 class="m-title">Noor Abed</h3><span class="m-sub">Filmmaker</span></div>
+      <div class="m-card"><h3 class="m-title">Al Amal Dance Company</h3><span class="m-sub">Ensemble</span></div>
+    </div>
+  </div>
+</section>
+
+<div class="end-note">Layout/interaction study only — direction, easing and pacing are all tunable once approved.</div>
 
 <script>
 (function(){
@@ -285,6 +280,17 @@
   });
 
   renderMode('week');
+})();
+
+(function(){
+  var a = document.getElementById('marqueeA');
+  var b = document.getElementById('marqueeB');
+  function parallax(){
+    var y = window.scrollY;
+    a.style.transform = 'translateX(' + (-(y * 0.06) % 200) + 'px)';
+    b.style.transform = 'translateX(' + ((y * 0.06) % 200) + 'px)';
+  }
+  window.addEventListener('scroll', parallax, { passive: true });
 })();
 </script>
 
