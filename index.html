@@ -761,6 +761,12 @@ async function _boot(){
     const MABBR = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
     const DWEN  = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
     const DWAR  = ["الأحد","الاثنين","الثلاثاء","الأربعاء","الخميس","الجمعة","السبت"];
+    const DWFULL = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+    const MFULL  = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+    function _ordinal(n){
+      const s = ["th","st","nd","rd"], v = n % 100;
+      return n + (s[(v-20)%10] || s[v] || s[0]);
+    }
 
     // Parse ISO string using LOCAL date parts to avoid timezone day-shift on all-day events
     function _iso(dt){
@@ -796,6 +802,9 @@ async function _boot(){
         year:     s ? s.getFullYear() : new Date().getFullYear(),
         dow:      s ? DWEN[s.getDay()] : 'Mon',
         dowAr:    s ? DWAR[s.getDay()] : '',
+        dowFull:    s ? DWFULL[s.getDay()] : '',
+        monthFull:  s ? MFULL[s.getMonth()] : '',
+        dayOrdinal: s ? _ordinal(s.getDate()) : '',
         start:    hasTime ? s.toTimeString().slice(0,5) : '',
         end:      e && (e.getHours()||e.getMinutes()) ? e.toTimeString().slice(0,5) : '',
         location: locationName,
@@ -1113,8 +1122,8 @@ ${audioBar}
   <button class="ep-close" aria-label="Close">✕</button>
   <div class="ep-meta">
     <div class="dt-block">
-      <span class="en-only">${_overlayDate(ev)}</span>
-      <span class="ar-only ar">${ev.day} ${MONTH_NAME_AR[ev.month]} ${arNum(ev.year)}</span>
+      <span class="en-only">${ev.dowFull ? `${ev.dowFull}<br>${ev.monthFull} ${ev.dayOrdinal}, ${ev.year}` : _overlayDate(ev)}</span>
+      <span class="ar-only ar">${ev.dowAr ? `${ev.dowAr}<br>` : ""}${ev.day} ${MONTH_NAME_AR[ev.month]} ${arNum(ev.year)}</span>
       <span class="ep-time">${ev.start}${ev.end ? " — " + ev.end : ""}</span>
     </div>
     <span class="ep-type-tag en-only">${ev.type}</span>
