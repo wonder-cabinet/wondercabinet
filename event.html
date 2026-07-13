@@ -8,14 +8,15 @@
 <style>
   :root { --bg: #ffffff; --ink: #0a0a16; --accent: #1d24ff; --highlight: #1d24ff; }
 
-  /* one flat colour field per event type — no header, no divide */
-  body[data-type="performance"]{ --bg:#E13C6E; --ink:#3E0A1E; }
-  body[data-type="film"]{ --bg:#F0653A; --ink:#4A1B0C; }
-  body[data-type="radio"]{ --bg:#5FA24A; --ink:#173404; }
-  body[data-type="class"]{ --bg:#2A9D8F; --ink:#08312C; }
-  body[data-type="workshop"]{ --bg:#E8A421; --ink:#412402; }
-  body[data-type="reading"]{ --bg:#2233EE; --ink:#EAEBFF; }
-  body[data-type="opening"]{ --bg:#7A5CD6; --ink:#EFEAFC; }
+  /* one flat colour field per event type — no header, no divide.
+     Same TYPE_COLORS as the homepage overlay panel (index.html). */
+  body[data-type="performance"]{ --bg:#cc6698; --ink:#0a0a16; }
+  body[data-type="film"]{ --bg:#ffe600; --ink:#0a0a16; }
+  body[data-type="class"]{ --bg:#c8a0f0; --ink:#0a0a16; }
+  body[data-type="workshop"]{ --bg:#ff5a00; --ink:#f6f3ea; }
+  body[data-type="radio"]{ --bg:#00d26a; --ink:#0a0a16; }
+  body[data-type="reading"]{ --bg:#ffd6c2; --ink:#0a0a16; }
+  body[data-type="opening"]{ --bg:#0a0a16; --ink:#f6f3ea; }
 
   .ev-lang-toggle{
     position: fixed; top: 20px; right: 24px; z-index: 50;
