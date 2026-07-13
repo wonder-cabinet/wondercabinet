@@ -256,6 +256,8 @@
   // (if any) carries the photo at the right point in the reading order.
   if (ev.cover && !ev.content.length) {
     document.getElementById('detail-cover').innerHTML = `<img src="${_sanityImg(ev.cover)}" alt="" />`;
+  } else {
+    document.getElementById('detail-cover').style.display = 'none';
   }
 
   // Body — prefer authored "content" blocks; otherwise fall back to the
