@@ -2029,7 +2029,7 @@ html[data-lang="ar"] .ar-only{ direction: rtl; }
 .cb-image{ display: flex; flex-direction: column; gap: 10px; }
 .cb-image img{
   display: block; width: 100%; max-width: 720px;
-  border-radius: 16px;
+  border-radius: 0;
 }
 .cb-caption{
   font-family: var(--ff-sans); font-size: 12px; letter-spacing: .12em;
