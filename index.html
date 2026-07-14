@@ -181,7 +181,7 @@ let ARTISTS = [];
 const MONTH_ORDER = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 const MONTH_NAME_EN = { Jan:"January", Feb:"February", Mar:"March", Apr:"April", May:"May", Jun:"June", Jul:"July", Aug:"August", Sep:"September", Oct:"October", Nov:"November", Dec:"December" };
 const MONTH_NAME_AR = { Jan:"يناير", Feb:"فبراير", Mar:"مارس", Apr:"أبريل", May:"مايو", Jun:"يونيو", Jul:"يوليو", Aug:"أغسطس", Sep:"سبتمبر", Oct:"أكتوبر", Nov:"نوفمبر", Dec:"ديسمبر" };
-const TYPE_AR = { Class:"صف", Film:"فيلم", Performance:"عرض", Radio:"إذاعة", Reading:"قراءة", Workshop:"ورشة", Opening:"افتتاح" };
+const TYPE_AR = { Class:"صف", Film:"فيلم", Performance:"عرض", Radio:"إذاعة", Reading:"قراءة", Workshop:"ورشة", Opening:"افتتاح", Bar:"بار" };
 const VENUE_AR = { "Ground floor":"الطابق الأرضي","Screening room":"غرفة العرض","Main hall":"القاعة الرئيسية","Library":"المكتبة","Studio":"الستوديو","Workshop":"الورشة","Whole building":"كامل المبنى","Bar open":"البار مفتوح" };
 const SEASON_NAME_AR = { Autumn:"خريف", Winter:"شتاء", Spring:"ربيع", Summer:"صيف" };
 
@@ -287,9 +287,9 @@ function renderThisWeek(){
    FILTER BAR — type filters with counts, primary navigation
    ============================================================ */
 function renderFilters(){
-  const TYPES = ["", "Performance", "Film", "Class", "Workshop", "Radio", "Reading", "Opening"];
-  const LABEL_EN = { "":"All", Performance:"Performance", Film:"Film", Class:"Class", Workshop:"Workshop", Radio:"Radio", Reading:"Reading", Opening:"Opening" };
-  const LABEL_AR = { "":"الكل", Performance:"عرض", Film:"فيلم", Class:"صف", Workshop:"ورشة", Radio:"إذاعة", Reading:"قراءة", Opening:"افتتاح" };
+  const TYPES = ["", "Performance", "Film", "Class", "Workshop", "Radio", "Reading", "Opening", "Bar"];
+  const LABEL_EN = { "":"All", Performance:"Performance", Film:"Film", Class:"Class", Workshop:"Workshop", Radio:"Radio", Reading:"Reading", Opening:"Opening", Bar:"Bar" };
+  const LABEL_AR = { "":"الكل", Performance:"عرض", Film:"فيلم", Class:"صف", Workshop:"ورشة", Radio:"إذاعة", Reading:"قراءة", Opening:"افتتاح", Bar:"بار" };
 
   function build(){
     const container = document.getElementById("ph-filters");
@@ -930,6 +930,7 @@ const TYPE_COLORS = {
   Radio:       { bg: "#00d26a", ink: "#0a0a16" },
   Reading:     { bg: "#ffd6c2", ink: "#0a0a16" },
   Opening:     { bg: "#0a0a16", ink: "#f6f3ea" },
+  Bar:         { bg: "#e8a33d", ink: "#0a0a16" },
 };
 // Admin-selectable overrides (Sanity `colorTheme` field) — keyed lowercase.
 // "paper" is the new plain white/paper option; others mirror TYPE_COLORS
@@ -942,6 +943,7 @@ const COLOR_THEME_OVERRIDES = {
   radio:       TYPE_COLORS.Radio,
   reading:     TYPE_COLORS.Reading,
   opening:     TYPE_COLORS.Opening,
+  bar:         TYPE_COLORS.Bar,
   paper:       { bg: "#FCFFE5", ink: "#0a0a16" },
 };
 function _colorFor(ev, fallback){
