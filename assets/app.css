@@ -1578,18 +1578,6 @@ html[data-lang="ar"] .ar-only{ direction: rtl; }
    Replaces the old opposing dual-column featured-split.
    Everything here is driven only by native scroll position.
    ========================================================= */
-.gs-mode-row{
-  display: flex; gap: 8px; flex-wrap: wrap;
-  padding: 16px 24px;
-  border-bottom: 2px solid var(--ink);
-}
-.gs-mode{
-  font-family: var(--ff-sans); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; font-weight: 700;
-  background: none; border: 1px solid var(--ink); color: var(--ink);
-  padding: 9px 18px; border-radius: 100px; cursor: pointer; opacity: .5;
-}
-.gs-mode.active{ opacity: 1; background: var(--ink); color: var(--bg); }
-
 .gs-outer{ position: relative; }
 .gs-sticky{
   --gs-bg: var(--paper); --gs-fg: var(--ink);
