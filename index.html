@@ -26,7 +26,7 @@
 </header>
 
 <!-- GROUPED SCROLL — this week (horizontal scroll-lock, sticky rail) →
-     Featured projects marquee → Residencies → Featured artists marquee.
+     Featured projects marquee → Residencies (hidden) → Artists in this week.
      Replaces the old static featured-split section; fully Sanity-driven. -->
 <section class="gscroll" id="gscroll">
 
@@ -36,6 +36,11 @@
         <div class="gs-kicker" id="gs-kicker"></div>
         <div class="gs-range" id="gs-range"></div>
         <div class="gs-count" id="gs-count"></div>
+        <div class="gs-theme" id="gs-theme" hidden>
+          <div class="gs-theme-kicker"><span class="en-only">This month's theme</span><span class="ar-only ar" dir="rtl">موضوع هذا الشهر</span></div>
+          <div class="gs-theme-title" id="gs-theme-title"></div>
+          <p class="gs-theme-desc" id="gs-theme-desc"></p>
+        </div>
         <div class="gs-hint"><span class="en-only">Scroll ↓ to move →</span><span class="ar-only ar" dir="rtl">مرر للأسفل للتنقل →</span></div>
         <a class="gs-link" href="#programme" id="gs-link"></a>
       </div>
@@ -60,8 +65,8 @@
     </div>
   </section>
 
-  <section class="gs-vsection" id="gs-artists-section" hidden>
-    <h2><span class="en-only">Featured artists</span><span class="ar-only ar" dir="rtl">فنانون مميزون</span></h2>
+  <section class="gs-vsection gs-dark" id="gs-artists-section" hidden>
+    <h2><span class="en-only">Artists in this week</span><span class="ar-only ar" dir="rtl">فنانون هذا الأسبوع</span></h2>
     <div class="gs-marquee-wrap"><div class="gs-marquee" id="gs-marquee-artists" style="justify-content:flex-end;"></div></div>
   </section>
 
@@ -164,6 +169,7 @@ let ALL = [];
 let SEASONS = [];
 let PROJECTS = [];
 let RESIDENCIES = [];
+let SETTINGS = null;
 let ARTISTS = [];
 
 // Helpers
@@ -571,22 +577,32 @@ function _gsWeekEvents(start){
   }).sort((a,b) => eventTimestamp(a) - eventTimestamp(b));
 }
 
+function _gsCardVideo(ev){
+  const b = (ev.content || []).find(c => (c._type || c.type) === "contentVideo");
+  if (!b) return "";
+  return _sanityFile(b.videoFile) || b.externalUrl || "";
+}
+
 function _gsEventCard(ev){
   const typeAr = TYPE_AR[ev.type] || ev.type;
-  return `<a class="gs-card" href="event.html?id=${ev.id}">
-    <div class="gs-c-meta">
-      <span class="en-only">${ev.type}${ev.dow ? " · " + ev.dow + " " + parseInt(ev.day,10) + " " + ev.month : ""}${ev.start ? " · " + ev.start : ""}</span>
-      <span class="ar-only ar" dir="rtl">${typeAr}${ev.dowAr ? " · " + ev.dowAr : ""}${ev.start ? " · " + ev.start : ""}</span>
+  const videoSrc = _gsCardVideo(ev);
+  return `<a class="gs-card${videoSrc ? " gs-card-video" : ""}" href="event.html?id=${ev.id}">
+    ${videoSrc ? `<video class="gs-card-bg-video" autoplay muted loop playsinline src="${videoSrc}"></video><div class="gs-card-scrim"></div>` : ""}
+    <div class="gs-card-inner">
+      <div class="gs-c-meta">
+        <span class="en-only">${ev.type}${ev.dow ? " · " + ev.dow + " " + parseInt(ev.day,10) + " " + ev.month : ""}${ev.start ? " · " + ev.start : ""}</span>
+        <span class="ar-only ar" dir="rtl">${typeAr}${ev.dowAr ? " · " + ev.dowAr : ""}${ev.start ? " · " + ev.start : ""}</span>
+      </div>
+      <h3 class="gs-c-title">
+        <span class="en-only">${ev.title}</span>
+        <span class="ar-only ar" dir="rtl">${ev.titleAr || ev.title}</span>
+      </h3>
+      ${ev.shortDesc ? `<p class="gs-c-desc">
+        <span class="en-only">${ev.shortDesc}</span>
+        ${ev.shortDescAr ? `<span class="ar-only ar" dir="rtl">${ev.shortDescAr}</span>` : ""}
+      </p>` : ""}
+      <div class="gs-c-cta"><span class="en-only">View event →</span><span class="ar-only ar" dir="rtl">← عرض الفعالية</span></div>
     </div>
-    <h3 class="gs-c-title">
-      <span class="en-only">${ev.title}</span>
-      <span class="ar-only ar" dir="rtl">${ev.titleAr || ev.title}</span>
-    </h3>
-    ${ev.shortDesc ? `<p class="gs-c-desc">
-      <span class="en-only">${ev.shortDesc}</span>
-      ${ev.shortDescAr ? `<span class="ar-only ar" dir="rtl">${ev.shortDescAr}</span>` : ""}
-    </p>` : ""}
-    <div class="gs-c-cta"><span class="en-only">View event →</span><span class="ar-only ar" dir="rtl">← عرض الفعالية</span></div>
   </a>`;
 }
 
@@ -634,6 +650,14 @@ function renderFeatured(){
     kicker.innerHTML = `<span class="en-only">This week</span><span class="ar-only ar" dir="rtl">هذا الأسبوع</span>`;
     range.innerHTML = `<span class="en-only">${start.getDate()}—${end.getDate()} ${MONTH_NAME_EN[MABBR_G[end.getMonth()]]}</span><span class="ar-only ar" dir="rtl">${arNum(start.getDate())}—${arNum(end.getDate())} ${MONTH_NAME_AR[MABBR_G[end.getMonth()]]}</span>`;
     count.innerHTML = `<span class="en-only">${evs.length} ${evs.length === 1 ? "event" : "events"}</span><span class="ar-only ar" dir="rtl">${arNum(evs.length)} فعاليات</span>`;
+    const themeEl = document.getElementById("gs-theme");
+    if (SETTINGS && SETTINGS.themeTitle){
+      themeEl.hidden = false;
+      document.getElementById("gs-theme-title").innerHTML = `<span class="en-only">${SETTINGS.themeTitle}</span><span class="ar-only ar" dir="rtl">${SETTINGS.themeTitleAr || SETTINGS.themeTitle}</span>`;
+      document.getElementById("gs-theme-desc").innerHTML = SETTINGS.themeDesc
+        ? `<span class="en-only">${SETTINGS.themeDesc}</span><span class="ar-only ar" dir="rtl">${SETTINGS.themeDescAr || SETTINGS.themeDesc}</span>`
+        : "";
+    }
     link.innerHTML = `<span class="en-only">View full week →</span><span class="ar-only ar" dir="rtl">← عرض الأسبوع كاملاً</span>`;
     link.href = "#programme";
     track.innerHTML = evs.length
@@ -716,16 +740,15 @@ function renderFeatured(){
       </div>`).join("");
   }
 
-  // Featured artists marquee
+  // Artists in this week — marquee. Links intentionally disabled until
+  // dedicated artist pages exist.
   const artistsSection = document.getElementById("gs-artists-section");
   const marqueeArtists = document.getElementById("gs-marquee-artists");
   if (ARTISTS.length){
     artistsSection.hidden = false;
     marqueeArtists.innerHTML = ARTISTS.map(a => {
       const inner = `<h3 class="gs-m-title">${a.name}</h3><span class="gs-m-sub">${a.discipline || ""}</span>`;
-      return a.slug
-        ? `<a class="gs-m-card" href="#">${inner}</a>`
-        : `<div class="gs-m-card gs-m-card-static">${inner}</div>`;
+      return `<div class="gs-m-card gs-m-card-static">${inner}</div>`;
     }).join("");
   }
 
@@ -792,7 +815,8 @@ async function _boot(){
     const q = encodeURIComponent(`{
       "events": *[_type == "event"] | order(startDateTime desc) { ..., location->{ name }, relatedArtists[]->{name, "slug": slug.current, discipline, photo}, relatedProject->{title, slug} },
       "projects": *[_type == "project"] | order(year desc) { title, "slug": slug.current, description, year, coverImage },
-      "residencies": *[_type == "residency"] | order(year desc) { title, "slug": slug.current, description, year, coverImage }
+      "residencies": *[_type == "residency"] | order(year desc) { title, "slug": slug.current, description, year, coverImage },
+      "settings": *[_type == "siteSettings"][0]{ monthlyThemeTitle, monthlyThemeDescription }
     }`);
     const res = await fetch(`https://xdtj605l.api.sanity.io/v2024-01-01/data/query/production?query=${q}`);
     const { result } = await res.json();
@@ -865,6 +889,13 @@ async function _boot(){
     RESIDENCIES = ((result && result.residencies) || []).map(r => ({
       title: _loc(r.title), slug: r.slug || '', desc: _loc(r.description), year: r.year || 0, cover: _sanityImg(r.coverImage),
     }));
+    const settingsDoc = result && result.settings;
+    SETTINGS = settingsDoc ? {
+      themeTitle:   settingsDoc.monthlyThemeTitle?.en || '',
+      themeTitleAr: settingsDoc.monthlyThemeTitle?.ar || '',
+      themeDesc:    settingsDoc.monthlyThemeDescription?.en || '',
+      themeDescAr:  settingsDoc.monthlyThemeDescription?.ar || '',
+    } : null;
     // Featured artists = everyone actually linked to a (non-past) event —
     // not a separately curated roster. Deduped by slug, falling back to name.
     const artistMap = new Map();
