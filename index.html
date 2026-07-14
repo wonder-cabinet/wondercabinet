@@ -37,7 +37,7 @@
         <div class="gs-range" id="gs-range"></div>
         <div class="gs-count" id="gs-count"></div>
         <div class="gs-hint"><span class="en-only">Scroll ↓ to move →</span><span class="ar-only ar" dir="rtl">مرر للأسفل للتنقل →</span></div>
-        <a class="gs-link" href="#this-week" id="gs-link"></a>
+        <a class="gs-link" href="#programme" id="gs-link"></a>
       </div>
       <div class="gs-track" id="gs-track"></div>
     </div>
@@ -65,21 +65,8 @@
 
 </section>
 
-<!-- THIS WEEK — the headline. Big. -->
-<section class="this-week" id="this-week">
-  <header class="tw-head">
-    <div class="tw-eyebrow">
-      <span class="en-only">This week</span>
-      <span class="ar-only ar" dir="rtl">هذا الأسبوع</span>
-    </div>
-    <div class="tw-range" id="tw-range"></div>
-    <div class="tw-nav">
-      <button id="tw-prev" aria-label="Previous week">←</button>
-      <button id="tw-next" aria-label="Next week">→</button>
-    </div>
-  </header>
-  <div class="tw-grid" id="tw-grid"></div>
-</section>
+<!-- THIS WEEK 7-day grid retired — redundant with the gscroll "this week"
+     teaser above. Markup + renderThisWeek() left commented for reference. -->
 
 <!-- PROGRAMME — sticky full-bleed filter bar, HKW-style -->
 <section class="programme-head" id="programme">
@@ -202,10 +189,11 @@ const DOW_AR = ["الأحد","الاثنين","الثلاثاء","الأربعا
 const MONTH_FULL_EN = { Jan:"January",Feb:"February",Mar:"March",Apr:"April",May:"May",Jun:"June",Jul:"July",Aug:"August",Sep:"September",Oct:"October",Nov:"November",Dec:"December" };
 
 function renderThisWeek(){
-  const start = STATE.weekStart;
-  const today = new Date(); today.setHours(0,0,0,0);
   const grid = document.getElementById("tw-grid");
   const rangeEl = document.getElementById("tw-range");
+  if (!grid || !rangeEl) return; // section retired — redundant with the gscroll "this week" teaser
+  const start = STATE.weekStart;
+  const today = new Date(); today.setHours(0,0,0,0);
 
   const days = Array.from({length:7}, (_,i) => {
     const d = new Date(start); d.setDate(start.getDate() + i);
@@ -645,7 +633,7 @@ function renderFeatured(){
     range.innerHTML = `<span class="en-only">${start.getDate()}—${end.getDate()} ${MONTH_NAME_EN[MABBR_G[end.getMonth()]]}</span><span class="ar-only ar" dir="rtl">${arNum(start.getDate())}—${arNum(end.getDate())} ${MONTH_NAME_AR[MABBR_G[end.getMonth()]]}</span>`;
     count.innerHTML = `<span class="en-only">${evs.length} ${evs.length === 1 ? "event" : "events"}</span><span class="ar-only ar" dir="rtl">${arNum(evs.length)} فعاليات</span>`;
     link.innerHTML = `<span class="en-only">View full week →</span><span class="ar-only ar" dir="rtl">← عرض الأسبوع كاملاً</span>`;
-    link.href = "#this-week";
+    link.href = "#programme";
     track.innerHTML = evs.length
       ? evs.map(_gsEventCard).join("")
       : _gsEmptyCard("Nothing scheduled this week — check the full programme.", "لا توجد فعاليات هذا الأسبوع — راجع البرنامج كاملاً.");
