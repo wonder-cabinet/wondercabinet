@@ -48,7 +48,9 @@
     <div class="gs-marquee-wrap"><div class="gs-marquee" id="gs-marquee-projects"></div></div>
   </section>
 
-  <section class="gs-vsection gs-tint" id="residencies">
+  <!-- Residencies — deferred to a later launch phase. Kept in the DOM
+       (hidden) so the nav/footer #residencies anchors don't break. -->
+  <section class="gs-vsection gs-tint" id="residencies" hidden>
     <h2><span class="en-only">Residencies</span><span class="ar-only ar" dir="rtl">إقامات</span></h2>
     <div class="gs-res-grid" id="gs-res-grid">
       <div class="gs-res-empty">
@@ -788,10 +790,9 @@ async function _boot(){
       return { key:`${n.toLowerCase()}-${y}`, name:n, year:y };
     }
     const q = encodeURIComponent(`{
-      "events": *[_type == "event"] | order(startDateTime desc) { ..., location->{ name }, relatedArtists[]->{name, slug}, relatedProject->{title, slug} },
+      "events": *[_type == "event"] | order(startDateTime desc) { ..., location->{ name }, relatedArtists[]->{name, "slug": slug.current, discipline, photo}, relatedProject->{title, slug} },
       "projects": *[_type == "project"] | order(year desc) { title, "slug": slug.current, description, year, coverImage },
-      "residencies": *[_type == "residency"] | order(year desc) { title, "slug": slug.current, description, year, coverImage },
-      "artists": *[_type == "artist"] { name, "slug": slug.current, discipline, photo }
+      "residencies": *[_type == "residency"] | order(year desc) { title, "slug": slug.current, description, year, coverImage }
     }`);
     const res = await fetch(`https://xdtj605l.api.sanity.io/v2024-01-01/data/query/production?query=${q}`);
     const { result } = await res.json();
@@ -838,7 +839,10 @@ async function _boot(){
         writeupAr: doc.writeup?.ar || '',
         cover:    _sanityImg(doc.cover),
         content:  doc.content || [],
-        relatedArtists: (doc.relatedArtists||[]).map(a => ({ name: _loc(a.name), slug: a.slug?.current || '' })).filter(a => a.name),
+        relatedArtists: (doc.relatedArtists||[]).map(a => ({
+          name: _loc(a.name), slug: a.slug || '',
+          discipline: (a.discipline||[]).join(', '), photo: _sanityImg(a.photo),
+        })).filter(a => a.name),
         relatedProject: doc.relatedProject ? { title: _loc(doc.relatedProject.title), slug: doc.relatedProject.slug?.current || '' } : null,
         season:   s ? _season(s) : { key:'unknown', name:'Unknown', year:new Date().getFullYear() },
       };
@@ -861,9 +865,17 @@ async function _boot(){
     RESIDENCIES = ((result && result.residencies) || []).map(r => ({
       title: _loc(r.title), slug: r.slug || '', desc: _loc(r.description), year: r.year || 0, cover: _sanityImg(r.coverImage),
     }));
-    ARTISTS = ((result && result.artists) || []).map(a => ({
-      name: _loc(a.name), slug: a.slug || '', discipline: (a.discipline || []).join(', '), photo: _sanityImg(a.photo),
-    })).filter(a => a.name);
+    // Featured artists = everyone actually linked to a (non-past) event —
+    // not a separately curated roster. Deduped by slug, falling back to name.
+    const artistMap = new Map();
+    ALL.forEach(ev => {
+      if (ev.status === 'past') return;
+      (ev.relatedArtists || []).forEach(a => {
+        const key = a.slug || a.name;
+        if (key && !artistMap.has(key)) artistMap.set(key, a);
+      });
+    });
+    ARTISTS = Array.from(artistMap.values());
     window.PROJECTS = PROJECTS;
     window.RESIDENCIES = RESIDENCIES;
     window.ARTISTS = ARTISTS;
