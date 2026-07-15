@@ -21,9 +21,28 @@
         <button data-lang-btn="en" aria-pressed="true">EN</button>
         <button data-lang-btn="ar" aria-pressed="false">AR</button>
       </div>
+      <a class="ph-exit" id="tb-exit" href="index.html" hidden>
+        <span class="ph-exit-x">✕</span>
+        <span class="en-only">Close history · Home</span>
+        <span class="ar-only ar" dir="rtl">إغلاق الأرشيف · الرئيسية</span>
+      </a>
     </nav>
   </div>
 </header>
+
+<!-- Archive — everything before the current calendar week. Hidden until
+     "View past events" is clicked; treat the whole site as one continuous
+     timeline with THIS WEEK (below) as the "magazine cover" sitting in the
+     middle, past behind it (revealed here, above), future ahead of it
+     (the Programme section further down, which starts at *next* week). -->
+<div class="tl-past-toggle" id="pt-outer" hidden>
+  <button class="tl-past-btn" id="pt-toggle" type="button">
+    <span class="tl-past-arrow">↑</span>
+    <span class="en-only">View past events</span>
+    <span class="ar-only ar" dir="rtl">عرض الفعاليات السابقة</span>
+    <span class="tl-past-count" id="pt-count"></span>
+  </button>
+</div>
 
 <!-- GROUPED SCROLL — this week (horizontal scroll-lock, sticky rail) →
      Featured projects marquee → Residencies (hidden) → Artists in this week.
@@ -83,11 +102,6 @@
     </div>
     <div class="ph-filters" id="ph-filters"></div>
     <div class="ph-seasons" id="season-rail"></div>
-    <a class="ph-exit" id="ph-exit" href="index.html" hidden>
-      <span class="ph-exit-x">✕</span>
-      <span class="en-only">Close history · Home</span>
-      <span class="ar-only ar" dir="rtl">إغلاق الأرشيف · الرئيسية</span>
-    </a>
   </div>
 </section>
 
@@ -380,14 +394,21 @@ function applyTypeFilter(arr){
   return out;
 }
 
-// Whether an event's calendar day is strictly before today. Deliberately
-// date-based (not the manually-curated `status` field) so the future/past
-// split in the timeline is always correct regardless of whether an admin
-// remembered to flip an old event's status to "past".
-function isBeforeToday(e){
-  const today = new Date(); today.setHours(0,0,0,0);
-  const eventDate = new Date(e.year, MONTH_ORDER.indexOf(e.month), parseInt(e.day, 10));
-  return eventDate.getTime() < today.getTime();
+// Date-only helper (deliberately date-based, not the manually-curated
+// `status` field, so splits below are always correct regardless of whether
+// an admin remembered to flip an old event's status to "past").
+function eventDateOnly(e){
+  return new Date(e.year, MONTH_ORDER.indexOf(e.month), parseInt(e.day, 10));
+}
+// The whole site is treated as one continuous timeline with "this week"
+// pulled out as a magazine-cover-style feature in the middle: everything
+// before this week is the archive (revealed above the hero), this week's
+// events live only in the This Week hero, and the Programme section below
+// starts at next week so it never repeats what the hero already shows.
+function currentWeekRange(){
+  const start = getMonday(new Date());
+  const end = new Date(start); end.setDate(start.getDate() + 6);
+  return { start, end };
 }
 
 // Builds season → month → day blocks for a given (already filtered) list of
@@ -441,59 +462,63 @@ function buildSeasonBlocks(events){
   }).join("");
 }
 
+// Programme now only ever shows the future *beyond* this week — the current
+// week's events live exclusively in the This Week hero above, so nothing
+// appears twice. Past-browsing has moved to the toggle above the hero
+// (renderPastArchive/revealPastArchive below); this section has no past
+// mode of its own anymore.
 function renderTimeline(){
   const tl = document.getElementById("timeline");
-  const exitBtn = document.getElementById("ph-exit");
-  if (exitBtn) exitBtn.hidden = true; // reset — a filter change collapses any expanded history
+  const { end: weekEnd } = currentWeekRange();
 
   const filtered = applyTypeFilter(ALL);
-  const future = filtered.filter(e => !isBeforeToday(e)).sort((a,b) => eventTimestamp(a) - eventTimestamp(b));
-  const past   = filtered.filter(e => isBeforeToday(e)).sort((a,b) => eventTimestamp(a) - eventTimestamp(b));
+  const future = filtered.filter(e => eventDateOnly(e) > weekEnd).sort((a,b) => eventTimestamp(a) - eventTimestamp(b));
 
   const futureHtml = buildSeasonBlocks(future);
   const emptyHtml = `<div class="tl-empty">
-    <span class="en-only">No upcoming events${STATE.type ? " in this category" : ""} — check back soon.</span>
-    <span class="ar-only ar" dir="rtl">لا توجد فعاليات قادمة${STATE.type ? " في هذه الفئة" : ""} — تابعونا قريباً.</span>
+    <span class="en-only">No upcoming events${STATE.type ? " in this category" : ""} beyond this week — check back soon.</span>
+    <span class="ar-only ar" dir="rtl">لا توجد فعاليات قادمة${STATE.type ? " في هذه الفئة" : ""} بعد هذا الأسبوع — تابعونا قريباً.</span>
   </div>`;
 
-  tl.innerHTML = `
-    <div class="tl-past-toggle" id="tl-past-toggle"${past.length ? "" : " hidden"}>
-      <button class="tl-past-btn" id="tl-past-btn" type="button">
-        <span class="tl-past-arrow">↑</span>
-        <span class="en-only">View past events</span>
-        <span class="ar-only ar" dir="rtl">عرض الفعاليات السابقة</span>
-        <span class="tl-past-count">${past.length}</span>
-      </button>
-    </div>
-    <div id="tl-future">${futureHtml || emptyHtml}</div>
-  `;
-
-  const btn = document.getElementById("tl-past-btn");
-  if (btn) btn.addEventListener("click", () => revealPastEvents(past));
-
+  tl.innerHTML = futureHtml || emptyHtml;
   initStickyMonths();
 }
 
-// Expands the history above "today" — prepends the past events (also oldest
-// → newest, so the most recent past sits right at the seam) and compensates
-// scroll so the page grows upward without the viewport jumping. The only way
-// back is the "Close history" link that appears in the sticky filter bar,
-// which returns to the homepage.
-function revealPastEvents(past){
-  const toggle = document.getElementById("tl-past-toggle");
+// The pre-hero archive — everything strictly before this week. Built once
+// at boot (not tied to the Programme type filter, since it now lives in a
+// completely separate part of the page).
+function renderPastArchive(){
+  const outer = document.getElementById("pt-outer");
+  if (!outer) return;
+  const { start: weekStart } = currentWeekRange();
+  const past = ALL.filter(e => eventDateOnly(e) < weekStart).sort((a,b) => eventTimestamp(a) - eventTimestamp(b));
+
+  outer.hidden = past.length === 0;
+  const count = document.getElementById("pt-count");
+  if (count) count.textContent = past.length;
+
+  const btn = document.getElementById("pt-toggle");
+  if (btn) btn.addEventListener("click", () => revealPastArchive(past));
+}
+
+// Expands the archive above the This Week hero — prepends the past events
+// (oldest → newest, so the most recent past sits right at the seam right
+// before this week) and lets native scroll anchoring keep the viewport
+// steady as the page grows upward. The only way back is the "Close
+// history" link that appears in the topbar (always visible, however far
+// up you've scrolled), which returns to the homepage.
+function revealPastArchive(past){
+  const toggle = document.getElementById("pt-outer");
   if (!toggle) return;
   const pastHtml = buildSeasonBlocks(past);
   const wrap = document.createElement("div");
-  wrap.id = "tl-past";
+  wrap.id = "pt-past";
   wrap.innerHTML = pastHtml || "";
   toggle.replaceWith(wrap);
 
-  const exitBtn = document.getElementById("ph-exit");
+  const exitBtn = document.getElementById("tb-exit");
   if (exitBtn) exitBtn.hidden = false;
 
-  // Chromium/Firefox scroll anchoring already keeps the viewport steady
-  // when content is inserted above it — no manual scroll compensation
-  // needed (and doing it manually double-counts on top of that).
   initStickyMonths();
 }
 
@@ -986,6 +1011,7 @@ async function _boot(){
   renderThisWeek();
   renderFilters();
   renderSeasonRail();
+  renderPastArchive();
   renderTimeline();
   renderFeatured();
   initLogoRotation();
