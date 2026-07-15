@@ -55,13 +55,14 @@ img{ display:block; max-width:100%; }
   overflow: hidden;
 }
 
-/* While browsing the past archive, the topbar stops being pinned to the
-   top (it scrolls away as normal content, "part of the scroll") and only
-   re-engages as sticky once scrolling up would otherwise carry it past
-   the bottom edge — at which point it settles there for the rest of the
-   upward scroll through history. */
+/* While browsing the past archive, the topbar isn't pinned to one edge —
+   it works both ways. Scrolling up through history, it scrolls away as
+   normal content ("part of the scroll") until it would pass the bottom
+   edge, where it sticks. Scrolling back down toward today, it scrolls
+   normally until it reaches the top edge, where it sticks there instead —
+   same mechanism as the default topbar, just also anchored to the bottom. */
 body.viewing-past .topbar{
-  position: sticky; top: auto; bottom: 0;
+  position: sticky; top: 0; bottom: 0;
 }
 .topbar-inner{
   display: flex;
