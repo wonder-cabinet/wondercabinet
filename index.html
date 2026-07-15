@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Programme · The Wonder Cabinet</title>
-<link rel="stylesheet" href="assets/app.css?v=14">
+<link rel="stylesheet" href="assets/app.css?v=15">
 </head>
 <body data-view="list">
 
@@ -690,17 +690,18 @@ function renderFeatured(){
   if (btnProject)   btnProject.hidden   = PROJECTS.length === 0;
   if (btnResidency) btnResidency.hidden = RESIDENCIES.length === 0;
 
+  const STICKY_TOP = 54; // matches .gs-sticky's sticky offset (site topbar height)
   function setup(){
     const railWidth = document.querySelector(".gs-rail").getBoundingClientRect().width;
     const visible   = window.innerWidth - railWidth;
     const maxScroll = Math.max(0, track.scrollWidth - visible);
-    outer.style.height = (window.innerHeight + maxScroll) + "px";
+    outer.style.height = (window.innerHeight - STICKY_TOP + maxScroll) + "px";
     outer.dataset.maxScroll = maxScroll;
   }
   function onScroll(){
     const maxScroll = parseFloat(outer.dataset.maxScroll || 0);
     const top = outer.getBoundingClientRect().top;
-    const progress = Math.min(Math.max(-top, 0), maxScroll);
+    const progress = Math.min(Math.max(STICKY_TOP - top, 0), maxScroll);
     track.style.transform = `translateX(${-progress}px)`;
   }
 
