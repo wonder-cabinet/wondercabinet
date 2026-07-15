@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Programme · The Wonder Cabinet</title>
-<link rel="stylesheet" href="assets/app.css?v=15">
+<link rel="stylesheet" href="assets/app.css?v=17">
 </head>
 <body data-view="list">
 
@@ -502,16 +502,31 @@ function renderPastArchive(){
 // (oldest → newest, so the most recent past sits right at the seam right
 // before this week) and lets native scroll anchoring keep the viewport
 // steady as the page grows upward. The only way back is the "Close
-// history" link that appears in the topbar (always visible, however far
-// up you've scrolled), which returns to the homepage.
+// history" link that appears in the topbar, which returns to the homepage.
+//
+// While browsing history the archive is hoisted *above* the topbar in the
+// DOM (instead of below it), and the topbar switches from sticky-top to
+// sticky-bottom (see body.viewing-past in app.css). The net effect: the
+// topbar scrolls away normally as you move up through the past — it's
+// just part of the flow — and only re-engages as a sticky bar once you'd
+// otherwise scroll it past the bottom edge, where it settles for the rest
+// of the upward scroll through history.
 function revealPastArchive(past){
   const toggle = document.getElementById("pt-outer");
   if (!toggle) return;
+  const header = document.querySelector("header.topbar");
   const pastHtml = buildSeasonBlocks(past);
   const wrap = document.createElement("div");
   wrap.id = "pt-past";
   wrap.innerHTML = pastHtml || "";
-  toggle.replaceWith(wrap);
+
+  if (header && header.parentNode) {
+    header.parentNode.insertBefore(wrap, header);
+  } else {
+    toggle.replaceWith(wrap);
+  }
+  toggle.remove();
+  document.body.classList.add("viewing-past");
 
   const exitBtn = document.getElementById("tb-exit");
   if (exitBtn) exitBtn.hidden = false;
