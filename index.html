@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Programme · The Wonder Cabinet</title>
-<link rel="stylesheet" href="assets/app.css?v=18">
+<link rel="stylesheet" href="assets/app.css?v=19">
 </head>
 <body data-view="list">
 
@@ -500,9 +500,12 @@ function renderPastArchive(){
 
 // Expands the archive above the This Week hero — prepends the past events
 // (oldest → newest, so the most recent past sits right at the seam right
-// before this week) and lets native scroll anchoring keep the viewport
-// steady as the page grows upward. The only way back is the "Close
-// history" link that appears in the topbar, which returns to the homepage.
+// before this week). Rather than jumping the viewport deep into the
+// archive (which just covers the screen with unfamiliar old content), we
+// land right at the seam: a small peek of the most recent past event
+// above, with the topbar sliding down a little to hint that scrolling up
+// reveals more history. The only way back is the "Close history" link in
+// the topbar, which returns to the homepage.
 //
 // While browsing history the archive is hoisted *above* the topbar in the
 // DOM (instead of below it), and the topbar switches from sticky-top to
@@ -532,6 +535,13 @@ function revealPastArchive(past){
   if (exitBtn) exitBtn.hidden = false;
 
   initStickyMonths();
+
+  // Land at the seam, not the top of the archive: scroll just past the
+  // end of the newly-inserted content, minus a small peek, so only the
+  // tail of the most recent past event and the sliding topbar are visible.
+  const PEEK = 120;
+  const landingY = Math.max(0, wrap.offsetHeight - PEEK);
+  window.scrollTo(0, landingY);
 }
 
 function renderYearMarker(year, direction){
