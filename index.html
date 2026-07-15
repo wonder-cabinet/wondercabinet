@@ -4,9 +4,27 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Programme · The Wonder Cabinet</title>
-<link rel="stylesheet" href="assets/app.css?v=19">
+<link rel="stylesheet" href="assets/app.css?v=20">
 </head>
 <body data-view="list">
+
+<!-- Archive — everything before the current calendar week. Collapsed to
+     zero height at rest, sitting ABOVE the topbar, so the page looks
+     completely normal until the user scrolls up: a first upward
+     scroll/wheel/touch gesture at the top peeks it open, a second commits
+     and loads the full archive (see armPastGravity/revealPastArchive).
+     Treat the whole site as one continuous timeline with THIS WEEK (below)
+     as the "magazine cover" sitting in the middle, past behind it
+     (revealed here, above), future ahead of it (the Programme section
+     further down, which starts at *next* week). -->
+<div class="tl-past-toggle" id="pt-outer" hidden>
+  <button class="tl-past-btn" id="pt-toggle" type="button">
+    <span class="tl-past-arrow">↑</span>
+    <span class="en-only">View past events</span>
+    <span class="ar-only ar" dir="rtl">عرض الفعاليات السابقة</span>
+    <span class="tl-past-count" id="pt-count"></span>
+  </button>
+</div>
 
 <header class="topbar">
   <div class="topbar-inner">
@@ -29,20 +47,6 @@
     </nav>
   </div>
 </header>
-
-<!-- Archive — everything before the current calendar week. Hidden until
-     "View past events" is clicked; treat the whole site as one continuous
-     timeline with THIS WEEK (below) as the "magazine cover" sitting in the
-     middle, past behind it (revealed here, above), future ahead of it
-     (the Programme section further down, which starts at *next* week). -->
-<div class="tl-past-toggle" id="pt-outer" hidden>
-  <button class="tl-past-btn" id="pt-toggle" type="button">
-    <span class="tl-past-arrow">↑</span>
-    <span class="en-only">View past events</span>
-    <span class="ar-only ar" dir="rtl">عرض الفعاليات السابقة</span>
-    <span class="tl-past-count" id="pt-count"></span>
-  </button>
-</div>
 
 <!-- GROUPED SCROLL — this week (horizontal scroll-lock, sticky rail) →
      Featured projects marquee → Residencies (hidden) → Artists in this week.
@@ -176,6 +180,7 @@ function getMonday(d){
 
 const STATE = {
   type: "",
+  pastType: "",
   search: "",
   weekStart: getMonday(new Date()), // always the current real-world week
 };
@@ -186,6 +191,8 @@ let PROJECTS = [];
 let RESIDENCIES = [];
 let SETTINGS = null;
 let ARTISTS = [];
+let PAST_EVENTS = []; // everything strictly before this week; populated by renderPastArchive()
+let archiveState = "idle"; // idle -> peek -> loaded, drives the scroll-gravity reveal
 
 // Helpers
 const MONTH_ORDER = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
@@ -296,43 +303,50 @@ function renderThisWeek(){
 }
 /* ============================================================
    FILTER BAR — type filters with counts, primary navigation
+   Shared between the future Programme bar and the past-archive bar:
+   same markup, same interaction, different backing list + STATE key.
    ============================================================ */
-function renderFilters(){
-  const TYPES = ["", "Performance", "Film", "Class", "Workshop", "Radio", "Reading", "Opening", "Bar"];
-  const LABEL_EN = { "":"All", Performance:"Performance", Film:"Film", Class:"Class", Workshop:"Workshop", Radio:"Radio", Reading:"Reading", Opening:"Opening", Bar:"Bar" };
-  const LABEL_AR = { "":"الكل", Performance:"عرض", Film:"فيلم", Class:"صف", Workshop:"ورشة", Radio:"إذاعة", Reading:"قراءة", Opening:"افتتاح", Bar:"بار" };
+const FILTER_TYPES = ["", "Performance", "Film", "Class", "Workshop", "Radio", "Reading", "Opening", "Bar"];
+const FILTER_LABEL_EN = { "":"All", Performance:"Performance", Film:"Film", Class:"Class", Workshop:"Workshop", Radio:"Radio", Reading:"Reading", Opening:"Opening", Bar:"Bar" };
+const FILTER_LABEL_AR = { "":"الكل", Performance:"عرض", Film:"فيلم", Class:"صف", Workshop:"ورشة", Radio:"إذاعة", Reading:"قراءة", Opening:"افتتاح", Bar:"بار" };
 
-  function build(){
-    const container = document.getElementById("ph-filters");
-    container.innerHTML = TYPES.map(t => {
-      const count = t ? ALL.filter(e => e.type === t).length : ALL.length;
-      if (t && count === 0) return "";
-      return `<button class="ph-filter${STATE.type === t ? " is-active" : ""}" data-type="${t}">
-        <span class="en-only">${LABEL_EN[t]}</span>
-        <span class="ar-only ar">${LABEL_AR[t]}</span>
-        <span class="ph-filter-count">${count}</span>
-      </button>`;
-    }).join("");
-    container.querySelectorAll(".ph-filter").forEach(btn => {
-      btn.addEventListener("click", () => {
-        STATE.type = btn.dataset.type;
-        build();
-        renderTimeline();
-      });
+function renderFilterBar(containerId, getList, stateKey, onChange){
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  const list = getList();
+  container.innerHTML = FILTER_TYPES.map(t => {
+    const count = t ? list.filter(e => e.type === t).length : list.length;
+    if (t && count === 0) return "";
+    return `<button class="ph-filter${STATE[stateKey] === t ? " is-active" : ""}" data-type="${t}">
+      <span class="en-only">${FILTER_LABEL_EN[t]}</span>
+      <span class="ar-only ar">${FILTER_LABEL_AR[t]}</span>
+      <span class="ph-filter-count">${count}</span>
+    </button>`;
+  }).join("");
+  container.querySelectorAll(".ph-filter").forEach(btn => {
+    btn.addEventListener("click", () => {
+      STATE[stateKey] = btn.dataset.type;
+      renderFilterBar(containerId, getList, stateKey, onChange);
+      onChange();
     });
-  }
-  build();
+  });
 }
+
+function renderFilters(){ renderFilterBar("ph-filters", () => ALL, "type", renderTimeline); }
+function renderPastFilters(){ renderFilterBar("ph-filters-past", () => PAST_EVENTS, "pastType", renderPastTimeline); }
 
 /* ============================================================
    SEASON RAIL (Programme nav)
    Lists every season with year, click to jump within timeline.
+   Shared between the future rail (all seasons, scoped to #timeline)
+   and the past-archive rail (seasons present in the past list, scoped
+   to #pt-past) — same markup/interaction pattern as the filter bar above.
    ============================================================ */
-function renderSeasonRail(){
-  const rail = document.getElementById("season-rail");
-  // Group seasons by year
+function renderSeasonRailFor(containerId, seasons, scopeSelector){
+  const rail = document.getElementById(containerId);
+  if (!rail) return;
   const byYear = {};
-  SEASONS.forEach(s => { (byYear[s.year] = byYear[s.year] || []).push(s); });
+  seasons.forEach(s => { (byYear[s.year] = byYear[s.year] || []).push(s); });
   const years = Object.keys(byYear).map(Number).sort((a,b)=>b-a);
   rail.innerHTML = years.map(y => `
     <div class="sr-year">
@@ -347,12 +361,19 @@ function renderSeasonRail(){
     </div>`).join("");
 
   rail.querySelectorAll(".sr-btn").forEach(b => {
-    b.addEventListener("click", () => scrollToSeason(b.dataset.season));
+    b.addEventListener("click", () => scrollToSeason(b.dataset.season, scopeSelector));
   });
 }
 
-function scrollToSeason(key){
-  const el = document.querySelector(`.tl-season[data-season="${key}"]`);
+function renderSeasonRail(){ renderSeasonRailFor("season-rail", SEASONS, "#timeline"); }
+function renderPastSeasonRail(){
+  const seen = {};
+  PAST_EVENTS.forEach(e => { seen[e.season.key] = seen[e.season.key] || e.season; });
+  renderSeasonRailFor("season-rail-past", Object.values(seen), "#pt-past");
+}
+
+function scrollToSeason(key, scopeSelector){
+  const el = document.querySelector(`${scopeSelector || ""} .tl-season[data-season="${key}"]`);
   if (el) {
     const top = el.getBoundingClientRect().top + window.scrollY - 12;
     window.scrollTo({ top, behavior: "smooth" });
@@ -483,65 +504,151 @@ function renderTimeline(){
 
 // The pre-hero archive — everything strictly before this week. Built once
 // at boot (not tied to the Programme type filter, since it now lives in a
-// completely separate part of the page).
+// completely separate part of the page). The toggle sits above the
+// topbar, collapsed to nothing — armPastGravity() wires up the
+// scroll/wheel/touch gesture that reveals and eventually loads it.
 function renderPastArchive(){
   const outer = document.getElementById("pt-outer");
   if (!outer) return;
   const { start: weekStart } = currentWeekRange();
-  const past = ALL.filter(e => eventDateOnly(e) < weekStart).sort((a,b) => eventTimestamp(a) - eventTimestamp(b));
+  PAST_EVENTS = ALL.filter(e => eventDateOnly(e) < weekStart).sort((a,b) => eventTimestamp(a) - eventTimestamp(b));
 
-  outer.hidden = past.length === 0;
+  outer.hidden = PAST_EVENTS.length === 0;
   const count = document.getElementById("pt-count");
-  if (count) count.textContent = past.length;
+  if (count) count.textContent = PAST_EVENTS.length;
 
+  if (!outer.hidden) armPastGravity();
+}
+
+// Scroll-gravity gesture: the toggle lives above the topbar, collapsed to
+// zero height, so at rest the page looks completely normal. Scrolling up
+// while already at the top of the page (wheel/touch, since scrollY can't
+// go below 0 on its own) is read as "trying to go further back":
+//   1st attempt  -> peek: the toggle expands open, just a hint + count.
+//   2nd attempt  -> commit: the full archive loads and the viewport is
+//                   pulled into it with a smooth, gravity-like scroll,
+//                   landing at the seam so the user can keep scrolling
+//                   up manually through the rest of history.
+// A plain click on the toggle (once peeking) also commits immediately,
+// for accessibility and anyone who'd rather not rely on the gesture.
+function armPastGravity(){
+  const outer = document.getElementById("pt-outer");
   const btn = document.getElementById("pt-toggle");
-  if (btn) btn.addEventListener("click", () => revealPastArchive(past));
+  if (!outer) return;
+
+  let peekTimer = null;
+  const nearTop = () => window.scrollY <= 2;
+
+  function showPeek(){
+    if (archiveState !== "idle") return;
+    archiveState = "peek";
+    outer.classList.add("is-peeking");
+    clearTimeout(peekTimer);
+    peekTimer = setTimeout(() => {
+      if (archiveState === "peek") {
+        archiveState = "idle";
+        outer.classList.remove("is-peeking");
+      }
+    }, 2600);
+  }
+
+  function commit(){
+    if (archiveState === "loaded") return;
+    clearTimeout(peekTimer);
+    window.removeEventListener("wheel", onWheel);
+    window.removeEventListener("touchmove", onTouchMove);
+    revealPastArchive();
+  }
+
+  function onWheel(e){
+    if (!nearTop() || e.deltaY >= 0) return;
+    if (archiveState === "idle") { showPeek(); return; }
+    if (archiveState === "peek") { commit(); }
+  }
+
+  let touchStartY = 0;
+  function onTouchStart(e){ touchStartY = e.touches[0].clientY; }
+  function onTouchMove(e){
+    if (!nearTop()) return;
+    const dy = e.touches[0].clientY - touchStartY;
+    if (dy <= 24) return; // dragging down while at the top = trying to scroll up
+    if (archiveState === "idle") { showPeek(); return; }
+    if (archiveState === "peek") { commit(); }
+  }
+
+  window.addEventListener("wheel", onWheel, { passive: true });
+  window.addEventListener("touchstart", onTouchStart, { passive: true });
+  window.addEventListener("touchmove", onTouchMove, { passive: true });
+  if (btn) btn.addEventListener("click", commit);
 }
 
 // Expands the archive above the This Week hero — prepends the past events
 // (oldest → newest, so the most recent past sits right at the seam right
-// before this week). Rather than jumping the viewport deep into the
-// archive (which just covers the screen with unfamiliar old content), we
-// land right at the seam: a small peek of the most recent past event
-// above, with the topbar sliding down a little to hint that scrolling up
-// reveals more history. The only way back is the "Close history" link in
-// the topbar, which returns to the homepage.
+// before this week), with its own filter bar (parity with the future
+// Programme bar). Rather than jumping the viewport deep into the archive,
+// we land right at the seam: a small peek of the most recent past event
+// above, with a smooth "gravity" scroll pulling the user in. The only way
+// back is the "Close history" link in the topbar, which returns home.
 //
-// While browsing history the archive is hoisted *above* the topbar in the
-// DOM (instead of below it), and the topbar switches from sticky-top to
-// sticky-bottom (see body.viewing-past in app.css). The net effect: the
-// topbar scrolls away normally as you move up through the past — it's
-// just part of the flow — and only re-engages as a sticky bar once you'd
-// otherwise scroll it past the bottom edge, where it settles for the rest
-// of the upward scroll through history.
-function revealPastArchive(past){
+// While browsing history the archive sits *above* the topbar in the DOM,
+// and the topbar switches from sticky-top to sticky-bottom (see
+// body.viewing-past in app.css) — it scrolls away normally as you move up
+// through the past, and only re-engages once you'd scroll it past the
+// bottom edge, where it settles for the rest of the upward scroll.
+function revealPastArchive(){
+  if (archiveState === "loaded") return;
+  archiveState = "loaded";
+
   const toggle = document.getElementById("pt-outer");
   if (!toggle) return;
-  const header = document.querySelector("header.topbar");
-  const pastHtml = buildSeasonBlocks(past);
+
   const wrap = document.createElement("div");
   wrap.id = "pt-past";
-  wrap.innerHTML = pastHtml || "";
-
-  if (header && header.parentNode) {
-    header.parentNode.insertBefore(wrap, header);
-  } else {
-    toggle.replaceWith(wrap);
-  }
-  toggle.remove();
+  wrap.innerHTML = `
+    <div class="programme-head past-ph">
+      <div class="ph-bar">
+        <div class="ph-title-cell">
+          <span class="en-only">Archive</span>
+          <span class="ar-only ar" dir="rtl">الأرشيف</span>
+        </div>
+        <div class="ph-filters" id="ph-filters-past"></div>
+        <div class="ph-seasons" id="season-rail-past"></div>
+      </div>
+    </div>
+    <div class="timeline" id="pt-timeline"></div>`;
+  toggle.replaceWith(wrap);
   document.body.classList.add("viewing-past");
 
   const exitBtn = document.getElementById("tb-exit");
   if (exitBtn) exitBtn.hidden = false;
 
-  initStickyMonths();
+  renderPastFilters();
+  renderPastSeasonRail();
+  renderPastTimeline();
 
   // Land at the seam, not the top of the archive: scroll just past the
   // end of the newly-inserted content, minus a small peek, so only the
   // tail of the most recent past event and the sliding topbar are visible.
   const PEEK = 120;
   const landingY = Math.max(0, wrap.offsetHeight - PEEK);
-  window.scrollTo(0, landingY);
+  window.scrollTo({ top: landingY, behavior: "smooth" });
+}
+
+function renderPastTimeline(){
+  const tl = document.getElementById("pt-timeline");
+  if (!tl) return;
+  const filtered = applyPastTypeFilter(PAST_EVENTS);
+  const pastHtml = buildSeasonBlocks(filtered);
+  const emptyHtml = `<div class="tl-empty">
+    <span class="en-only">No past events${STATE.pastType ? " in this category" : ""}.</span>
+    <span class="ar-only ar" dir="rtl">لا توجد فعاليات سابقة${STATE.pastType ? " في هذه الفئة" : ""}.</span>
+  </div>`;
+  tl.innerHTML = pastHtml || emptyHtml;
+  initStickyMonths();
+}
+
+function applyPastTypeFilter(arr){
+  return STATE.pastType ? arr.filter(e => e.type === STATE.pastType) : arr;
 }
 
 function renderYearMarker(year, direction){
@@ -638,23 +745,36 @@ function renderEventRow(e, day, isFirst){
    Each .tl-month-head sticks to the top while its body is in view.
    When the next month's body hits the threshold, the active head shrinks.
    ============================================================ */
+// initStickyMonths() is called after every timeline re-render — both the
+// future Programme list and the past archive (each has its own filter
+// bar, so both can exist and re-render independently). Rather than a
+// single hardcoded top offset (which only ever matched the future
+// section's topbar+filter-bar stack), each head's threshold is read
+// straight from its own computed CSS `top` — the past archive's month
+// heads sit under a shorter stack (their own filter bar only, no
+// permanently-fixed topbar above them), and are scoped a different `top`
+// value in CSS (see #pt-past .tl-month-head). This keeps the JS in sync
+// with whatever the cascade says, in either context.
+let _stickyMonthsCleanup = null;
 function initStickyMonths(){
+  if (_stickyMonthsCleanup) { _stickyMonthsCleanup(); _stickyMonthsCleanup = null; }
+
   const heads = Array.from(document.querySelectorAll(".tl-month-head"));
   if (!heads.length) return;
 
-  const TOP_OFFSET = 104; // topbar (54) + filter bar (50)
   function update(){
     heads.forEach(h => {
       const body = h.parentElement;
       const r = body.getBoundingClientRect();
       const headH = h.offsetHeight;
+      const topOffset = parseFloat(getComputedStyle(h).top) || 0;
       // Active = body has scrolled past the top
-      const active = r.top <= TOP_OFFSET + 1 && r.bottom > TOP_OFFSET + headH;
-      const exiting = r.bottom <= TOP_OFFSET + headH && r.bottom > TOP_OFFSET;
+      const active = r.top <= topOffset + 1 && r.bottom > topOffset + headH;
+      const exiting = r.bottom <= topOffset + headH && r.bottom > topOffset;
       h.classList.toggle("is-stuck", active || exiting);
       if (exiting){
         // shrink as the next month approaches
-        const t = Math.max(0, Math.min(1, (TOP_OFFSET + headH - r.bottom) / headH));
+        const t = Math.max(0, Math.min(1, (topOffset + headH - r.bottom) / headH));
         h.style.setProperty("--tl-shrink", t.toFixed(3));
       } else if (active){
         h.style.setProperty("--tl-shrink", "0");
@@ -666,6 +786,10 @@ function initStickyMonths(){
   window.addEventListener("scroll", update, { passive: true });
   window.addEventListener("resize", update);
   update();
+  _stickyMonthsCleanup = () => {
+    window.removeEventListener("scroll", update);
+    window.removeEventListener("resize", update);
+  };
 }
 
 /* ============================================================

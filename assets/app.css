@@ -1254,6 +1254,21 @@ html[data-lang="ar"] .ar-only{ direction: rtl; }
 .sr-btn .ar{ font-family: var(--ff-ar); letter-spacing: 0; text-transform: none; font-size: 13px; }
 .sr-btn:hover, .sr-btn.is-active{ background: var(--ink); color: var(--bg); }
 
+/* Past-archive filter bar — same markup/behavior as the future Programme
+   bar above, but it can't rely on the topbar being stuck at top (while
+   deep in history the topbar is bottom-stuck instead, see
+   body.viewing-past .topbar), so it's sticky to the top on its own. It's
+   only ever visible while scrolled within #pt-past, which is exactly when
+   the topbar has detached from the top — so the two never compete for
+   the same edge. */
+.programme-head.past-ph{
+  position: sticky; top: 0; z-index: 42;
+}
+/* Month heads inside the archive sit under this shorter stack (their own
+   filter bar only, ~58px) instead of the future section's topbar+ph-bar
+   stack (118px) — initStickyMonths() reads this back from computed style. */
+#pt-past .tl-month-head{ top: 58px; }
+
 /* Exit link — only shown once past history is expanded; lives in the
    sticky filter bar so it's reachable while scrolled deep into history. */
 .ph-exit{
@@ -1332,6 +1347,7 @@ html[data-lang="ar"] .ar-only{ direction: rtl; }
 .tl-month-head{
   --tl-shrink: 0;
   position: sticky; top: 118px; z-index: 5;
+  /* topbar (54) + future's ph-bar (~64) stuck above it */
   background: var(--bg);
   display: grid;
   grid-template-columns: 1fr auto;
@@ -1453,14 +1469,20 @@ html[data-lang="ar"] .ar-only{ direction: rtl; }
 .tl-free{ background: transparent; color: var(--ink); }
 .tl-past{ background: transparent; color: var(--ink); border-style: dotted; opacity: .8; }
 
-/* Past-history reveal — sits at the top of the (future-first) timeline;
-   clicking prepends the full history above and scroll-compensates so the
-   page just grows upward. Exit lives in the sticky filter bar instead of
-   here, so it stays reachable no matter how far back you scroll. */
-/* Extra top clearance so the toggle isn't hidden under the sticky
-   topbar + filter bar when the page rests at #programme (e.g. via the
-   nav link, which lands right at this scroll position). */
-.tl-past-toggle{ border-bottom: 2px solid var(--ink); padding-top: 48px; }
+/* Past-history reveal — sits ABOVE the topbar, collapsed to zero height
+   at rest, so the page looks completely normal until the user scrolls up
+   (see armPastGravity() in index.html). A first upward scroll/wheel/touch
+   attempt at the top peeks it open (.is-peeking); a second commits and
+   loads the full archive with a smooth "gravity" scroll pulling the user
+   in. Exit lives in the sticky filter bar, reachable however far back you
+   scroll. */
+.tl-past-toggle{
+  max-height: 0;
+  overflow: hidden;
+  border-bottom: 2px solid var(--ink);
+  transition: max-height .4s cubic-bezier(.2,.8,.2,1);
+}
+.tl-past-toggle.is-peeking{ max-height: 140px; }
 .tl-past-btn{
   all: unset; cursor: pointer; width: 100%; box-sizing: border-box;
   display: flex; align-items: center; justify-content: center; gap: 10px;
