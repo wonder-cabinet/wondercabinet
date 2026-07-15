@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Programme · The Wonder Cabinet</title>
-<link rel="stylesheet" href="assets/app.css?v=12">
+<link rel="stylesheet" href="assets/app.css?v=13">
 </head>
 <body data-view="list">
 
@@ -380,6 +380,15 @@ function applyTypeFilter(arr){
   return out;
 }
 
+// Whether an event's calendar day is strictly before today. Deliberately
+// date-based (not the manually-curated `status` field) so the future/past
+// split in the timeline is always correct regardless of whether an admin
+// remembered to flip an old event's status to "past".
+function isBeforeToday(e){
+  const today = new Date(); today.setHours(0,0,0,0);
+  const eventDate = new Date(e.year, MONTH_ORDER.indexOf(e.month), parseInt(e.day, 10));
+  return eventDate.getTime() < today.getTime();
+}
 
 // Builds season → month → day blocks for a given (already filtered) list of
 // events, always in ascending chronological order (oldest first). Used for
@@ -438,8 +447,8 @@ function renderTimeline(){
   if (exitBtn) exitBtn.hidden = true; // reset — a filter change collapses any expanded history
 
   const filtered = applyTypeFilter(ALL);
-  const future = filtered.filter(e => e.status !== "past").sort((a,b) => eventTimestamp(a) - eventTimestamp(b));
-  const past   = filtered.filter(e => e.status === "past").sort((a,b) => eventTimestamp(a) - eventTimestamp(b));
+  const future = filtered.filter(e => !isBeforeToday(e)).sort((a,b) => eventTimestamp(a) - eventTimestamp(b));
+  const past   = filtered.filter(e => isBeforeToday(e)).sort((a,b) => eventTimestamp(a) - eventTimestamp(b));
 
   const futureHtml = buildSeasonBlocks(future);
   const emptyHtml = `<div class="tl-empty">

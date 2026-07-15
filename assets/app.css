@@ -1257,6 +1257,7 @@ html[data-lang="ar"] .ar-only{ direction: rtl; }
 }
 .ph-exit:hover{ background: var(--ink); color: var(--bg); }
 .ph-exit-x{ font-size: 12px; }
+.ph-exit[hidden]{ display: none; }
 
 /* ---------- TIMELINE — full bleed, lines edge to edge ---------- */
 .timeline{
