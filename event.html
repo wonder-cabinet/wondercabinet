@@ -1,28 +1,23 @@
 <!doctype html>
-<html lang="en" data-lang="both">
+<html lang="en" data-lang="en">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Event · The Wonder Cabinet</title>
-<link rel="stylesheet" href="assets/app.css?v=4" />
+<link rel="stylesheet" href="assets/app.css?v=16" />
 <style>
-  :root { --bg: #FCFFE5; --ink: #0a0a16; --accent: #1d24ff; --highlight: #1d24ff; }
-
-  /* Colour field per event — admin-controlled from Sanity (colorTheme
-     override field, falling back to the event's Type). "paper" is the
-     new plain white/paper option matching the current design spec. */
-  body[data-color="performance"]{ --bg:#cc6698; --ink:#0a0a16; }
-  body[data-color="film"]{ --bg:#ffe600; --ink:#0a0a16; }
-  body[data-color="class"]{ --bg:#c8a0f0; --ink:#0a0a16; }
-  body[data-color="workshop"]{ --bg:#ff5a00; --ink:#f6f3ea; }
-  body[data-color="radio"]{ --bg:#00d26a; --ink:#0a0a16; }
-  body[data-color="reading"]{ --bg:#ffd6c2; --ink:#0a0a16; }
-  body[data-color="opening"]{ --bg:#0a0a16; --ink:#f6f3ea; }
-  body[data-color="bar"]{ --bg:#e8a33d; --ink:#0a0a16; }
-  body[data-color="paper"]{ --bg:#FCFFE5; --ink:#0a0a16; }
-
+  /* This page uses the exact same .ep-* / .event-panel template as every
+     other entry point on the site (the homepage hero cards, the Programme
+     timeline rows) used to render — this is now the single, canonical
+     event template, just laid out in-flow instead of as a slide-in panel. */
+  .event-panel.is-page{
+    position: static;
+    width: 100%; max-width: 860px; margin: 0 auto;
+    min-height: 50vh;
+    transform: none; box-shadow: none;
+  }
   .ev-lang-toggle{
-    position: fixed; top: 20px; right: 24px; z-index: 50;
+    position: fixed; top: 20px; left: 24px; z-index: 50;
     display: inline-flex; gap: 16px; border: none; background: none;
   }
   .ev-lang-toggle button{
@@ -31,19 +26,8 @@
     font-family: var(--ff-sans); font-size: 12px; letter-spacing: 0; font-weight: 700;
     padding: 0;
   }
-  .ev-lang-toggle button + button{ border-left: none !important; }
   .ev-lang-toggle button[aria-pressed="true"]{ opacity: 1; }
-
-  .cta-inline-link{
-    display: inline-block;
-    margin-top: 10px;
-    font-weight: 700;
-    text-decoration: underline;
-    text-underline-offset: 3px;
-    color: inherit;
-  }
-  .artist-bio{ margin-top: 8px; }
-  .artist-bio p:first-child{ margin-top: 0; }
+  .event-page-wrap{ padding-top: clamp(24px, 4vw, 48px); min-height: 60vh; }
 </style>
 </head>
 <body>
@@ -53,58 +37,98 @@
   <button data-lang-btn="ar" aria-pressed="false">AR</button>
 </div>
 
-<main>
-  <article class="detail" id="detail">
-    <a class="back" href="index.html">← Back to programme</a>
-    <div id="detail-head"></div>
-    <div class="detail-cover" id="detail-cover"></div>
-    <div class="detail-grid">
-      <div class="detail-body" id="detail-body"></div>
-      <aside class="facts" id="detail-facts"></aside>
-    </div>
-  </article>
+<main class="event-page-wrap">
+  <div class="event-panel is-page" id="epRoot" style="background:var(--paper);color:var(--night);"></div>
 
-  <section class="more">
-    <h3>Also <em>this month</em></h3>
+  <section class="more" id="moreSection" hidden>
+    <h3><span class="en-only">Also <em>this month</em></span><span class="ar-only ar" dir="rtl">أيضاً <em>هذا الشهر</em></span></h3>
     <div class="more-grid" id="more-grid"></div>
   </section>
 </main>
 
-<footer class="foot">
-  <div>
-    <div class="brand-foot">The Wonder Cabinet<span class="ar">مجلس العجب</span></div>
+<footer class="foot" id="visit">
+  <div class="foot-cols">
+    <div class="foot-col">
+      <div class="foot-col-head">The Wonder Cabinet</div>
+      <div class="foot-col-body">
+        <p>Karkafeh Street<br>Bethlehem, Palestine<br>(Next to Arij)</p>
+        <p>Wed – Sun<br>10:00 – 22:00</p>
+        <a href="https://goo.gl/maps/9BhxnnrTfYZZVoMU9" target="_blank" rel="noopener">Google Maps →</a>
+      </div>
+    </div>
+    <div class="foot-col">
+      <div class="foot-col-head">Programme</div>
+      <div class="foot-col-body">
+        <a href="index.html#programme">Events</a>
+        <a href="index.html#residencies">Residencies</a>
+        <a href="index.html">Archive</a>
+        <a href="index.html">Contribute</a>
+        <a href="index.html">About</a>
+      </div>
+    </div>
+    <div class="foot-col">
+      <div class="foot-col-head">Follow</div>
+      <div class="foot-col-body">
+        <a href="https://www.instagram.com/wonder.cabinet/" target="_blank" rel="noopener">Instagram</a>
+        <a href="https://www.facebook.com/wondercabinetbethlehem" target="_blank" rel="noopener">Facebook</a>
+        <a href="https://chat.whatsapp.com/I8ETsHie2Ye87kURhWnZY1" target="_blank" rel="noopener">WhatsApp</a>
+        <button class="foot-newsletter-btn">Subscribe to Newsletter</button>
+      </div>
+    </div>
+    <div class="foot-col">
+      <div class="foot-col-head">Contact</div>
+      <div class="foot-col-body">
+        <a href="mailto:office@wondercabinet.space">office@wondercabinet.space</a>
+        <a href="https://radioalhara.net" target="_blank" rel="noopener">Radio Alhara</a>
+        <a href="index.html">Local Industries</a>
+      </div>
+    </div>
   </div>
-  <div>
-    <div class="k">Visit</div>
-    <div class="v">Karkafeh Street, Bethlehem, Palestine<br><span style="font-family:var(--ff-mono);font-size:12px;letter-spacing: 0;color:var(--ink-soft);">Wed–Sun · 10:00–22:00</span></div>
-  </div>
-  <div>
-    <div class="k">Correspond</div>
-    <div class="v"><a href="#">days@wondercabinet.space</a><br><a href="#">Newsletter</a><br><a href="#">Instagram</a></div>
+  <div class="foot-base">
+    <span>© The Wonder Cabinet · Bethlehem, Palestine</span>
+    <span><a href="index.html">مجلس العجب</a></span>
   </div>
 </footer>
 
 <script>
 (async function(){
+  const SANITY_PROJECT = 'xdtj605l', SANITY_DATASET = 'production';
   const MABBR = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
   const DWEN  = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
-  const MFULL = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+  const DWAR  = ["الأحد","الاثنين","الثلاثاء","الأربعاء","الخميس","الجمعة","السبت"];
   const DWFULL = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
-  const SANITY_PROJECT = 'xdtj605l', SANITY_DATASET = 'production';
+  const MFULL  = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+  const MONTH_NAME_AR = { Jan:"يناير", Feb:"فبراير", Mar:"مارس", Apr:"أبريل", May:"مايو", Jun:"يونيو", Jul:"يوليو", Aug:"أغسطس", Sep:"سبتمبر", Oct:"أكتوبر", Nov:"نوفمبر", Dec:"ديسمبر" };
+  const TYPE_AR = { Class:"صف", Film:"فيلم", Performance:"عرض", Radio:"إذاعة", Reading:"قراءة", Workshop:"ورشة", Opening:"افتتاح", Bar:"بار" };
 
-  function _ordinal(n){
-    const s = ["th","st","nd","rd"], v = n % 100;
-    return n + (s[(v-20)%10] || s[v] || s[0]);
+  const TYPE_COLORS = {
+    Performance: { bg: "#cc6698", ink: "#0a0a16" },
+    Film:        { bg: "#ffe600", ink: "#0a0a16" },
+    Class:       { bg: "#c8a0f0", ink: "#0a0a16" },
+    Workshop:    { bg: "#ff5a00", ink: "#f6f3ea" },
+    Radio:       { bg: "#00d26a", ink: "#0a0a16" },
+    Reading:     { bg: "#ffd6c2", ink: "#0a0a16" },
+    Opening:     { bg: "#0a0a16", ink: "#f6f3ea" },
+    Bar:         { bg: "#e8a33d", ink: "#0a0a16" },
+  };
+  const COLOR_THEME_OVERRIDES = {
+    performance: TYPE_COLORS.Performance, film: TYPE_COLORS.Film, class: TYPE_COLORS.Class,
+    workshop: TYPE_COLORS.Workshop, radio: TYPE_COLORS.Radio, reading: TYPE_COLORS.Reading,
+    opening: TYPE_COLORS.Opening, bar: TYPE_COLORS.Bar,
+    paper: { bg: "#FCFFE5", ink: "#0a0a16" },
+  };
+  function _colorFor(ev, fallback){
+    if (ev.colorTheme && COLOR_THEME_OVERRIDES[ev.colorTheme]) return COLOR_THEME_OVERRIDES[ev.colorTheme];
+    return TYPE_COLORS[ev.type] || fallback;
   }
+  function arNum(s){ return String(s).replace(/[0-9]/g, d => "٠١٢٣٤٥٦٧٨٩"[d]); }
+  function _overlayDate(ev){ return `${parseInt(ev.day)} ${MFULL[MABBR.indexOf(ev.month)]} ${ev.year}`; }
+  function _ordinal(n){ const s = ["th","st","nd","rd"], v = n % 100; return n + (s[(v-20)%10] || s[v] || s[0]); }
 
   function _iso(dt){
     const m = dt && dt.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/);
     return m ? new Date(+m[1], +m[2]-1, +m[3], +m[4], +m[5]) : null;
   }
-
-  // Sanity asset refs look like "image-<hash>-<W>x<H>-<format>" / "file-<hash>-<format>"
-  // and map to a flat CDN filename "<hash>-<W>x<H>.<format>" — only the trailing
-  // "-<format>" becomes a dot, the hash/dimensions hyphen must stay a hyphen.
   function _sanityImg(ref){
     const r = typeof ref === 'string' ? ref : (ref && ref.asset && ref.asset._ref) || '';
     if (!r) return '';
@@ -119,227 +143,279 @@
   }
   function _loc(v){ return typeof v === 'object' && v !== null ? (v.en || v.ar || '') : (v || ''); }
 
-  // Split a plain-text field into paragraphs on blank lines, keeping single
-  // line breaks (e.g. a "Dancers:\nName\nName" list) as <br> within a paragraph.
-  function _paras(text){
-    if (!text) return [];
-    return text.split(/\n\n+/).map(s => s.trim()).filter(Boolean);
-  }
-  function _p(text){
-    return _paras(text).map(s => `<p>${s.replace(/\n/g,'<br>')}</p>`).join('');
-  }
-
-  // Renders the event's rich "content" blocks (contentText / contentImage /
-  // contentPullquote / contentAudio / contentVideo / contentGallery / contentDivider)
-  function renderContentBlocks(blocks){
-    if (!blocks || !blocks.length) return '';
-    return blocks.map(b => {
-      const kind = (b._type || '').replace(/^content/, '').toLowerCase();
-      switch (kind){
-        case 'text': {
-          const enHtml = (b.en||[]).map(p=>`<p>${p}</p>`).join('');
-          const arHtml = (b.ar||[]).map(p=>`<p>${p}</p>`).join('');
-          return `<div class="cb-text">${enHtml?`<div class="en-only">${enHtml}</div>`:''}${arHtml?`<div class="ar-only ar" dir="rtl">${arHtml}</div>`:''}</div>`;
-        }
-        case 'image': {
-          const src = _sanityImg(b.image);
-          if (!src) return '';
-          return `<figure class="cb-image"><img src="${src}" alt="${b.captionEn||''}">${(b.captionEn||b.captionAr)?`<figcaption class="cb-caption"><span class="en-only">${b.captionEn||''}</span><span class="ar-only ar" dir="rtl">${b.captionAr||''}</span></figcaption>`:''}</figure>`;
-        }
-        case 'pullquote':
-          return `<blockquote class="cb-quote">${b.en?`<p class="en-only">${b.en}</p>`:''}${b.ar?`<p class="ar-only ar" dir="rtl">${b.ar}</p>`:''}${b.attribution?`<cite>${b.attribution}</cite>`:''}</blockquote>`;
-        case 'audio': {
-          const src = _sanityFile(b.audioFile) || b.externalUrl || '';
-          return `<div class="cb-audio"><div class="cb-audio-head"><span class="cb-audio-title"><span class="en-only">${b.titleEn||'Audio'}</span><span class="ar-only ar">${b.titleAr||b.titleEn||''}</span></span>${b.durationMin?`<span class="cb-audio-dur">${b.durationMin} min</span>`:''}</div>${src?`<audio controls src="${src}" style="width:100%"></audio>`:''}</div>`;
-        }
-        case 'video': {
-          const src = _sanityFile(b.videoFile) || '';
-          const cap = (b.captionEn||b.captionAr) ? `<div class="cb-caption"><span class="en-only">${b.captionEn||''}</span><span class="ar-only ar" dir="rtl">${b.captionAr||''}</span></div>` : '';
-          if (b.externalUrl) return `<div class="cb-video"><div class="cb-video-frame"><iframe src="${b.externalUrl}" allowfullscreen></iframe></div>${cap}</div>`;
-          if (src) return `<div class="cb-video"><video controls src="${src}" style="width:100%;display:block;border-radius:16px;"></video>${cap}</div>`;
-          return '';
-        }
-        case 'gallery': {
-          const imgs = (b.images||[]).map(img => { const s=_sanityImg(img); return s ? `<div class="cb-gal-item"><img src="${s}" alt=""></div>` : ''; }).join('');
-          return imgs ? `<div class="cb-gallery">${imgs}</div>` : '';
-        }
-        case 'divider':
-          return `<hr class="cb-divider">`;
-        default: return '';
-      }
-    }).join('');
-  }
-
   function docToEv(doc){
     const s = _iso(doc.startDateTime), e = _iso(doc.endDateTime);
     const hasTime = s && (s.getHours() || s.getMinutes());
-    const locationName = typeof doc.location === 'object' && doc.location !== null
-      ? (doc.location.name || '')
-      : (doc.location || '');
+    const locationName = typeof doc.location === 'object' && doc.location !== null ? (doc.location.name || '') : (doc.location || '');
     return {
-      id:          doc.slug?.current || doc._id,
-      title:       doc.title?.en || '',
-      titleAr:     doc.title?.ar || '',
-      subtitle:    doc.subtitle?.en || '',
-      subtitleAr:  doc.subtitle?.ar || '',
-      type:        doc.eventType || '',
-      colorTheme:  doc.colorTheme || '',
-      day:         s ? String(s.getDate()).padStart(2,'0') : '',
-      month:       s ? MABBR[s.getMonth()] : '',
-      year:        s ? s.getFullYear() : '',
-      dow:         s ? DWEN[s.getDay()] : '',
-      dowFull:     s ? DWFULL[s.getDay()] : '',
-      monthFull:   s ? MFULL[s.getMonth()] : '',
-      dayOrdinal:  s ? _ordinal(s.getDate()) : '',
-      start:       hasTime ? s.toTimeString().slice(0,5) : '',
-      end:         e && (e.getHours()||e.getMinutes()) ? e.toTimeString().slice(0,5) : '',
-      location:    locationName,
-      register:    doc.registerUrl || '',
-      shortDesc:   doc.shortDescription?.en || '',
-      shortDescAr: doc.shortDescription?.ar || '',
-      body:        doc.body?.en || '',
-      bodyAr:      doc.body?.ar || '',
-      writeup:     doc.writeup?.en || '',
-      writeupAr:   doc.writeup?.ar || '',
-      cover:       doc.cover?.asset?._ref || '',
-      content:     doc.content || [],
-      recurring:   !!doc.recurring,
-      recurringLabel:   doc.recurringLabel?.en || '',
-      recurringLabelAr: doc.recurringLabel?.ar || '',
-      relatedArtists: (doc.relatedArtists||[]).map(a => ({ name: _loc(a.name), slug: a.slug?.current || '', bioEn: a.bio?.en || '', bioAr: a.bio?.ar || '' })).filter(a => a.name),
+      id:       doc.slug?.current || doc._id,
+      title:    doc.title?.en || '',
+      titleAr:  doc.title?.ar || '',
+      subtitle:   doc.subtitle?.en || '',
+      subtitleAr: doc.subtitle?.ar || '',
+      type:     doc.eventType || '',
+      colorTheme: doc.colorTheme || '',
+      day:      s ? String(s.getDate()).padStart(2,'0') : '01',
+      month:    s ? MABBR[s.getMonth()] : 'Jan',
+      year:     s ? s.getFullYear() : new Date().getFullYear(),
+      dow:      s ? DWEN[s.getDay()] : 'Mon',
+      dowAr:    s ? DWAR[s.getDay()] : '',
+      dowFull:  s ? DWFULL[s.getDay()] : '',
+      monthFull: s ? MFULL[s.getMonth()] : '',
+      dayOrdinal: s ? _ordinal(s.getDate()) : '',
+      start:    hasTime ? s.toTimeString().slice(0,5) : '',
+      end:      e && (e.getHours()||e.getMinutes()) ? e.toTimeString().slice(0,5) : '',
+      location: locationName,
+      recurring: !!doc.recurring,
+      status:   doc.status || 'upcoming',
+      featured: !!doc.featured,
+      register: doc.registerUrl || '',
+      short:    doc.shortDescription?.en || '',
+      shortAr:  doc.shortDescription?.ar || '',
+      body:     doc.body?.en ? doc.body.en.split(/\n\n+/).map(p=>p.trim()).filter(Boolean) : [],
+      bodyAr:   doc.body?.ar ? doc.body.ar.split(/\n\n+/).map(p=>p.trim()).filter(Boolean) : [],
+      writeup:   doc.writeup?.en || '',
+      writeupAr: doc.writeup?.ar || '',
+      cover:    _sanityImg(doc.cover),
+      content:  doc.content || [],
+      relatedArtists: (doc.relatedArtists||[]).map(a => ({ name: _loc(a.name), slug: a.slug || '' })).filter(a => a.name),
       relatedProject: doc.relatedProject ? { title: _loc(doc.relatedProject.title), slug: doc.relatedProject.slug?.current || '' } : null,
     };
   }
 
+  function _renderBlocks(content){
+    if (!content || !content.length) return "";
+    return content.map(b => {
+      const kind = (b._type || b.type || '').replace(/^content/, '').toLowerCase();
+      switch(kind){
+        case "text": {
+          const enHtml = (b.en||[]).map(p=>`<p>${p}</p>`).join("");
+          const arHtml = (b.ar||[]).map(p=>`<p>${p}</p>`).join("");
+          return `<div class="cb-text">${enHtml?`<div class="en-only">${enHtml}</div>`:""}${arHtml?`<div class="ar-only ar" dir="rtl">${arHtml}</div>`:""}</div>`;
+        }
+        case "image": {
+          const src = _sanityImg(b.image);
+          if (!src) return "";
+          return `<div class="cb-image"><img src="${src}" alt="${b.captionEn||""}">${(b.captionEn||b.captionAr)?`<div class="cb-caption"><span class="en-only">${b.captionEn||""}</span><span class="ar-only ar" dir="rtl">${b.captionAr||""}</span></div>`:""}</div>`;
+        }
+        case "pullquote":
+          return `<blockquote class="cb-quote">${b.en?`<p class="en-only">${b.en}</p>`:""}${b.ar?`<p class="ar-only ar" dir="rtl">${b.ar}</p>`:""}${b.attribution?`<cite>${b.attribution}</cite>`:""}</blockquote>`;
+        case "audio": {
+          const src = _sanityFile(b.audioFile) || b.externalUrl || '';
+          return `<div class="cb-audio"><div class="cb-audio-head"><span class="cb-audio-icon">◉</span><span class="cb-audio-title"><span class="en-only">${b.titleEn||"Audio"}</span><span class="ar-only ar">${b.titleAr||b.titleEn||"صوت"}</span></span>${b.durationMin?`<span class="cb-audio-dur">${b.durationMin} min</span>`:""}</div>${src?`<audio controls src="${src}" style="width:100%;margin-top:10px;"></audio>`:`<div class="cb-audio-placeholder"><span class="en-only">Recording will appear here after the event</span><span class="ar-only ar" dir="rtl">سيظهر التسجيل هنا بعد الفعالية</span></div>`}</div>`;
+        }
+        case "video": {
+          const src = _sanityFile(b.videoFile) || '';
+          const cap = (b.captionEn||b.captionAr) ? `<div class="cb-caption"><span class="en-only">${b.captionEn||""}</span><span class="ar-only ar" dir="rtl">${b.captionAr||""}</span></div>` : "";
+          if (b.externalUrl) return `<div class="cb-video"><div class="cb-video-frame"><iframe src="${b.externalUrl}" allowfullscreen></iframe></div>${cap}</div>`;
+          if (src) return `<div class="cb-video"><video controls src="${src}" style="width:100%;display:block;border-radius:16px;"></video>${cap}</div>`;
+          return `<div class="cb-video-placeholder"><span class="en-only">Video</span><span class="ar-only ar">فيديو</span></div>`;
+        }
+        case "gallery": {
+          const imgs = (b.images||[]).map(img=>{ const s=_sanityImg(img); return s?`<div class="cb-gal-item"><img src="${s}" alt=""></div>`:''; }).join("");
+          return imgs ? `<div class="cb-gallery">${imgs}</div>` : "";
+        }
+        case "divider": return `<hr class="cb-divider">`;
+        default: return "";
+      }
+    }).join("");
+  }
+
+  function _findAdjacentEvents(all, currentId){
+    const idx = all.findIndex(e => e.id === currentId);
+    if (idx === -1) return { prev: null, next: null };
+    return { prev: idx > 0 ? all[idx - 1] : null, next: idx < all.length - 1 ? all[idx + 1] : null };
+  }
+
+  function _initPanelAudio(root){
+    const audio = root.querySelector(".epa-audio");
+    if (!audio) return;
+    const playBtn = root.querySelector(".epa-play"), iconPlay = root.querySelector(".epa-icon-play"),
+          iconPause = root.querySelector(".epa-icon-pause"), fill = root.querySelector(".epa-fill"),
+          seek = root.querySelector(".epa-seek"), curr = root.querySelector(".epa-current"), tot = root.querySelector(".epa-total");
+    function fmt(s){ if (isNaN(s)||!isFinite(s)) return "--:--"; return Math.floor(s/60)+":"+String(Math.floor(s%60)).padStart(2,"0"); }
+    playBtn.addEventListener("click", () => audio.paused ? audio.play() : audio.pause());
+    audio.addEventListener("play",  () => { iconPlay.style.display="none"; iconPause.style.display=""; });
+    audio.addEventListener("pause", () => { iconPlay.style.display="";     iconPause.style.display="none"; });
+    audio.addEventListener("ended", () => { fill.style.width="0%"; seek.value=0; curr.textContent="0:00"; iconPlay.style.display=""; iconPause.style.display="none"; });
+    audio.addEventListener("timeupdate", () => {
+      const pct = audio.duration ? (audio.currentTime/audio.duration)*100 : 0;
+      fill.style.width = pct+"%"; seek.value = pct; curr.textContent = fmt(audio.currentTime);
+    });
+    audio.addEventListener("loadedmetadata", () => { tot.textContent = fmt(audio.duration); });
+    seek.addEventListener("input", () => { if (audio.duration) audio.currentTime = (seek.value/100)*audio.duration; });
+  }
+
+  // The single canonical event template — identical output regardless of
+  // where the user came from, since every entry point now just links here.
+  function buildEventPanel(ev, all){
+    const typeArLabel = TYPE_AR[ev.type] || ev.type;
+    const venue = (ev.location || "").split("·")[0].trim();
+    const coverHtml = (ev.cover && !(ev.content && ev.content.length))
+      ? `<div class="ep-cover"><img src="${ev.cover}" alt="" style="width:100%;height:220px;object-fit:contain;padding:28px;display:block;"></div>`
+      : "";
+    const bodyEnParts = [...(ev.short ? [ev.short] : []), ...(ev.body && ev.body.length ? ev.body : [])];
+    const bodyArParts = [...(ev.shortAr ? [ev.shortAr] : []), ...(ev.bodyAr && ev.bodyAr.length ? ev.bodyAr : [])];
+    const bodyEn = bodyEnParts.map(p => `<p>${p}</p>`).join("");
+    const bodyAr = bodyArParts.map(p => `<p>${p}</p>`).join("");
+    const writeupEn = ev.writeup ? `<p class="ep-writeup">${ev.writeup}</p>` : "";
+    const writeupAr = ev.writeupAr ? `<p class="ep-writeup" dir="rtl">${ev.writeupAr}</p>` : "";
+    const cta = ev.register
+      ? `<a href="${ev.register}" class="ep-register" target="_blank"><span class="en-only">Register →</span><span class="ar-only ar">← التسجيل</span></a>`
+      : `<span class="ep-register ep-free"><span class="en-only">Free entry</span><span class="ar-only ar">دخول حرّ</span></span>`;
+
+    // Audio bar sourced from a contentAudio block, if present.
+    const audioSrcBlock = (ev.content || []).find(b => (b._type||'') === 'contentAudio');
+    const audioSrc = audioSrcBlock ? (_sanityFile(audioSrcBlock.audioFile) || audioSrcBlock.externalUrl || '') : '';
+    const audioBar = (audioSrcBlock && audioSrc) ? `
+<div class="ep-audio-bar">
+  <audio class="epa-audio" src="${audioSrc}" preload="metadata"></audio>
+  <button class="epa-play" aria-label="Play / Pause">
+    <svg class="epa-icon-play"  viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M8 5v14l11-7z"/></svg>
+    <svg class="epa-icon-pause" viewBox="0 0 24 24" fill="currentColor" width="20" height="20" style="display:none"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+  </button>
+  <div class="epa-track">
+    <div class="epa-label"><span class="en-only">${audioSrcBlock.titleEn||"Recording"}</span><span class="ar-only ar">${audioSrcBlock.titleAr||audioSrcBlock.titleEn||"تسجيل"}</span></div>
+    <div class="epa-progress-wrap">
+      <div class="epa-progress"><div class="epa-fill"></div></div>
+      <input type="range" class="epa-seek" min="0" max="100" value="0" step="0.1" aria-label="Seek">
+    </div>
+  </div>
+  <div class="epa-time"><span class="epa-current">0:00</span> / <span class="epa-total">${audioSrcBlock.durationMin ? audioSrcBlock.durationMin+":00" : "--:--"}</span></div>
+</div>` : "";
+
+    const { prev, next } = _findAdjacentEvents(all, ev.id);
+    const navBar = `
+<div class="ep-nav">
+  ${prev ? `<a href="event.html?id=${prev.id}" class="ep-nav-btn ep-nav-prev">
+    <span class="ep-nav-dir"><span class="en-only">← Prev</span><span class="ar-only ar">التالي →</span></span>
+    <span class="ep-nav-name"><span class="en-only">${prev.title}</span><span class="ar-only ar">${prev.titleAr||prev.title}</span></span>
+  </a>` : `<div class="ep-nav-btn ep-nav-empty"></div>`}
+  ${next ? `<a href="event.html?id=${next.id}" class="ep-nav-btn ep-nav-next">
+    <span class="ep-nav-dir"><span class="en-only">Next →</span><span class="ar-only ar">← السابق</span></span>
+    <span class="ep-nav-name"><span class="en-only">${next.title}</span><span class="ar-only ar">${next.titleAr||next.title}</span></span>
+  </a>` : `<div class="ep-nav-btn ep-nav-empty"></div>`}
+</div>`;
+
+    return `
+${audioBar}
+<div class="ep-header">
+  <a class="ep-close" id="epClose" href="index.html" aria-label="Back">✕</a>
+  <div class="ep-meta">
+    <div class="dt-block">
+      <span class="en-only">${ev.dowFull ? `${ev.dowFull}<br>${ev.monthFull} ${ev.dayOrdinal}, ${ev.year}` : _overlayDate(ev)}</span>
+      <span class="ar-only ar">${ev.dowAr ? `${ev.dowAr}<br>` : ""}${ev.day} ${MONTH_NAME_AR[ev.month]} ${arNum(ev.year)}</span>
+      <span class="ep-time">${ev.start}${ev.end ? " — " + ev.end : ""}</span>
+    </div>
+    <span class="ep-type-tag en-only">${ev.type}</span>
+    <span class="ep-type-tag ar-only ar">${typeArLabel}</span>
+  </div>
+  <h1 class="ep-title">
+    <span class="en-only">${ev.title}</span>
+    <span class="ar-only ar" dir="rtl">${ev.titleAr || ev.title}</span>
+  </h1>
+  ${(ev.subtitle && !(ev.content && ev.content.length)) ? `<p class="ep-subtitle en-only">${ev.subtitle}</p>` : ""}
+</div>
+<div class="ep-body">
+  ${coverHtml}
+  <div class="ep-content">
+    ${ev.content && ev.content.length
+      ? `<div class="ep-content-blocks">${_renderBlocks(ev.content)}</div>`
+      : (bodyEn || bodyAr ? `
+    <div class="ep-text">
+      ${bodyEn ? `<div class="en-only">${bodyEn}</div>` : ""}
+      ${writeupEn ? `<div class="en-only">${writeupEn}</div>` : ""}
+      ${bodyAr ? `<div class="ar-only ar" dir="rtl">${bodyAr}</div>` : ""}
+      ${writeupAr ? `<div class="ar-only ar" dir="rtl">${writeupAr}</div>` : ""}
+    </div>` : "")}
+    ${(ev.subtitle && ev.content && ev.content.length) ? `<p class="ep-subtitle en-only">${ev.subtitle}</p>` : ""}
+    <div class="ep-facts">
+      <div class="ep-fact">
+        <span class="ef-key"><span class="en-only">Venue</span><span class="ar-only ar">المكان</span></span>
+        <span class="ef-leader"></span>
+        <span class="ef-val">${venue || "—"}</span>
+      </div>
+      <div class="ep-fact">
+        <span class="ef-key"><span class="en-only">Time</span><span class="ar-only ar">التوقيت</span></span>
+        <span class="ef-leader"></span>
+        <span class="ef-val">${ev.start}${ev.end ? " — " + ev.end : ""}</span>
+      </div>
+      <div class="ep-fact">
+        <span class="ef-key"><span class="en-only">Date</span><span class="ar-only ar">التاريخ</span></span>
+        <span class="ef-leader"></span>
+        <span class="ef-val en-only">${_overlayDate(ev)}</span>
+        <span class="ef-val ar-only ar">${ev.day} ${MONTH_NAME_AR[ev.month]}</span>
+      </div>
+      <div class="ep-fact">
+        <span class="ef-key"><span class="en-only">Type</span><span class="ar-only ar">النوع</span></span>
+        <span class="ef-leader"></span>
+        <span class="ef-val"><span class="en-only">${ev.type}</span><span class="ar-only ar">${typeArLabel}</span></span>
+      </div>
+      ${ev.relatedArtists && ev.relatedArtists.length ? `<div class="ep-fact">
+        <span class="ef-key"><span class="en-only">Artists</span><span class="ar-only ar">فنانون</span></span>
+        <span class="ef-leader"></span>
+        <span class="ef-val">${ev.relatedArtists.map(a=>a.name).join(', ')}</span>
+      </div>` : ""}
+      ${ev.relatedProject ? `<div class="ep-fact">
+        <span class="ef-key"><span class="en-only">Part of</span><span class="ar-only ar">جزء من</span></span>
+        <span class="ef-leader"></span>
+        <span class="ef-val">${ev.relatedProject.title}</span>
+      </div>` : ""}
+    </div>
+    ${cta}
+  </div>
+  ${navBar}
+</div>`;
+  }
+
   const params = new URLSearchParams(location.search);
   const id = params.get('id') || '';
-
   const BASE = `https://${SANITY_PROJECT}.api.sanity.io/v2024-01-01/data/query/${SANITY_DATASET}?query=`;
+  async function groq(query){ const res = await fetch(BASE + encodeURIComponent(query)); const json = await res.json(); return json.result; }
 
-  async function groq(query) {
-    const res = await fetch(BASE + encodeURIComponent(query));
-    const json = await res.json();
-    return json.result;
-  }
-
-  let ev, allEvents = [];
+  let ev, all = [];
   try {
-    const doc = await groq(`*[_type == "event" && slug.current == "${id}"][0]{
-      ...,
-      location->{name},
-      relatedArtists[]->{name, slug, bio},
-      relatedProject->{title, slug}
-    }`);
-    if (doc) ev = docToEv(doc);
-  } catch(err) {
-    console.warn('[WC] event fetch failed', err);
-  }
-
-  if (ev) {
-    try {
-      const more = await groq(`*[_type == "event" && slug.current != "${id}" && dateTime(startDateTime) >= dateTime(now()) - 60*60*24*45][0...8]{slug, title, eventType, startDateTime, location->{name}}`);
-      allEvents = (more || []).map(docToEv);
-    } catch(err) { /* non-critical */ }
-  }
+    const q = `*[_type == "event"] | order(startDateTime desc) { ..., location->{ name }, relatedArtists[]->{name, "slug": slug.current}, relatedProject->{title, slug} }`;
+    const docs = await groq(q);
+    all = (docs || []).map(docToEv);
+    ev = all.find(e => e.id === id);
+  } catch(err) { console.warn('[WC] event fetch failed', err); }
 
   if (!ev) {
-    document.getElementById('detail-head').innerHTML = '<p>Event not found.</p>';
+    document.getElementById('epRoot').innerHTML = `<div class="ep-header"><h1 class="ep-title">Event not found.</h1><p class="ep-subtitle"><a href="index.html">← Back to programme</a></p></div>`;
     return;
   }
 
   document.title = `${ev.title} · The Wonder Cabinet`;
-  if (ev.type) document.body.dataset.type = ev.type.toLowerCase();
-  document.body.dataset.color = ev.colorTheme || (ev.type ? ev.type.toLowerCase() : '');
+  const tc = _colorFor(ev, { bg: "#1d24ff", ink: "#f6f3ea" });
+  const root = document.getElementById('epRoot');
+  root.style.background = tc.bg;
+  root.style.color = tc.ink;
+  root.innerHTML = buildEventPanel(ev, all);
+  document.getElementById('epClose').addEventListener('click', function(e){
+    if (document.referrer && document.referrer.indexOf(location.origin) === 0 && history.length > 1) {
+      e.preventDefault();
+      history.back();
+    }
+  });
+  _initPanelAudio(root);
 
-  // Head
-  const dateStr = [ev.dow, ev.day, ev.month, ev.year].filter(Boolean).join(' ');
-  const dateStrFull = ev.dowFull ? `${ev.dowFull}<br>${ev.monthFull} ${ev.dayOrdinal}, ${ev.year}` : dateStr;
-  const timeStr = ev.start ? (ev.end ? `${ev.start} — ${ev.end}` : ev.start) : '';
-  document.getElementById('detail-head').innerHTML = `
-    <div class="detail-kicker">
-      <div class="dt-block">
-        <span>${dateStrFull}</span>
-        ${timeStr ? `<span>${timeStr}</span>` : ''}
-        ${ev.recurringLabel ? `<span class="en-only">${ev.recurringLabel}</span><span class="ar-only ar">${ev.recurringLabelAr||ev.recurringLabel}</span>` : ''}
-        ${ev.register ? '<span style="text-decoration:underline;">Registration open</span>' : ''}
-      </div>
-      <span class="type">${ev.type}</span>
-    </div>
-    <h1><span class="en-only">${ev.title}</span><span class="ar-only ar" dir="rtl">${ev.titleAr || ev.title}</span></h1>
-  `;
-
-  // Cover — only render the standalone cover block when there are no authored
-  // content blocks. When content[] is present, its own contentImage block
-  // (if any) carries the photo at the right point in the reading order.
-  if (ev.cover && !ev.content.length) {
-    document.getElementById('detail-cover').innerHTML = `<img src="${_sanityImg(ev.cover)}" alt="" />`;
-  } else {
-    document.getElementById('detail-cover').style.display = 'none';
+  // Also this month
+  const more = all.filter(e => e.month === ev.month && e.year === ev.year && e.id !== ev.id).slice(0, 4);
+  if (more.length) {
+    document.getElementById('moreSection').hidden = false;
+    document.getElementById('more-grid').innerHTML = more.map(e => `
+      <a class="week-card" href="event.html?id=${e.id}">
+        <div class="wc-date-row">
+          <div class="wc-day">${e.day}</div>
+          <div class="wc-dow">${e.dow}</div>
+        </div>
+        <div class="wc-type">${e.type}${e.start ? ' · ' + e.start : ''}</div>
+        <h3 class="wc-title">${e.title}</h3>
+        <div class="wc-meta"><span>${e.location || ''}</span><span class="arrow">→</span></div>
+      </a>
+    `).join('');
   }
-
-  // Body — prefer authored "content" blocks; otherwise fall back to the
-  // plain subtitle / short description / body text fields.
-  const creditsEn = ev.relatedArtists.length ? `<p class="credits-line"><span class="k">Artists</span> ${ev.relatedArtists.map(a=>a.name).join(', ')}</p>` : '';
-  const creditsAr = ev.relatedArtists.length ? `<p class="credits-line" dir="rtl"><span class="k">فنانون</span> ${ev.relatedArtists.map(a=>a.name).join('، ')}</p>` : '';
-  const projectEn = ev.relatedProject ? `<p class="credits-line"><span class="k">Part of</span> ${ev.relatedProject.title}</p>` : '';
-
-  // Artist bios — pulled live from the referenced artist documents, not
-  // duplicated into the event's own text.
-  const artistBiosEn = ev.relatedArtists.filter(a=>a.bioEn).map(a=>`<div class="artist-bio">${_p(a.bioEn)}</div>`).join('');
-  const artistBiosAr = ev.relatedArtists.filter(a=>a.bioAr).map(a=>`<div class="artist-bio" dir="rtl">${_p(a.bioAr)}</div>`).join('');
-
-  const fallbackEn = `${_p(ev.shortDesc)}${_p(ev.body)}${ev.writeup ? `<p class="writeup">${ev.writeup}</p>` : ''}`;
-  const fallbackAr = `${_p(ev.shortDescAr)}${_p(ev.bodyAr)}${ev.writeupAr ? `<p class="writeup" dir="rtl">${ev.writeupAr}</p>` : ''}`;
-
-  // With authored content[] blocks, the subtitle credit line moves down next
-  // to the other credits (matching the approved reference, which shows
-  // nothing between the title and the pull-quote). Without content blocks,
-  // it stays at the top as before.
-  document.getElementById('detail-body').innerHTML = `
-    <div class="en-only">
-      ${(ev.subtitle && !ev.content.length) ? `<p class="subtitle">${ev.subtitle}</p>` : ''}
-      ${ev.content.length ? renderContentBlocks(ev.content) : fallbackEn}
-      ${(ev.subtitle && ev.content.length) ? `<p class="credits-line">${ev.subtitle}</p>` : ''}
-      ${artistBiosEn}
-      ${creditsEn}
-      ${projectEn}
-    </div>
-    <div class="ar ar-only" dir="rtl">
-      ${(ev.subtitleAr && !ev.content.length) ? `<p class="subtitle">${ev.subtitleAr}</p>` : ''}
-      ${ev.content.length ? renderContentBlocks(ev.content) : fallbackAr}
-      ${(ev.subtitleAr && ev.content.length) ? `<p class="credits-line" dir="rtl">${ev.subtitleAr}</p>` : ''}
-      ${artistBiosAr}
-      ${creditsAr}
-    </div>
-  `;
-
-  // Facts sidebar
-  const facts = [
-    ['Date', dateStr],
-    timeStr ? ['Time', timeStr] : null,
-    ev.type ? ['Type', ev.type] : null,
-    ['Location', ev.location || 'The Wonder Cabinet'],
-  ].filter(Boolean);
-  document.getElementById('detail-facts').innerHTML = `
-    ${facts.map(([k,v]) => `<div class="row"><span class="k">${k}</span><span class="leader"></span><span class="v">${v}</span></div>`).join('')}
-    ${ev.register
-      ? `<a class="cta" href="${ev.register}" target="_blank" rel="noopener">Register →</a>`
-      : `<span class="cta free">Free entry</span>`}
-  `;
-
-  // More this month
-  const more = allEvents.filter(e => e.month === ev.month && e.year === ev.year && e.id !== ev.id).slice(0, 4);
-  document.getElementById('more-grid').innerHTML = more.map(e => `
-    <a class="week-card" href="event.html?id=${e.id}">
-      <div class="wc-date-row">
-        <div class="wc-day">${e.day}</div>
-        <div class="wc-dow">${e.dow}</div>
-      </div>
-      <div class="wc-type">${e.type}${e.start ? ' · ' + e.start : ''}</div>
-      <h3 class="wc-title">${e.title}</h3>
-      <div class="wc-meta"><span>${e.location || ''}</span><span class="arrow">→</span></div>
-    </a>
-  `).join('');
 
   // Language toggle
   document.querySelectorAll('[data-lang-btn]').forEach(btn => {
