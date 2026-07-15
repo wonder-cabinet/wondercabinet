@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Programme · The Wonder Cabinet</title>
-<link rel="stylesheet" href="assets/app.css?v=11">
+<link rel="stylesheet" href="assets/app.css?v=12">
 </head>
 <body data-view="list">
 
@@ -83,6 +83,11 @@
     </div>
     <div class="ph-filters" id="ph-filters"></div>
     <div class="ph-seasons" id="season-rail"></div>
+    <a class="ph-exit" id="ph-exit" href="index.html" hidden>
+      <span class="ph-exit-x">✕</span>
+      <span class="en-only">Close history · Home</span>
+      <span class="ar-only ar" dir="rtl">إغلاق الأرشيف · الرئيسية</span>
+    </a>
   </div>
 </section>
 
@@ -376,21 +381,20 @@ function applyTypeFilter(arr){
 }
 
 
-function renderTimeline(){
-  const tl = document.getElementById("timeline");
-  const events = applyTypeFilter(ALL).slice().sort((a,b) => eventTimestamp(b) - eventTimestamp(a)); // newest first; we'll flip per-section as needed
-
-  // Order seasons newest first (matches SEASONS order which is desc)
-  const order = SEASONS;
-
+// Builds season → month → day blocks for a given (already filtered) list of
+// events, always in ascending chronological order (oldest first). Used for
+// both the future list and the on-demand past list — the two just get
+// stacked past-above-future so the whole page reads oldest → newest, top to
+// bottom, with "today" as the seam between them.
+function buildSeasonBlocks(events){
+  if (!events.length) return "";
+  const seasonsAsc = SEASONS.slice().reverse(); // SEASONS is newest-first; mirror it for ascending order
   let prevYear = null;
-  const blocks = order.map((season, sIdx) => {
+  return seasonsAsc.map(season => {
     const inSeason = events.filter(e => e.season.key === season.key);
     if (!inSeason.length) return "";
-    // Within a season, list events in chronological order (earliest first)
     inSeason.sort((a,b) => eventTimestamp(a) - eventTimestamp(b));
 
-    // Group by month, then by day
     const months = {};
     inSeason.forEach(e => {
       months[e.month] = months[e.month] || { key: e.month, evs: [] };
@@ -398,11 +402,9 @@ function renderTimeline(){
     });
     const monthList = Object.values(months).sort((a,b) => MONTH_ORDER.indexOf(a.key) - MONTH_ORDER.indexOf(b.key));
 
-    // Year marker: insert when crossing into a season whose year differs from the previous
     let yearMarker = "";
-    if (sIdx === 0) {
-      // first block — show the year above
-      yearMarker = renderYearMarker(season.year, /*direction*/ "current");
+    if (prevYear === null) {
+      yearMarker = renderYearMarker(season.year, "current");
       prevYear = season.year;
     } else if (season.year !== prevYear) {
       yearMarker = renderYearMarker(season.year, season.year < prevYear ? "back" : "forward");
@@ -428,8 +430,61 @@ function renderTimeline(){
         ${monthsHtml}
       </div>`;
   }).join("");
+}
 
-  tl.innerHTML = blocks;
+function renderTimeline(){
+  const tl = document.getElementById("timeline");
+  const exitBtn = document.getElementById("ph-exit");
+  if (exitBtn) exitBtn.hidden = true; // reset — a filter change collapses any expanded history
+
+  const filtered = applyTypeFilter(ALL);
+  const future = filtered.filter(e => e.status !== "past").sort((a,b) => eventTimestamp(a) - eventTimestamp(b));
+  const past   = filtered.filter(e => e.status === "past").sort((a,b) => eventTimestamp(a) - eventTimestamp(b));
+
+  const futureHtml = buildSeasonBlocks(future);
+  const emptyHtml = `<div class="tl-empty">
+    <span class="en-only">No upcoming events${STATE.type ? " in this category" : ""} — check back soon.</span>
+    <span class="ar-only ar" dir="rtl">لا توجد فعاليات قادمة${STATE.type ? " في هذه الفئة" : ""} — تابعونا قريباً.</span>
+  </div>`;
+
+  tl.innerHTML = `
+    <div class="tl-past-toggle" id="tl-past-toggle"${past.length ? "" : " hidden"}>
+      <button class="tl-past-btn" id="tl-past-btn" type="button">
+        <span class="tl-past-arrow">↑</span>
+        <span class="en-only">View past events</span>
+        <span class="ar-only ar" dir="rtl">عرض الفعاليات السابقة</span>
+        <span class="tl-past-count">${past.length}</span>
+      </button>
+    </div>
+    <div id="tl-future">${futureHtml || emptyHtml}</div>
+  `;
+
+  const btn = document.getElementById("tl-past-btn");
+  if (btn) btn.addEventListener("click", () => revealPastEvents(past));
+
+  initStickyMonths();
+}
+
+// Expands the history above "today" — prepends the past events (also oldest
+// → newest, so the most recent past sits right at the seam) and compensates
+// scroll so the page grows upward without the viewport jumping. The only way
+// back is the "Close history" link that appears in the sticky filter bar,
+// which returns to the homepage.
+function revealPastEvents(past){
+  const toggle = document.getElementById("tl-past-toggle");
+  if (!toggle) return;
+  const pastHtml = buildSeasonBlocks(past);
+  const wrap = document.createElement("div");
+  wrap.id = "tl-past";
+  wrap.innerHTML = pastHtml || "";
+  toggle.replaceWith(wrap);
+
+  const exitBtn = document.getElementById("ph-exit");
+  if (exitBtn) exitBtn.hidden = false;
+
+  const addedHeight = wrap.getBoundingClientRect().height;
+  if (addedHeight) window.scrollBy(0, addedHeight);
+
   initStickyMonths();
 }
 
