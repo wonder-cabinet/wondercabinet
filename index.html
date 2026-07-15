@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Programme · The Wonder Cabinet</title>
-<link rel="stylesheet" href="assets/app.css?v=9">
+<link rel="stylesheet" href="assets/app.css?v=10">
 </head>
 <body data-view="list">
 
@@ -33,14 +33,14 @@
   <div class="gs-outer" id="gs-outer">
     <div class="gs-sticky" id="gs-sticky">
       <div class="gs-rail">
+        <div class="gs-theme" id="gs-theme" hidden>
+          <div class="gs-theme-kicker"><span class="en-only">This week's theme</span><span class="ar-only ar" dir="rtl">موضوع هذا الأسبوع</span></div>
+          <p class="gs-theme-quote" id="gs-theme-quote"></p>
+          <p class="gs-theme-desc" id="gs-theme-desc"></p>
+        </div>
         <div class="gs-kicker" id="gs-kicker"></div>
         <div class="gs-range" id="gs-range"></div>
         <div class="gs-count" id="gs-count"></div>
-        <div class="gs-theme" id="gs-theme" hidden>
-          <div class="gs-theme-kicker"><span class="en-only">This month's theme</span><span class="ar-only ar" dir="rtl">موضوع هذا الشهر</span></div>
-          <div class="gs-theme-title" id="gs-theme-title"></div>
-          <p class="gs-theme-desc" id="gs-theme-desc"></p>
-        </div>
         <div class="gs-hint"><span class="en-only">Scroll ↓ to move →</span><span class="ar-only ar" dir="rtl">مرر للأسفل للتنقل →</span></div>
         <a class="gs-link" href="#programme" id="gs-link"></a>
       </div>
@@ -651,11 +651,15 @@ function renderFeatured(){
     range.innerHTML = `<span class="en-only">${start.getDate()}—${end.getDate()} ${MONTH_NAME_EN[MABBR_G[end.getMonth()]]}</span><span class="ar-only ar" dir="rtl">${arNum(start.getDate())}—${arNum(end.getDate())} ${MONTH_NAME_AR[MABBR_G[end.getMonth()]]}</span>`;
     count.innerHTML = `<span class="en-only">${evs.length} ${evs.length === 1 ? "event" : "events"}</span><span class="ar-only ar" dir="rtl">${arNum(evs.length)} فعاليات</span>`;
     const themeEl = document.getElementById("gs-theme");
-    if (SETTINGS && SETTINGS.themeTitle){
+    if (SETTINGS && (SETTINGS.themeDesc || SETTINGS.themeTitle)){
       themeEl.hidden = false;
-      document.getElementById("gs-theme-title").innerHTML = `<span class="en-only">${SETTINGS.themeTitle}</span><span class="ar-only ar" dir="rtl">${SETTINGS.themeTitleAr || SETTINGS.themeTitle}</span>`;
-      document.getElementById("gs-theme-desc").innerHTML = SETTINGS.themeDesc
+      document.getElementById("gs-theme-quote").innerHTML = SETTINGS.themeDesc
         ? `<span class="en-only">${SETTINGS.themeDesc}</span><span class="ar-only ar" dir="rtl">${SETTINGS.themeDescAr || SETTINGS.themeDesc}</span>`
+        : "";
+      const titleEn = SETTINGS.themeTitle || "";
+      const titleAr = SETTINGS.themeTitleAr || titleEn;
+      document.getElementById("gs-theme-desc").innerHTML = titleEn
+        ? `<span class="en-only">Explore <mark class="gs-theme-highlight">${titleEn}</mark> through the Wonder Cabinet program this week.</span><span class="ar-only ar" dir="rtl">استكشف <mark class="gs-theme-highlight">${titleAr}</mark> من خلال برنامج وندر كابينت هذا الأسبوع.</span>`
         : "";
     }
     link.innerHTML = `<span class="en-only">View full week →</span><span class="ar-only ar" dir="rtl">← عرض الأسبوع كاملاً</span>`;
