@@ -1447,7 +1447,10 @@ html[data-lang="ar"] .ar-only{ direction: rtl; }
    clicking prepends the full history above and scroll-compensates so the
    page just grows upward. Exit lives in the sticky filter bar instead of
    here, so it stays reachable no matter how far back you scroll. */
-.tl-past-toggle{ border-bottom: 2px solid var(--ink); }
+/* Extra top clearance so the toggle isn't hidden under the sticky
+   topbar + filter bar when the page rests at #programme (e.g. via the
+   nav link, which lands right at this scroll position). */
+.tl-past-toggle{ border-bottom: 2px solid var(--ink); padding-top: 48px; }
 .tl-past-btn{
   all: unset; cursor: pointer; width: 100%; box-sizing: border-box;
   display: flex; align-items: center; justify-content: center; gap: 10px;
