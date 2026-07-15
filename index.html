@@ -491,9 +491,9 @@ function revealPastEvents(past){
   const exitBtn = document.getElementById("ph-exit");
   if (exitBtn) exitBtn.hidden = false;
 
-  const addedHeight = wrap.getBoundingClientRect().height;
-  if (addedHeight) window.scrollBy(0, addedHeight);
-
+  // Chromium/Firefox scroll anchoring already keeps the viewport steady
+  // when content is inserted above it — no manual scroll compensation
+  // needed (and doing it manually double-counts on top of that).
   initStickyMonths();
 }
 
