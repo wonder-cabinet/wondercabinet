@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Programme · The Wonder Cabinet</title>
-<link rel="stylesheet" href="assets/app.css?v=29">
+<link rel="stylesheet" href="assets/app.css?v=30">
 </head>
 <body data-view="list">
 
@@ -550,12 +550,22 @@ function armPastGravity(){
   let pull = 0;        // accumulator for whichever stage is currently active
   let springTimer = null;
 
-  // True while the in-grid reader is open, and for a short cooldown right
-  // after it closes — see the comment on _gsReaderClosedAt above for why the
-  // cooldown matters (trailing wheel ticks from the gesture that closed it).
+  // True while the in-grid reader is open, and for a cooldown after it
+  // closes. The cooldown is a SLIDING window: any wheel/touch activity
+  // during it pushes it forward, so a single continuous gesture (incl.
+  // trackpad inertia, which can keep emitting ticks for a second or more
+  // after the fingers lift) can never carry over from closing the reader
+  // into arming the archive — no matter how long it coasts. Only after a
+  // genuine pause in input does the archive gesture re-arm.
   const READER_COOLDOWN_MS = 400;
-  const readerOpen = () => document.body.classList.contains("gs-reader-open")
-    || (Date.now() - _gsReaderClosedAt) < READER_COOLDOWN_MS;
+  function readerOpen(){
+    if (document.body.classList.contains("gs-reader-open")) return true;
+    if ((Date.now() - _gsReaderClosedAt) < READER_COOLDOWN_MS){
+      _gsReaderClosedAt = Date.now(); // still coasting — keep the window sliding
+      return true;
+    }
+    return false;
+  }
 
   // "Top" means the very start of the timeline: page scrollY at 0 AND (if
   // the This Week rail is present) its horizontal scroll fully retracted —
@@ -698,12 +708,27 @@ function revealPastArchive(){
   renderPastSeasonRail();
   renderPastTimeline();
 
-  // Land at the seam, not the top of the archive: scroll just past the
-  // end of the newly-inserted content, minus a small peek, so only the
-  // tail of the most recent past event and the sliding topbar are visible.
-  const PEEK = 120;
-  const landingY = Math.max(0, wrap.offsetHeight - PEEK);
-  window.scrollTo({ top: landingY, behavior: "smooth" });
+  // Land at the seam WITHOUT the viewport flying through the whole archive.
+  // The archive is inserted above the current content, so first re-anchor
+  // the scroll position instantly to compensate — visually nothing moves,
+  // the user is still looking at exactly what they were looking at. Then a
+  // small, slow, eased nudge upward reveals just the tail of the most
+  // recent past event (the "gravity" pull-in) and hands control straight
+  // back to the user's own scrolling from there.
+  const PEEK = 160;
+  const seamY = wrap.offsetHeight; // seam = right where the old top-of-page was
+  window.scrollTo(0, seamY); // plain scrollTo is always instant
+
+  const from = seamY;
+  const to = Math.max(0, seamY - PEEK);
+  const DUR = 900;
+  const t0 = performance.now();
+  const easeInOut = t => t < 0.5 ? 2*t*t : 1 - Math.pow(-2*t + 2, 2) / 2;
+  (function step(now){
+    const t = Math.min(1, (now - t0) / DUR);
+    window.scrollTo(0, from + (to - from) * easeInOut(t));
+    if (t < 1) requestAnimationFrame(step);
+  })(t0);
 }
 
 function renderPastTimeline(){
@@ -945,6 +970,28 @@ let _gsReaderOpen = false;
 // a short cooldown after this timestamp to give that trailing motion
 // somewhere harmless to land.
 let _gsReaderClosedAt = 0;
+// Failsafe: if reader state ever gets inconsistent (a stray error mid-open,
+// an interrupted collapse — anything that leaves the body locked or a stale
+// frame in the DOM with no live reader driving it), tear absolutely
+// everything down to a clean, scrollable page. Never called on the happy
+// path; exists so no bug in the reader can ever strand the page blank or
+// frozen.
+function _gsHardReset(){
+  document.querySelectorAll(".gs-card-frame").forEach(f => f.remove());
+  document.querySelectorAll(".gs-card-open").forEach(c => {
+    c.classList.remove("gs-card-open", "gs-anim");
+    c.style.flexBasis = "";
+  });
+  const track = document.getElementById("gs-track");
+  if (track) track.classList.remove("gs-anim");
+  document.body.style.position = "";
+  document.body.style.top = "";
+  document.body.style.left = "";
+  document.body.style.right = "";
+  document.body.classList.remove("gs-reader-open");
+  _gsReaderOpen = false;
+  window.dispatchEvent(new Event("resize"));
+}
 function _gsOpenReader(cardEl){
   if (_gsReaderOpen) return;
   _gsReaderOpen = true;
@@ -1038,7 +1085,21 @@ function _gsOpenReader(cardEl){
 
   function onWheel(e){
     e.preventDefault();
-
+    try{ onWheelInner(e); }
+    catch(err){
+      // Never let a bug here strand the page frozen behind a preventDefault
+      // wall — tear everything down to a clean, scrollable state instead.
+      console.warn("[WC] reader wheel error, resetting", err);
+      closed = true;
+      window.removeEventListener("message", onMsg);
+      window.removeEventListener("keydown", onKey);
+      window.removeEventListener("wheel", onWheel);
+      cardEl.removeEventListener("click", onClick, true);
+      _gsHardReset();
+      _gsReaderClosedAt = Date.now();
+    }
+  }
+  function onWheelInner(e){
     if (scrollT < 1){
       // Pre-full-expansion — a single continuous scale from fully closed
       // (rawY = -CLOSE_PX) through the click-nudge (rawY = 0) up to fully
@@ -1100,11 +1161,21 @@ function _gsOpenReader(cardEl){
     if (!doc) return;
     const inner = doc.elementFromPoint(x, y);
     const clickable = inner && inner.closest("a,button");
-    if (clickable){
-      e.preventDefault();
-      e.stopPropagation();
-      clickable.click();
+    if (!clickable) return;
+    e.preventDefault();
+    e.stopPropagation();
+    // Internal event links (prev/next nav) must stay in embed mode — their
+    // raw hrefs point at the full standalone page, and letting them
+    // navigate the iframe there strands a complete non-embed page (its
+    // own ✕ then loads the whole homepage nested inside the card, and
+    // everything degrades from there). Rewrite them to the embed URL and
+    // scroll the reader back to the top for the new event.
+    const href = clickable.getAttribute && clickable.getAttribute("href");
+    if (href && href.indexOf("event.html?id=") === 0 && !clickable.target){
+      frame.contentWindow.location.replace(href + "&embed=1");
+      return;
     }
+    clickable.click();
   }
 
   function onMsg(e){
@@ -1300,6 +1371,13 @@ function renderFeatured(){
     // card's real href navigate normally instead of arming the reader.
     if (window.innerWidth <= 700) return;
     e.preventDefault();
+    // Failsafe: if the page thinks a reader is open but there's no live
+    // frame actually in the DOM (a previous open/close got interrupted),
+    // reset everything before opening fresh instead of silently ignoring
+    // the click against a phantom lock.
+    if (document.body.classList.contains("gs-reader-open") && !document.querySelector(".gs-card-frame")){
+      _gsHardReset();
+    }
     _gsOpenReader(card);
   });
 
