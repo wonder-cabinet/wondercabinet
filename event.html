@@ -66,6 +66,11 @@
   html.embed .ep-close{ right: 14px; }
   html.embed .ep-pop{ right: 46px; }
   .ep-hero-video video{ width: 100%; display: block; }
+  /* Extra runway at the very end of the article — reaching the true bottom
+     shouldn't feel like slamming into a wall right as the content stops, so
+     there's an empty half-viewport of "cushion" before the end-of-scroll
+     gravity in the parent page even engages. */
+  .ep-embed-spacer{ height: 50vh; }
   .ep-pop{
     all: unset; cursor: pointer;
     position: absolute; top: 15px; right: 47px;
@@ -431,6 +436,7 @@ ${audioBar}
     ${cta}
   </div>
   ${navBar}
+  ${EMBED ? '<div class="ep-embed-spacer" aria-hidden="true"></div>' : ""}
 </div>`;
   }
 

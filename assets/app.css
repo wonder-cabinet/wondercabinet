@@ -1769,6 +1769,14 @@ html[data-lang="ar"] .ar-only{ direction: rtl; }
     flex-basis .45s cubic-bezier(.2,.8,.2,1),
     transform .45s cubic-bezier(.2,.8,.2,1);
 }
+/* End-of-article gravity: springing back (or finally letting go) uses a
+   slower, springier easing with a touch of overshoot so it reads as weighty
+   resistance giving way, not a flat snap. */
+.gs-anim-bounce{
+  transition:
+    flex-basis .6s cubic-bezier(.34,1.56,.64,1),
+    transform .6s cubic-bezier(.34,1.56,.64,1);
+}
 body.gs-reader-open{ overflow: hidden; }
 
 /* =========================================================

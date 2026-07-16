@@ -956,8 +956,11 @@ function _gsOpenReader(cardEl){
   const lerp = (a, b, t) => a + (b - a) * t;
   const CLICK_T = 0.18;   // borders nudge open on click — "content will be here"
   const EXPAND_PX = 320;  // wheel-px of "virtual" scroll to go from nudge to fully open
-  const PULL_MAX = 700;   // sustained pull-past-the-end needed to collapse (gravity)
-  const CLOSE_PULL_MAX = 300; // sustained pull back past rawY=0 needed to bail out early
+  const CLOSE_PULL_MAX = 300;  // sustained pull back past rawY=0 needed to bail out early
+  const READ_PULL_MAX = 1600;  // sustained pull past the article's end needed to actually close —
+                                // deliberately heavy: this is the "have to force it" gravity at
+                                // the end of reading, distinct from (and stronger than) the
+                                // pre-expansion one above.
   let scrollT = 0;        // 0..1 expansion progress
   let rawY = 0;           // accumulated virtual scroll driving scrollT, pre-expansion
   let closePull = 0;      // sustained-pull accumulator, pre-expansion reversal
@@ -968,13 +971,17 @@ function _gsOpenReader(cardEl){
     cardEl.style.flexBasis = lerp(startW, targetW, t) + "px";
     track.style.transform = `translateX(${lerp(baseX, targetX, t)}px)`;
   }
-  function animateOnce(){
-    cardEl.classList.add("gs-anim");
-    track.classList.add("gs-anim");
+  // bounce=true uses a springier, slower easing (a bit of overshoot before
+  // settling) — reserved for the end-of-article gravity, so springing back
+  // or finally letting go both feel weighty rather than a flat snap.
+  function animateOnce(bounce){
+    const cls = bounce ? "gs-anim-bounce" : "gs-anim";
+    cardEl.classList.add(cls);
+    track.classList.add(cls);
     setTimeout(() => {
-      cardEl.classList.remove("gs-anim");
-      track.classList.remove("gs-anim");
-    }, 500);
+      cardEl.classList.remove(cls);
+      track.classList.remove(cls);
+    }, bounce ? 650 : 500);
   }
   animateOnce();
   // Force a reflow so the transition class is live before the first apply
@@ -1015,19 +1022,23 @@ function _gsOpenReader(cardEl){
     const atTop = win.scrollY <= 1;
     const atBottom = win.scrollY >= max - 2;
     if ((e.deltaY > 0 && atBottom) || (e.deltaY < 0 && atTop)){
-      // Gravity at either end of the article: squeeze back toward the
-      // card shape the harder you pull, spring back if you let go before
-      // the threshold, only actually collapse on a sustained pull.
+      // Gravity at either end of the article — deliberately heavy, like a
+      // rubber band: resistance builds up rather than giving way linearly,
+      // so the first bit of over-scroll barely moves it and only a
+      // sustained, forceful pull all the way through actually closes it.
+      // Letting go before that springs it back with a little bounce rather
+      // than a flat snap.
       readPull += Math.abs(e.deltaY);
-      if (readPull >= PULL_MAX){ collapse(); return; }
-      apply(1 - 0.35 * Math.min(1, readPull / PULL_MAX));
+      if (readPull >= READ_PULL_MAX){ collapse(true); return; }
+      const s = Math.min(1, readPull / READ_PULL_MAX);
+      apply(1 - 0.3 * (s * s)); // quadratic ease-in: stiff at first, gives more near the end
       clearTimeout(readPullTimer);
-      readPullTimer = setTimeout(() => { readPull = 0; animateOnce(); apply(1); }, 650);
+      readPullTimer = setTimeout(() => { readPull = 0; animateOnce(true); apply(1); }, 650);
     } else {
       if (readPull > 0){
         readPull = 0;
         clearTimeout(readPullTimer);
-        animateOnce();
+        animateOnce(true);
         apply(1);
       }
       win.scrollBy(0, e.deltaY);
@@ -1062,10 +1073,10 @@ function _gsOpenReader(cardEl){
   function onKey(e){ if (e.key === "Escape") collapse(); }
 
   let closed = false;
-  function collapse(){
+  function collapse(bounce){
     if (closed) return;
     closed = true;
-    animateOnce();
+    animateOnce(bounce);
     apply(0);
     setTimeout(() => {
       frame.remove();
@@ -1088,7 +1099,7 @@ function _gsOpenReader(cardEl){
       // genuinely changed (viewport resize, scrollbar reappearing) while
       // they weren't watching.
       window.dispatchEvent(new Event("resize"));
-    }, 480);
+    }, bounce ? 650 : 480);
   }
 
   window.addEventListener("message", onMsg);
