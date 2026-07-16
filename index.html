@@ -542,7 +542,12 @@ function armPastGravity(){
   let pull = 0;
   let springTimer = null;
 
-  const readerOpen = () => document.body.classList.contains("gs-reader-open");
+  // True while the in-grid reader is open, and for a short cooldown right
+  // after it closes — see the comment on _gsReaderClosedAt above for why the
+  // cooldown matters (trailing wheel ticks from the gesture that closed it).
+  const READER_COOLDOWN_MS = 400;
+  const readerOpen = () => document.body.classList.contains("gs-reader-open")
+    || (Date.now() - _gsReaderClosedAt) < READER_COOLDOWN_MS;
 
   // "Top" means the very start of the timeline: page scrollY at 0 AND (if
   // the This Week rail is present) its horizontal scroll fully retracted —
@@ -896,6 +901,16 @@ function _gsEmptyCard(en, ar){
                     same page standalone at its real, shareable URL.
    ============================================================ */
 let _gsReaderOpen = false;
+// Timestamp of the last reader close — a fast, sustained upward scroll used
+// to close the reader (pulling past the top of the article) can keep firing
+// wheel ticks for a few frames after gs-reader-open flips off, and those
+// trailing ticks land on armPastGravity's listener with window.scrollY back
+// at 0 (the reader restores the exact pre-open scroll position) — which
+// looks identical to "scrolling up at the top of the page" and would wrongly
+// arm the past-archive reveal. armPastGravity ignores wheel/touch input for
+// a short cooldown after this timestamp to give that trailing motion
+// somewhere harmless to land.
+let _gsReaderClosedAt = 0;
 function _gsOpenReader(cardEl){
   if (_gsReaderOpen) return;
   _gsReaderOpen = true;
@@ -1097,6 +1112,7 @@ function _gsOpenReader(cardEl){
       window.removeEventListener("wheel", onWheel);
       cardEl.removeEventListener("click", onClick, true);
       _gsReaderOpen = false;
+      _gsReaderClosedAt = Date.now();
       // setup()/onScroll() were locked out while the reader was open —
       // resync them now via the existing resize listener in case anything
       // genuinely changed (viewport resize, scrollbar reappearing) while
