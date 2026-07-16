@@ -932,16 +932,23 @@ function _gsOpenReader(cardEl){
   frame.className = "gs-card-frame";
   frame.title = "Event";
   frame.src = `event.html?id=${encodeURIComponent(cardEl.dataset.ev)}&embed=1`;
-  // The iframe stays non-interactive until fully expanded — see the wheel
-  // handler below for why: expansion used to be driven by the iframe's own
-  // scroll position reported back via postMessage, but that silently broke
-  // whenever an event's content was short enough to fit in one viewport
-  // (no scrollable overflow at all → the inner page's own boundary-pull
-  // logic treated every single wheel tick as "already at both the top and
-  // bottom", swallowing it before it could ever scroll or report back).
-  // Capturing the expansion gesture here instead — on the outer page,
-  // which is exactly the same reliable wheel-capture already proven by the
-  // past-archive gravity — removes that dependency entirely.
+  // The iframe stays pointer-events:none for the whole time it's embedded —
+  // permanently, not just during expansion. Two real, confirmed bugs led
+  // here: (1) whenever an event's content was short enough to fit in one
+  // viewport (no scrollable overflow at all), the embed page's own
+  // boundary-pull wheel logic treated every tick as simultaneously "at the
+  // top and bottom", swallowing it before it could scroll or report back;
+  // (2) even for long events, once the frame was handed pointer-events:auto
+  // after full expansion, real wheel/trackpad scrolling over it did nothing
+  // at all in testing on the actual deployed site — same-origin same-tab
+  // input just wasn't reaching the nested document reliably. Rather than
+  // keep chasing why, the outer page now drives EVERYTHING itself for as
+  // long as the reader is open: the expansion, the reading scroll (forwarded
+  // into the iframe programmatically), and the end-of-article gravity — all
+  // from wheel events captured here, the one mechanism already proven
+  // reliable (it's the same approach the past-archive gravity uses). Clicks
+  // (close/pop-out/register/nav links) are forwarded on a matching click
+  // listener below since pointer-events:none blocks native click routing too.
   frame.style.pointerEvents = "none";
   cardEl.appendChild(frame);
 
@@ -949,9 +956,13 @@ function _gsOpenReader(cardEl){
   const lerp = (a, b, t) => a + (b - a) * t;
   const CLICK_T = 0.18;   // borders nudge open on click — "content will be here"
   const EXPAND_PX = 320;  // wheel-px of "virtual" scroll to go from nudge to fully open
-  const PULL_MAX = 700;   // wheel-past-the-end needed to break out (gravity)
+  const PULL_MAX = 700;   // sustained pull-past-the-end needed to collapse (gravity)
+  const CLOSE_PULL_MAX = 300; // sustained pull back past rawY=0 needed to bail out early
   let scrollT = 0;        // 0..1 expansion progress
   let rawY = 0;           // accumulated virtual scroll driving scrollT, pre-expansion
+  let closePull = 0;      // sustained-pull accumulator, pre-expansion reversal
+  let readPull = 0;       // sustained-pull accumulator, post-expansion (reading) end-gravity
+  let readPullTimer = null;
 
   function apply(t){
     cardEl.style.flexBasis = lerp(startW, targetW, t) + "px";
@@ -975,45 +986,76 @@ function _gsOpenReader(cardEl){
     return CLICK_T + (1 - CLICK_T) * ease(Math.min(1, Math.max(0, y || 0) / EXPAND_PX));
   }
 
-  // Drives the expansion directly from wheel deltas on the outer page while
-  // the frame is locked (pointer-events:none). Once scrollT reaches 1, the
-  // frame is handed pointer-events back and the reader's own content takes
-  // over scrolling normally (including its own end-of-article gravity,
-  // reported back below via wc-pull/wc-collapse).
-  const CLOSE_PULL_MAX = 300; // sustained pull back past rawY=0 needed to bail out
-  let closePull = 0;
   function onWheel(e){
-    if (scrollT >= 1) return; // handed off to the iframe already
     e.preventDefault();
-    if (e.deltaY < 0 && rawY <= 0) {
-      // Already back at the card's nudged-open state and still pulling up
-      // — gravity, not an instant close: only a sustained pull bails out.
-      closePull += Math.abs(e.deltaY);
-      if (closePull >= CLOSE_PULL_MAX) collapse();
+
+    if (scrollT < 1){
+      // Expansion phase — drive flex-basis/translateX directly from the
+      // wheel delta.
+      if (e.deltaY < 0 && rawY <= 0){
+        // Already back at the nudged-open state and still pulling up —
+        // gravity, not an instant close: only a sustained pull bails out.
+        closePull += Math.abs(e.deltaY);
+        if (closePull >= CLOSE_PULL_MAX) collapse();
+        return;
+      }
+      closePull = 0;
+      rawY = Math.min(EXPAND_PX, Math.max(0, rawY + e.deltaY));
+      scrollT = tFromScroll(rawY);
+      apply(scrollT);
       return;
     }
-    closePull = 0;
-    rawY = Math.min(EXPAND_PX, Math.max(0, rawY + e.deltaY));
-    scrollT = tFromScroll(rawY);
-    apply(scrollT);
-    if (scrollT >= 1) frame.style.pointerEvents = "auto";
+
+    // Reading phase — fully expanded. Forward the gesture into the embedded
+    // page's own scroll manually rather than trusting native wheel delivery
+    // into the iframe.
+    const doc = frame.contentDocument, win = frame.contentWindow;
+    if (!doc || !win) return;
+    const max = doc.documentElement.scrollHeight - win.innerHeight;
+    const atTop = win.scrollY <= 1;
+    const atBottom = win.scrollY >= max - 2;
+    if ((e.deltaY > 0 && atBottom) || (e.deltaY < 0 && atTop)){
+      // Gravity at either end of the article: squeeze back toward the
+      // card shape the harder you pull, spring back if you let go before
+      // the threshold, only actually collapse on a sustained pull.
+      readPull += Math.abs(e.deltaY);
+      if (readPull >= PULL_MAX){ collapse(); return; }
+      apply(1 - 0.35 * Math.min(1, readPull / PULL_MAX));
+      clearTimeout(readPullTimer);
+      readPullTimer = setTimeout(() => { readPull = 0; animateOnce(); apply(1); }, 650);
+    } else {
+      if (readPull > 0){
+        readPull = 0;
+        clearTimeout(readPullTimer);
+        animateOnce();
+        apply(1);
+      }
+      win.scrollBy(0, e.deltaY);
+    }
+  }
+
+  // pointer-events:none on the frame blocks native click routing too, so
+  // clicks (close ✕, pop-out ↗, register link, prev/next nav) are forwarded
+  // the same way: find what's under the click inside the (same-origin)
+  // iframe document and trigger it directly.
+  function onClick(e){
+    const rect = frame.getBoundingClientRect();
+    const x = e.clientX - rect.left, y = e.clientY - rect.top;
+    if (x < 0 || y < 0 || x > rect.width || y > rect.height) return;
+    const doc = frame.contentDocument;
+    if (!doc) return;
+    const inner = doc.elementFromPoint(x, y);
+    const clickable = inner && inner.closest("a,button");
+    if (clickable){
+      e.preventDefault();
+      e.stopPropagation();
+      clickable.click();
+    }
   }
 
   function onMsg(e){
     const d = e.data || {};
-    if (d.type === "wc-scroll"){
-      // Expansion is fully driven by onWheel() above now — by the time the
-      // iframe is interactive enough to report its own scroll, scrollT is
-      // already 1. Nothing to do here; kept only so older messages in
-      // flight during the handoff can't throw.
-    } else if (d.type === "wc-pull"){
-      // Gravity at either end of the inner page: the block squeezes back
-      // toward its card shape the harder you pull, and springs back if
-      // you let go before the threshold.
-      const s = Math.min(1, (d.amount || 0) / PULL_MAX);
-      if (s === 0) animateOnce();
-      apply(scrollT * (1 - 0.35 * s));
-    } else if (d.type === "wc-close" || d.type === "wc-collapse"){
+    if (d.type === "wc-close" || d.type === "wc-collapse"){
       collapse();
     }
   }
@@ -1039,6 +1081,7 @@ function _gsOpenReader(cardEl){
       window.removeEventListener("message", onMsg);
       window.removeEventListener("keydown", onKey);
       window.removeEventListener("wheel", onWheel);
+      cardEl.removeEventListener("click", onClick, true);
       _gsReaderOpen = false;
       // setup()/onScroll() were locked out while the reader was open —
       // resync them now via the existing resize listener in case anything
@@ -1051,6 +1094,10 @@ function _gsOpenReader(cardEl){
   window.addEventListener("message", onMsg);
   window.addEventListener("keydown", onKey);
   window.addEventListener("wheel", onWheel, { passive: false });
+  // Capture phase so this runs before the track-level click delegate above
+  // (which would otherwise just no-op on the already-open reader anyway,
+  // but capture keeps the forwarding deterministic either way).
+  cardEl.addEventListener("click", onClick, true);
 }
 
 function renderFeatured(){
