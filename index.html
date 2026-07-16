@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Programme · The Wonder Cabinet</title>
-<link rel="stylesheet" href="assets/app.css?v=26">
+<link rel="stylesheet" href="assets/app.css?v=27">
 </head>
 <body data-view="list">
 
@@ -820,7 +820,7 @@ function _gsCardVideo(ev){
 function _gsEventCard(ev){
   const typeAr = TYPE_AR[ev.type] || ev.type;
   const videoSrc = _gsCardVideo(ev);
-  return `<a class="gs-card${videoSrc ? " gs-card-video" : ""}" href="event.html?id=${ev.id}">
+  return `<a class="gs-card${videoSrc ? " gs-card-video" : ""}" href="event.html?id=${ev.id}" data-ev="${ev.id}">
     ${videoSrc ? `<video class="gs-card-bg-video" autoplay muted loop playsinline src="${videoSrc}"></video><div class="gs-card-scrim"></div>` : ""}
     <div class="gs-card-inner">
       <div class="gs-c-meta">
@@ -844,6 +844,93 @@ function _gsEmptyCard(en, ar){
   return `<div class="gs-card gs-card-empty">
     <p class="gs-c-desc"><span class="en-only">${en}</span><span class="ar-only ar" dir="rtl">${ar}</span></p>
   </div>`;
+}
+
+/* ============================================================
+   IN-GRID EVENT READER
+   Clicking a This Week card doesn't navigate — it opens the real
+   event page (event.html?id=X&embed=1, the one canonical template)
+   inside the card's own block. The inner page's scroll drives
+   everything from there:
+     scroll down  → the block grows from the card's rect to the full
+                    area right of the rail (left text block stays),
+                    while the page reveals content underneath —
+                    hero video scrolls away, title sticks.
+     keep going   → normal reading, sticky title all the way.
+     overscroll   → past the bottom (or back past the top), the block
+                    collapses back into its card and the grid returns.
+     ✕            → collapses immediately.  ↗ (next to it) → opens the
+                    same page standalone at its real, shareable URL.
+   ============================================================ */
+let _gsReaderEl = null;
+function _gsOpenReader(cardEl){
+  if (_gsReaderEl) return;
+  const evId = cardEl.dataset.ev;
+  const rail = document.querySelector(".gs-rail");
+  const railRight = rail ? rail.getBoundingClientRect().right : 0;
+  const r = cardEl.getBoundingClientRect();
+  const startRect = { left: r.left, top: r.top, width: r.width, height: r.height };
+  const endRect = () => ({
+    left: railRight, top: 54,
+    width: window.innerWidth - railRight,
+    height: window.innerHeight - 54,
+  });
+
+  const el = document.createElement("div");
+  el.id = "gs-reader";
+  el.innerHTML = `<iframe src="event.html?id=${encodeURIComponent(evId)}&embed=1" title="Event"></iframe>`;
+  document.body.appendChild(el);
+  document.body.classList.add("gs-reader-open");
+  _gsReaderEl = el;
+
+  function setRect(rc){
+    el.style.left = rc.left + "px"; el.style.top = rc.top + "px";
+    el.style.width = rc.width + "px"; el.style.height = rc.height + "px";
+  }
+  setRect(startRect);
+
+  const ease = t => 1 - Math.pow(1 - t, 3);
+  const lerp = (a, b, t) => a + (b - a) * t;
+
+  function onMsg(e){
+    const d = e.data || {};
+    if (d.type === "wc-scroll"){
+      const p = ease(Math.min(1, (d.y || 0) / 320));
+      const eR = endRect();
+      setRect({
+        left: lerp(startRect.left, eR.left, p),
+        top: lerp(startRect.top, eR.top, p),
+        width: lerp(startRect.width, eR.width, p),
+        height: lerp(startRect.height, eR.height, p),
+      });
+    } else if (d.type === "wc-close" || d.type === "wc-overscroll"){
+      close();
+    }
+  }
+  function onKey(e){ if (e.key === "Escape") close(); }
+
+  let closed = false;
+  function close(){
+    if (closed) return;
+    closed = true;
+    el.classList.add("closing");
+    setRect(startRect);
+    let removed = false;
+    const done = () => {
+      if (removed) return;
+      removed = true;
+      window.removeEventListener("message", onMsg);
+      window.removeEventListener("keydown", onKey);
+      el.remove();
+      document.body.classList.remove("gs-reader-open");
+      _gsReaderEl = null;
+    };
+    el.addEventListener("transitionend", done, { once: true });
+    setTimeout(done, 600);
+  }
+
+  window.addEventListener("message", onMsg);
+  window.addEventListener("keydown", onKey);
 }
 
 function renderFeatured(){
@@ -954,6 +1041,15 @@ function renderFeatured(){
   window.addEventListener("resize", setup);
   window.addEventListener("scroll", onScroll, { passive: true });
   onScroll();
+
+  // Event cards open the in-grid reader instead of navigating; cmd/ctrl
+  // click (and the reader's own ↗ button) still reach the real URL.
+  track.addEventListener("click", (e) => {
+    const card = e.target.closest("a.gs-card[data-ev]");
+    if (!card || e.metaKey || e.ctrlKey || e.shiftKey) return;
+    e.preventDefault();
+    _gsOpenReader(card);
+  });
 
   // Featured projects marquee
   const projectsSection = document.getElementById("gs-projects-section");

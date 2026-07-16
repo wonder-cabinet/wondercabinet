@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Event · The Wonder Cabinet</title>
-<link rel="stylesheet" href="assets/app.css?v=26" />
+<link rel="stylesheet" href="assets/app.css?v=27" />
 <style>
   /* This page uses the exact same .ep-* / .event-panel template as every
      other entry point on the site (the homepage hero cards, the Programme
@@ -35,6 +35,35 @@
   }
   .ev-lang-toggle button[aria-pressed="true"]{ opacity: 1; }
   .event-page-wrap{ padding-top: clamp(24px, 4vw, 48px); min-height: 60vh; }
+
+  /* ---- EMBED MODE (?embed=1) ----
+     The same page, hosted inside the homepage grid's expanding reader
+     block (an iframe). Chrome is stripped (lang toggle, footer, "also
+     this month"), the panel fills the frame edge-to-edge, the title
+     stays sticky while everything scrolls beneath it, and a hero video
+     (the same one the grid card uses as its background) sits at the top
+     of the flow so it scrolls away as you read. */
+  html.embed .ev-lang-toggle{ display: none; }
+  html.embed .more{ display: none !important; }
+  html.embed .foot{ display: none !important; }
+  html.embed .event-page-wrap{ padding-top: 0; min-height: 0; }
+  html.embed .event-panel.is-page{ max-width: none; margin: 0; min-height: 100vh; }
+  html.embed .ep-header{ background: inherit; }
+  html.embed .ep-title{
+    position: sticky; top: 0; z-index: 30;
+    background: inherit; padding: 10px 0;
+  }
+  html.embed .cb-text:has(.cta-inline-link){ top: var(--wc-title-h, 96px); }
+  .ep-hero-video video{ width: 100%; display: block; }
+  .ep-pop{
+    all: unset; cursor: pointer;
+    position: absolute; top: 15px; right: 47px;
+    width: 24px; height: 24px;
+    display: grid; place-items: center;
+    font-size: 15px; font-weight: 700;
+    opacity: .55; transition: opacity .15s;
+  }
+  .ep-pop:hover{ opacity: 1; }
 </style>
 </head>
 <body>
@@ -304,10 +333,28 @@
   </a>` : `<div class="ep-nav-btn ep-nav-empty"></div>`}
 </div>`;
 
+    // Embed mode: pull the event's video (the same one the grid card uses
+    // as its background) up to the very top of the flow, so it scrolls
+    // away as you read — and don't render it twice down in the blocks.
+    let contentBlocks = ev.content || [];
+    let heroVideoHtml = "";
+    if (EMBED) {
+      const vb = contentBlocks.find(b => (b._type || '') === 'contentVideo');
+      const vsrc = vb ? (_sanityFile(vb.videoFile) || '') : '';
+      if (vsrc) {
+        heroVideoHtml = `<div class="ep-hero-video"><video autoplay muted loop playsinline src="${vsrc}"></video></div>`;
+        contentBlocks = contentBlocks.filter(b => b !== vb);
+      }
+    }
+    const popBtn = EMBED
+      ? `<a class="ep-pop" href="event.html?id=${encodeURIComponent(ev.id)}" target="_top" aria-label="Open as its own page">↗</a>`
+      : "";
+
     return `
-${audioBar}
+${heroVideoHtml}${audioBar}
 <div class="ep-header">
   <a class="ep-close" id="epClose" href="index.html" aria-label="Back">✕</a>
+  ${popBtn}
   <div class="ep-meta">
     <div class="dt-block">
       <span class="en-only">${ev.dowFull ? `${ev.dowFull}<br>${ev.monthFull} ${ev.dayOrdinal}, ${ev.year}` : _overlayDate(ev)}</span>
@@ -326,8 +373,8 @@ ${audioBar}
 <div class="ep-body">
   ${coverHtml}
   <div class="ep-content">
-    ${ev.content && ev.content.length
-      ? `<div class="ep-content-blocks">${_renderBlocks(ev.content)}</div>`
+    ${contentBlocks && contentBlocks.length
+      ? `<div class="ep-content-blocks">${_renderBlocks(contentBlocks)}</div>`
       : (bodyEn || bodyAr ? `
     <div class="ep-text">
       ${bodyEn ? `<div class="en-only">${bodyEn}</div>` : ""}
@@ -377,6 +424,9 @@ ${audioBar}
 
   const params = new URLSearchParams(location.search);
   const id = params.get('id') || '';
+  const EMBED = params.get('embed') === '1';
+  if (EMBED) document.documentElement.classList.add('embed');
+  const _post = m => { try { if (window.parent !== window) window.parent.postMessage(m, '*'); } catch(_){} };
   const BASE = `https://${SANITY_PROJECT}.api.sanity.io/v2024-01-01/data/query/${SANITY_DATASET}?query=`;
   async function groq(query){ const res = await fetch(BASE + encodeURIComponent(query)); const json = await res.json(); return json.result; }
 
@@ -400,12 +450,49 @@ ${audioBar}
   root.style.color = tc.ink;
   root.innerHTML = buildEventPanel(ev, all);
   document.getElementById('epClose').addEventListener('click', function(e){
+    if (EMBED) {
+      // Inside the homepage grid reader — ✕ collapses the block back into
+      // its card instead of navigating anywhere.
+      e.preventDefault();
+      _post({ type: 'wc-close' });
+      return;
+    }
     if (document.referrer && document.referrer.indexOf(location.origin) === 0 && history.length > 1) {
       e.preventDefault();
       history.back();
     }
   });
   _initPanelAudio(root);
+
+  if (EMBED) {
+    // Fill the whole frame with the event's theme color (no page margins).
+    document.documentElement.style.setProperty('--bg', tc.bg);
+    document.body.style.background = tc.bg;
+
+    // The ticket bar sticks just below the sticky title — measure the
+    // title's real height so the CSS offset always matches.
+    const titleEl = root.querySelector('.ep-title');
+    if (titleEl) document.documentElement.style.setProperty('--wc-title-h', (titleEl.offsetHeight + 20) + 'px');
+
+    // Report scroll position to the parent — it maps the first stretch of
+    // scrolling onto the block's expansion from card-size to full-area.
+    window.addEventListener('scroll', () => _post({ type: 'wc-scroll', y: window.scrollY }), { passive: true });
+
+    // Over-scrolling past either end (bottom of the page, or back up past
+    // the top) tells the parent to collapse the reader back into the grid.
+    let _overAcc = 0;
+    window.addEventListener('wheel', (e) => {
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      const atBottom = window.scrollY >= max - 2;
+      const atTop = window.scrollY <= 1;
+      if ((e.deltaY > 0 && atBottom) || (e.deltaY < 0 && atTop)) {
+        _overAcc += Math.abs(e.deltaY);
+        if (_overAcc > 260) { _overAcc = -1e9; _post({ type: 'wc-overscroll' }); }
+      } else {
+        _overAcc = 0;
+      }
+    }, { passive: true });
+  }
 
   // Also this month
   const more = all.filter(e => e.month === ev.month && e.year === ev.year && e.id !== ev.id).slice(0, 4);

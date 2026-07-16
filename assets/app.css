@@ -1746,6 +1746,32 @@ html[data-lang="ar"] .ar-only{ direction: rtl; }
   .gs-res-item:last-child{ border-bottom: 0; }
 }
 
+/* ---------- IN-GRID EVENT READER ----------
+   A fixed-position window that starts at a This Week card's exact rect
+   and — driven by the embedded page's own scroll — grows to fill the
+   area right of the rail. Hosts event.html?embed=1 in an iframe (the
+   single canonical event template). */
+#gs-reader{
+  position: fixed;
+  z-index: 80;
+  overflow: hidden;
+  background: var(--paper);
+  border: 2px solid var(--ink);
+  box-sizing: border-box;
+}
+#gs-reader iframe{
+  width: 100%; height: 100%;
+  border: 0; display: block;
+}
+#gs-reader.closing{
+  transition:
+    left .45s cubic-bezier(.2,.8,.2,1),
+    top .45s cubic-bezier(.2,.8,.2,1),
+    width .45s cubic-bezier(.2,.8,.2,1),
+    height .45s cubic-bezier(.2,.8,.2,1);
+}
+body.gs-reader-open{ overflow: hidden; }
+
 /* =========================================================
    EVENT OVERLAY — backdrop · panel (right-slide) · fullscreen
    ========================================================= */
