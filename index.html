@@ -724,11 +724,14 @@ function revealPastArchive(){
   const DUR = 900;
   const t0 = performance.now();
   const easeInOut = t => t < 0.5 ? 2*t*t : 1 - Math.pow(-2*t + 2, 2) / 2;
-  (function step(now){
-    const t = Math.min(1, (now - t0) / DUR);
+  // setInterval rather than rAF — rAF stalls in occluded/backgrounded tabs
+  // (bitten by this before), and a 60fps-ish timer is indistinguishable
+  // here while never silently freezing mid-animation.
+  const timer = setInterval(() => {
+    const t = Math.min(1, (performance.now() - t0) / DUR);
     window.scrollTo(0, from + (to - from) * easeInOut(t));
-    if (t < 1) requestAnimationFrame(step);
-  })(t0);
+    if (t >= 1) clearInterval(timer);
+  }, 16);
 }
 
 function renderPastTimeline(){
