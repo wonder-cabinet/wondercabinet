@@ -49,12 +49,22 @@
   html.embed .foot{ display: none !important; }
   html.embed .event-page-wrap{ padding-top: 0; min-height: 0; }
   html.embed .event-panel.is-page{ max-width: none; margin: 0; min-height: 100vh; }
-  html.embed .ep-header{ background: inherit; }
-  html.embed .ep-title{
-    position: sticky; top: 0; z-index: 30;
-    background: inherit; padding: 10px 0;
+  /* The whole header is sticky at a negative offset so that once you
+     scroll, the meta rows slide out above the frame and ONLY the title
+     row stays pinned — and since the header's containing block is the
+     full page, the title stays pinned all the way down. */
+  html.embed .ep-header{
+    position: sticky;
+    top: var(--wc-header-stick, 0px);
+    z-index: 30;
+    background: inherit;
   }
+  html.embed .ep-title{ padding: 10px 80px 10px 0; }
   html.embed .cb-text:has(.cta-inline-link){ top: var(--wc-title-h, 96px); }
+  /* Close / pop-out always reachable, pinned to the frame itself. */
+  html.embed .ep-close, html.embed .ep-pop{ position: fixed; top: 14px; z-index: 60; }
+  html.embed .ep-close{ right: 14px; }
+  html.embed .ep-pop{ right: 46px; }
   .ep-hero-video video{ width: 100%; display: block; }
   .ep-pop{
     all: unset; cursor: pointer;
@@ -470,10 +480,17 @@ ${heroVideoHtml}${audioBar}
     document.documentElement.style.setProperty('--bg', tc.bg);
     document.body.style.background = tc.bg;
 
-    // The ticket bar sticks just below the sticky title — measure the
-    // title's real height so the CSS offset always matches.
+    // Sticky header math: pin the header at a negative top equal to the
+    // title's offset within it, so exactly the title row stays visible
+    // once scrolled. The ticket bar then sticks just below that.
+    const headerEl = root.querySelector('.ep-header');
     const titleEl = root.querySelector('.ep-title');
-    if (titleEl) document.documentElement.style.setProperty('--wc-title-h', (titleEl.offsetHeight + 20) + 'px');
+    if (headerEl && titleEl) {
+      const stick = -titleEl.offsetTop;
+      const visibleH = headerEl.offsetHeight - titleEl.offsetTop;
+      document.documentElement.style.setProperty('--wc-header-stick', stick + 'px');
+      document.documentElement.style.setProperty('--wc-title-h', visibleH + 'px');
+    }
 
     // Report scroll position to the parent — it maps the first stretch of
     // scrolling onto the block's expansion from card-size to full-area.
