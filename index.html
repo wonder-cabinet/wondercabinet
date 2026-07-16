@@ -956,32 +956,30 @@ function _gsOpenReader(cardEl){
   const lerp = (a, b, t) => a + (b - a) * t;
   const CLICK_T = 0.18;   // borders nudge open on click — "content will be here"
   const EXPAND_PX = 320;  // wheel-px of "virtual" scroll to go from nudge to fully open
-  const CLOSE_PULL_MAX = 300;  // sustained pull back past rawY=0 needed to bail out early
-  const READ_PULL_MAX = 1600;  // sustained pull past the article's end needed to actually close —
-                                // deliberately heavy: this is the "have to force it" gravity at
-                                // the end of reading, distinct from (and stronger than) the
-                                // pre-expansion one above.
+  const CLOSE_PX = 320;   // wheel-px of "virtual" scroll to go from fully open back to closed —
+                           // used symmetrically at BOTH ends (before full expansion, and past
+                           // either edge of the article), so opening and closing are the exact
+                           // same kind of motion in reverse: continuously tied to the wheel,
+                           // reversible at any point, no threshold/snap/auto-trigger anywhere.
+                           // Reaching the end of that motion (t=0) IS the close — not a separate
+                           // action layered on top of it.
   let scrollT = 0;        // 0..1 expansion progress
-  let rawY = 0;           // accumulated virtual scroll driving scrollT, pre-expansion
-  let closePull = 0;      // sustained-pull accumulator, pre-expansion reversal
-  let readPull = 0;       // sustained-pull accumulator, post-expansion (reading) end-gravity
-  let readPullTimer = null;
+  let rawY = 0;           // virtual scroll position pre-full-expansion, ranges -CLOSE_PX..EXPAND_PX
+                           // (negative = shrinking from the nudge back toward closed)
+  let closeRawY = 0;      // virtual scroll position once past an edge during reading, 0..CLOSE_PX
+  let closeDir = 0;       // 0 = reading normally; +1 closing via the bottom edge, -1 via the top
 
   function apply(t){
     cardEl.style.flexBasis = lerp(startW, targetW, t) + "px";
     track.style.transform = `translateX(${lerp(baseX, targetX, t)}px)`;
   }
-  // bounce=true uses a springier, slower easing (a bit of overshoot before
-  // settling) — reserved for the end-of-article gravity, so springing back
-  // or finally letting go both feel weighty rather than a flat snap.
-  function animateOnce(bounce){
-    const cls = bounce ? "gs-anim-bounce" : "gs-anim";
-    cardEl.classList.add(cls);
-    track.classList.add(cls);
+  function animateOnce(){
+    cardEl.classList.add("gs-anim");
+    track.classList.add("gs-anim");
     setTimeout(() => {
-      cardEl.classList.remove(cls);
-      track.classList.remove(cls);
-    }, bounce ? 650 : 500);
+      cardEl.classList.remove("gs-anim");
+      track.classList.remove("gs-anim");
+    }, 500);
   }
   animateOnce();
   // Force a reflow so the transition class is live before the first apply
@@ -989,27 +987,21 @@ function _gsOpenReader(cardEl){
   void cardEl.offsetWidth;
   apply(CLICK_T);
 
-  function tFromScroll(y){
-    return CLICK_T + (1 - CLICK_T) * ease(Math.min(1, Math.max(0, y || 0) / EXPAND_PX));
-  }
-
   function onWheel(e){
     e.preventDefault();
 
     if (scrollT < 1){
-      // Expansion phase — drive flex-basis/translateX directly from the
-      // wheel delta.
-      if (e.deltaY < 0 && rawY <= 0){
-        // Already back at the nudged-open state and still pulling up —
-        // gravity, not an instant close: only a sustained pull bails out.
-        closePull += Math.abs(e.deltaY);
-        if (closePull >= CLOSE_PULL_MAX) collapse();
-        return;
-      }
-      closePull = 0;
-      rawY = Math.min(EXPAND_PX, Math.max(0, rawY + e.deltaY));
-      scrollT = tFromScroll(rawY);
+      // Pre-full-expansion — a single continuous scale from fully closed
+      // (rawY = -CLOSE_PX) through the click-nudge (rawY = 0) up to fully
+      // open (rawY = EXPAND_PX), driven directly and reversibly by the
+      // wheel. No thresholds: scrolling back down at any point just grows
+      // it again; only actually reaching either end does anything final.
+      rawY = Math.min(EXPAND_PX, Math.max(-CLOSE_PX, rawY + e.deltaY));
+      scrollT = rawY >= 0
+        ? CLICK_T + (1 - CLICK_T) * ease(rawY / EXPAND_PX)
+        : CLICK_T * (1 - ease(-rawY / CLOSE_PX));
       apply(scrollT);
+      if (rawY <= -CLOSE_PX){ collapse(true); return; }
       return;
     }
 
@@ -1018,29 +1010,31 @@ function _gsOpenReader(cardEl){
     // into the iframe.
     const doc = frame.contentDocument, win = frame.contentWindow;
     if (!doc || !win) return;
+
+    if (closeDir !== 0){
+      // Already past an edge and shrinking back — same continuous, fully
+      // reversible motion as the pre-expansion phase, just mirrored: keep
+      // pulling the same way and it shrinks all the way to closed;
+      // reverse and it grows back to full size and resumes reading.
+      closeRawY = Math.min(CLOSE_PX, Math.max(0, closeRawY + closeDir * e.deltaY));
+      apply(1 - ease(closeRawY / CLOSE_PX));
+      if (closeRawY <= 0){ closeDir = 0; return; }
+      if (closeRawY >= CLOSE_PX){ collapse(true); return; }
+      return;
+    }
+
     const max = doc.documentElement.scrollHeight - win.innerHeight;
     const atTop = win.scrollY <= 1;
     const atBottom = win.scrollY >= max - 2;
-    if ((e.deltaY > 0 && atBottom) || (e.deltaY < 0 && atTop)){
-      // Gravity at either end of the article — deliberately heavy, like a
-      // rubber band: resistance builds up rather than giving way linearly,
-      // so the first bit of over-scroll barely moves it and only a
-      // sustained, forceful pull all the way through actually closes it.
-      // Letting go before that springs it back with a little bounce rather
-      // than a flat snap.
-      readPull += Math.abs(e.deltaY);
-      if (readPull >= READ_PULL_MAX){ collapse(true); return; }
-      const s = Math.min(1, readPull / READ_PULL_MAX);
-      apply(1 - 0.3 * (s * s)); // quadratic ease-in: stiff at first, gives more near the end
-      clearTimeout(readPullTimer);
-      readPullTimer = setTimeout(() => { readPull = 0; animateOnce(true); apply(1); }, 650);
+    if (e.deltaY > 0 && atBottom){
+      closeDir = 1;
+      closeRawY = Math.min(CLOSE_PX, e.deltaY);
+      apply(1 - ease(closeRawY / CLOSE_PX));
+    } else if (e.deltaY < 0 && atTop){
+      closeDir = -1;
+      closeRawY = Math.min(CLOSE_PX, -e.deltaY);
+      apply(1 - ease(closeRawY / CLOSE_PX));
     } else {
-      if (readPull > 0){
-        readPull = 0;
-        clearTimeout(readPullTimer);
-        animateOnce(true);
-        apply(1);
-      }
       win.scrollBy(0, e.deltaY);
     }
   }
@@ -1073,11 +1067,20 @@ function _gsOpenReader(cardEl){
   function onKey(e){ if (e.key === "Escape") collapse(); }
 
   let closed = false;
-  function collapse(bounce){
+  // instant=true means the continuous wheel-driven shrink already carried
+  // the block all the way down to card size (t=0) on its own — there's
+  // nothing left to animate, just tear down and clean up. Used by onWheel's
+  // two continuous-close paths above. The default (no argument) is for the
+  // deliberate, discrete actions — ✕, pop-out's sibling Escape key, a
+  // postMessage close — which still get the snap-shut transition since
+  // there's no preceding scroll motion to hand off from.
+  function collapse(instant){
     if (closed) return;
     closed = true;
-    animateOnce(bounce);
-    apply(0);
+    if (!instant){
+      animateOnce();
+      apply(0);
+    }
     setTimeout(() => {
       frame.remove();
       cardEl.classList.remove("gs-card-open");
@@ -1099,7 +1102,7 @@ function _gsOpenReader(cardEl){
       // genuinely changed (viewport resize, scrollbar reappearing) while
       // they weren't watching.
       window.dispatchEvent(new Event("resize"));
-    }, bounce ? 650 : 480);
+    }, instant ? 0 : 480);
   }
 
   window.addEventListener("message", onMsg);
