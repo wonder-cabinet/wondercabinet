@@ -909,7 +909,10 @@ function _gsOpenReader(cardEl){
     }, 500);
   }
   animateOnce();
-  requestAnimationFrame(() => apply(CLICK_T));
+  // Force a reflow so the transition class is live before the first apply
+  // (rAF is unreliable in backgrounded/occluded tabs).
+  void cardEl.offsetWidth;
+  apply(CLICK_T);
 
   function tFromScroll(y){
     return CLICK_T + (1 - CLICK_T) * ease(Math.min(1, (y || 0) / 320));
