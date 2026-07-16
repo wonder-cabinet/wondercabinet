@@ -912,8 +912,19 @@ function _gsOpenReader(cardEl){
   const targetW = window.innerWidth - railW; // full area right of the rail
   const targetX = -cardEl.offsetLeft;        // card's left border lands on the rail
 
-  document.documentElement.style.overflow = "hidden";
-  document.body.style.overflow = "hidden";
+  // Freeze the background page. overflow:hidden alone is not reliable here
+  // — some wheel/trackpad gestures still nudge window.scrollY through it,
+  // and it also makes body/html the nearest "scroll container" for any
+  // position:sticky descendant, corrupting their stuck-state math (the
+  // exact class of bug already hit once with the ticket bar). Locking via
+  // position:fixed removes the body from scrollable flow entirely — no
+  // scroll can occur, sticky computations elsewhere are untouched — and we
+  // restore the exact scroll position on close.
+  const _lockScrollY = window.scrollY;
+  document.body.style.position = "fixed";
+  document.body.style.top = `-${_lockScrollY}px`;
+  document.body.style.left = "0";
+  document.body.style.right = "0";
   document.body.classList.add("gs-reader-open");
 
   cardEl.classList.add("gs-card-open");
@@ -980,9 +991,12 @@ function _gsOpenReader(cardEl){
       cardEl.classList.remove("gs-card-open");
       cardEl.style.flexBasis = "";
       track.style.transform = `translateX(${baseX}px)`;
-      document.documentElement.style.overflow = "";
-      document.body.style.overflow = "";
+      document.body.style.position = "";
+      document.body.style.top = "";
+      document.body.style.left = "";
+      document.body.style.right = "";
       document.body.classList.remove("gs-reader-open");
+      window.scrollTo(0, _lockScrollY);
       window.removeEventListener("message", onMsg);
       window.removeEventListener("keydown", onKey);
       _gsReaderOpen = false;
