@@ -2082,8 +2082,12 @@ html[data-lang="ar"] .ar-only{ direction: rtl; }
   width: 100vw;
   position: sticky;
   top: 0;
-  left: 50%;
-  margin-left: -50vw;
+  /* left:50%/-50vw resolves against the CARD's width (the containing
+     block), not the viewport, so it drifted the whole bar off-center —
+     margin calc(50% - 50vw) is viewport-relative regardless of the
+     containing block and centers it correctly under position:sticky. */
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
   padding: 16px max(15px, calc((100vw - 860px) / 2 + 15px));
   z-index: 20;
 }
