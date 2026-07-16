@@ -1830,7 +1830,6 @@ html[data-lang="ar"] .ar-only{ direction: rtl; }
   margin: 0 0 .9em; max-width: 58ch; font-weight: 500;
   color: var(--night);
 }
-.ep-text p:first-child{ font-size: 18px; font-weight: 600; }
 .ep-text .ar p{
   font-family: var(--ff-ar); direction: rtl; text-align: right;
   font-size: 19px; line-height: 1.9; font-weight: 400;
@@ -2062,9 +2061,7 @@ html[data-lang="ar"] .ar-only{ direction: rtl; }
   font-family: var(--ff-sans); font-size: 17px; line-height: 1.6;
   margin: 0 0 .9em; font-weight: 500;
 }
-.cb-text p:first-child{ font-size: 19px; font-weight: 600; }
 .efs-content-blocks .cb-text p{ font-size: 18px; line-height: 1.65; }
-.efs-content-blocks .cb-text p:first-child{ font-size: 21px; }
 .cb-text .ar p{
   font-family: var(--ff-ar); direction: rtl; text-align: right;
   font-size: 19px; line-height: 1.9; font-weight: 400;
