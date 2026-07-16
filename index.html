@@ -881,6 +881,10 @@ function _gsOpenReader(cardEl){
   el.innerHTML = `<iframe src="event.html?id=${encodeURIComponent(evId)}&embed=1" title="Event"></iframe>`;
   document.body.appendChild(el);
   document.body.classList.add("gs-reader-open");
+  // Hard scroll lock on both potential scrollers — the card's rect (our
+  // collapse target) is viewport-relative and must not drift while open.
+  document.documentElement.style.overflow = "hidden";
+  document.body.style.overflow = "hidden";
   _gsReaderEl = el;
 
   function setRect(rc){
@@ -923,6 +927,8 @@ function _gsOpenReader(cardEl){
       window.removeEventListener("keydown", onKey);
       el.remove();
       document.body.classList.remove("gs-reader-open");
+      document.documentElement.style.overflow = "";
+      document.body.style.overflow = "";
       _gsReaderEl = null;
     };
     el.addEventListener("transitionend", done, { once: true });
