@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Event · The Wonder Cabinet</title>
-<link rel="stylesheet" href="assets/app.css?v=27" />
+<link rel="stylesheet" href="assets/app.css?v=28" />
 <style>
   /* This page uses the exact same .ep-* / .event-panel template as every
      other entry point on the site (the homepage hero cards, the Programme
@@ -496,18 +496,35 @@ ${heroVideoHtml}${audioBar}
     // scrolling onto the block's expansion from card-size to full-area.
     window.addEventListener('scroll', () => _post({ type: 'wc-scroll', y: window.scrollY }), { passive: true });
 
-    // Over-scrolling past either end (bottom of the page, or back up past
-    // the top) tells the parent to collapse the reader back into the grid.
-    let _overAcc = 0;
+    // Gravity at both ends: over-scrolling past the bottom (or back past
+    // the top) doesn't close the reader immediately — the pull amount is
+    // streamed to the parent, which squeezes the block in response, and
+    // only a sustained pull past the threshold breaks it out and
+    // collapses the page back into the grid. Letting go springs it back.
+    const PULL_MAX = 700;
+    let _pull = 0, _pullTimer = null;
     window.addEventListener('wheel', (e) => {
       const max = document.documentElement.scrollHeight - window.innerHeight;
       const atBottom = window.scrollY >= max - 2;
       const atTop = window.scrollY <= 1;
       if ((e.deltaY > 0 && atBottom) || (e.deltaY < 0 && atTop)) {
-        _overAcc += Math.abs(e.deltaY);
-        if (_overAcc > 260) { _overAcc = -1e9; _post({ type: 'wc-overscroll' }); }
-      } else {
-        _overAcc = 0;
+        _pull += Math.abs(e.deltaY);
+        if (_pull >= PULL_MAX) {
+          _pull = -1e9;
+          clearTimeout(_pullTimer);
+          _post({ type: 'wc-collapse' });
+          return;
+        }
+        _post({ type: 'wc-pull', amount: _pull });
+        clearTimeout(_pullTimer);
+        _pullTimer = setTimeout(() => {
+          _pull = 0;
+          _post({ type: 'wc-pull', amount: 0 });
+        }, 650);
+      } else if (_pull > 0) {
+        _pull = 0;
+        clearTimeout(_pullTimer);
+        _post({ type: 'wc-pull', amount: 0 });
       }
     }, { passive: true });
   }

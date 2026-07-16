@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Programme · The Wonder Cabinet</title>
-<link rel="stylesheet" href="assets/app.css?v=27">
+<link rel="stylesheet" href="assets/app.css?v=28">
 </head>
 <body data-view="list">
 
@@ -862,77 +862,95 @@ function _gsEmptyCard(en, ar){
      ✕            → collapses immediately.  ↗ (next to it) → opens the
                     same page standalone at its real, shareable URL.
    ============================================================ */
-let _gsReaderEl = null;
+let _gsReaderOpen = false;
 function _gsOpenReader(cardEl){
-  if (_gsReaderEl) return;
-  const evId = cardEl.dataset.ev;
-  const rail = document.querySelector(".gs-rail");
-  const railRight = rail ? rail.getBoundingClientRect().right : 0;
-  const r = cardEl.getBoundingClientRect();
-  const startRect = { left: r.left, top: r.top, width: r.width, height: r.height };
-  const endRect = () => ({
-    left: railRight, top: 54,
-    width: window.innerWidth - railRight,
-    height: window.innerHeight - 54,
-  });
+  if (_gsReaderOpen) return;
+  _gsReaderOpen = true;
 
-  const el = document.createElement("div");
-  el.id = "gs-reader";
-  el.innerHTML = `<iframe src="event.html?id=${encodeURIComponent(evId)}&embed=1" title="Event"></iframe>`;
-  document.body.appendChild(el);
-  document.body.classList.add("gs-reader-open");
-  // Hard scroll lock on both potential scrollers — the card's rect (our
-  // collapse target) is viewport-relative and must not drift while open.
+  const track = document.getElementById("gs-track");
+  const rail = document.querySelector(".gs-rail");
+  const railW = rail ? rail.getBoundingClientRect().width : 0;
+
+  // Current track translate (the horizontal scroll-lock position) — the
+  // page scroll is frozen while reading, so this stays our baseline.
+  const m = /translateX\((-?[\d.]+)px\)/.exec(track.style.transform || "");
+  const baseX = m ? parseFloat(m[1]) : 0;
+  const startW = cardEl.getBoundingClientRect().width;
+  const targetW = window.innerWidth - railW; // full area right of the rail
+  const targetX = -cardEl.offsetLeft;        // card's left border lands on the rail
+
   document.documentElement.style.overflow = "hidden";
   document.body.style.overflow = "hidden";
-  _gsReaderEl = el;
+  document.body.classList.add("gs-reader-open");
 
-  function setRect(rc){
-    el.style.left = rc.left + "px"; el.style.top = rc.top + "px";
-    el.style.width = rc.width + "px"; el.style.height = rc.height + "px";
-  }
-  setRect(startRect);
+  cardEl.classList.add("gs-card-open");
+  const frame = document.createElement("iframe");
+  frame.className = "gs-card-frame";
+  frame.title = "Event";
+  frame.src = `event.html?id=${encodeURIComponent(cardEl.dataset.ev)}&embed=1`;
+  cardEl.appendChild(frame);
 
   const ease = t => 1 - Math.pow(1 - t, 3);
   const lerp = (a, b, t) => a + (b - a) * t;
+  const CLICK_T = 0.18;   // borders nudge open on click — "content will be here"
+  const PULL_MAX = 700;   // wheel-past-the-end needed to break out (gravity)
+  let scrollT = 0;        // expansion driven by the inner page's scroll
+
+  function apply(t){
+    cardEl.style.flexBasis = lerp(startW, targetW, t) + "px";
+    track.style.transform = `translateX(${lerp(baseX, targetX, t)}px)`;
+  }
+  function animateOnce(){
+    cardEl.classList.add("gs-anim");
+    track.classList.add("gs-anim");
+    setTimeout(() => {
+      cardEl.classList.remove("gs-anim");
+      track.classList.remove("gs-anim");
+    }, 500);
+  }
+  animateOnce();
+  requestAnimationFrame(() => apply(CLICK_T));
+
+  function tFromScroll(y){
+    return CLICK_T + (1 - CLICK_T) * ease(Math.min(1, (y || 0) / 320));
+  }
 
   function onMsg(e){
     const d = e.data || {};
     if (d.type === "wc-scroll"){
-      const p = ease(Math.min(1, (d.y || 0) / 320));
-      const eR = endRect();
-      setRect({
-        left: lerp(startRect.left, eR.left, p),
-        top: lerp(startRect.top, eR.top, p),
-        width: lerp(startRect.width, eR.width, p),
-        height: lerp(startRect.height, eR.height, p),
-      });
-    } else if (d.type === "wc-close" || d.type === "wc-overscroll"){
-      close();
+      scrollT = tFromScroll(d.y);
+      apply(scrollT);
+    } else if (d.type === "wc-pull"){
+      // Gravity at either end of the inner page: the block squeezes back
+      // toward its card shape the harder you pull, and springs back if
+      // you let go before the threshold.
+      const s = Math.min(1, (d.amount || 0) / PULL_MAX);
+      if (s === 0) animateOnce();
+      apply(scrollT * (1 - 0.35 * s));
+    } else if (d.type === "wc-close" || d.type === "wc-collapse"){
+      collapse();
     }
   }
-  function onKey(e){ if (e.key === "Escape") close(); }
+  function onKey(e){ if (e.key === "Escape") collapse(); }
 
   let closed = false;
-  function close(){
+  function collapse(){
     if (closed) return;
     closed = true;
-    el.classList.add("closing");
-    setRect(startRect);
-    let removed = false;
-    const done = () => {
-      if (removed) return;
-      removed = true;
-      window.removeEventListener("message", onMsg);
-      window.removeEventListener("keydown", onKey);
-      el.remove();
-      document.body.classList.remove("gs-reader-open");
+    animateOnce();
+    apply(0);
+    setTimeout(() => {
+      frame.remove();
+      cardEl.classList.remove("gs-card-open");
+      cardEl.style.flexBasis = "";
+      track.style.transform = `translateX(${baseX}px)`;
       document.documentElement.style.overflow = "";
       document.body.style.overflow = "";
-      _gsReaderEl = null;
-    };
-    el.addEventListener("transitionend", done, { once: true });
-    setTimeout(done, 600);
+      document.body.classList.remove("gs-reader-open");
+      window.removeEventListener("message", onMsg);
+      window.removeEventListener("keydown", onKey);
+      _gsReaderOpen = false;
+    }, 480);
   }
 
   window.addEventListener("message", onMsg);
