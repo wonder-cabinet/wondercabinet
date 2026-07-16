@@ -1471,18 +1471,20 @@ html[data-lang="ar"] .ar-only{ direction: rtl; }
 
 /* Past-history reveal — sits ABOVE the topbar, collapsed to zero height
    at rest, so the page looks completely normal until the user scrolls up
-   (see armPastGravity() in index.html). A first upward scroll/wheel/touch
-   attempt at the top peeks it open (.is-peeking); a second commits and
-   loads the full archive with a smooth "gravity" scroll pulling the user
-   in. Exit lives in the sticky filter bar, reachable however far back you
-   scroll. */
+   (see armPastGravity() in index.html). Scrolling up while at the top
+   streams a live "pull" into the toggle, squeezing it open proportionally
+   (.is-tracking, transition disabled for 1:1 tracking) — a sustained pull
+   past the threshold commits and loads the full archive with a smooth
+   scroll pulling the user in; letting go springs it back shut (transition
+   re-enabled). Exit lives in the sticky filter bar, reachable however far
+   back you scroll. */
 .tl-past-toggle{
   max-height: 0;
   overflow: hidden;
   border-bottom: 2px solid var(--ink);
-  transition: max-height .4s cubic-bezier(.2,.8,.2,1);
+  transition: max-height .35s cubic-bezier(.2,.8,.2,1);
 }
-.tl-past-toggle.is-peeking{ max-height: 140px; }
+.tl-past-toggle.is-tracking{ transition: none; }
 .tl-past-btn{
   all: unset; cursor: pointer; width: 100%; box-sizing: border-box;
   display: flex; align-items: center; justify-content: center; gap: 10px;
