@@ -2104,21 +2104,21 @@ body.gs-reader-open{ overflow: hidden; }
    text happens to include an inline .cta-inline-link anchor (see the
    Sanity `content` field), so it's targeted via :has() rather than a
    dedicated block type. Rendered as a black bar that bleeds full viewport
-   width (not just the card's edges) and stays pinned to the top while
-   scrolling past it. The padding uses max() so the inner text still lines
-   up with the card's own content on wide screens, but just sits flush
-   with 15px like every other paragraph once the viewport is narrower
-   than the card's max-width (mobile, where there's no bleed to do). */
+   width (not just the card's edges) and scrolls with the rest of the
+   content — sticking it to the top while scrolling past it turned out to
+   be more distracting than useful, so that's been dropped. The padding
+   uses max() so the inner text still lines up with the card's own content
+   on wide screens, but just sits flush with 15px like every other
+   paragraph once the viewport is narrower than the card's max-width
+   (mobile, where there's no bleed to do). */
 .cb-text:has(.cta-inline-link){
   background: #0a0a0a;
   box-sizing: border-box;
   width: 100vw;
-  position: sticky;
-  top: 0;
   /* left:50%/-50vw resolves against the CARD's width (the containing
      block), not the viewport, so it drifted the whole bar off-center —
      margin calc(50% - 50vw) is viewport-relative regardless of the
-     containing block and centers it correctly under position:sticky. */
+     containing block and centers it correctly. */
   margin-left: calc(50% - 50vw);
   margin-right: calc(50% - 50vw);
   padding: 16px max(15px, calc((100vw - 860px) / 2 + 15px));
