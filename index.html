@@ -932,13 +932,26 @@ function _gsOpenReader(cardEl){
   frame.className = "gs-card-frame";
   frame.title = "Event";
   frame.src = `event.html?id=${encodeURIComponent(cardEl.dataset.ev)}&embed=1`;
+  // The iframe stays non-interactive until fully expanded — see the wheel
+  // handler below for why: expansion used to be driven by the iframe's own
+  // scroll position reported back via postMessage, but that silently broke
+  // whenever an event's content was short enough to fit in one viewport
+  // (no scrollable overflow at all → the inner page's own boundary-pull
+  // logic treated every single wheel tick as "already at both the top and
+  // bottom", swallowing it before it could ever scroll or report back).
+  // Capturing the expansion gesture here instead — on the outer page,
+  // which is exactly the same reliable wheel-capture already proven by the
+  // past-archive gravity — removes that dependency entirely.
+  frame.style.pointerEvents = "none";
   cardEl.appendChild(frame);
 
   const ease = t => 1 - Math.pow(1 - t, 3);
   const lerp = (a, b, t) => a + (b - a) * t;
   const CLICK_T = 0.18;   // borders nudge open on click — "content will be here"
+  const EXPAND_PX = 320;  // wheel-px of "virtual" scroll to go from nudge to fully open
   const PULL_MAX = 700;   // wheel-past-the-end needed to break out (gravity)
-  let scrollT = 0;        // expansion driven by the inner page's scroll
+  let scrollT = 0;        // 0..1 expansion progress
+  let rawY = 0;           // accumulated virtual scroll driving scrollT, pre-expansion
 
   function apply(t){
     cardEl.style.flexBasis = lerp(startW, targetW, t) + "px";
@@ -959,14 +972,40 @@ function _gsOpenReader(cardEl){
   apply(CLICK_T);
 
   function tFromScroll(y){
-    return CLICK_T + (1 - CLICK_T) * ease(Math.min(1, (y || 0) / 320));
+    return CLICK_T + (1 - CLICK_T) * ease(Math.min(1, Math.max(0, y || 0) / EXPAND_PX));
+  }
+
+  // Drives the expansion directly from wheel deltas on the outer page while
+  // the frame is locked (pointer-events:none). Once scrollT reaches 1, the
+  // frame is handed pointer-events back and the reader's own content takes
+  // over scrolling normally (including its own end-of-article gravity,
+  // reported back below via wc-pull/wc-collapse).
+  const CLOSE_PULL_MAX = 300; // sustained pull back past rawY=0 needed to bail out
+  let closePull = 0;
+  function onWheel(e){
+    if (scrollT >= 1) return; // handed off to the iframe already
+    e.preventDefault();
+    if (e.deltaY < 0 && rawY <= 0) {
+      // Already back at the card's nudged-open state and still pulling up
+      // — gravity, not an instant close: only a sustained pull bails out.
+      closePull += Math.abs(e.deltaY);
+      if (closePull >= CLOSE_PULL_MAX) collapse();
+      return;
+    }
+    closePull = 0;
+    rawY = Math.min(EXPAND_PX, Math.max(0, rawY + e.deltaY));
+    scrollT = tFromScroll(rawY);
+    apply(scrollT);
+    if (scrollT >= 1) frame.style.pointerEvents = "auto";
   }
 
   function onMsg(e){
     const d = e.data || {};
     if (d.type === "wc-scroll"){
-      scrollT = tFromScroll(d.y);
-      apply(scrollT);
+      // Expansion is fully driven by onWheel() above now — by the time the
+      // iframe is interactive enough to report its own scroll, scrollT is
+      // already 1. Nothing to do here; kept only so older messages in
+      // flight during the handoff can't throw.
     } else if (d.type === "wc-pull"){
       // Gravity at either end of the inner page: the block squeezes back
       // toward its card shape the harder you pull, and springs back if
@@ -999,6 +1038,7 @@ function _gsOpenReader(cardEl){
       window.scrollTo(0, _lockScrollY);
       window.removeEventListener("message", onMsg);
       window.removeEventListener("keydown", onKey);
+      window.removeEventListener("wheel", onWheel);
       _gsReaderOpen = false;
       // setup()/onScroll() were locked out while the reader was open —
       // resync them now via the existing resize listener in case anything
@@ -1010,6 +1050,7 @@ function _gsOpenReader(cardEl){
 
   window.addEventListener("message", onMsg);
   window.addEventListener("keydown", onKey);
+  window.addEventListener("wheel", onWheel, { passive: false });
 }
 
 function renderFeatured(){
