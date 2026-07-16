@@ -2067,6 +2067,40 @@ html[data-lang="ar"] .ar-only{ direction: rtl; }
   font-size: 34px; line-height: 1.5; font-weight: 400;
 }
 
+/* Ticket/register block — this is a plain contentText block whose raw
+   text happens to include an inline .cta-inline-link anchor (see the
+   Sanity `content` field), so it's targeted via :has() rather than a
+   dedicated block type. Rendered as a black bar that bleeds to the card's
+   edges and stays pinned to the top while scrolling past it. */
+.cb-text:has(.cta-inline-link){
+  background: #0a0a0a;
+  margin: 0 -15px;
+  padding: 16px 15px;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+.cb-text:has(.cta-inline-link) p{
+  color: #fff;
+  font-weight: 700;
+  margin: 0;
+  display: flow-root;
+}
+.cta-inline-link{
+  float: right;
+  color: #fff !important;
+  font-weight: 700;
+  text-decoration: none;
+  border-bottom: 2px solid #fff;
+  padding-bottom: 2px;
+}
+.cta-inline-link:hover{ opacity: .7; }
+[dir="rtl"] .cta-inline-link{ float: left; }
+
+/* Facts leader-list + register CTA at the bottom of the page — hidden
+   for now per request, not deleted, so it's easy to bring back later. */
+.ep-facts, .ep-content > .ep-register{ display: none; }
+
 /* Image block — open, no outline, soft rounded corners */
 .cb-image{ display: flex; flex-direction: column; gap: 10px; }
 .cb-image img{
