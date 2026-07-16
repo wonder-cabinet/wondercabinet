@@ -2070,14 +2070,21 @@ html[data-lang="ar"] .ar-only{ direction: rtl; }
 /* Ticket/register block — this is a plain contentText block whose raw
    text happens to include an inline .cta-inline-link anchor (see the
    Sanity `content` field), so it's targeted via :has() rather than a
-   dedicated block type. Rendered as a black bar that bleeds to the card's
-   edges and stays pinned to the top while scrolling past it. */
+   dedicated block type. Rendered as a black bar that bleeds full viewport
+   width (not just the card's edges) and stays pinned to the top while
+   scrolling past it. The padding uses max() so the inner text still lines
+   up with the card's own content on wide screens, but just sits flush
+   with 15px like every other paragraph once the viewport is narrower
+   than the card's max-width (mobile, where there's no bleed to do). */
 .cb-text:has(.cta-inline-link){
   background: #0a0a0a;
-  margin: 0 -15px;
-  padding: 16px 15px;
+  box-sizing: border-box;
+  width: 100vw;
   position: sticky;
   top: 0;
+  left: 50%;
+  margin-left: -50vw;
+  padding: 16px max(15px, calc((100vw - 860px) / 2 + 15px));
   z-index: 20;
 }
 .cb-text:has(.cta-inline-link) p{
