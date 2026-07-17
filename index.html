@@ -1378,13 +1378,37 @@ function _tlOpenReader(rowEl){
       rowEl.style.height = lerp(startH, targetH, t) + "px";
       rowEl.style.transform = `translateY(${(-rise * t).toFixed(2)}px)`;
     }
-    function animateOnce(){
-      rowEl.classList.add("tl-anim");
-      setTimeout(() => rowEl.classList.remove("tl-anim"), 500);
+
+    // Smoothing layer: the wheel only ever moves a TARGET progress; a
+    // fixed 16ms loop eases what's actually on screen toward that target
+    // (classic exponential chase). Wheel input arrives in coarse,
+    // irregular ticks — especially from a stepped mouse wheel — and
+    // mapping those ticks straight onto height made the expansion judder.
+    // The chase keeps the motion scroll-connected (the target is always
+    // exactly where the accumulated scroll says) but the visible block
+    // glides between those positions instead of jumping. setInterval, not
+    // rAF — same occluded-tab lesson as everywhere else in this file.
+    let visT = 0;      // what's currently painted
+    let targetT = 0;   // where the accumulated scroll says we should be
+    let closing = false; // terminal shrink to 0 in progress (wheel-through, ✕, Escape, postMessage)
+    const CHASE = 0.22;  // per-tick easing factor (~60ms to cover most of a step)
+    const anim = setInterval(() => {
+      if (closed) return;
+      const d = targetT - visT;
+      if (Math.abs(d) < 0.002){
+        if (visT !== targetT){ visT = targetT; apply(visT); }
+        if (closing) finish();
+        return;
+      }
+      visT += d * CHASE;
+      apply(visT);
+    }, 16);
+
+    function requestClose(){
+      closing = true;
+      targetT = 0;
     }
-    animateOnce();
-    void rowEl.offsetHeight; // reflow so the transition is live (rAF is unreliable occluded)
-    apply(CLICK_T);
+    targetT = CLICK_T; // the click nudge rides the same chase
 
     function onWheel(e){
       e.preventDefault();
@@ -1392,6 +1416,7 @@ function _tlOpenReader(rowEl){
       catch(err){
         console.warn("[WC] timeline reader wheel error, resetting", err);
         closed = true;
+        clearInterval(anim);
         window.removeEventListener("message", onMsg);
         window.removeEventListener("keydown", onKey);
         window.removeEventListener("wheel", onWheel);
@@ -1401,22 +1426,23 @@ function _tlOpenReader(rowEl){
       }
     }
     function onWheelInner(e){
+      if (closing) return; // terminal shrink is already in flight — let it land
       if (scrollT < 1){
         rawY = Math.min(EXPAND_PX, Math.max(-CLOSE_PX, rawY + e.deltaY));
         scrollT = rawY >= 0
           ? CLICK_T + (1 - CLICK_T) * ease(rawY / EXPAND_PX)
           : CLICK_T * (1 - ease(-rawY / CLOSE_PX));
-        apply(scrollT);
-        if (rawY <= -CLOSE_PX){ collapse(true); return; }
+        targetT = scrollT;
+        if (rawY <= -CLOSE_PX) requestClose();
         return;
       }
       const doc = frame.contentDocument, win = frame.contentWindow;
       if (!doc || !win) return;
       if (closeDir !== 0){
         closeRawY = Math.min(CLOSE_PX, Math.max(0, closeRawY + closeDir * e.deltaY));
-        apply(1 - ease(closeRawY / CLOSE_PX));
+        targetT = 1 - ease(closeRawY / CLOSE_PX);
         if (closeRawY <= 0){ closeDir = 0; return; }
-        if (closeRawY >= CLOSE_PX){ collapse(true); return; }
+        if (closeRawY >= CLOSE_PX) requestClose();
         return;
       }
       const max = doc.documentElement.scrollHeight - win.innerHeight;
@@ -1425,11 +1451,11 @@ function _tlOpenReader(rowEl){
       if (e.deltaY > 0 && atBottom){
         closeDir = 1;
         closeRawY = Math.min(CLOSE_PX, e.deltaY);
-        apply(1 - ease(closeRawY / CLOSE_PX));
+        targetT = 1 - ease(closeRawY / CLOSE_PX);
       } else if (e.deltaY < 0 && atTop){
         closeDir = -1;
         closeRawY = Math.min(CLOSE_PX, -e.deltaY);
-        apply(1 - ease(closeRawY / CLOSE_PX));
+        targetT = 1 - ease(closeRawY / CLOSE_PX);
       } else {
         win.scrollBy(0, e.deltaY);
       }
@@ -1456,37 +1482,35 @@ function _tlOpenReader(rowEl){
 
     function onMsg(e){
       const d = e.data || {};
-      if (d.type === "wc-close" || d.type === "wc-collapse") collapse();
+      if (d.type === "wc-close" || d.type === "wc-collapse") requestClose();
     }
-    function onKey(e){ if (e.key === "Escape") collapse(); }
+    function onKey(e){ if (e.key === "Escape") requestClose(); }
 
+    // Every close path — wheel-through, ✕, Escape, postMessage — goes
+    // through requestClose(): the chase loop eases the block shut, and
+    // once it visually lands at 0 the loop calls finish() to tear down.
     let closed = false;
-    function collapse(instant){
+    function finish(){
       if (closed) return;
       closed = true;
-      if (!instant){
-        animateOnce();
-        apply(0);
-      }
-      setTimeout(() => {
-        frame.remove();
-        rowEl.classList.remove("tl-row-open", "tl-anim");
-        rowEl.style.height = "";
-        rowEl.style.transform = "";
-        document.body.style.position = "";
-        document.body.style.top = "";
-        document.body.style.left = "";
-        document.body.style.right = "";
-        document.body.classList.remove("gs-reader-open");
-        window.scrollTo(0, _lockScrollY);
-        window.removeEventListener("message", onMsg);
-        window.removeEventListener("keydown", onKey);
-        window.removeEventListener("wheel", onWheel);
-        rowEl.removeEventListener("click", onClick, true);
-        _gsReaderOpen = false;
-        _gsReaderClosedAt = Date.now();
-        window.dispatchEvent(new Event("resize"));
-      }, instant ? 0 : 480);
+      clearInterval(anim);
+      frame.remove();
+      rowEl.classList.remove("tl-row-open", "tl-anim");
+      rowEl.style.height = "";
+      rowEl.style.transform = "";
+      document.body.style.position = "";
+      document.body.style.top = "";
+      document.body.style.left = "";
+      document.body.style.right = "";
+      document.body.classList.remove("gs-reader-open");
+      window.scrollTo(0, _lockScrollY);
+      window.removeEventListener("message", onMsg);
+      window.removeEventListener("keydown", onKey);
+      window.removeEventListener("wheel", onWheel);
+      rowEl.removeEventListener("click", onClick, true);
+      _gsReaderOpen = false;
+      _gsReaderClosedAt = Date.now();
+      window.dispatchEvent(new Event("resize"));
     }
 
     window.addEventListener("message", onMsg);
