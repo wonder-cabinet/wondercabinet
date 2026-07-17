@@ -572,9 +572,9 @@ ${audioBar}
       }
       return;
     }
-    // Programme row — expand inline (standalone) or navigate within iframe (EMBED)
+    // Programme row — always expand inline (mountEvent handles both EMBED and standalone)
     const progRow = e.target.closest('.ep-prog-row[data-ev]');
-    if (progRow && !EMBED) {
+    if (progRow) {
       e.preventDefault();
       const targetEv = all.find(ev => ev.id === progRow.dataset.ev);
       if (targetEv) mountEvent(targetEv);
