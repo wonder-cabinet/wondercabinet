@@ -12,7 +12,7 @@
 <meta property="og:url" content="https://wondercabinet.space">
 <meta property="og:image" content="" id="og-image-meta">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="stylesheet" href="assets/app.css?v=38">
+<link rel="stylesheet" href="assets/app.css?v=39">
 </head>
 <body data-view="list">
 
@@ -932,7 +932,7 @@ function renderCurrentExhibitions(){
             <span class="ar-only ar" dir="rtl">البرنامج</span>
           </div>
           ${e.programmeEvents.map(pe => `
-            <a class="cx-prog-row" href="event.html?id=${pe.id}">
+            <a class="cx-prog-row" data-ev="${pe.id}" href="event.html?id=${pe.id}">
               <span class="cx-prog-date">${parseInt(pe.day,10)} ${MONTH_NAME_EN[pe.month]?.slice(0,3)||''}</span>
               <span class="cx-prog-type">${pe.type}</span>
               <span class="cx-prog-name">
@@ -1649,7 +1649,7 @@ function _tlOpenReader(rowEl){
 // timelines, since each re-renders its rows freely on filter changes.
 // cmd/ctrl/shift-click still reaches the real, shareable URL.
 document.addEventListener("click", (e) => {
-  const row = e.target.closest("a.tl-row[data-ev], a.cx-card[data-ev]");
+  const row = e.target.closest("a.tl-row[data-ev], a.cx-card[data-ev], a.cx-prog-row[data-ev]");
   if (!row || e.metaKey || e.ctrlKey || e.shiftKey) return;
   e.preventDefault();
   if (document.body.classList.contains("gs-reader-open") && !document.querySelector(".gs-card-frame")){
