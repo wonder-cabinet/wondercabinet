@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Programme · The Wonder Cabinet</title>
-<link rel="stylesheet" href="assets/app.css?v=33">
+<link rel="stylesheet" href="assets/app.css?v=34">
 </head>
 <body data-view="list">
 
@@ -96,6 +96,20 @@
     <div class="gs-marquee-wrap"><div class="gs-marquee" id="gs-marquee-artists" style="justify-content:flex-end;"></div></div>
   </section>
 
+</section>
+
+<!-- CURRENT EXHIBITIONS — long-running shows on view right now. Hidden
+     unless at least one Exhibition-type event's date range covers today.
+     Each card opens the same in-grid reader as the timeline rows. -->
+<section class="cx" id="cx-section" hidden>
+  <div class="cx-head">
+    <h2 class="cx-title-head">
+      <span class="en-only">Current <em>exhibitions</em></span>
+      <span class="ar-only ar" dir="rtl">معارض <em>حالية</em></span>
+    </h2>
+    <div class="cx-count" id="cx-count"></div>
+  </div>
+  <div class="cx-list" id="cx-list"></div>
 </section>
 
 <!-- THIS WEEK 7-day grid retired — redundant with the gscroll "this week"
@@ -202,7 +216,7 @@ let archiveState = "idle"; // idle -> peek -> loaded, drives the scroll-gravity 
 const MONTH_ORDER = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 const MONTH_NAME_EN = { Jan:"January", Feb:"February", Mar:"March", Apr:"April", May:"May", Jun:"June", Jul:"July", Aug:"August", Sep:"September", Oct:"October", Nov:"November", Dec:"December" };
 const MONTH_NAME_AR = { Jan:"يناير", Feb:"فبراير", Mar:"مارس", Apr:"أبريل", May:"مايو", Jun:"يونيو", Jul:"يوليو", Aug:"أغسطس", Sep:"سبتمبر", Oct:"أكتوبر", Nov:"نوفمبر", Dec:"ديسمبر" };
-const TYPE_AR = { Class:"صف", Film:"فيلم", Performance:"عرض", Radio:"إذاعة", Reading:"قراءة", Workshop:"ورشة", Opening:"افتتاح", Bar:"بار" };
+const TYPE_AR = { Class:"صف", Film:"فيلم", Performance:"عرض", Radio:"إذاعة", Reading:"قراءة", Workshop:"ورشة", Opening:"افتتاح", Bar:"بار", Exhibition:"معرض" };
 const VENUE_AR = { "Ground floor":"الطابق الأرضي","Screening room":"غرفة العرض","Main hall":"القاعة الرئيسية","Library":"المكتبة","Studio":"الستوديو","Workshop":"الورشة","Whole building":"كامل المبنى","Bar open":"البار مفتوح" };
 const SEASON_NAME_AR = { Autumn:"خريف", Winter:"شتاء", Spring:"ربيع", Summer:"صيف" };
 
@@ -310,9 +324,9 @@ function renderThisWeek(){
    Shared between the future Programme bar and the past-archive bar:
    same markup, same interaction, different backing list + STATE key.
    ============================================================ */
-const FILTER_TYPES = ["", "Performance", "Film", "Class", "Workshop", "Radio", "Reading", "Opening", "Bar"];
-const FILTER_LABEL_EN = { "":"All", Performance:"Performance", Film:"Film", Class:"Class", Workshop:"Workshop", Radio:"Radio", Reading:"Reading", Opening:"Opening", Bar:"Bar" };
-const FILTER_LABEL_AR = { "":"الكل", Performance:"عرض", Film:"فيلم", Class:"صف", Workshop:"ورشة", Radio:"إذاعة", Reading:"قراءة", Opening:"افتتاح", Bar:"بار" };
+const FILTER_TYPES = ["", "Performance", "Film", "Class", "Workshop", "Radio", "Reading", "Opening", "Bar", "Exhibition"];
+const FILTER_LABEL_EN = { "":"All", Performance:"Performance", Film:"Film", Class:"Class", Workshop:"Workshop", Radio:"Radio", Reading:"Reading", Opening:"Opening", Bar:"Bar", Exhibition:"Exhibition" };
+const FILTER_LABEL_AR = { "":"الكل", Performance:"عرض", Film:"فيلم", Class:"صف", Workshop:"ورشة", Radio:"إذاعة", Reading:"قراءة", Opening:"افتتاح", Bar:"بار", Exhibition:"معرض" };
 
 function renderFilterBar(containerId, getList, stateKey, onChange){
   const container = document.getElementById(containerId);
@@ -422,6 +436,14 @@ function applyTypeFilter(arr){
 function eventDateOnly(e){
   return new Date(e.year, MONTH_ORDER.indexOf(e.month), parseInt(e.day, 10));
 }
+// End DATE (falls back to the start date for single-day events) — needed
+// for anything long-running: an exhibition is neither "past" nor "this
+// week" while its range covers today.
+function eventEndDateOnly(e){
+  return e.endMonth
+    ? new Date(e.endYear, MONTH_ORDER.indexOf(e.endMonth), parseInt(e.endDay, 10))
+    : eventDateOnly(e);
+}
 // The whole site is treated as one continuous timeline with "this week"
 // pulled out as a magazine-cover-style feature in the middle: everything
 // before this week is the archive (revealed above the hero), this week's
@@ -515,7 +537,10 @@ function renderPastArchive(){
   const outer = document.getElementById("pt-outer");
   if (!outer) return;
   const { start: weekStart } = currentWeekRange();
-  PAST_EVENTS = ALL.filter(e => eventDateOnly(e) < weekStart).sort((a,b) => eventTimestamp(a) - eventTimestamp(b));
+  // An event belongs to the past only once it's fully OVER — a running
+  // exhibition starts weeks back but is current, not archive material.
+  PAST_EVENTS = ALL.filter(e => eventDateOnly(e) < weekStart && eventEndDateOnly(e) < weekStart)
+    .sort((a,b) => eventTimestamp(a) - eventTimestamp(b));
 
   outer.hidden = PAST_EVENTS.length === 0;
   const count = document.getElementById("pt-count");
@@ -838,6 +863,53 @@ function renderEventRow(e, day, isFirst){
       </div>
       <div class="tl-tag-cell">${tag}</div>
     </a>`;
+}
+
+/* ============================================================
+   CURRENT EXHIBITIONS
+   Long-running shows whose date range covers today. They live in
+   their own full-bleed band (they're neither "this week" nor
+   Programme material), and each card opens the same in-grid reader
+   as the timeline rows — vertical expansion, in place. Once an
+   exhibition closes, it drops out of here and flows into the past
+   archive on its own.
+   ============================================================ */
+function renderCurrentExhibitions(){
+  const sec = document.getElementById("cx-section");
+  const list = document.getElementById("cx-list");
+  const count = document.getElementById("cx-count");
+  if (!sec || !list) return;
+  const today = new Date(); today.setHours(0,0,0,0);
+  const cur = ALL.filter(e =>
+    e.type === "Exhibition" &&
+    eventDateOnly(e) <= today && today <= eventEndDateOnly(e)
+  ).sort((a,b) => eventTimestamp(a) - eventTimestamp(b));
+
+  if (!cur.length){ sec.hidden = true; return; }
+  sec.hidden = false;
+  if (count) count.innerHTML =
+    `<span class="en-only">${String(cur.length).padStart(2,"0")} on view</span>` +
+    `<span class="ar-only ar" dir="rtl">${arNum(cur.length)} معروض</span>`;
+
+  list.innerHTML = cur.map(e => {
+    const range = `${parseInt(e.day,10)} ${MONTH_NAME_EN[e.month].slice(0,3)} — ${parseInt(e.endDay,10)} ${MONTH_NAME_EN[e.endMonth].slice(0,3)}`;
+    const rangeAr = `${arNum(parseInt(e.day,10))} ${MONTH_NAME_AR[e.month]} — ${arNum(parseInt(e.endDay,10))} ${MONTH_NAME_AR[e.endMonth]}`;
+    return `
+    <a class="cx-card" href="event.html?id=${e.id}" data-ev="${e.id}">
+      <div class="cx-row-top">
+        <span class="cx-range"><span class="en-only">${range}</span><span class="ar-only ar" dir="rtl">${rangeAr}</span></span>
+        <span class="cx-tag"><span class="en-only">On view now</span><span class="ar-only ar" dir="rtl">معروض الآن</span></span>
+      </div>
+      <h3 class="cx-name">
+        <span class="en-only">${e.title}</span>
+        <span class="ar-only ar" dir="rtl">${e.titleAr || e.title}</span>
+      </h3>
+      <div class="cx-row-bottom">
+        ${e.location ? `<span class="cx-venue">${e.location}</span>` : "<span></span>"}
+        <span class="cx-cta"><span class="en-only">Enter →</span><span class="ar-only ar">← دخول</span></span>
+      </div>
+    </a>`;
+  }).join("");
 }
 
 /* ============================================================
@@ -1268,10 +1340,10 @@ function _gsOpenReaderMobile(cardEl){
   const targetH = Math.max(window.innerHeight - 78, 480);
 
   cardEl.classList.add("gs-card-open", "gs-card-open-m");
-  // Timeline rows reuse this whole path on narrow viewports — they just
-  // need their own "host an absolute frame, hide my own content" class
-  // since the gs-card one is scoped to card children.
-  if (cardEl.classList.contains("tl-row")) cardEl.classList.add("tl-row-open");
+  // Timeline rows and exhibition cards reuse this whole path on narrow
+  // viewports — they just need their own "host an absolute frame, hide my
+  // own content" class since the gs-card one is scoped to card children.
+  if (cardEl.matches(".tl-row, .cx-card")) cardEl.classList.add("tl-row-open");
   cardEl.style.height = startH + "px";
 
   const frame = document.createElement("iframe");
@@ -1528,7 +1600,7 @@ function _tlOpenReader(rowEl){
 // timelines, since each re-renders its rows freely on filter changes.
 // cmd/ctrl/shift-click still reaches the real, shareable URL.
 document.addEventListener("click", (e) => {
-  const row = e.target.closest("a.tl-row[data-ev]");
+  const row = e.target.closest("a.tl-row[data-ev], a.cx-card[data-ev]");
   if (!row || e.metaKey || e.ctrlKey || e.shiftKey) return;
   e.preventDefault();
   if (document.body.classList.contains("gs-reader-open") && !document.querySelector(".gs-card-frame")){
@@ -1814,6 +1886,12 @@ async function _boot(){
         dayOrdinal: s ? _ordinal(s.getDate()) : '',
         start:    hasTime ? s.toTimeString().slice(0,5) : '',
         end:      e && (e.getHours()||e.getMinutes()) ? e.toTimeString().slice(0,5) : '',
+        // Full end DATE (not just the time) — long-running things like
+        // exhibitions span weeks, and "is this on view right now?" needs
+        // the real closing date, not the start date.
+        endDay:   e ? String(e.getDate()).padStart(2,'0') : '',
+        endMonth: e ? MABBR[e.getMonth()] : '',
+        endYear:  e ? e.getFullYear() : 0,
         location: locationName,
         recurring: !!doc.recurring,
         recurringLabel:   doc.recurringLabel?.en || '',
@@ -1884,6 +1962,7 @@ async function _boot(){
 
   // Render all sections
   renderThisWeek();
+  renderCurrentExhibitions();
   renderFilters();
   renderSeasonRail();
   renderPastArchive();

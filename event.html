@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Event · The Wonder Cabinet</title>
-<link rel="stylesheet" href="assets/app.css?v=33" />
+<link rel="stylesheet" href="assets/app.css?v=34" />
 <style>
   /* This page uses the exact same .ep-* / .event-panel template as every
      other entry point on the site (the homepage hero cards, the Programme
@@ -143,7 +143,7 @@
   const DWFULL = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
   const MFULL  = ["January","February","March","April","May","June","July","August","September","October","November","December"];
   const MONTH_NAME_AR = { Jan:"يناير", Feb:"فبراير", Mar:"مارس", Apr:"أبريل", May:"مايو", Jun:"يونيو", Jul:"يوليو", Aug:"أغسطس", Sep:"سبتمبر", Oct:"أكتوبر", Nov:"نوفمبر", Dec:"ديسمبر" };
-  const TYPE_AR = { Class:"صف", Film:"فيلم", Performance:"عرض", Radio:"إذاعة", Reading:"قراءة", Workshop:"ورشة", Opening:"افتتاح", Bar:"بار" };
+  const TYPE_AR = { Class:"صف", Film:"فيلم", Performance:"عرض", Radio:"إذاعة", Reading:"قراءة", Workshop:"ورشة", Opening:"افتتاح", Bar:"بار", Exhibition:"معرض" };
 
   const TYPE_COLORS = {
     Performance: { bg: "#cc6698", ink: "#0a0a16" },
@@ -154,11 +154,13 @@
     Reading:     { bg: "#ffd6c2", ink: "#0a0a16" },
     Opening:     { bg: "#0a0a16", ink: "#f6f3ea" },
     Bar:         { bg: "#e8a33d", ink: "#0a0a16" },
+    Exhibition:  { bg: "#1d24ff", ink: "#f6f3ea" },
   };
   const COLOR_THEME_OVERRIDES = {
     performance: TYPE_COLORS.Performance, film: TYPE_COLORS.Film, class: TYPE_COLORS.Class,
     workshop: TYPE_COLORS.Workshop, radio: TYPE_COLORS.Radio, reading: TYPE_COLORS.Reading,
     opening: TYPE_COLORS.Opening, bar: TYPE_COLORS.Bar,
+    exhibition: TYPE_COLORS.Exhibition,
     paper: { bg: "#FCFFE5", ink: "#0a0a16" },
   };
   function _colorFor(ev, fallback){
