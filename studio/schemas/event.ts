@@ -1,4 +1,5 @@
 import {defineType, defineField} from 'sanity'
+import {ColorThemePicker} from '../components/ColorThemePicker'
 
 export const event = defineType({
   name: 'event',
@@ -61,22 +62,9 @@ export const event = defineType({
       name: 'colorTheme',
       title: 'Colour theme (override)',
       description:
-        'Optional. Overrides the default colour field for this event. Leave blank to use the default colour for the event\'s Type.',
+        'Optional. Overrides the default colour for this event. Leave blank to use the colour for the event\'s Type.',
       type: 'string',
-      options: {
-        list: [
-          {title: 'Performance — pink', value: 'performance'},
-          {title: 'Film — yellow', value: 'film'},
-          {title: 'Class — violet', value: 'class'},
-          {title: 'Workshop — orange', value: 'workshop'},
-          {title: 'Radio — green', value: 'radio'},
-          {title: 'Reading — peach', value: 'reading'},
-          {title: 'Opening — dark', value: 'opening'},
-          {title: 'Bar — amber', value: 'bar'},
-          {title: 'Paper — white', value: 'paper'},
-        ],
-        layout: 'dropdown',
-      },
+      components: {input: ColorThemePicker},
     }),
     defineField({name: 'startDateTime', title: 'Start', type: 'datetime'}),
     defineField({name: 'endDateTime', title: 'End', type: 'datetime'}),
