@@ -1399,8 +1399,13 @@ html[data-lang="ar"] .ar-only{ direction: rtl; }
 .tl-date{ display: flex; flex-direction: column; line-height: 1; }
 .tl-day{
   font-family: var(--ff-sans); font-weight: 700;
-  font-size: clamp(30px, 3vw, 44px); line-height: .9; letter-spacing: 0;
+  font-size: clamp(44px, 4.5vw, 60px); line-height: .9; letter-spacing: 0;
   font-variant-numeric: lining-nums;
+  color: var(--ink);
+}
+.tl-recur-mark{
+  font-size: clamp(22px, 2.5vw, 32px); font-weight: 700; line-height: .9;
+  color: var(--ink);
 }
 .tl-dow{
   font-family: var(--ff-sans); font-size: 10px; letter-spacing: 0;
@@ -1794,6 +1799,7 @@ body.gs-reader-open{ overflow: hidden; }
   position: relative; overflow: hidden;
   z-index: 45;
   display: block;
+  border-top: 2px solid #1d24ff;
 }
 .tl-row-open > :not(.gs-card-frame){ visibility: hidden; }
 .tl-anim{
@@ -1913,19 +1919,23 @@ body.gs-reader-open{ overflow: hidden; }
 }
 .ep-close{
   all: unset; cursor: pointer;
-  position: absolute; top: 15px; right: 15px;
-  width: 24px; height: 24px;
-  display: grid; place-items: center;
-  font-size: 16px; font-weight: 700;
-  opacity: .55; transition: opacity .15s;
+  color: white;
+  font-size: 28px; font-weight: 700;
+  opacity: 1; transition: opacity .15s;
+  line-height: 1;
 }
-.ep-close:hover{ opacity: 1; }
+.ep-close:hover{ opacity: .7; }
 
 .ep-meta{
   font-family: var(--ff-sans); font-weight: 400;
   letter-spacing: 0; text-transform: none; opacity: 1;
-  display: flex; justify-content: space-between; align-items: flex-start; gap: 16px;
-  padding-right: 40px;
+  display: flex; flex-direction: column; gap: 8px;
+}
+.ep-meta-bottom{
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+}
+.ep-header-icons{
+  display: flex; align-items: center; gap: 10px; flex-shrink: 0;
 }
 .ep-meta .dt-block{ display: flex; flex-direction: column; gap: 2px; line-height: 1.4; font-size: 40px; }
 .ep-type-tag{ letter-spacing: 0; font-weight: 400; font-size: 40px; }
@@ -1991,6 +2001,18 @@ body.gs-reader-open{ overflow: hidden; }
   white-space: nowrap;
 }
 .ef-val .ar{ font-family: var(--ff-ar); font-size: 17px; letter-spacing: 0; }
+
+/* Register button in event header — prominent, full-width */
+.ep-register-header{
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 24px;
+  font-family: var(--ff-sans); font-size: clamp(16px, 2.5vw, 22px); font-weight: 700;
+  background: white; color: #0a0a16;
+  text-decoration: none; border-radius: 4px;
+  transition: opacity .15s;
+  margin-top: 4px;
+}
+.ep-register-header:hover{ opacity: .85; }
 
 .ep-register{
   display: flex; align-items: center; justify-content: space-between;

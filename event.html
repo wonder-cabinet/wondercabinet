@@ -1,10 +1,17 @@
 <!doctype html>
-<html lang="en" data-lang="en" style="--bg: #AFD214;">
+<html lang="ar" data-lang="ar" style="--bg: #AFD214;">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Event · The Wonder Cabinet</title>
-<link rel="stylesheet" href="assets/app.css?v=34" />
+<title>The Wonder Cabinet – مجلس العجب · Bethlehem, Palestine</title>
+<meta name="description" content="A space for art production and cultural development in Bethlehem, Palestine.">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="The Wonder Cabinet">
+<meta property="og:title" content="The Wonder Cabinet" id="og-title-meta">
+<meta property="og:description" content="A space for art production and cultural development in Bethlehem, Palestine." id="og-desc-meta">
+<meta property="og:image" content="" id="og-image-meta">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="assets/app.css?v=37" />
 <style>
   /* This page uses the exact same .ep-* / .event-panel template as every
      other entry point on the site (the homepage hero cards, the Programme
@@ -70,20 +77,20 @@
   .ep-embed-spacer{ height: 50vh; }
   .ep-pop{
     all: unset; cursor: pointer;
-    position: absolute; top: 15px; right: 47px;
-    width: 24px; height: 24px;
     display: grid; place-items: center;
-    font-size: 15px; font-weight: 700;
-    opacity: .55; transition: opacity .15s;
+    color: white;
+    font-size: 24px; font-weight: 700;
+    opacity: 1; transition: opacity .15s;
+    line-height: 1;
   }
-  .ep-pop:hover{ opacity: 1; }
+  .ep-pop:hover{ opacity: .7; }
 </style>
 </head>
 <body>
 
 <div class="ev-lang-toggle lang-toggle" role="group" aria-label="Language">
-  <button data-lang-btn="en" aria-pressed="true">EN</button>
-  <button data-lang-btn="ar" aria-pressed="false">AR</button>
+  <button data-lang-btn="en" aria-pressed="false">EN</button>
+  <button data-lang-btn="ar" aria-pressed="true">AR</button>
 </div>
 
 <main class="event-page-wrap">
@@ -96,7 +103,7 @@
       <div class="foot-col-head">The Wonder Cabinet</div>
       <div class="foot-col-body">
         <p>Karkafeh Street<br>Bethlehem, Palestine<br>(Next to Arij)</p>
-        <p>Wed – Sun<br>10:00 – 22:00</p>
+        <p>Every day<br>9:00 – 23:00</p>
         <a href="https://goo.gl/maps/9BhxnnrTfYZZVoMU9" target="_blank" rel="noopener">Google Maps →</a>
       </div>
     </div>
@@ -104,7 +111,6 @@
       <div class="foot-col-head">Programme</div>
       <div class="foot-col-body">
         <a href="index.html#programme">Events</a>
-        <a href="index.html#residencies">Residencies</a>
         <a href="index.html">Archive</a>
         <a href="index.html">Contribute</a>
         <a href="index.html">About</a>
@@ -125,6 +131,7 @@
         <a href="mailto:office@wondercabinet.space">office@wondercabinet.space</a>
         <a href="https://radioalhara.net" target="_blank" rel="noopener">Radio Alhara</a>
         <a href="index.html">Local Industries</a>
+        <a href="https://www.aauanastas.com" target="_blank" rel="noopener">AAU Anastas</a>
       </div>
     </div>
   </div>
@@ -275,7 +282,8 @@
   function _findAdjacentEvents(all, currentId){
     const idx = all.findIndex(e => e.id === currentId);
     if (idx === -1) return { prev: null, next: null };
-    return { prev: idx > 0 ? all[idx - 1] : null, next: idx < all.length - 1 ? all[idx + 1] : null };
+    // Events are sorted newest-first (desc), so idx-1 is later, idx+1 is earlier.
+    return { prev: idx < all.length - 1 ? all[idx + 1] : null, next: idx > 0 ? all[idx - 1] : null };
   }
 
   function _initPanelAudio(root){
@@ -376,8 +384,6 @@
     return `
 ${audioBar}
 <div class="ep-header">
-  <a class="ep-close" id="epClose" href="index.html" aria-label="Back">✕</a>
-  ${popBtn}
   <div class="ep-meta">
     <div class="dt-block">
       ${ev.endDate ? `
@@ -389,8 +395,17 @@ ${audioBar}
       <span class="ep-time">${ev.start}${ev.end ? " — " + ev.end : ""}</span>
       `}
     </div>
-    <span class="ep-type-tag en-only">${ev.type}</span>
-    <span class="ep-type-tag ar-only ar">${typeArLabel}</span>
+    ${ev.register ? `<a href="${ev.register}" class="ep-register-header" target="_blank" rel="noopener">
+      <span class="en-only">Register →</span><span class="ar-only ar" dir="rtl">← سجّل الآن</span>
+    </a>` : ""}
+    <div class="ep-meta-bottom">
+      <span class="ep-type-tag en-only">${ev.type}</span>
+      <span class="ep-type-tag ar-only ar">${typeArLabel}</span>
+      <div class="ep-header-icons">
+        ${popBtn}
+        <a class="ep-close" id="epClose" href="index.html" aria-label="Back">✕</a>
+      </div>
+    </div>
   </div>
   <h1 class="ep-title">
     <span class="en-only">${ev.title}</span>
@@ -473,7 +488,15 @@ ${audioBar}
     return;
   }
 
-  document.title = `${ev.title} · The Wonder Cabinet`;
+  const _titleStr = ev.titleAr ? `${ev.title} · ${ev.titleAr}` : ev.title;
+  document.title = `${_titleStr} – The Wonder Cabinet`;
+  // Update OG meta for browser-share (crawlers see the static fallback in <head>)
+  const _ogTitle = document.getElementById('og-title-meta');
+  const _ogDesc  = document.getElementById('og-desc-meta');
+  const _ogImg   = document.getElementById('og-image-meta');
+  if (_ogTitle) _ogTitle.setAttribute('content', `${ev.title} – The Wonder Cabinet`);
+  if (_ogDesc && ev.short) _ogDesc.setAttribute('content', ev.short);
+  if (_ogImg && ev.cover) _ogImg.setAttribute('content', ev.cover);
   const tc = _colorFor(ev, { bg: "#1d24ff", ink: "#f6f3ea" });
   const root = document.getElementById('epRoot');
   root.style.background = tc.bg;

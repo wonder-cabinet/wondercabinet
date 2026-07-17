@@ -53,7 +53,8 @@ export const event = defineType({
           {title: 'Opening', value: 'Opening'},
           {title: 'Bar', value: 'Bar'},
         ],
-        layout: 'radio',
+        layout: 'dropdown',
+        allowCustomValue: true,
       },
     }),
     defineField({

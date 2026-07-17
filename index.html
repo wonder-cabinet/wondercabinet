@@ -1,10 +1,18 @@
-<!DOCTYPE html><html lang="en" data-lang="en" style="--bg: #f6f3ea; --ink: #1d24ff; --highlight: #ffe65c; --paper: #f6f3ea; --card: #f6f3ea; --rule: #1d24ff; --rule-strong: #1d24ff;"><head>
+<!DOCTYPE html><html lang="ar" data-lang="ar" style="--bg: #f6f3ea; --ink: #1d24ff; --highlight: #ffe65c; --paper: #f6f3ea; --card: #f6f3ea; --rule: #1d24ff; --rule-strong: #1d24ff;"><head>
 
 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Programme · The Wonder Cabinet</title>
-<link rel="stylesheet" href="assets/app.css?v=34">
+<title>The Wonder Cabinet – مجلس العجب · Bethlehem, Palestine</title>
+<meta name="description" content="A space for art production and cultural development in Bethlehem, Palestine.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="The Wonder Cabinet">
+<meta property="og:title" content="The Wonder Cabinet – مجلس العجب">
+<meta property="og:description" content="A space for art production and cultural development in Bethlehem, Palestine.">
+<meta property="og:url" content="https://wondercabinet.space">
+<meta property="og:image" content="" id="og-image-meta">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="assets/app.css?v=37">
 </head>
 <body data-view="list">
 
@@ -37,11 +45,9 @@
     </a>
     <nav class="tpb-nav">
       <a href="#programme"><span class="en-only">Programme</span><span class="ar-only ar">البرنامج</span></a>
-      <a href="#residencies"><span class="en-only">Residencies</span><span class="ar-only ar">إقامات</span></a>
-      <a href="#visit"><span class="en-only">Visit</span><span class="ar-only ar">زيارة</span></a>
       <div class="lang-toggle" role="group" aria-label="Language">
-        <button data-lang-btn="en" aria-pressed="true">EN</button>
-        <button data-lang-btn="ar" aria-pressed="false">AR</button>
+        <button data-lang-btn="en" aria-pressed="false">EN</button>
+        <button data-lang-btn="ar" aria-pressed="true">AR</button>
       </div>
       <a class="ph-exit" id="tb-exit" href="index.html" hidden>
         <span class="ph-exit-x">✕</span>
@@ -92,7 +98,7 @@
   </section>
 
   <section class="gs-vsection gs-dark" id="gs-artists-section" hidden>
-    <h2><span class="en-only">Artists in this week</span><span class="ar-only ar" dir="rtl">فنانون هذا الأسبوع</span></h2>
+    <h2><span class="en-only">Artists this week</span><span class="ar-only ar" dir="rtl">فنانو هذا الأسبوع</span></h2>
     <div class="gs-marquee-wrap"><div class="gs-marquee" id="gs-marquee-artists" style="justify-content:flex-end;"></div></div>
   </section>
 
@@ -137,7 +143,7 @@
       <div class="foot-col-head">The Wonder Cabinet</div>
       <div class="foot-col-body">
         <p>Karkafeh Street<br>Bethlehem, Palestine<br>(Next to Arij)</p>
-        <p>Wed – Sun<br>10:00 – 22:00</p>
+        <p>Every day<br>9:00 – 23:00</p>
         <a href="https://goo.gl/maps/9BhxnnrTfYZZVoMU9" target="_blank" rel="noopener">Google Maps →</a>
       </div>
     </div>
@@ -147,7 +153,6 @@
       <div class="foot-col-head">Programme</div>
       <div class="foot-col-body">
         <a href="#programme">Events</a>
-        <a href="#residencies">Residencies</a>
         <a href="#">Archive</a>
         <a href="#">Contribute</a>
         <a href="#">About</a>
@@ -172,6 +177,7 @@
         <a href="mailto:office@wondercabinet.space">office@wondercabinet.space</a>
         <a href="https://radioalhara.net" target="_blank" rel="noopener">Radio Alhara</a>
         <a href="#">Local Industries</a>
+        <a href="https://www.aauanastas.com" target="_blank" rel="noopener">AAU Anastas</a>
       </div>
     </div>
 
@@ -795,14 +801,33 @@ function renderYearMarker(year, direction){
 }
 
 function renderMonth(month, season){
-  const days = {};
+  // Collapse recurring series: show only first occurrence per title per month,
+  // listed at the top of the month body.
+  const seenRecurring = new Set();
+  const recurringFirst = [];
+  const oneoffs = [];
   month.evs.forEach(e => {
+    if (e.recurring) {
+      if (!seenRecurring.has(e.title)) {
+        seenRecurring.add(e.title);
+        recurringFirst.push(e);
+      }
+    } else {
+      oneoffs.push(e);
+    }
+  });
+
+  // Recurring rows (one per series, shown at top)
+  const recurringRows = recurringFirst.map(e => renderEventRow(e, null, true)).join("");
+
+  // One-off rows grouped by day
+  const days = {};
+  oneoffs.forEach(e => {
     days[e.day] = days[e.day] || { day: e.day, dow: e.dow, dowAr: e.dowAr, evs: [] };
     days[e.day].evs.push(e);
   });
   const dayList = Object.values(days).sort((a,b) => a.day.localeCompare(b.day));
-
-  const rows = dayList.map(d => d.evs.map((e,i) => renderEventRow(e, d, i === 0)).join("")).join("");
+  const oneoffRows = dayList.map(d => d.evs.map((e,i) => renderEventRow(e, d, i === 0)).join("")).join("");
 
   return `
     <div class="tl-month" data-month="${month.key}">
@@ -816,7 +841,7 @@ function renderMonth(month, season){
           <span class="tl-month-count">${String(month.evs.length).padStart(2,"0")}</span>
         </div>
       </div>
-      <div class="tl-month-body">${rows}</div>
+      <div class="tl-month-body">${recurringRows}${oneoffRows}</div>
     </div>`;
 }
 
@@ -840,7 +865,13 @@ function renderEventRow(e, day, isFirst){
   return `
     <a class="tl-row${isPast ? ' is-past' : ''}${isFirst ? ' tl-first' : ''}" href="event.html?id=${e.id}" data-ev="${e.id}">
       <div class="tl-date">
-        ${isFirst ? `
+        ${isFirst && e.recurring ? `
+          <span class="tl-recur-mark">↻</span>
+          <span class="tl-dow">
+            <span class="en-only">${e.recurringLabel || 'Every ' + e.dow}</span>
+            <span class="ar-only ar" dir="rtl">${e.recurringLabelAr || 'أسبوعي'}</span>
+          </span>
+        ` : isFirst ? `
           <span class="tl-day">${e.day}</span>
           <span class="tl-dow"><span class="en-only">${e.dow}</span><span class="ar-only ar">${e.dowAr}</span></span>
         ` : ''}
@@ -1856,7 +1887,7 @@ async function _boot(){
       "events": *[_type == "event"] | order(startDateTime desc) { ..., location->{ name }, relatedArtists[]->{name, "slug": slug.current, discipline, photo}, relatedProject->{title, slug} },
       "projects": *[_type == "project"] | order(year desc) { title, "slug": slug.current, description, year, coverImage },
       "residencies": *[_type == "residency"] | order(year desc) { title, "slug": slug.current, description, year, coverImage },
-      "settings": *[_type == "siteSettings"][0]{ monthlyThemeTitle, monthlyThemeDescription }
+      "settings": *[_type == "siteSettings"][0]{ monthlyThemeTitle, monthlyThemeDescription, ogImage }
     }`);
     const res = await fetch(`https://xdtj605l.api.sanity.io/v2024-01-01/data/query/production?query=${q}`);
     const { result } = await res.json();
@@ -1942,11 +1973,20 @@ async function _boot(){
       themeDesc:    settingsDoc.monthlyThemeDescription?.en || '',
       themeDescAr:  settingsDoc.monthlyThemeDescription?.ar || '',
     } : null;
-    // Featured artists = everyone actually linked to a (non-past) event —
-    // not a separately curated roster. Deduped by slug, falling back to name.
+    // Inject OG image from siteSettings (best effort — helps browsers, not crawlers)
+    if (settingsDoc && settingsDoc.ogImage) {
+      const ogUrl = _sanityImg(settingsDoc.ogImage);
+      if (ogUrl) {
+        const ogMeta = document.getElementById('og-image-meta');
+        if (ogMeta) ogMeta.setAttribute('content', ogUrl + '?w=1200&auto=format');
+      }
+    }
+    // Artists this week — only artists linked to events happening THIS week.
+    const { start: _wkStart, end: _wkEnd } = currentWeekRange();
     const artistMap = new Map();
     ALL.forEach(ev => {
-      if (ev.status === 'past') return;
+      const d = eventDateOnly(ev);
+      if (d < _wkStart || d > _wkEnd) return;
       (ev.relatedArtists || []).forEach(a => {
         const key = a.slug || a.name;
         if (key && !artistMap.has(key)) artistMap.set(key, a);
