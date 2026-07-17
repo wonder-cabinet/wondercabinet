@@ -1902,7 +1902,7 @@ async function _boot(){
       return { key:`${n.toLowerCase()}-${y}`, name:n, year:y };
     }
     const q = encodeURIComponent(`{
-      "events": *[_type == "event"] | order(startDateTime desc) { ..., location->{ name }, relatedArtists[]->{name, "slug": slug.current, discipline, photo}, relatedProject->{title, slug}, programmeEvents[]->{_id, title, eventType, startDateTime} },
+      "events": *[_type == "event"] | order(startDateTime desc) { ..., location->{ name }, relatedArtists[]->{name, "slug": slug.current, discipline, photo}, relatedProject->{title, slug}, programmeEvents[]->{_id, "slug": slug.current, title, eventType, startDateTime} },
       "projects": *[_type == "project"] | order(year desc) { title, "slug": slug.current, description, year, coverImage },
       "residencies": *[_type == "residency"] | order(year desc) { title, "slug": slug.current, description, year, coverImage },
       "settings": *[_type == "siteSettings"][0]{ monthlyThemeTitle, monthlyThemeDescription, ogImage, address, hours, mapsUrl }
@@ -1966,7 +1966,7 @@ async function _boot(){
         programmeEvents: (doc.programmeEvents || []).map(pe => {
           const ps = _iso(pe.startDateTime);
           return {
-            id: pe._id,
+            id: pe.slug || pe._id,
             title: pe.title?.en || '',
             titleAr: pe.title?.ar || '',
             type: pe.eventType || '',
