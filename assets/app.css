@@ -1786,6 +1786,18 @@ html[data-lang="ar"] .ar-only{ direction: rtl; }
 }
 body.gs-reader-open{ overflow: hidden; }
 
+/* Timeline rows host the same reader, expanding vertically in place (see
+   _tlOpenReader in index.html). The open row paints above the sticky
+   month heads (z 5) and the filter bar (z 42) but under the topbar (z 50)
+   so the reading surface owns everything below the topbar. */
+.tl-row-open{
+  position: relative; overflow: hidden;
+  z-index: 45;
+  display: block;
+}
+.tl-row-open > :not(.gs-card-frame){ visibility: hidden; }
+.tl-anim{ transition: height .45s cubic-bezier(.2,.8,.2,1); }
+
 /* Mobile equivalent (see _gsOpenReaderMobile in index.html): below 700px
    cards stack in a column with natural height instead of the horizontal
    rail, so the tapped card's own height animates open in place rather

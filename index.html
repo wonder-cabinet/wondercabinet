@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Programme · The Wonder Cabinet</title>
-<link rel="stylesheet" href="assets/app.css?v=31">
+<link rel="stylesheet" href="assets/app.css?v=32">
 </head>
 <body data-view="list">
 
@@ -813,7 +813,7 @@ function renderEventRow(e, day, isFirst){
             ? `<span class="tl-tag tl-rsvp"><span class="en-only">Register</span><span class="ar-only ar">تسجيل</span></span>`
             : `<span class="tl-tag tl-free"><span class="en-only">Free entry</span><span class="ar-only ar">دخول حرّ</span></span>`);
   return `
-    <a class="tl-row${isPast ? ' is-past' : ''}${isFirst ? ' tl-first' : ''}" href="event.html?id=${e.id}">
+    <a class="tl-row${isPast ? ' is-past' : ''}${isFirst ? ' tl-first' : ''}" href="event.html?id=${e.id}" data-ev="${e.id}">
       <div class="tl-date">
         ${isFirst ? `
           <span class="tl-day">${e.day}</span>
@@ -985,6 +985,10 @@ function _gsHardReset(){
     c.classList.remove("gs-card-open", "gs-anim", "gs-card-open-m");
     c.style.flexBasis = "";
     c.style.height = "";
+  });
+  document.querySelectorAll(".tl-row-open").forEach(r => {
+    r.classList.remove("tl-row-open", "tl-anim");
+    r.style.height = "";
   });
   const track = document.getElementById("gs-track");
   if (track) track.classList.remove("gs-anim");
@@ -1175,7 +1179,9 @@ function _gsOpenReader(cardEl){
     // everything degrades from there). Rewrite them to the embed URL and
     // scroll the reader back to the top for the new event.
     const href = clickable.getAttribute && clickable.getAttribute("href");
-    if (href && href.indexOf("event.html?id=") === 0 && !clickable.target){
+    if (href && href.indexOf("event.html?id=") === 0 && href.indexOf("embed=1") === -1 && !clickable.target){
+      // Belt-and-suspenders — event.html now bakes &embed=1 into its own
+      // internal links, but any that slipped through still get rewritten.
       frame.contentWindow.location.replace(href + "&embed=1");
       return;
     }
@@ -1261,6 +1267,10 @@ function _gsOpenReaderMobile(cardEl){
   const targetH = Math.max(window.innerHeight - 78, 480);
 
   cardEl.classList.add("gs-card-open", "gs-card-open-m");
+  // Timeline rows reuse this whole path on narrow viewports — they just
+  // need their own "host an absolute frame, hide my own content" class
+  // since the gs-card one is scoped to card children.
+  if (cardEl.classList.contains("tl-row")) cardEl.classList.add("tl-row-open");
   cardEl.style.height = startH + "px";
 
   const frame = document.createElement("iframe");
@@ -1289,7 +1299,7 @@ function _gsOpenReaderMobile(cardEl){
     cardEl.style.height = startH + "px";
     setTimeout(() => {
       frame.remove();
-      cardEl.classList.remove("gs-card-open", "gs-card-open-m");
+      cardEl.classList.remove("gs-card-open", "gs-card-open-m", "tl-row-open");
       cardEl.style.height = "";
       document.body.classList.remove("gs-reader-open");
       window.removeEventListener("message", onMsg);
@@ -1302,6 +1312,203 @@ function _gsOpenReaderMobile(cardEl){
   window.addEventListener("message", onMsg);
   window.addEventListener("keydown", onKey);
 }
+
+/* ---------- TIMELINE IN-GRID READER ----------
+   Programme / past-archive rows open the same embedded reader as the
+   week-view cards, but the expansion axis is vertical: the row itself
+   grows downward in place until it fills the viewport below the topbar.
+   Same interaction grammar as _gsOpenReader on purpose — click nudges it
+   open, scrolling grows it continuously and reversibly, the article
+   scroll is forwarded into the iframe, and pulling past either edge
+   shrinks it back into the row; reaching the end of that motion IS the
+   close. */
+function _tlOpenReader(rowEl){
+  if (_gsReaderOpen) return;
+  _gsReaderOpen = true;
+
+  const TOP = 56; // reading position: just below the fixed topbar
+
+  // Glide the row up to the reading position first (quick eased scroll,
+  // not a jump), THEN freeze the page and start the reader — the lock
+  // needs a settled scroll position to restore on close.
+  const fromY = window.scrollY;
+  const toY = Math.max(0, fromY + rowEl.getBoundingClientRect().top - TOP);
+  const GLIDE_MS = 300;
+  const g0 = performance.now();
+  const easeInOut = t => t < .5 ? 2*t*t : 1 - Math.pow(-2*t + 2, 2) / 2;
+  const glide = setInterval(() => {
+    const t = Math.min(1, (performance.now() - g0) / GLIDE_MS);
+    window.scrollTo(0, fromY + (toY - fromY) * easeInOut(t));
+    if (t >= 1){ clearInterval(glide); begin(); }
+  }, 16);
+
+  function begin(){
+    const startH = rowEl.getBoundingClientRect().height;
+    const targetH = window.innerHeight - TOP;
+
+    const _lockScrollY = window.scrollY;
+    document.body.style.position = "fixed";
+    document.body.style.top = `-${_lockScrollY}px`;
+    document.body.style.left = "0";
+    document.body.style.right = "0";
+    document.body.classList.add("gs-reader-open");
+
+    rowEl.classList.add("tl-row-open");
+    const frame = document.createElement("iframe");
+    frame.className = "gs-card-frame";
+    frame.title = "Event";
+    frame.src = `event.html?id=${encodeURIComponent(rowEl.dataset.ev)}&embed=1`;
+    // Same architecture as the week reader: the frame never receives
+    // input directly — the outer page owns every wheel tick and click,
+    // and forwards them in programmatically. See _gsOpenReader for the
+    // two confirmed bugs that led here.
+    frame.style.pointerEvents = "none";
+    rowEl.appendChild(frame);
+
+    const ease = t => 1 - Math.pow(1 - t, 3);
+    const lerp = (a, b, t) => a + (b - a) * t;
+    const CLICK_T = 0.18;
+    const EXPAND_PX = 320;
+    const CLOSE_PX = 320;
+    let scrollT = 0;
+    let rawY = 0;
+    let closeRawY = 0;
+    let closeDir = 0;
+
+    function apply(t){
+      rowEl.style.height = lerp(startH, targetH, t) + "px";
+    }
+    function animateOnce(){
+      rowEl.classList.add("tl-anim");
+      setTimeout(() => rowEl.classList.remove("tl-anim"), 500);
+    }
+    animateOnce();
+    void rowEl.offsetHeight; // reflow so the transition is live (rAF is unreliable occluded)
+    apply(CLICK_T);
+
+    function onWheel(e){
+      e.preventDefault();
+      try{ onWheelInner(e); }
+      catch(err){
+        console.warn("[WC] timeline reader wheel error, resetting", err);
+        closed = true;
+        window.removeEventListener("message", onMsg);
+        window.removeEventListener("keydown", onKey);
+        window.removeEventListener("wheel", onWheel);
+        rowEl.removeEventListener("click", onClick, true);
+        _gsHardReset();
+        _gsReaderClosedAt = Date.now();
+      }
+    }
+    function onWheelInner(e){
+      if (scrollT < 1){
+        rawY = Math.min(EXPAND_PX, Math.max(-CLOSE_PX, rawY + e.deltaY));
+        scrollT = rawY >= 0
+          ? CLICK_T + (1 - CLICK_T) * ease(rawY / EXPAND_PX)
+          : CLICK_T * (1 - ease(-rawY / CLOSE_PX));
+        apply(scrollT);
+        if (rawY <= -CLOSE_PX){ collapse(true); return; }
+        return;
+      }
+      const doc = frame.contentDocument, win = frame.contentWindow;
+      if (!doc || !win) return;
+      if (closeDir !== 0){
+        closeRawY = Math.min(CLOSE_PX, Math.max(0, closeRawY + closeDir * e.deltaY));
+        apply(1 - ease(closeRawY / CLOSE_PX));
+        if (closeRawY <= 0){ closeDir = 0; return; }
+        if (closeRawY >= CLOSE_PX){ collapse(true); return; }
+        return;
+      }
+      const max = doc.documentElement.scrollHeight - win.innerHeight;
+      const atTop = win.scrollY <= 1;
+      const atBottom = win.scrollY >= max - 2;
+      if (e.deltaY > 0 && atBottom){
+        closeDir = 1;
+        closeRawY = Math.min(CLOSE_PX, e.deltaY);
+        apply(1 - ease(closeRawY / CLOSE_PX));
+      } else if (e.deltaY < 0 && atTop){
+        closeDir = -1;
+        closeRawY = Math.min(CLOSE_PX, -e.deltaY);
+        apply(1 - ease(closeRawY / CLOSE_PX));
+      } else {
+        win.scrollBy(0, e.deltaY);
+      }
+    }
+
+    function onClick(e){
+      const rect = frame.getBoundingClientRect();
+      const x = e.clientX - rect.left, y = e.clientY - rect.top;
+      if (x < 0 || y < 0 || x > rect.width || y > rect.height) return;
+      const doc = frame.contentDocument;
+      if (!doc) return;
+      const inner = doc.elementFromPoint(x, y);
+      const clickable = inner && inner.closest("a,button");
+      if (!clickable) return;
+      e.preventDefault();
+      e.stopPropagation();
+      const href = clickable.getAttribute && clickable.getAttribute("href");
+      if (href && href.indexOf("event.html?id=") === 0 && href.indexOf("embed=1") === -1 && !clickable.target){
+        frame.contentWindow.location.replace(href + "&embed=1");
+        return;
+      }
+      clickable.click();
+    }
+
+    function onMsg(e){
+      const d = e.data || {};
+      if (d.type === "wc-close" || d.type === "wc-collapse") collapse();
+    }
+    function onKey(e){ if (e.key === "Escape") collapse(); }
+
+    let closed = false;
+    function collapse(instant){
+      if (closed) return;
+      closed = true;
+      if (!instant){
+        animateOnce();
+        apply(0);
+      }
+      setTimeout(() => {
+        frame.remove();
+        rowEl.classList.remove("tl-row-open", "tl-anim");
+        rowEl.style.height = "";
+        document.body.style.position = "";
+        document.body.style.top = "";
+        document.body.style.left = "";
+        document.body.style.right = "";
+        document.body.classList.remove("gs-reader-open");
+        window.scrollTo(0, _lockScrollY);
+        window.removeEventListener("message", onMsg);
+        window.removeEventListener("keydown", onKey);
+        window.removeEventListener("wheel", onWheel);
+        rowEl.removeEventListener("click", onClick, true);
+        _gsReaderOpen = false;
+        _gsReaderClosedAt = Date.now();
+        window.dispatchEvent(new Event("resize"));
+      }, instant ? 0 : 480);
+    }
+
+    window.addEventListener("message", onMsg);
+    window.addEventListener("keydown", onKey);
+    window.addEventListener("wheel", onWheel, { passive: false });
+    rowEl.addEventListener("click", onClick, true);
+  }
+}
+
+// Timeline rows (Programme + past archive) open the in-grid reader in
+// place instead of navigating. One document-level delegate covers both
+// timelines, since each re-renders its rows freely on filter changes.
+// cmd/ctrl/shift-click still reaches the real, shareable URL.
+document.addEventListener("click", (e) => {
+  const row = e.target.closest("a.tl-row[data-ev]");
+  if (!row || e.metaKey || e.ctrlKey || e.shiftKey) return;
+  e.preventDefault();
+  if (document.body.classList.contains("gs-reader-open") && !document.querySelector(".gs-card-frame")){
+    _gsHardReset();
+  }
+  if (window.innerWidth <= 700) _gsOpenReaderMobile(row);
+  else _tlOpenReader(row);
+});
 
 function renderFeatured(){
   const outer  = document.getElementById("gs-outer");

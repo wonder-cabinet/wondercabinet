@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Event · The Wonder Cabinet</title>
-<link rel="stylesheet" href="assets/app.css?v=31" />
+<link rel="stylesheet" href="assets/app.css?v=32" />
 <style>
   /* This page uses the exact same .ep-* / .event-panel template as every
      other entry point on the site (the homepage hero cards, the Programme
@@ -88,11 +88,6 @@
 
 <main class="event-page-wrap">
   <div class="event-panel is-page" id="epRoot" style="background:var(--paper);color:var(--night);"></div>
-
-  <section class="more" id="moreSection" hidden>
-    <h3><span class="en-only">Also <em>this month</em></span><span class="ar-only ar" dir="rtl">أيضاً <em>هذا الشهر</em></span></h3>
-    <div class="more-grid" id="more-grid"></div>
-  </section>
 </main>
 
 <footer class="foot" id="visit">
@@ -533,23 +528,6 @@ ${audioBar}
         _post({ type: 'wc-pull', amount: 0 });
       }
     }, { passive: false });
-  }
-
-  // Also this month
-  const more = all.filter(e => e.month === ev.month && e.year === ev.year && e.id !== ev.id).slice(0, 4);
-  if (more.length) {
-    document.getElementById('moreSection').hidden = false;
-    document.getElementById('more-grid').innerHTML = more.map(e => `
-      <a class="week-card" href="event.html?id=${e.id}">
-        <div class="wc-date-row">
-          <div class="wc-day">${e.day}</div>
-          <div class="wc-dow">${e.dow}</div>
-        </div>
-        <div class="wc-type">${e.type}${e.start ? ' · ' + e.start : ''}</div>
-        <h3 class="wc-title">${e.title}</h3>
-        <div class="wc-meta"><span>${e.location || ''}</span><span class="arrow">→</span></div>
-      </a>
-    `).join('');
   }
 
   // Language toggle
