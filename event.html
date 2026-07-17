@@ -483,7 +483,7 @@ ${audioBar}
       <span class="ar-only ar" dir="rtl">البرنامج</span>
     </div>
     ${ev.programmeEvents.map(pe => `
-      <a class="ep-prog-row" href="event.html?id=${pe.id}${navSuffix}">
+      <a class="ep-prog-row" data-ev="${pe.id}" href="event.html?id=${pe.id}${navSuffix}">
         <span class="ep-prog-date">${parseInt(pe.day,10)} ${pe.monthFull}</span>
         <span class="ep-prog-type">${pe.type}</span>
         <span class="ep-prog-name">
@@ -533,37 +533,60 @@ ${audioBar}
     return;
   }
 
-  const _titleStr = ev.titleAr ? `${ev.title} · ${ev.titleAr}` : ev.title;
-  document.title = `${_titleStr} – The Wonder Cabinet`;
-  // Update OG meta for browser-share (crawlers see the static fallback in <head>)
-  const _ogTitle = document.getElementById('og-title-meta');
-  const _ogDesc  = document.getElementById('og-desc-meta');
-  const _ogImg   = document.getElementById('og-image-meta');
-  if (_ogTitle) _ogTitle.setAttribute('content', `${ev.title} – The Wonder Cabinet`);
-  if (_ogDesc && ev.short) _ogDesc.setAttribute('content', ev.short);
-  if (_ogImg && ev.cover) _ogImg.setAttribute('content', ev.cover);
-  const tc = _colorFor(ev, { bg: "#1d24ff", ink: "#f6f3ea" });
   const root = document.getElementById('epRoot');
-  root.style.background = tc.bg;
-  root.style.color = tc.ink;
-  root.innerHTML = buildEventPanel(ev, all);
-  document.getElementById('epClose').addEventListener('click', function(e){
+
+  // Mount an event into the page — called on first load and on programme-row clicks.
+  function mountEvent(targetEv) {
+    const tc = _colorFor(targetEv, { bg: "#1d24ff", ink: "#f6f3ea" });
+    root.style.background = tc.bg;
+    root.style.color = tc.ink;
+    root.innerHTML = buildEventPanel(targetEv, all);
+    _initPanelAudio(root);
+    window.scrollTo(0, 0);
+    // Update title + OG
+    const titleStr = targetEv.titleAr ? `${targetEv.title} · ${targetEv.titleAr}` : targetEv.title;
+    document.title = `${titleStr} – The Wonder Cabinet`;
+    const _ogTitle = document.getElementById('og-title-meta');
+    const _ogDesc  = document.getElementById('og-desc-meta');
+    const _ogImg   = document.getElementById('og-image-meta');
+    if (_ogTitle) _ogTitle.setAttribute('content', `${targetEv.title} – The Wonder Cabinet`);
+    if (_ogDesc && targetEv.short) _ogDesc.setAttribute('content', targetEv.short);
+    if (_ogImg && targetEv.cover) _ogImg.setAttribute('content', targetEv.cover);
+    // Update URL (standalone only — EMBED stays in the iframe)
+    if (!EMBED) {
+      history.pushState({id: targetEv.id}, '', `event.html?id=${encodeURIComponent(targetEv.id)}`);
+    }
     if (EMBED) {
-      // Inside the homepage grid reader — ✕ collapses the block back into
-      // its card instead of navigating anywhere.
-      e.preventDefault();
-      _post({ type: 'wc-close' });
+      document.documentElement.style.setProperty('--bg', tc.bg);
+      document.body.style.background = tc.bg;
+    }
+  }
+
+  // Document-level delegation — survives every innerHTML swap
+  document.addEventListener('click', function(e) {
+    // Close / back button
+    if (e.target.closest('#epClose, .ep-close')) {
+      if (EMBED) { e.preventDefault(); _post({ type: 'wc-close' }); return; }
+      if (document.referrer && document.referrer.indexOf(location.origin) === 0 && history.length > 1) {
+        e.preventDefault(); history.back();
+      }
       return;
     }
-    if (document.referrer && document.referrer.indexOf(location.origin) === 0 && history.length > 1) {
+    // Programme row — expand inline (standalone) or navigate within iframe (EMBED)
+    const progRow = e.target.closest('.ep-prog-row[data-ev]');
+    if (progRow && !EMBED) {
       e.preventDefault();
-      history.back();
+      const targetEv = all.find(ev => ev.id === progRow.dataset.ev);
+      if (targetEv) mountEvent(targetEv);
     }
   });
-  _initPanelAudio(root);
+
+  mountEvent(ev);
 
   if (EMBED) {
     // Fill the whole frame with the event's theme color (no page margins).
+    // (mountEvent already sets it, but set it here too before first paint.)
+    const tc = _colorFor(ev, { bg: "#1d24ff", ink: "#f6f3ea" });
     document.documentElement.style.setProperty('--bg', tc.bg);
     document.body.style.background = tc.bg;
 
