@@ -1,10 +1,18 @@
-<!DOCTYPE html><html lang="en" data-lang="en" style="--bg: #f6f3ea; --ink: #1d24ff; --highlight: #ffe65c; --paper: #f6f3ea; --card: #f6f3ea; --rule: #1d24ff; --rule-strong: #1d24ff;"><head>
+<!DOCTYPE html><html lang="ar" data-lang="ar" style="--bg: #f6f3ea; --ink: #1d24ff; --highlight: #ffe65c; --paper: #f6f3ea; --card: #f6f3ea; --rule: #1d24ff; --rule-strong: #1d24ff;"><head>
 
 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Programme · The Wonder Cabinet</title>
-<link rel="stylesheet" href="assets/app.css?v=35">
+<title>The Wonder Cabinet – مجلس العجب · Bethlehem, Palestine</title>
+<meta name="description" content="A space for art production and cultural development in Bethlehem, Palestine.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="The Wonder Cabinet">
+<meta property="og:title" content="The Wonder Cabinet – مجلس العجب">
+<meta property="og:description" content="A space for art production and cultural development in Bethlehem, Palestine.">
+<meta property="og:url" content="https://wondercabinet.space">
+<meta property="og:image" content="" id="og-image-meta">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="assets/app.css?v=36">
 </head>
 <body data-view="list">
 
@@ -38,8 +46,8 @@
     <nav class="tpb-nav">
       <a href="#programme"><span class="en-only">Programme</span><span class="ar-only ar">البرنامج</span></a>
       <div class="lang-toggle" role="group" aria-label="Language">
-        <button data-lang-btn="en" aria-pressed="true">EN</button>
-        <button data-lang-btn="ar" aria-pressed="false">AR</button>
+        <button data-lang-btn="en" aria-pressed="false">EN</button>
+        <button data-lang-btn="ar" aria-pressed="true">AR</button>
       </div>
       <a class="ph-exit" id="tb-exit" href="index.html" hidden>
         <span class="ph-exit-x">✕</span>
@@ -90,7 +98,7 @@
   </section>
 
   <section class="gs-vsection gs-dark" id="gs-artists-section" hidden>
-    <h2><span class="en-only">Artists in this week</span><span class="ar-only ar" dir="rtl">فنانون هذا الأسبوع</span></h2>
+    <h2><span class="en-only">Artists this week</span><span class="ar-only ar" dir="rtl">فنانو هذا الأسبوع</span></h2>
     <div class="gs-marquee-wrap"><div class="gs-marquee" id="gs-marquee-artists" style="justify-content:flex-end;"></div></div>
   </section>
 
@@ -1854,7 +1862,7 @@ async function _boot(){
       "events": *[_type == "event"] | order(startDateTime desc) { ..., location->{ name }, relatedArtists[]->{name, "slug": slug.current, discipline, photo}, relatedProject->{title, slug} },
       "projects": *[_type == "project"] | order(year desc) { title, "slug": slug.current, description, year, coverImage },
       "residencies": *[_type == "residency"] | order(year desc) { title, "slug": slug.current, description, year, coverImage },
-      "settings": *[_type == "siteSettings"][0]{ monthlyThemeTitle, monthlyThemeDescription }
+      "settings": *[_type == "siteSettings"][0]{ monthlyThemeTitle, monthlyThemeDescription, ogImage }
     }`);
     const res = await fetch(`https://xdtj605l.api.sanity.io/v2024-01-01/data/query/production?query=${q}`);
     const { result } = await res.json();
@@ -1940,11 +1948,20 @@ async function _boot(){
       themeDesc:    settingsDoc.monthlyThemeDescription?.en || '',
       themeDescAr:  settingsDoc.monthlyThemeDescription?.ar || '',
     } : null;
-    // Featured artists = everyone actually linked to a (non-past) event —
-    // not a separately curated roster. Deduped by slug, falling back to name.
+    // Inject OG image from siteSettings (best effort — helps browsers, not crawlers)
+    if (settingsDoc && settingsDoc.ogImage) {
+      const ogUrl = _sanityImg(settingsDoc.ogImage);
+      if (ogUrl) {
+        const ogMeta = document.getElementById('og-image-meta');
+        if (ogMeta) ogMeta.setAttribute('content', ogUrl + '?w=1200&auto=format');
+      }
+    }
+    // Artists this week — only artists linked to events happening THIS week.
+    const { start: _wkStart, end: _wkEnd } = currentWeekRange();
     const artistMap = new Map();
     ALL.forEach(ev => {
-      if (ev.status === 'past') return;
+      const d = eventDateOnly(ev);
+      if (d < _wkStart || d > _wkEnd) return;
       (ev.relatedArtists || []).forEach(a => {
         const key = a.slug || a.name;
         if (key && !artistMap.has(key)) artistMap.set(key, a);

@@ -28,6 +28,13 @@ export const siteSettings = defineType({
       description: 'Short intro text under the theme title, framing what this week/month\'s programme is about.',
       type: 'localeText',
     }),
+    defineField({
+      name: 'ogImage',
+      title: 'Share image (OG / WhatsApp)',
+      description: 'Image shown when the site is shared on WhatsApp, Instagram, etc. Recommended: 1200×630px.',
+      type: 'image',
+      options: { hotspot: true },
+    }),
     defineField({name: 'contactEmail', title: 'Contact email', type: 'string', initialValue: 'office@wondercabinet.space'}),
     defineField({
       name: 'socialLinks',
