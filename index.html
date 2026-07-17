@@ -12,7 +12,7 @@
 <meta property="og:url" content="https://wondercabinet.space">
 <meta property="og:image" content="" id="og-image-meta">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="stylesheet" href="assets/app.css?v=36">
+<link rel="stylesheet" href="assets/app.css?v=37">
 </head>
 <body data-view="list">
 
@@ -801,14 +801,33 @@ function renderYearMarker(year, direction){
 }
 
 function renderMonth(month, season){
-  const days = {};
+  // Collapse recurring series: show only first occurrence per title per month,
+  // listed at the top of the month body.
+  const seenRecurring = new Set();
+  const recurringFirst = [];
+  const oneoffs = [];
   month.evs.forEach(e => {
+    if (e.recurring) {
+      if (!seenRecurring.has(e.title)) {
+        seenRecurring.add(e.title);
+        recurringFirst.push(e);
+      }
+    } else {
+      oneoffs.push(e);
+    }
+  });
+
+  // Recurring rows (one per series, shown at top)
+  const recurringRows = recurringFirst.map(e => renderEventRow(e, null, true)).join("");
+
+  // One-off rows grouped by day
+  const days = {};
+  oneoffs.forEach(e => {
     days[e.day] = days[e.day] || { day: e.day, dow: e.dow, dowAr: e.dowAr, evs: [] };
     days[e.day].evs.push(e);
   });
   const dayList = Object.values(days).sort((a,b) => a.day.localeCompare(b.day));
-
-  const rows = dayList.map(d => d.evs.map((e,i) => renderEventRow(e, d, i === 0)).join("")).join("");
+  const oneoffRows = dayList.map(d => d.evs.map((e,i) => renderEventRow(e, d, i === 0)).join("")).join("");
 
   return `
     <div class="tl-month" data-month="${month.key}">
@@ -822,7 +841,7 @@ function renderMonth(month, season){
           <span class="tl-month-count">${String(month.evs.length).padStart(2,"0")}</span>
         </div>
       </div>
-      <div class="tl-month-body">${rows}</div>
+      <div class="tl-month-body">${recurringRows}${oneoffRows}</div>
     </div>`;
 }
 
@@ -846,7 +865,13 @@ function renderEventRow(e, day, isFirst){
   return `
     <a class="tl-row${isPast ? ' is-past' : ''}${isFirst ? ' tl-first' : ''}" href="event.html?id=${e.id}" data-ev="${e.id}">
       <div class="tl-date">
-        ${isFirst ? `
+        ${isFirst && e.recurring ? `
+          <span class="tl-recur-mark">↻</span>
+          <span class="tl-dow">
+            <span class="en-only">${e.recurringLabel || 'Every ' + e.dow}</span>
+            <span class="ar-only ar" dir="rtl">${e.recurringLabelAr || 'أسبوعي'}</span>
+          </span>
+        ` : isFirst ? `
           <span class="tl-day">${e.day}</span>
           <span class="tl-dow"><span class="en-only">${e.dow}</span><span class="ar-only ar">${e.dowAr}</span></span>
         ` : ''}
