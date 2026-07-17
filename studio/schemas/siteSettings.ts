@@ -37,6 +37,23 @@ export const siteSettings = defineType({
     }),
     defineField({name: 'contactEmail', title: 'Contact email', type: 'string', initialValue: 'office@wondercabinet.space'}),
     defineField({
+      name: 'address',
+      title: 'Address',
+      description: 'Physical address shown in the footer.',
+      type: 'localeText',
+    }),
+    defineField({
+      name: 'hours',
+      title: 'Opening hours',
+      description: 'e.g. "Every day · 9:00 – 23:00"',
+      type: 'localeString',
+    }),
+    defineField({
+      name: 'mapsUrl',
+      title: 'Google Maps link',
+      type: 'url',
+    }),
+    defineField({
       name: 'socialLinks',
       title: 'Social / footer links',
       type: 'array',

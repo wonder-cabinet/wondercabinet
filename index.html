@@ -142,9 +142,9 @@
     <div class="foot-col">
       <div class="foot-col-head">The Wonder Cabinet</div>
       <div class="foot-col-body">
-        <p>Karkafeh Street<br>Bethlehem, Palestine<br>(Next to Arij)</p>
-        <p>Every day<br>9:00 – 23:00</p>
-        <a href="https://goo.gl/maps/9BhxnnrTfYZZVoMU9" target="_blank" rel="noopener">Google Maps →</a>
+        <p id="footer-address">Karkafeh Street<br>Bethlehem, Palestine<br>(Next to Arij)</p>
+        <p id="footer-hours">Every day<br>9:00 – 23:00</p>
+        <a id="footer-maps" href="https://goo.gl/maps/9BhxnnrTfYZZVoMU9" target="_blank" rel="noopener">Google Maps →</a>
       </div>
     </div>
 
@@ -1887,7 +1887,7 @@ async function _boot(){
       "events": *[_type == "event"] | order(startDateTime desc) { ..., location->{ name }, relatedArtists[]->{name, "slug": slug.current, discipline, photo}, relatedProject->{title, slug} },
       "projects": *[_type == "project"] | order(year desc) { title, "slug": slug.current, description, year, coverImage },
       "residencies": *[_type == "residency"] | order(year desc) { title, "slug": slug.current, description, year, coverImage },
-      "settings": *[_type == "siteSettings"][0]{ monthlyThemeTitle, monthlyThemeDescription, ogImage }
+      "settings": *[_type == "siteSettings"][0]{ monthlyThemeTitle, monthlyThemeDescription, ogImage, address, hours, mapsUrl }
     }`);
     const res = await fetch(`https://xdtj605l.api.sanity.io/v2024-01-01/data/query/production?query=${q}`);
     const { result } = await res.json();
@@ -1972,7 +1972,25 @@ async function _boot(){
       themeTitleAr: settingsDoc.monthlyThemeTitle?.ar || '',
       themeDesc:    settingsDoc.monthlyThemeDescription?.en || '',
       themeDescAr:  settingsDoc.monthlyThemeDescription?.ar || '',
+      address:      settingsDoc.address?.en || '',
+      addressAr:    settingsDoc.address?.ar || '',
+      hours:        settingsDoc.hours?.en || '',
+      hoursAr:      settingsDoc.hours?.ar || '',
+      mapsUrl:      settingsDoc.mapsUrl || '',
     } : null;
+    // Inject footer address/hours/maps from siteSettings
+    if (SETTINGS) {
+      const fAddr = document.getElementById('footer-address');
+      const fHours = document.getElementById('footer-hours');
+      const fMaps = document.getElementById('footer-maps');
+      if (fAddr && SETTINGS.address) fAddr.innerHTML =
+        `<span class="en-only">${SETTINGS.address.replace(/\n/g,'<br>')}</span>` +
+        (SETTINGS.addressAr ? `<span class="ar-only ar" dir="rtl">${SETTINGS.addressAr.replace(/\n/g,'<br>')}</span>` : '');
+      if (fHours && SETTINGS.hours) fHours.innerHTML =
+        `<span class="en-only">${SETTINGS.hours}</span>` +
+        (SETTINGS.hoursAr ? `<span class="ar-only ar" dir="rtl">${SETTINGS.hoursAr}</span>` : '');
+      if (fMaps && SETTINGS.mapsUrl) { fMaps.href = SETTINGS.mapsUrl; fMaps.hidden = false; }
+    }
     // Inject OG image from siteSettings (best effort — helps browsers, not crawlers)
     if (settingsDoc && settingsDoc.ogImage) {
       const ogUrl = _sanityImg(settingsDoc.ogImage);
