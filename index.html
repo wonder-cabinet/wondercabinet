@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Programme · The Wonder Cabinet</title>
-<link rel="stylesheet" href="assets/app.css?v=30">
+<link rel="stylesheet" href="assets/app.css?v=31">
 </head>
 <body data-view="list">
 
@@ -982,8 +982,9 @@ let _gsReaderClosedAt = 0;
 function _gsHardReset(){
   document.querySelectorAll(".gs-card-frame").forEach(f => f.remove());
   document.querySelectorAll(".gs-card-open").forEach(c => {
-    c.classList.remove("gs-card-open", "gs-anim");
+    c.classList.remove("gs-card-open", "gs-anim", "gs-card-open-m");
     c.style.flexBasis = "";
+    c.style.height = "";
   });
   const track = document.getElementById("gs-track");
   if (track) track.classList.remove("gs-anim");
@@ -1238,6 +1239,70 @@ function _gsOpenReader(cardEl){
   cardEl.addEventListener("click", onClick, true);
 }
 
+/* ---------- MOBILE IN-GRID READER ----------
+   Below 700px the horizontal rail is off entirely — cards stack in a
+   column with natural height (see the max-width:700px block in app.css) —
+   so there's no flex-basis/translateX axis for _gsOpenReader above to
+   expand into. Same idea, different axis: the tapped card's own HEIGHT
+   grows open right where it sits in the stack, and the page's normal
+   scroll carries the user down into it. No rail, no locked background, no
+   forwarded wheel events — all of that machinery in _gsOpenReader exists
+   only to work around wheel delivery into the iframe, and mobile doesn't
+   use wheel input. Touch-scrolling reaches the iframe natively here, so
+   the frame keeps normal pointer-events and everything inside (links, the
+   real ✕, prev/next — now embed-aware at the source in event.html) just
+   works without any click-forwarding. */
+function _gsOpenReaderMobile(cardEl){
+  if (_gsReaderOpen) return;
+  _gsReaderOpen = true;
+  document.body.classList.add("gs-reader-open");
+
+  const startH = cardEl.getBoundingClientRect().height;
+  const targetH = Math.max(window.innerHeight - 78, 480);
+
+  cardEl.classList.add("gs-card-open", "gs-card-open-m");
+  cardEl.style.height = startH + "px";
+
+  const frame = document.createElement("iframe");
+  frame.className = "gs-card-frame";
+  frame.title = "Event";
+  frame.src = `event.html?id=${encodeURIComponent(cardEl.dataset.ev)}&embed=1`;
+  cardEl.appendChild(frame);
+
+  // Force a reflow so the starting height + transition are live before the
+  // target height is pushed — rAF is unreliable in backgrounded tabs, same
+  // lesson already learned from the desktop reader and the archive nudge.
+  void cardEl.offsetHeight;
+  cardEl.style.height = targetH + "px";
+  cardEl.scrollIntoView({ behavior: "smooth", block: "start" });
+
+  function onMsg(e){
+    const d = e.data || {};
+    if (d.type === "wc-close" || d.type === "wc-collapse") collapse();
+  }
+  function onKey(e){ if (e.key === "Escape") collapse(); }
+
+  let closed = false;
+  function collapse(){
+    if (closed) return;
+    closed = true;
+    cardEl.style.height = startH + "px";
+    setTimeout(() => {
+      frame.remove();
+      cardEl.classList.remove("gs-card-open", "gs-card-open-m");
+      cardEl.style.height = "";
+      document.body.classList.remove("gs-reader-open");
+      window.removeEventListener("message", onMsg);
+      window.removeEventListener("keydown", onKey);
+      _gsReaderOpen = false;
+      _gsReaderClosedAt = Date.now();
+    }, 450);
+  }
+
+  window.addEventListener("message", onMsg);
+  window.addEventListener("keydown", onKey);
+}
+
 function renderFeatured(){
   const outer  = document.getElementById("gs-outer");
   const sticky = document.getElementById("gs-sticky");
@@ -1363,16 +1428,6 @@ function renderFeatured(){
   track.addEventListener("click", (e) => {
     const card = e.target.closest("a.gs-card[data-ev]");
     if (!card || e.metaKey || e.ctrlKey || e.shiftKey) return;
-    // Below 700px the horizontal scroll-lock is switched off entirely (see
-    // the max-width:700px block in app.css — .gs-outer/.gs-track fall back
-    // to a plain stacked column). The in-grid reader's whole mechanism is
-    // built on that rail (flex-basis + track translateX), so on a narrow
-    // viewport flex-basis ends up driving the card's HEIGHT instead of its
-    // width (main axis is vertical in a column flex container) — that's
-    // what was ballooning the section into a tall blank area and making
-    // the page look "resized"/blank. Below the breakpoint, just let the
-    // card's real href navigate normally instead of arming the reader.
-    if (window.innerWidth <= 700) return;
     e.preventDefault();
     // Failsafe: if the page thinks a reader is open but there's no live
     // frame actually in the DOM (a previous open/close got interrupted),
@@ -1381,7 +1436,17 @@ function renderFeatured(){
     if (document.body.classList.contains("gs-reader-open") && !document.querySelector(".gs-card-frame")){
       _gsHardReset();
     }
-    _gsOpenReader(card);
+    // Below 700px the horizontal scroll-lock rail is off entirely (see the
+    // max-width:700px block in app.css — cards stack in a column instead).
+    // _gsOpenReader's mechanism is built on that rail (flex-basis + track
+    // translateX); on a narrow viewport that axis is vertical instead, so
+    // it needs its own mobile-appropriate version — same "expand in place,
+    // never navigate away" idea, just driven by height, not the rail.
+    if (window.innerWidth <= 700){
+      _gsOpenReaderMobile(card);
+    } else {
+      _gsOpenReader(card);
+    }
   });
 
   // Featured projects marquee

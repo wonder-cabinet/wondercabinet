@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Event · The Wonder Cabinet</title>
-<link rel="stylesheet" href="assets/app.css?v=30" />
+<link rel="stylesheet" href="assets/app.css?v=31" />
 <style>
   /* This page uses the exact same .ep-* / .event-panel template as every
      other entry point on the site (the homepage hero cards, the Programme
@@ -334,13 +334,21 @@
 </div>` : "";
 
     const { prev, next } = _findAdjacentEvents(all, ev.id);
+    // Adjacent-event links must stay in embed mode when we're already
+    // embedded (in-grid reader, desktop or mobile) — otherwise following
+    // one strands a full standalone page nested inside the reader, whose
+    // own ✕ then loads the entire homepage nested inside itself. The
+    // desktop reader used to patch this up client-side by rewriting the
+    // href on click; baking it in here fixes it at the source for every
+    // entry point, including mobile's native (unforwarded) taps.
+    const navSuffix = EMBED ? "&embed=1" : "";
     const navBar = `
 <div class="ep-nav">
-  ${prev ? `<a href="event.html?id=${prev.id}" class="ep-nav-btn ep-nav-prev">
+  ${prev ? `<a href="event.html?id=${prev.id}${navSuffix}" class="ep-nav-btn ep-nav-prev">
     <span class="ep-nav-dir"><span class="en-only">← Prev</span><span class="ar-only ar">التالي →</span></span>
     <span class="ep-nav-name"><span class="en-only">${prev.title}</span><span class="ar-only ar">${prev.titleAr||prev.title}</span></span>
   </a>` : `<div class="ep-nav-btn ep-nav-empty"></div>`}
-  ${next ? `<a href="event.html?id=${next.id}" class="ep-nav-btn ep-nav-next">
+  ${next ? `<a href="event.html?id=${next.id}${navSuffix}" class="ep-nav-btn ep-nav-next">
     <span class="ep-nav-dir"><span class="en-only">Next →</span><span class="ar-only ar">← السابق</span></span>
     <span class="ep-nav-name"><span class="en-only">${next.title}</span><span class="ar-only ar">${next.titleAr||next.title}</span></span>
   </a>` : `<div class="ep-nav-btn ep-nav-empty"></div>`}

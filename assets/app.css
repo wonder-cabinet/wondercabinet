@@ -1786,6 +1786,18 @@ html[data-lang="ar"] .ar-only{ direction: rtl; }
 }
 body.gs-reader-open{ overflow: hidden; }
 
+/* Mobile equivalent (see _gsOpenReaderMobile in index.html): below 700px
+   cards stack in a column with natural height instead of the horizontal
+   rail, so the tapped card's own height animates open in place rather
+   than flex-basis/translateX. Native touch scrolling handles the reading
+   itself, so the frame here keeps normal pointer-events. */
+@media (max-width: 700px){
+  .gs-card-open-m{
+    transition: height .45s cubic-bezier(.2,.8,.2,1);
+    scroll-margin-top: 60px;
+  }
+}
+
 /* =========================================================
    EVENT OVERLAY — backdrop · panel (right-slide) · fullscreen
    ========================================================= */
