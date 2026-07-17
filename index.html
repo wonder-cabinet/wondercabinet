@@ -12,7 +12,7 @@
 <meta property="og:url" content="https://wondercabinet.space">
 <meta property="og:image" content="" id="og-image-meta">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="stylesheet" href="assets/app.css?v=37">
+<link rel="stylesheet" href="assets/app.css?v=38">
 </head>
 <body data-view="list">
 
@@ -925,6 +925,23 @@ function renderCurrentExhibitions(){
   list.innerHTML = cur.map(e => {
     const range = `${parseInt(e.day,10)} ${MONTH_NAME_EN[e.month].slice(0,3)} — ${parseInt(e.endDay,10)} ${MONTH_NAME_EN[e.endMonth].slice(0,3)}`;
     const rangeAr = `${arNum(parseInt(e.day,10))} ${MONTH_NAME_AR[e.month]} — ${arNum(parseInt(e.endDay,10))} ${MONTH_NAME_AR[e.endMonth]}`;
+    const progRows = (e.programmeEvents && e.programmeEvents.length)
+      ? `<div class="cx-programme">
+          <div class="cx-programme-head">
+            <span class="en-only">Programme</span>
+            <span class="ar-only ar" dir="rtl">البرنامج</span>
+          </div>
+          ${e.programmeEvents.map(pe => `
+            <a class="cx-prog-row" href="event.html?id=${pe.id}">
+              <span class="cx-prog-date">${parseInt(pe.day,10)} ${MONTH_NAME_EN[pe.month]?.slice(0,3)||''}</span>
+              <span class="cx-prog-type">${pe.type}</span>
+              <span class="cx-prog-name">
+                <span class="en-only">${pe.title}</span>
+                <span class="ar-only ar" dir="rtl">${pe.titleAr||pe.title}</span>
+              </span>
+            </a>`).join("")}
+        </div>`
+      : "";
     return `
     <a class="cx-card" href="event.html?id=${e.id}" data-ev="${e.id}">
       <div class="cx-row-top">
@@ -939,7 +956,8 @@ function renderCurrentExhibitions(){
         ${e.location ? `<span class="cx-venue">${e.location}</span>` : "<span></span>"}
         <span class="cx-cta"><span class="en-only">Enter →</span><span class="ar-only ar">← دخول</span></span>
       </div>
-    </a>`;
+    </a>
+    ${progRows}`
   }).join("");
 }
 
@@ -1884,7 +1902,7 @@ async function _boot(){
       return { key:`${n.toLowerCase()}-${y}`, name:n, year:y };
     }
     const q = encodeURIComponent(`{
-      "events": *[_type == "event"] | order(startDateTime desc) { ..., location->{ name }, relatedArtists[]->{name, "slug": slug.current, discipline, photo}, relatedProject->{title, slug} },
+      "events": *[_type == "event"] | order(startDateTime desc) { ..., location->{ name }, relatedArtists[]->{name, "slug": slug.current, discipline, photo}, relatedProject->{title, slug}, programmeEvents[]->{_id, title, eventType, startDateTime} },
       "projects": *[_type == "project"] | order(year desc) { title, "slug": slug.current, description, year, coverImage },
       "residencies": *[_type == "residency"] | order(year desc) { title, "slug": slug.current, description, year, coverImage },
       "settings": *[_type == "siteSettings"][0]{ monthlyThemeTitle, monthlyThemeDescription, ogImage, address, hours, mapsUrl }
@@ -1945,6 +1963,18 @@ async function _boot(){
           discipline: (a.discipline||[]).join(', '), photo: _sanityImg(a.photo),
         })).filter(a => a.name),
         relatedProject: doc.relatedProject ? { title: _loc(doc.relatedProject.title), slug: doc.relatedProject.slug?.current || '' } : null,
+        programmeEvents: (doc.programmeEvents || []).map(pe => {
+          const ps = _iso(pe.startDateTime);
+          return {
+            id: pe._id,
+            title: pe.title?.en || '',
+            titleAr: pe.title?.ar || '',
+            type: pe.eventType || '',
+            day: ps ? String(ps.getDate()).padStart(2,'0') : '',
+            month: ps ? MABBR[ps.getMonth()] : '',
+            start: ps && (ps.getHours()||ps.getMinutes()) ? ps.toTimeString().slice(0,5) : '',
+          };
+        }),
         season:   s ? _season(s) : { key:'unknown', name:'Unknown', year:new Date().getFullYear() },
       };
     });
