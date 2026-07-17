@@ -6,3 +6,4 @@ dist/
 *.zip
 project/
 wonder-cabinet.zip
+.claude/

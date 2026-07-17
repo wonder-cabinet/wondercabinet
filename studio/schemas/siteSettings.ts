@@ -16,6 +16,18 @@ export const siteSettings = defineType({
     defineField({name: 'themeHighlight', title: 'Theme: Highlight accent', type: 'string', initialValue: '#ffe65c'}),
     defineField({name: 'themePaper', title: 'Theme: Paper (panel bg)', type: 'string', initialValue: '#f6f3ea'}),
     defineField({name: 'themeRule', title: 'Theme: Rule (borders/lines)', type: 'string', initialValue: '#1d24ff'}),
+    defineField({
+      name: 'monthlyThemeTitle',
+      title: "This month's theme — title",
+      description: 'Editorial theme shown on the homepage next to "This week" (e.g. "Movement"). Update it whenever the theme changes.',
+      type: 'localeString',
+    }),
+    defineField({
+      name: 'monthlyThemeDescription',
+      title: "This month's theme — description",
+      description: 'Short intro text under the theme title, framing what this week/month\'s programme is about.',
+      type: 'localeText',
+    }),
     defineField({name: 'contactEmail', title: 'Contact email', type: 'string', initialValue: 'office@wondercabinet.space'}),
     defineField({
       name: 'socialLinks',

@@ -4,9 +4,31 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Programme · The Wonder Cabinet</title>
-<link rel="stylesheet" href="assets/app.css?v=8">
+<link rel="stylesheet" href="assets/app.css?v=34">
 </head>
 <body data-view="list">
+
+<!-- Archive — everything before the current calendar week. Collapsed to
+     zero height at rest, sitting ABOVE the topbar, so the page looks
+     completely normal until the user scrolls up: a first upward
+     scroll/wheel/touch gesture at the top peeks it open, a second commits
+     and loads the full archive (see armPastGravity/revealPastArchive).
+     Treat the whole site as one continuous timeline with THIS WEEK (below)
+     as the "magazine cover" sitting in the middle, past behind it
+     (revealed here, above), future ahead of it (the Programme section
+     further down, which starts at *next* week). -->
+<div class="tl-past-toggle" id="pt-outer" hidden>
+  <div class="tl-past-peek">
+    <span class="en-only">↑ Scroll to explore our past</span>
+    <span class="ar-only ar" dir="rtl">↑ مرر لاستكشاف أرشيفنا</span>
+  </div>
+  <button class="tl-past-btn" id="pt-toggle" type="button">
+    <span class="tl-past-arrow">↑</span>
+    <span class="en-only">View past events</span>
+    <span class="ar-only ar" dir="rtl">عرض الفعاليات السابقة</span>
+    <span class="tl-past-count" id="pt-count"></span>
+  </button>
+</div>
 
 <header class="topbar">
   <div class="topbar-inner">
@@ -21,18 +43,27 @@
         <button data-lang-btn="en" aria-pressed="true">EN</button>
         <button data-lang-btn="ar" aria-pressed="false">AR</button>
       </div>
+      <a class="ph-exit" id="tb-exit" href="index.html" hidden>
+        <span class="ph-exit-x">✕</span>
+        <span class="en-only">Close history · Home</span>
+        <span class="ar-only ar" dir="rtl">إغلاق الأرشيف · الرئيسية</span>
+      </a>
     </nav>
   </div>
 </header>
 
 <!-- GROUPED SCROLL — this week (horizontal scroll-lock, sticky rail) →
-     Featured projects marquee → Residencies → Featured artists marquee.
+     Featured projects marquee → Residencies (hidden) → Artists in this week.
      Replaces the old static featured-split section; fully Sanity-driven. -->
 <section class="gscroll" id="gscroll">
 
   <div class="gs-outer" id="gs-outer">
     <div class="gs-sticky" id="gs-sticky">
       <div class="gs-rail">
+        <div class="gs-theme" id="gs-theme" hidden>
+          <p class="gs-theme-quote" id="gs-theme-quote"></p>
+          <p class="gs-theme-desc" id="gs-theme-desc"></p>
+        </div>
         <div class="gs-kicker" id="gs-kicker"></div>
         <div class="gs-range" id="gs-range"></div>
         <div class="gs-count" id="gs-count"></div>
@@ -48,7 +79,9 @@
     <div class="gs-marquee-wrap"><div class="gs-marquee" id="gs-marquee-projects"></div></div>
   </section>
 
-  <section class="gs-vsection gs-tint" id="residencies">
+  <!-- Residencies — deferred to a later launch phase. Kept in the DOM
+       (hidden) so the nav/footer #residencies anchors don't break. -->
+  <section class="gs-vsection gs-tint" id="residencies" hidden>
     <h2><span class="en-only">Residencies</span><span class="ar-only ar" dir="rtl">إقامات</span></h2>
     <div class="gs-res-grid" id="gs-res-grid">
       <div class="gs-res-empty">
@@ -58,11 +91,25 @@
     </div>
   </section>
 
-  <section class="gs-vsection" id="gs-artists-section" hidden>
-    <h2><span class="en-only">Featured artists</span><span class="ar-only ar" dir="rtl">فنانون مميزون</span></h2>
+  <section class="gs-vsection gs-dark" id="gs-artists-section" hidden>
+    <h2><span class="en-only">Artists in this week</span><span class="ar-only ar" dir="rtl">فنانون هذا الأسبوع</span></h2>
     <div class="gs-marquee-wrap"><div class="gs-marquee" id="gs-marquee-artists" style="justify-content:flex-end;"></div></div>
   </section>
 
+</section>
+
+<!-- CURRENT EXHIBITIONS — long-running shows on view right now. Hidden
+     unless at least one Exhibition-type event's date range covers today.
+     Each card opens the same in-grid reader as the timeline rows. -->
+<section class="cx" id="cx-section" hidden>
+  <div class="cx-head">
+    <h2 class="cx-title-head">
+      <span class="en-only">Current <em>exhibitions</em></span>
+      <span class="ar-only ar" dir="rtl">معارض <em>حالية</em></span>
+    </h2>
+    <div class="cx-count" id="cx-count"></div>
+  </div>
+  <div class="cx-list" id="cx-list"></div>
 </section>
 
 <!-- THIS WEEK 7-day grid retired — redundant with the gscroll "this week"
@@ -135,9 +182,6 @@
   </div>
 </footer>
 
-<div id="overlay-backdrop" class="overlay-backdrop"></div>
-<div id="event-panel" class="event-panel" role="dialog" aria-modal="true" aria-label="Event details"></div>
-<div id="event-fullscreen" class="event-fullscreen" role="dialog" aria-modal="true" aria-label="Event details"></div>
 <script>
 /* ============================================================
    STATE
@@ -154,6 +198,7 @@ function getMonday(d){
 
 const STATE = {
   type: "",
+  pastType: "",
   search: "",
   weekStart: getMonday(new Date()), // always the current real-world week
 };
@@ -162,13 +207,16 @@ let ALL = [];
 let SEASONS = [];
 let PROJECTS = [];
 let RESIDENCIES = [];
+let SETTINGS = null;
 let ARTISTS = [];
+let PAST_EVENTS = []; // everything strictly before this week; populated by renderPastArchive()
+let archiveState = "idle"; // idle -> peek -> loaded, drives the scroll-gravity reveal
 
 // Helpers
 const MONTH_ORDER = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 const MONTH_NAME_EN = { Jan:"January", Feb:"February", Mar:"March", Apr:"April", May:"May", Jun:"June", Jul:"July", Aug:"August", Sep:"September", Oct:"October", Nov:"November", Dec:"December" };
 const MONTH_NAME_AR = { Jan:"يناير", Feb:"فبراير", Mar:"مارس", Apr:"أبريل", May:"مايو", Jun:"يونيو", Jul:"يوليو", Aug:"أغسطس", Sep:"سبتمبر", Oct:"أكتوبر", Nov:"نوفمبر", Dec:"ديسمبر" };
-const TYPE_AR = { Class:"صف", Film:"فيلم", Performance:"عرض", Radio:"إذاعة", Reading:"قراءة", Workshop:"ورشة", Opening:"افتتاح", Bar:"بار" };
+const TYPE_AR = { Class:"صف", Film:"فيلم", Performance:"عرض", Radio:"إذاعة", Reading:"قراءة", Workshop:"ورشة", Opening:"افتتاح", Bar:"بار", Exhibition:"معرض" };
 const VENUE_AR = { "Ground floor":"الطابق الأرضي","Screening room":"غرفة العرض","Main hall":"القاعة الرئيسية","Library":"المكتبة","Studio":"الستوديو","Workshop":"الورشة","Whole building":"كامل المبنى","Bar open":"البار مفتوح" };
 const SEASON_NAME_AR = { Autumn:"خريف", Winter:"شتاء", Spring:"ربيع", Summer:"صيف" };
 
@@ -273,43 +321,50 @@ function renderThisWeek(){
 }
 /* ============================================================
    FILTER BAR — type filters with counts, primary navigation
+   Shared between the future Programme bar and the past-archive bar:
+   same markup, same interaction, different backing list + STATE key.
    ============================================================ */
-function renderFilters(){
-  const TYPES = ["", "Performance", "Film", "Class", "Workshop", "Radio", "Reading", "Opening", "Bar"];
-  const LABEL_EN = { "":"All", Performance:"Performance", Film:"Film", Class:"Class", Workshop:"Workshop", Radio:"Radio", Reading:"Reading", Opening:"Opening", Bar:"Bar" };
-  const LABEL_AR = { "":"الكل", Performance:"عرض", Film:"فيلم", Class:"صف", Workshop:"ورشة", Radio:"إذاعة", Reading:"قراءة", Opening:"افتتاح", Bar:"بار" };
+const FILTER_TYPES = ["", "Performance", "Film", "Class", "Workshop", "Radio", "Reading", "Opening", "Bar", "Exhibition"];
+const FILTER_LABEL_EN = { "":"All", Performance:"Performance", Film:"Film", Class:"Class", Workshop:"Workshop", Radio:"Radio", Reading:"Reading", Opening:"Opening", Bar:"Bar", Exhibition:"Exhibition" };
+const FILTER_LABEL_AR = { "":"الكل", Performance:"عرض", Film:"فيلم", Class:"صف", Workshop:"ورشة", Radio:"إذاعة", Reading:"قراءة", Opening:"افتتاح", Bar:"بار", Exhibition:"معرض" };
 
-  function build(){
-    const container = document.getElementById("ph-filters");
-    container.innerHTML = TYPES.map(t => {
-      const count = t ? ALL.filter(e => e.type === t).length : ALL.length;
-      if (t && count === 0) return "";
-      return `<button class="ph-filter${STATE.type === t ? " is-active" : ""}" data-type="${t}">
-        <span class="en-only">${LABEL_EN[t]}</span>
-        <span class="ar-only ar">${LABEL_AR[t]}</span>
-        <span class="ph-filter-count">${count}</span>
-      </button>`;
-    }).join("");
-    container.querySelectorAll(".ph-filter").forEach(btn => {
-      btn.addEventListener("click", () => {
-        STATE.type = btn.dataset.type;
-        build();
-        renderTimeline();
-      });
+function renderFilterBar(containerId, getList, stateKey, onChange){
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  const list = getList();
+  container.innerHTML = FILTER_TYPES.map(t => {
+    const count = t ? list.filter(e => e.type === t).length : list.length;
+    if (t && count === 0) return "";
+    return `<button class="ph-filter${STATE[stateKey] === t ? " is-active" : ""}" data-type="${t}">
+      <span class="en-only">${FILTER_LABEL_EN[t]}</span>
+      <span class="ar-only ar">${FILTER_LABEL_AR[t]}</span>
+      <span class="ph-filter-count">${count}</span>
+    </button>`;
+  }).join("");
+  container.querySelectorAll(".ph-filter").forEach(btn => {
+    btn.addEventListener("click", () => {
+      STATE[stateKey] = btn.dataset.type;
+      renderFilterBar(containerId, getList, stateKey, onChange);
+      onChange();
     });
-  }
-  build();
+  });
 }
+
+function renderFilters(){ renderFilterBar("ph-filters", () => ALL, "type", renderTimeline); }
+function renderPastFilters(){ renderFilterBar("ph-filters-past", () => PAST_EVENTS, "pastType", renderPastTimeline); }
 
 /* ============================================================
    SEASON RAIL (Programme nav)
    Lists every season with year, click to jump within timeline.
+   Shared between the future rail (all seasons, scoped to #timeline)
+   and the past-archive rail (seasons present in the past list, scoped
+   to #pt-past) — same markup/interaction pattern as the filter bar above.
    ============================================================ */
-function renderSeasonRail(){
-  const rail = document.getElementById("season-rail");
-  // Group seasons by year
+function renderSeasonRailFor(containerId, seasons, scopeSelector){
+  const rail = document.getElementById(containerId);
+  if (!rail) return;
   const byYear = {};
-  SEASONS.forEach(s => { (byYear[s.year] = byYear[s.year] || []).push(s); });
+  seasons.forEach(s => { (byYear[s.year] = byYear[s.year] || []).push(s); });
   const years = Object.keys(byYear).map(Number).sort((a,b)=>b-a);
   rail.innerHTML = years.map(y => `
     <div class="sr-year">
@@ -324,12 +379,19 @@ function renderSeasonRail(){
     </div>`).join("");
 
   rail.querySelectorAll(".sr-btn").forEach(b => {
-    b.addEventListener("click", () => scrollToSeason(b.dataset.season));
+    b.addEventListener("click", () => scrollToSeason(b.dataset.season, scopeSelector));
   });
 }
 
-function scrollToSeason(key){
-  const el = document.querySelector(`.tl-season[data-season="${key}"]`);
+function renderSeasonRail(){ renderSeasonRailFor("season-rail", SEASONS, "#timeline"); }
+function renderPastSeasonRail(){
+  const seen = {};
+  PAST_EVENTS.forEach(e => { seen[e.season.key] = seen[e.season.key] || e.season; });
+  renderSeasonRailFor("season-rail-past", Object.values(seen), "#pt-past");
+}
+
+function scrollToSeason(key, scopeSelector){
+  const el = document.querySelector(`${scopeSelector || ""} .tl-season[data-season="${key}"]`);
   if (el) {
     const top = el.getBoundingClientRect().top + window.scrollY - 12;
     window.scrollTo({ top, behavior: "smooth" });
@@ -368,22 +430,45 @@ function applyTypeFilter(arr){
   return out;
 }
 
+// Date-only helper (deliberately date-based, not the manually-curated
+// `status` field, so splits below are always correct regardless of whether
+// an admin remembered to flip an old event's status to "past").
+function eventDateOnly(e){
+  return new Date(e.year, MONTH_ORDER.indexOf(e.month), parseInt(e.day, 10));
+}
+// End DATE (falls back to the start date for single-day events) — needed
+// for anything long-running: an exhibition is neither "past" nor "this
+// week" while its range covers today.
+function eventEndDateOnly(e){
+  return e.endMonth
+    ? new Date(e.endYear, MONTH_ORDER.indexOf(e.endMonth), parseInt(e.endDay, 10))
+    : eventDateOnly(e);
+}
+// The whole site is treated as one continuous timeline with "this week"
+// pulled out as a magazine-cover-style feature in the middle: everything
+// before this week is the archive (revealed above the hero), this week's
+// events live only in the This Week hero, and the Programme section below
+// starts at next week so it never repeats what the hero already shows.
+function currentWeekRange(){
+  const start = getMonday(new Date());
+  const end = new Date(start); end.setDate(start.getDate() + 6);
+  return { start, end };
+}
 
-function renderTimeline(){
-  const tl = document.getElementById("timeline");
-  const events = applyTypeFilter(ALL).slice().sort((a,b) => eventTimestamp(b) - eventTimestamp(a)); // newest first; we'll flip per-section as needed
-
-  // Order seasons newest first (matches SEASONS order which is desc)
-  const order = SEASONS;
-
+// Builds season → month → day blocks for a given (already filtered) list of
+// events, always in ascending chronological order (oldest first). Used for
+// both the future list and the on-demand past list — the two just get
+// stacked past-above-future so the whole page reads oldest → newest, top to
+// bottom, with "today" as the seam between them.
+function buildSeasonBlocks(events){
+  if (!events.length) return "";
+  const seasonsAsc = SEASONS.slice().reverse(); // SEASONS is newest-first; mirror it for ascending order
   let prevYear = null;
-  const blocks = order.map((season, sIdx) => {
+  return seasonsAsc.map(season => {
     const inSeason = events.filter(e => e.season.key === season.key);
     if (!inSeason.length) return "";
-    // Within a season, list events in chronological order (earliest first)
     inSeason.sort((a,b) => eventTimestamp(a) - eventTimestamp(b));
 
-    // Group by month, then by day
     const months = {};
     inSeason.forEach(e => {
       months[e.month] = months[e.month] || { key: e.month, evs: [] };
@@ -391,11 +476,9 @@ function renderTimeline(){
     });
     const monthList = Object.values(months).sort((a,b) => MONTH_ORDER.indexOf(a.key) - MONTH_ORDER.indexOf(b.key));
 
-    // Year marker: insert when crossing into a season whose year differs from the previous
     let yearMarker = "";
-    if (sIdx === 0) {
-      // first block — show the year above
-      yearMarker = renderYearMarker(season.year, /*direction*/ "current");
+    if (prevYear === null) {
+      yearMarker = renderYearMarker(season.year, "current");
       prevYear = season.year;
     } else if (season.year !== prevYear) {
       yearMarker = renderYearMarker(season.year, season.year < prevYear ? "back" : "forward");
@@ -421,9 +504,276 @@ function renderTimeline(){
         ${monthsHtml}
       </div>`;
   }).join("");
+}
 
-  tl.innerHTML = blocks;
+// Programme now only ever shows the future *beyond* this week — the current
+// week's events live exclusively in the This Week hero above, so nothing
+// appears twice. Past-browsing has moved to the toggle above the hero
+// (renderPastArchive/revealPastArchive below); this section has no past
+// mode of its own anymore.
+function renderTimeline(){
+  const tl = document.getElementById("timeline");
+  const { end: weekEnd } = currentWeekRange();
+
+  const filtered = applyTypeFilter(ALL);
+  const future = filtered.filter(e => eventDateOnly(e) > weekEnd).sort((a,b) => eventTimestamp(a) - eventTimestamp(b));
+
+  const futureHtml = buildSeasonBlocks(future);
+  const emptyHtml = `<div class="tl-empty">
+    <span class="en-only">No upcoming events${STATE.type ? " in this category" : ""} beyond this week — check back soon.</span>
+    <span class="ar-only ar" dir="rtl">لا توجد فعاليات قادمة${STATE.type ? " في هذه الفئة" : ""} بعد هذا الأسبوع — تابعونا قريباً.</span>
+  </div>`;
+
+  tl.innerHTML = futureHtml || emptyHtml;
   initStickyMonths();
+}
+
+// The pre-hero archive — everything strictly before this week. Built once
+// at boot (not tied to the Programme type filter, since it now lives in a
+// completely separate part of the page). The toggle sits above the
+// topbar, collapsed to nothing — armPastGravity() wires up the
+// scroll/wheel/touch gesture that reveals and eventually loads it.
+function renderPastArchive(){
+  const outer = document.getElementById("pt-outer");
+  if (!outer) return;
+  const { start: weekStart } = currentWeekRange();
+  // An event belongs to the past only once it's fully OVER — a running
+  // exhibition starts weeks back but is current, not archive material.
+  PAST_EVENTS = ALL.filter(e => eventDateOnly(e) < weekStart && eventEndDateOnly(e) < weekStart)
+    .sort((a,b) => eventTimestamp(a) - eventTimestamp(b));
+
+  outer.hidden = PAST_EVENTS.length === 0;
+  const count = document.getElementById("pt-count");
+  if (count) count.textContent = PAST_EVENTS.length;
+
+  if (!outer.hidden) armPastGravity();
+}
+
+// Scroll-gravity gesture: the toggle lives above the topbar, collapsed to
+// zero height, so at rest the page looks completely normal. Scrolling up
+// while already at the top of the page (wheel/touch, since scrollY can't
+// go below 0 on its own) streams a live "pull" into the toggle — it
+// squeezes open proportionally to how hard/long you keep pulling, and
+// springs back shut if you let go before the threshold. A sustained pull
+// past the threshold commits: the full archive loads and the viewport is
+// pulled into it with a smooth scroll, landing at the seam so the user can
+// keep scrolling up manually through the rest of history. Same gravity
+// language as the in-grid reader's end-of-scroll gesture, on purpose.
+// Guarded against the reader: while it's open (gs-reader-open), scroll
+// chaining out of its iframe must never leak into this gesture.
+function armPastGravity(){
+  const outer = document.getElementById("pt-outer");
+  const btn = document.getElementById("pt-toggle");
+  if (!outer) return;
+
+  const PEEK_HEIGHT = 70;   // px — first stage: just enough to show the hint message
+  const FULL_HEIGHT = 140;  // px — second stage: message + the toggle button beneath it
+  const PEEK_PULL = 150;    // wheel px (stage 1) to settle into the peek/message state
+  const COMMIT_PULL = 550;  // further wheel px (stage 2, heavier) to actually commit
+  const PEEK_HOLD_MS = 2400; // how long the peek sits on its own before springing shut
+  let stage = "idle";  // idle -> peek (commit itself is handled by revealPastArchive)
+  let pull = 0;        // accumulator for whichever stage is currently active
+  let springTimer = null;
+
+  // True while the in-grid reader is open, and for a cooldown after it
+  // closes. The cooldown is a SLIDING window: any wheel/touch activity
+  // during it pushes it forward, so a single continuous gesture (incl.
+  // trackpad inertia, which can keep emitting ticks for a second or more
+  // after the fingers lift) can never carry over from closing the reader
+  // into arming the archive — no matter how long it coasts. Only after a
+  // genuine pause in input does the archive gesture re-arm.
+  const READER_COOLDOWN_MS = 400;
+  function readerOpen(){
+    if (document.body.classList.contains("gs-reader-open")) return true;
+    if ((Date.now() - _gsReaderClosedAt) < READER_COOLDOWN_MS){
+      _gsReaderClosedAt = Date.now(); // still coasting — keep the window sliding
+      return true;
+    }
+    return false;
+  }
+
+  // "Top" means the very start of the timeline: page scrollY at 0 AND (if
+  // the This Week rail is present) its horizontal scroll fully retracted —
+  // otherwise a wheel-up mid-rail could be misread as reaching for history.
+  function nearTop(){
+    if (window.scrollY > 2) return false;
+    const rail = document.getElementById("gs-outer");
+    if (rail && !rail.hidden && rail.dataset.maxScroll) {
+      const maxScroll = parseFloat(rail.dataset.maxScroll || 0);
+      if (maxScroll > 0) {
+        const top = rail.getBoundingClientRect().top;
+        const progress = Math.min(Math.max(54 - top, 0), maxScroll);
+        if (progress > 2) return false;
+      }
+    }
+    return true;
+  }
+
+  function setHeight(px){
+    outer.classList.add("is-tracking");
+    outer.style.maxHeight = px + "px";
+  }
+  function closeAll(){
+    stage = "idle";
+    pull = 0;
+    clearTimeout(springTimer);
+    outer.classList.remove("is-tracking", "is-peeking");
+    outer.style.maxHeight = "";
+  }
+  // Settles into the peek stage at a fixed height, message visible. Left
+  // alone, it springs shut again after a few seconds — it's a hint, not a
+  // commitment.
+  function settlePeek(){
+    stage = "peek";
+    pull = 0;
+    outer.classList.add("is-peeking");
+    setHeight(PEEK_HEIGHT);
+    clearTimeout(springTimer);
+    springTimer = setTimeout(closeAll, PEEK_HOLD_MS);
+  }
+
+  function commit(){
+    if (archiveState === "loaded") return;
+    clearTimeout(springTimer);
+    window.removeEventListener("wheel", onWheel);
+    window.removeEventListener("touchstart", onTouchStart);
+    window.removeEventListener("touchmove", onTouchMove);
+    outer.classList.remove("is-tracking", "is-peeking");
+    outer.style.maxHeight = "";
+    revealPastArchive();
+  }
+
+  function advance(pullAmount){
+    pull = pullAmount;
+    if (stage === "idle"){
+      // Stage 1 — pulling the toggle open just enough to show the hint.
+      if (pull >= PEEK_PULL){ settlePeek(); return; }
+      setHeight(PEEK_HEIGHT * Math.min(1, pull / PEEK_PULL));
+      clearTimeout(springTimer);
+      springTimer = setTimeout(closeAll, 500);
+    } else {
+      // Stage 2 — already peeking; a heavier, sustained pull (quadratic
+      // ease-in, same "have to force it" gravity as the reader's own
+      // end-of-scroll) reveals the toggle button beneath the message and
+      // finally commits.
+      if (pull >= COMMIT_PULL){ commit(); return; }
+      const s = Math.min(1, pull / COMMIT_PULL);
+      setHeight(PEEK_HEIGHT + (FULL_HEIGHT - PEEK_HEIGHT) * (s * s));
+      clearTimeout(springTimer);
+      springTimer = setTimeout(settlePeek, 500); // let go mid-pull -> back to just the message
+    }
+  }
+
+  function onWheel(e){
+    if (readerOpen()) return;
+    if (!nearTop() || e.deltaY >= 0){
+      if (stage !== "idle" || pull > 0) closeAll();
+      return;
+    }
+    advance(pull + Math.abs(e.deltaY));
+  }
+
+  let touchStartY = 0;
+  function onTouchStart(e){ touchStartY = e.touches[0].clientY; }
+  function onTouchMove(e){
+    if (readerOpen()) return;
+    if (!nearTop()){ if (stage !== "idle" || pull > 0) closeAll(); return; }
+    const dy = e.touches[0].clientY - touchStartY;
+    if (dy <= 0){ if (stage !== "idle" || pull > 0) closeAll(); return; } // dragging down while at the top = trying to scroll up
+    advance(dy * 3); // touch drags are shorter than wheel deltas — scale up
+  }
+
+  window.addEventListener("wheel", onWheel, { passive: true });
+  window.addEventListener("touchstart", onTouchStart, { passive: true });
+  window.addEventListener("touchmove", onTouchMove, { passive: true });
+  if (btn) btn.addEventListener("click", commit);
+}
+
+// Expands the archive above the This Week hero — prepends the past events
+// (oldest → newest, so the most recent past sits right at the seam right
+// before this week), with its own filter bar (parity with the future
+// Programme bar). Rather than jumping the viewport deep into the archive,
+// we land right at the seam: a small peek of the most recent past event
+// above, with a smooth "gravity" scroll pulling the user in. The only way
+// back is the "Close history" link in the topbar, which returns home.
+//
+// While browsing history the archive sits *above* the topbar in the DOM,
+// and the topbar switches from sticky-top to sticky-bottom (see
+// body.viewing-past in app.css) — it scrolls away normally as you move up
+// through the past, and only re-engages once you'd scroll it past the
+// bottom edge, where it settles for the rest of the upward scroll.
+function revealPastArchive(){
+  if (archiveState === "loaded") return;
+  archiveState = "loaded";
+
+  const toggle = document.getElementById("pt-outer");
+  if (!toggle) return;
+
+  const wrap = document.createElement("div");
+  wrap.id = "pt-past";
+  wrap.innerHTML = `
+    <div class="programme-head past-ph">
+      <div class="ph-bar">
+        <div class="ph-title-cell">
+          <span class="en-only">Archive</span>
+          <span class="ar-only ar" dir="rtl">الأرشيف</span>
+        </div>
+        <div class="ph-filters" id="ph-filters-past"></div>
+        <div class="ph-seasons" id="season-rail-past"></div>
+      </div>
+    </div>
+    <div class="timeline" id="pt-timeline"></div>`;
+  toggle.replaceWith(wrap);
+  document.body.classList.add("viewing-past");
+
+  const exitBtn = document.getElementById("tb-exit");
+  if (exitBtn) exitBtn.hidden = false;
+
+  renderPastFilters();
+  renderPastSeasonRail();
+  renderPastTimeline();
+
+  // Land at the seam WITHOUT the viewport flying through the whole archive.
+  // The archive is inserted above the current content, so first re-anchor
+  // the scroll position instantly to compensate — visually nothing moves,
+  // the user is still looking at exactly what they were looking at. Then a
+  // small, slow, eased nudge upward reveals just the tail of the most
+  // recent past event (the "gravity" pull-in) and hands control straight
+  // back to the user's own scrolling from there.
+  const PEEK = 160;
+  const seamY = wrap.offsetHeight; // seam = right where the old top-of-page was
+  window.scrollTo(0, seamY); // plain scrollTo is always instant
+
+  const from = seamY;
+  const to = Math.max(0, seamY - PEEK);
+  const DUR = 900;
+  const t0 = performance.now();
+  const easeInOut = t => t < 0.5 ? 2*t*t : 1 - Math.pow(-2*t + 2, 2) / 2;
+  // setInterval rather than rAF — rAF stalls in occluded/backgrounded tabs
+  // (bitten by this before), and a 60fps-ish timer is indistinguishable
+  // here while never silently freezing mid-animation.
+  const timer = setInterval(() => {
+    const t = Math.min(1, (performance.now() - t0) / DUR);
+    window.scrollTo(0, from + (to - from) * easeInOut(t));
+    if (t >= 1) clearInterval(timer);
+  }, 16);
+}
+
+function renderPastTimeline(){
+  const tl = document.getElementById("pt-timeline");
+  if (!tl) return;
+  const filtered = applyPastTypeFilter(PAST_EVENTS);
+  const pastHtml = buildSeasonBlocks(filtered);
+  const emptyHtml = `<div class="tl-empty">
+    <span class="en-only">No past events${STATE.pastType ? " in this category" : ""}.</span>
+    <span class="ar-only ar" dir="rtl">لا توجد فعاليات سابقة${STATE.pastType ? " في هذه الفئة" : ""}.</span>
+  </div>`;
+  tl.innerHTML = pastHtml || emptyHtml;
+  initStickyMonths();
+}
+
+function applyPastTypeFilter(arr){
+  return STATE.pastType ? arr.filter(e => e.type === STATE.pastType) : arr;
 }
 
 function renderYearMarker(year, direction){
@@ -488,7 +838,7 @@ function renderEventRow(e, day, isFirst){
             ? `<span class="tl-tag tl-rsvp"><span class="en-only">Register</span><span class="ar-only ar">تسجيل</span></span>`
             : `<span class="tl-tag tl-free"><span class="en-only">Free entry</span><span class="ar-only ar">دخول حرّ</span></span>`);
   return `
-    <a class="tl-row${isPast ? ' is-past' : ''}${isFirst ? ' tl-first' : ''}" href="event.html?id=${e.id}">
+    <a class="tl-row${isPast ? ' is-past' : ''}${isFirst ? ' tl-first' : ''}" href="event.html?id=${e.id}" data-ev="${e.id}">
       <div class="tl-date">
         ${isFirst ? `
           <span class="tl-day">${e.day}</span>
@@ -516,27 +866,87 @@ function renderEventRow(e, day, isFirst){
 }
 
 /* ============================================================
+   CURRENT EXHIBITIONS
+   Long-running shows whose date range covers today. They live in
+   their own full-bleed band (they're neither "this week" nor
+   Programme material), and each card opens the same in-grid reader
+   as the timeline rows — vertical expansion, in place. Once an
+   exhibition closes, it drops out of here and flows into the past
+   archive on its own.
+   ============================================================ */
+function renderCurrentExhibitions(){
+  const sec = document.getElementById("cx-section");
+  const list = document.getElementById("cx-list");
+  const count = document.getElementById("cx-count");
+  if (!sec || !list) return;
+  const today = new Date(); today.setHours(0,0,0,0);
+  const cur = ALL.filter(e =>
+    e.type === "Exhibition" &&
+    eventDateOnly(e) <= today && today <= eventEndDateOnly(e)
+  ).sort((a,b) => eventTimestamp(a) - eventTimestamp(b));
+
+  if (!cur.length){ sec.hidden = true; return; }
+  sec.hidden = false;
+  if (count) count.innerHTML =
+    `<span class="en-only">${String(cur.length).padStart(2,"0")} on view</span>` +
+    `<span class="ar-only ar" dir="rtl">${arNum(cur.length)} معروض</span>`;
+
+  list.innerHTML = cur.map(e => {
+    const range = `${parseInt(e.day,10)} ${MONTH_NAME_EN[e.month].slice(0,3)} — ${parseInt(e.endDay,10)} ${MONTH_NAME_EN[e.endMonth].slice(0,3)}`;
+    const rangeAr = `${arNum(parseInt(e.day,10))} ${MONTH_NAME_AR[e.month]} — ${arNum(parseInt(e.endDay,10))} ${MONTH_NAME_AR[e.endMonth]}`;
+    return `
+    <a class="cx-card" href="event.html?id=${e.id}" data-ev="${e.id}">
+      <div class="cx-row-top">
+        <span class="cx-range"><span class="en-only">${range}</span><span class="ar-only ar" dir="rtl">${rangeAr}</span></span>
+        <span class="cx-tag"><span class="en-only">On view now</span><span class="ar-only ar" dir="rtl">معروض الآن</span></span>
+      </div>
+      <h3 class="cx-name">
+        <span class="en-only">${e.title}</span>
+        <span class="ar-only ar" dir="rtl">${e.titleAr || e.title}</span>
+      </h3>
+      <div class="cx-row-bottom">
+        ${e.location ? `<span class="cx-venue">${e.location}</span>` : "<span></span>"}
+        <span class="cx-cta"><span class="en-only">Enter →</span><span class="ar-only ar">← دخول</span></span>
+      </div>
+    </a>`;
+  }).join("");
+}
+
+/* ============================================================
    STICKY-SHRINK MONTH HEADER
    Each .tl-month-head sticks to the top while its body is in view.
    When the next month's body hits the threshold, the active head shrinks.
    ============================================================ */
+// initStickyMonths() is called after every timeline re-render — both the
+// future Programme list and the past archive (each has its own filter
+// bar, so both can exist and re-render independently). Rather than a
+// single hardcoded top offset (which only ever matched the future
+// section's topbar+filter-bar stack), each head's threshold is read
+// straight from its own computed CSS `top` — the past archive's month
+// heads sit under a shorter stack (their own filter bar only, no
+// permanently-fixed topbar above them), and are scoped a different `top`
+// value in CSS (see #pt-past .tl-month-head). This keeps the JS in sync
+// with whatever the cascade says, in either context.
+let _stickyMonthsCleanup = null;
 function initStickyMonths(){
+  if (_stickyMonthsCleanup) { _stickyMonthsCleanup(); _stickyMonthsCleanup = null; }
+
   const heads = Array.from(document.querySelectorAll(".tl-month-head"));
   if (!heads.length) return;
 
-  const TOP_OFFSET = 104; // topbar (54) + filter bar (50)
   function update(){
     heads.forEach(h => {
       const body = h.parentElement;
       const r = body.getBoundingClientRect();
       const headH = h.offsetHeight;
+      const topOffset = parseFloat(getComputedStyle(h).top) || 0;
       // Active = body has scrolled past the top
-      const active = r.top <= TOP_OFFSET + 1 && r.bottom > TOP_OFFSET + headH;
-      const exiting = r.bottom <= TOP_OFFSET + headH && r.bottom > TOP_OFFSET;
+      const active = r.top <= topOffset + 1 && r.bottom > topOffset + headH;
+      const exiting = r.bottom <= topOffset + headH && r.bottom > topOffset;
       h.classList.toggle("is-stuck", active || exiting);
       if (exiting){
         // shrink as the next month approaches
-        const t = Math.max(0, Math.min(1, (TOP_OFFSET + headH - r.bottom) / headH));
+        const t = Math.max(0, Math.min(1, (topOffset + headH - r.bottom) / headH));
         h.style.setProperty("--tl-shrink", t.toFixed(3));
       } else if (active){
         h.style.setProperty("--tl-shrink", "0");
@@ -548,6 +958,10 @@ function initStickyMonths(){
   window.addEventListener("scroll", update, { passive: true });
   window.addEventListener("resize", update);
   update();
+  _stickyMonthsCleanup = () => {
+    window.removeEventListener("scroll", update);
+    window.removeEventListener("resize", update);
+  };
 }
 
 /* ============================================================
@@ -569,22 +983,32 @@ function _gsWeekEvents(start){
   }).sort((a,b) => eventTimestamp(a) - eventTimestamp(b));
 }
 
+function _gsCardVideo(ev){
+  const b = (ev.content || []).find(c => (c._type || c.type) === "contentVideo");
+  if (!b) return "";
+  return _sanityFile(b.videoFile) || b.externalUrl || "";
+}
+
 function _gsEventCard(ev){
   const typeAr = TYPE_AR[ev.type] || ev.type;
-  return `<a class="gs-card" href="event.html?id=${ev.id}">
-    <div class="gs-c-meta">
-      <span class="en-only">${ev.type}${ev.dow ? " · " + ev.dow + " " + parseInt(ev.day,10) + " " + ev.month : ""}${ev.start ? " · " + ev.start : ""}</span>
-      <span class="ar-only ar" dir="rtl">${typeAr}${ev.dowAr ? " · " + ev.dowAr : ""}${ev.start ? " · " + ev.start : ""}</span>
+  const videoSrc = _gsCardVideo(ev);
+  return `<a class="gs-card${videoSrc ? " gs-card-video" : ""}" href="event.html?id=${ev.id}" data-ev="${ev.id}">
+    ${videoSrc ? `<video class="gs-card-bg-video" autoplay muted loop playsinline src="${videoSrc}"></video><div class="gs-card-scrim"></div>` : ""}
+    <div class="gs-card-inner">
+      <div class="gs-c-meta">
+        <span class="en-only">${ev.type}${ev.dow ? " · " + ev.dow + " " + parseInt(ev.day,10) + " " + ev.month : ""}${ev.start ? " · " + ev.start : ""}</span>
+        <span class="ar-only ar" dir="rtl">${typeAr}${ev.dowAr ? " · " + ev.dowAr : ""}${ev.start ? " · " + ev.start : ""}</span>
+      </div>
+      <h3 class="gs-c-title">
+        <span class="en-only">${ev.title}</span>
+        <span class="ar-only ar" dir="rtl">${ev.titleAr || ev.title}</span>
+      </h3>
+      ${ev.shortDesc ? `<p class="gs-c-desc">
+        <span class="en-only">${ev.shortDesc}</span>
+        ${ev.shortDescAr ? `<span class="ar-only ar" dir="rtl">${ev.shortDescAr}</span>` : ""}
+      </p>` : ""}
+      <div class="gs-c-cta"><span class="en-only">View event →</span><span class="ar-only ar" dir="rtl">← عرض الفعالية</span></div>
     </div>
-    <h3 class="gs-c-title">
-      <span class="en-only">${ev.title}</span>
-      <span class="ar-only ar" dir="rtl">${ev.titleAr || ev.title}</span>
-    </h3>
-    ${ev.shortDesc ? `<p class="gs-c-desc">
-      <span class="en-only">${ev.shortDesc}</span>
-      ${ev.shortDescAr ? `<span class="ar-only ar" dir="rtl">${ev.shortDescAr}</span>` : ""}
-    </p>` : ""}
-    <div class="gs-c-cta"><span class="en-only">View event →</span><span class="ar-only ar" dir="rtl">← عرض الفعالية</span></div>
   </a>`;
 }
 
@@ -593,6 +1017,598 @@ function _gsEmptyCard(en, ar){
     <p class="gs-c-desc"><span class="en-only">${en}</span><span class="ar-only ar" dir="rtl">${ar}</span></p>
   </div>`;
 }
+
+/* ============================================================
+   IN-GRID EVENT READER
+   Clicking a This Week card doesn't navigate — it opens the real
+   event page (event.html?id=X&embed=1, the one canonical template)
+   inside the card's own block. The inner page's scroll drives
+   everything from there:
+     scroll down  → the block grows from the card's rect to the full
+                    area right of the rail (left text block stays),
+                    while the page reveals content underneath —
+                    hero video scrolls away, title sticks.
+     keep going   → normal reading, sticky title all the way.
+     overscroll   → past the bottom (or back past the top), the block
+                    collapses back into its card and the grid returns.
+     ✕            → collapses immediately.  ↗ (next to it) → opens the
+                    same page standalone at its real, shareable URL.
+   ============================================================ */
+let _gsReaderOpen = false;
+// Timestamp of the last reader close — a fast, sustained upward scroll used
+// to close the reader (pulling past the top of the article) can keep firing
+// wheel ticks for a few frames after gs-reader-open flips off, and those
+// trailing ticks land on armPastGravity's listener with window.scrollY back
+// at 0 (the reader restores the exact pre-open scroll position) — which
+// looks identical to "scrolling up at the top of the page" and would wrongly
+// arm the past-archive reveal. armPastGravity ignores wheel/touch input for
+// a short cooldown after this timestamp to give that trailing motion
+// somewhere harmless to land.
+let _gsReaderClosedAt = 0;
+// Failsafe: if reader state ever gets inconsistent (a stray error mid-open,
+// an interrupted collapse — anything that leaves the body locked or a stale
+// frame in the DOM with no live reader driving it), tear absolutely
+// everything down to a clean, scrollable page. Never called on the happy
+// path; exists so no bug in the reader can ever strand the page blank or
+// frozen.
+function _gsHardReset(){
+  document.querySelectorAll(".gs-card-frame").forEach(f => f.remove());
+  document.querySelectorAll(".gs-card-open").forEach(c => {
+    c.classList.remove("gs-card-open", "gs-anim", "gs-card-open-m");
+    c.style.flexBasis = "";
+    c.style.height = "";
+  });
+  document.querySelectorAll(".tl-row-open").forEach(r => {
+    r.classList.remove("tl-row-open", "tl-anim");
+    r.style.height = "";
+    r.style.transform = "";
+  });
+  const track = document.getElementById("gs-track");
+  if (track) track.classList.remove("gs-anim");
+  document.body.style.position = "";
+  document.body.style.top = "";
+  document.body.style.left = "";
+  document.body.style.right = "";
+  document.body.classList.remove("gs-reader-open");
+  _gsReaderOpen = false;
+  window.dispatchEvent(new Event("resize"));
+}
+function _gsOpenReader(cardEl){
+  if (_gsReaderOpen) return;
+  _gsReaderOpen = true;
+
+  const track = document.getElementById("gs-track");
+  const rail = document.querySelector(".gs-rail");
+  const railW = rail ? rail.getBoundingClientRect().width : 0;
+
+  // Current track translate (the horizontal scroll-lock position) — the
+  // page scroll is frozen while reading, so this stays our baseline.
+  const m = /translateX\((-?[\d.]+)px\)/.exec(track.style.transform || "");
+  const baseX = m ? parseFloat(m[1]) : 0;
+  const startW = cardEl.getBoundingClientRect().width;
+  const targetW = window.innerWidth - railW; // full area right of the rail
+  const targetX = -cardEl.offsetLeft;        // card's left border lands on the rail
+
+  // Freeze the background page. overflow:hidden alone is not reliable here
+  // — some wheel/trackpad gestures still nudge window.scrollY through it,
+  // and it also makes body/html the nearest "scroll container" for any
+  // position:sticky descendant, corrupting their stuck-state math (the
+  // exact class of bug already hit once with the ticket bar). Locking via
+  // position:fixed removes the body from scrollable flow entirely — no
+  // scroll can occur, sticky computations elsewhere are untouched — and we
+  // restore the exact scroll position on close.
+  const _lockScrollY = window.scrollY;
+  document.body.style.position = "fixed";
+  document.body.style.top = `-${_lockScrollY}px`;
+  document.body.style.left = "0";
+  document.body.style.right = "0";
+  document.body.classList.add("gs-reader-open");
+
+  cardEl.classList.add("gs-card-open");
+  const frame = document.createElement("iframe");
+  frame.className = "gs-card-frame";
+  frame.title = "Event";
+  frame.src = `event.html?id=${encodeURIComponent(cardEl.dataset.ev)}&embed=1`;
+  // The iframe stays pointer-events:none for the whole time it's embedded —
+  // permanently, not just during expansion. Two real, confirmed bugs led
+  // here: (1) whenever an event's content was short enough to fit in one
+  // viewport (no scrollable overflow at all), the embed page's own
+  // boundary-pull wheel logic treated every tick as simultaneously "at the
+  // top and bottom", swallowing it before it could scroll or report back;
+  // (2) even for long events, once the frame was handed pointer-events:auto
+  // after full expansion, real wheel/trackpad scrolling over it did nothing
+  // at all in testing on the actual deployed site — same-origin same-tab
+  // input just wasn't reaching the nested document reliably. Rather than
+  // keep chasing why, the outer page now drives EVERYTHING itself for as
+  // long as the reader is open: the expansion, the reading scroll (forwarded
+  // into the iframe programmatically), and the end-of-article gravity — all
+  // from wheel events captured here, the one mechanism already proven
+  // reliable (it's the same approach the past-archive gravity uses). Clicks
+  // (close/pop-out/register/nav links) are forwarded on a matching click
+  // listener below since pointer-events:none blocks native click routing too.
+  frame.style.pointerEvents = "none";
+  cardEl.appendChild(frame);
+
+  const ease = t => 1 - Math.pow(1 - t, 3);
+  const lerp = (a, b, t) => a + (b - a) * t;
+  const CLICK_T = 0.18;   // borders nudge open on click — "content will be here"
+  const EXPAND_PX = 320;  // wheel-px of "virtual" scroll to go from nudge to fully open
+  const CLOSE_PX = 320;   // wheel-px of "virtual" scroll to go from fully open back to closed —
+                           // used symmetrically at BOTH ends (before full expansion, and past
+                           // either edge of the article), so opening and closing are the exact
+                           // same kind of motion in reverse: continuously tied to the wheel,
+                           // reversible at any point, no threshold/snap/auto-trigger anywhere.
+                           // Reaching the end of that motion (t=0) IS the close — not a separate
+                           // action layered on top of it.
+  let scrollT = 0;        // 0..1 expansion progress
+  let rawY = 0;           // virtual scroll position pre-full-expansion, ranges -CLOSE_PX..EXPAND_PX
+                           // (negative = shrinking from the nudge back toward closed)
+  let closeRawY = 0;      // virtual scroll position once past an edge during reading, 0..CLOSE_PX
+  let closeDir = 0;       // 0 = reading normally; +1 closing via the bottom edge, -1 via the top
+
+  function apply(t){
+    cardEl.style.flexBasis = lerp(startW, targetW, t) + "px";
+    track.style.transform = `translateX(${lerp(baseX, targetX, t)}px)`;
+  }
+  function animateOnce(){
+    cardEl.classList.add("gs-anim");
+    track.classList.add("gs-anim");
+    setTimeout(() => {
+      cardEl.classList.remove("gs-anim");
+      track.classList.remove("gs-anim");
+    }, 500);
+  }
+  animateOnce();
+  // Force a reflow so the transition class is live before the first apply
+  // (rAF is unreliable in backgrounded/occluded tabs).
+  void cardEl.offsetWidth;
+  apply(CLICK_T);
+
+  function onWheel(e){
+    e.preventDefault();
+    try{ onWheelInner(e); }
+    catch(err){
+      // Never let a bug here strand the page frozen behind a preventDefault
+      // wall — tear everything down to a clean, scrollable state instead.
+      console.warn("[WC] reader wheel error, resetting", err);
+      closed = true;
+      window.removeEventListener("message", onMsg);
+      window.removeEventListener("keydown", onKey);
+      window.removeEventListener("wheel", onWheel);
+      cardEl.removeEventListener("click", onClick, true);
+      _gsHardReset();
+      _gsReaderClosedAt = Date.now();
+    }
+  }
+  function onWheelInner(e){
+    if (scrollT < 1){
+      // Pre-full-expansion — a single continuous scale from fully closed
+      // (rawY = -CLOSE_PX) through the click-nudge (rawY = 0) up to fully
+      // open (rawY = EXPAND_PX), driven directly and reversibly by the
+      // wheel. No thresholds: scrolling back down at any point just grows
+      // it again; only actually reaching either end does anything final.
+      rawY = Math.min(EXPAND_PX, Math.max(-CLOSE_PX, rawY + e.deltaY));
+      scrollT = rawY >= 0
+        ? CLICK_T + (1 - CLICK_T) * ease(rawY / EXPAND_PX)
+        : CLICK_T * (1 - ease(-rawY / CLOSE_PX));
+      apply(scrollT);
+      if (rawY <= -CLOSE_PX){ collapse(true); return; }
+      return;
+    }
+
+    // Reading phase — fully expanded. Forward the gesture into the embedded
+    // page's own scroll manually rather than trusting native wheel delivery
+    // into the iframe.
+    const doc = frame.contentDocument, win = frame.contentWindow;
+    if (!doc || !win) return;
+
+    if (closeDir !== 0){
+      // Already past an edge and shrinking back — same continuous, fully
+      // reversible motion as the pre-expansion phase, just mirrored: keep
+      // pulling the same way and it shrinks all the way to closed;
+      // reverse and it grows back to full size and resumes reading.
+      closeRawY = Math.min(CLOSE_PX, Math.max(0, closeRawY + closeDir * e.deltaY));
+      apply(1 - ease(closeRawY / CLOSE_PX));
+      if (closeRawY <= 0){ closeDir = 0; return; }
+      if (closeRawY >= CLOSE_PX){ collapse(true); return; }
+      return;
+    }
+
+    const max = doc.documentElement.scrollHeight - win.innerHeight;
+    const atTop = win.scrollY <= 1;
+    const atBottom = win.scrollY >= max - 2;
+    if (e.deltaY > 0 && atBottom){
+      closeDir = 1;
+      closeRawY = Math.min(CLOSE_PX, e.deltaY);
+      apply(1 - ease(closeRawY / CLOSE_PX));
+    } else if (e.deltaY < 0 && atTop){
+      closeDir = -1;
+      closeRawY = Math.min(CLOSE_PX, -e.deltaY);
+      apply(1 - ease(closeRawY / CLOSE_PX));
+    } else {
+      win.scrollBy(0, e.deltaY);
+    }
+  }
+
+  // pointer-events:none on the frame blocks native click routing too, so
+  // clicks (close ✕, pop-out ↗, register link, prev/next nav) are forwarded
+  // the same way: find what's under the click inside the (same-origin)
+  // iframe document and trigger it directly.
+  function onClick(e){
+    const rect = frame.getBoundingClientRect();
+    const x = e.clientX - rect.left, y = e.clientY - rect.top;
+    if (x < 0 || y < 0 || x > rect.width || y > rect.height) return;
+    const doc = frame.contentDocument;
+    if (!doc) return;
+    const inner = doc.elementFromPoint(x, y);
+    const clickable = inner && inner.closest("a,button");
+    if (!clickable) return;
+    e.preventDefault();
+    e.stopPropagation();
+    // Internal event links (prev/next nav) must stay in embed mode — their
+    // raw hrefs point at the full standalone page, and letting them
+    // navigate the iframe there strands a complete non-embed page (its
+    // own ✕ then loads the whole homepage nested inside the card, and
+    // everything degrades from there). Rewrite them to the embed URL and
+    // scroll the reader back to the top for the new event.
+    const href = clickable.getAttribute && clickable.getAttribute("href");
+    if (href && href.indexOf("event.html?id=") === 0 && href.indexOf("embed=1") === -1 && !clickable.target){
+      // Belt-and-suspenders — event.html now bakes &embed=1 into its own
+      // internal links, but any that slipped through still get rewritten.
+      frame.contentWindow.location.replace(href + "&embed=1");
+      return;
+    }
+    clickable.click();
+  }
+
+  function onMsg(e){
+    const d = e.data || {};
+    if (d.type === "wc-close" || d.type === "wc-collapse"){
+      collapse();
+    }
+  }
+  function onKey(e){ if (e.key === "Escape") collapse(); }
+
+  let closed = false;
+  // instant=true means the continuous wheel-driven shrink already carried
+  // the block all the way down to card size (t=0) on its own — there's
+  // nothing left to animate, just tear down and clean up. Used by onWheel's
+  // two continuous-close paths above. The default (no argument) is for the
+  // deliberate, discrete actions — ✕, pop-out's sibling Escape key, a
+  // postMessage close — which still get the snap-shut transition since
+  // there's no preceding scroll motion to hand off from.
+  function collapse(instant){
+    if (closed) return;
+    closed = true;
+    if (!instant){
+      animateOnce();
+      apply(0);
+    }
+    setTimeout(() => {
+      frame.remove();
+      cardEl.classList.remove("gs-card-open");
+      cardEl.style.flexBasis = "";
+      track.style.transform = `translateX(${baseX}px)`;
+      document.body.style.position = "";
+      document.body.style.top = "";
+      document.body.style.left = "";
+      document.body.style.right = "";
+      document.body.classList.remove("gs-reader-open");
+      window.scrollTo(0, _lockScrollY);
+      window.removeEventListener("message", onMsg);
+      window.removeEventListener("keydown", onKey);
+      window.removeEventListener("wheel", onWheel);
+      cardEl.removeEventListener("click", onClick, true);
+      _gsReaderOpen = false;
+      _gsReaderClosedAt = Date.now();
+      // setup()/onScroll() were locked out while the reader was open —
+      // resync them now via the existing resize listener in case anything
+      // genuinely changed (viewport resize, scrollbar reappearing) while
+      // they weren't watching.
+      window.dispatchEvent(new Event("resize"));
+    }, instant ? 0 : 480);
+  }
+
+  window.addEventListener("message", onMsg);
+  window.addEventListener("keydown", onKey);
+  window.addEventListener("wheel", onWheel, { passive: false });
+  // Capture phase so this runs before the track-level click delegate above
+  // (which would otherwise just no-op on the already-open reader anyway,
+  // but capture keeps the forwarding deterministic either way).
+  cardEl.addEventListener("click", onClick, true);
+}
+
+/* ---------- MOBILE IN-GRID READER ----------
+   Below 700px the horizontal rail is off entirely — cards stack in a
+   column with natural height (see the max-width:700px block in app.css) —
+   so there's no flex-basis/translateX axis for _gsOpenReader above to
+   expand into. Same idea, different axis: the tapped card's own HEIGHT
+   grows open right where it sits in the stack, and the page's normal
+   scroll carries the user down into it. No rail, no locked background, no
+   forwarded wheel events — all of that machinery in _gsOpenReader exists
+   only to work around wheel delivery into the iframe, and mobile doesn't
+   use wheel input. Touch-scrolling reaches the iframe natively here, so
+   the frame keeps normal pointer-events and everything inside (links, the
+   real ✕, prev/next — now embed-aware at the source in event.html) just
+   works without any click-forwarding. */
+function _gsOpenReaderMobile(cardEl){
+  if (_gsReaderOpen) return;
+  _gsReaderOpen = true;
+  document.body.classList.add("gs-reader-open");
+
+  const startH = cardEl.getBoundingClientRect().height;
+  const targetH = Math.max(window.innerHeight - 78, 480);
+
+  cardEl.classList.add("gs-card-open", "gs-card-open-m");
+  // Timeline rows and exhibition cards reuse this whole path on narrow
+  // viewports — they just need their own "host an absolute frame, hide my
+  // own content" class since the gs-card one is scoped to card children.
+  if (cardEl.matches(".tl-row, .cx-card")) cardEl.classList.add("tl-row-open");
+  cardEl.style.height = startH + "px";
+
+  const frame = document.createElement("iframe");
+  frame.className = "gs-card-frame";
+  frame.title = "Event";
+  frame.src = `event.html?id=${encodeURIComponent(cardEl.dataset.ev)}&embed=1`;
+  cardEl.appendChild(frame);
+
+  // Force a reflow so the starting height + transition are live before the
+  // target height is pushed — rAF is unreliable in backgrounded tabs, same
+  // lesson already learned from the desktop reader and the archive nudge.
+  void cardEl.offsetHeight;
+  cardEl.style.height = targetH + "px";
+  cardEl.scrollIntoView({ behavior: "smooth", block: "start" });
+
+  function onMsg(e){
+    const d = e.data || {};
+    if (d.type === "wc-close" || d.type === "wc-collapse") collapse();
+  }
+  function onKey(e){ if (e.key === "Escape") collapse(); }
+
+  let closed = false;
+  function collapse(){
+    if (closed) return;
+    closed = true;
+    cardEl.style.height = startH + "px";
+    setTimeout(() => {
+      frame.remove();
+      cardEl.classList.remove("gs-card-open", "gs-card-open-m", "tl-row-open");
+      cardEl.style.height = "";
+      document.body.classList.remove("gs-reader-open");
+      window.removeEventListener("message", onMsg);
+      window.removeEventListener("keydown", onKey);
+      _gsReaderOpen = false;
+      _gsReaderClosedAt = Date.now();
+    }, 450);
+  }
+
+  window.addEventListener("message", onMsg);
+  window.addEventListener("keydown", onKey);
+}
+
+/* ---------- TIMELINE IN-GRID READER ----------
+   Programme / past-archive rows open the same embedded reader as the
+   week-view cards, but the expansion axis is vertical: the row itself
+   grows downward in place until it fills the viewport below the topbar.
+   Same interaction grammar as _gsOpenReader on purpose — click nudges it
+   open, scrolling grows it continuously and reversibly, the article
+   scroll is forwarded into the iframe, and pulling past either edge
+   shrinks it back into the row; reaching the end of that motion IS the
+   close. */
+function _tlOpenReader(rowEl){
+  if (_gsReaderOpen) return;
+  _gsReaderOpen = true;
+
+  const TOP = 56; // reading position: just below the fixed topbar
+
+  begin();
+
+  function begin(){
+    // The row expands from BOTH edges, right where it sits: the page is
+    // frozen at the click, and every step of the expansion grows the
+    // bottom edge (height) while sliding the top edge up (translateY),
+    // both mapped to the same eased progress — so the block visually
+    // opens outward from its own position and the two edges arrive at
+    // the reading frame (topbar → viewport bottom) together at t=1. No
+    // pre-scroll glide: the motion is one continuous thing, driven first
+    // by the click nudge, then by the wheel.
+    const r0 = rowEl.getBoundingClientRect();
+    const startH = r0.height;
+    const targetH = window.innerHeight - TOP;
+    const rise = r0.top - TOP; // how far the top edge travels up (can be negative if the row is already above the reading line — then it slides down into place instead)
+
+    const _lockScrollY = window.scrollY;
+    document.body.style.position = "fixed";
+    document.body.style.top = `-${_lockScrollY}px`;
+    document.body.style.left = "0";
+    document.body.style.right = "0";
+    document.body.classList.add("gs-reader-open");
+
+    rowEl.classList.add("tl-row-open");
+    const frame = document.createElement("iframe");
+    frame.className = "gs-card-frame";
+    frame.title = "Event";
+    frame.src = `event.html?id=${encodeURIComponent(rowEl.dataset.ev)}&embed=1`;
+    // Same architecture as the week reader: the frame never receives
+    // input directly — the outer page owns every wheel tick and click,
+    // and forwards them in programmatically. See _gsOpenReader for the
+    // two confirmed bugs that led here.
+    frame.style.pointerEvents = "none";
+    rowEl.appendChild(frame);
+
+    const ease = t => 1 - Math.pow(1 - t, 3);
+    const lerp = (a, b, t) => a + (b - a) * t;
+    const CLICK_T = 0.18;
+    const EXPAND_PX = 320;
+    const CLOSE_PX = 320;
+    let scrollT = 0;
+    let rawY = 0;
+    let closeRawY = 0;
+    let closeDir = 0;
+
+    function apply(t){
+      rowEl.style.height = lerp(startH, targetH, t) + "px";
+      rowEl.style.transform = `translateY(${(-rise * t).toFixed(2)}px)`;
+    }
+
+    // Smoothing layer: the wheel only ever moves a TARGET progress; a
+    // fixed 16ms loop eases what's actually on screen toward that target
+    // (classic exponential chase). Wheel input arrives in coarse,
+    // irregular ticks — especially from a stepped mouse wheel — and
+    // mapping those ticks straight onto height made the expansion judder.
+    // The chase keeps the motion scroll-connected (the target is always
+    // exactly where the accumulated scroll says) but the visible block
+    // glides between those positions instead of jumping. setInterval, not
+    // rAF — same occluded-tab lesson as everywhere else in this file.
+    let visT = 0;      // what's currently painted
+    let targetT = 0;   // where the accumulated scroll says we should be
+    let closing = false; // terminal shrink to 0 in progress (wheel-through, ✕, Escape, postMessage)
+    const CHASE = 0.22;      // per-tick easing factor (~60ms to cover most of a step)
+    const MIN_STEP = 0.004;  // floor on per-tick movement — pure exponential decay
+                             // never quite arrives, leaving a floaty half-second
+                             // crawl at the end of every motion; this clips the tail
+    const anim = setInterval(() => {
+      if (closed) return;
+      const d = targetT - visT;
+      if (Math.abs(d) < 0.006){
+        if (visT !== targetT){ visT = targetT; apply(visT); }
+        if (closing) finish();
+        return;
+      }
+      visT += Math.sign(d) * Math.min(Math.abs(d), Math.max(Math.abs(d) * CHASE, MIN_STEP));
+      apply(visT);
+    }, 16);
+
+    function requestClose(){
+      closing = true;
+      targetT = 0;
+    }
+    targetT = CLICK_T; // the click nudge rides the same chase
+
+    function onWheel(e){
+      e.preventDefault();
+      try{ onWheelInner(e); }
+      catch(err){
+        console.warn("[WC] timeline reader wheel error, resetting", err);
+        closed = true;
+        clearInterval(anim);
+        window.removeEventListener("message", onMsg);
+        window.removeEventListener("keydown", onKey);
+        window.removeEventListener("wheel", onWheel);
+        rowEl.removeEventListener("click", onClick, true);
+        _gsHardReset();
+        _gsReaderClosedAt = Date.now();
+      }
+    }
+    function onWheelInner(e){
+      if (closing) return; // terminal shrink is already in flight — let it land
+      if (scrollT < 1){
+        rawY = Math.min(EXPAND_PX, Math.max(-CLOSE_PX, rawY + e.deltaY));
+        scrollT = rawY >= 0
+          ? CLICK_T + (1 - CLICK_T) * ease(rawY / EXPAND_PX)
+          : CLICK_T * (1 - ease(-rawY / CLOSE_PX));
+        targetT = scrollT;
+        if (rawY <= -CLOSE_PX) requestClose();
+        return;
+      }
+      const doc = frame.contentDocument, win = frame.contentWindow;
+      if (!doc || !win) return;
+      if (closeDir !== 0){
+        closeRawY = Math.min(CLOSE_PX, Math.max(0, closeRawY + closeDir * e.deltaY));
+        targetT = 1 - ease(closeRawY / CLOSE_PX);
+        if (closeRawY <= 0){ closeDir = 0; return; }
+        if (closeRawY >= CLOSE_PX) requestClose();
+        return;
+      }
+      const max = doc.documentElement.scrollHeight - win.innerHeight;
+      const atTop = win.scrollY <= 1;
+      const atBottom = win.scrollY >= max - 2;
+      if (e.deltaY > 0 && atBottom){
+        closeDir = 1;
+        closeRawY = Math.min(CLOSE_PX, e.deltaY);
+        targetT = 1 - ease(closeRawY / CLOSE_PX);
+      } else if (e.deltaY < 0 && atTop){
+        closeDir = -1;
+        closeRawY = Math.min(CLOSE_PX, -e.deltaY);
+        targetT = 1 - ease(closeRawY / CLOSE_PX);
+      } else {
+        win.scrollBy(0, e.deltaY);
+      }
+    }
+
+    function onClick(e){
+      const rect = frame.getBoundingClientRect();
+      const x = e.clientX - rect.left, y = e.clientY - rect.top;
+      if (x < 0 || y < 0 || x > rect.width || y > rect.height) return;
+      const doc = frame.contentDocument;
+      if (!doc) return;
+      const inner = doc.elementFromPoint(x, y);
+      const clickable = inner && inner.closest("a,button");
+      if (!clickable) return;
+      e.preventDefault();
+      e.stopPropagation();
+      const href = clickable.getAttribute && clickable.getAttribute("href");
+      if (href && href.indexOf("event.html?id=") === 0 && href.indexOf("embed=1") === -1 && !clickable.target){
+        frame.contentWindow.location.replace(href + "&embed=1");
+        return;
+      }
+      clickable.click();
+    }
+
+    function onMsg(e){
+      const d = e.data || {};
+      if (d.type === "wc-close" || d.type === "wc-collapse") requestClose();
+    }
+    function onKey(e){ if (e.key === "Escape") requestClose(); }
+
+    // Every close path — wheel-through, ✕, Escape, postMessage — goes
+    // through requestClose(): the chase loop eases the block shut, and
+    // once it visually lands at 0 the loop calls finish() to tear down.
+    let closed = false;
+    function finish(){
+      if (closed) return;
+      closed = true;
+      clearInterval(anim);
+      frame.remove();
+      rowEl.classList.remove("tl-row-open", "tl-anim");
+      rowEl.style.height = "";
+      rowEl.style.transform = "";
+      document.body.style.position = "";
+      document.body.style.top = "";
+      document.body.style.left = "";
+      document.body.style.right = "";
+      document.body.classList.remove("gs-reader-open");
+      window.scrollTo(0, _lockScrollY);
+      window.removeEventListener("message", onMsg);
+      window.removeEventListener("keydown", onKey);
+      window.removeEventListener("wheel", onWheel);
+      rowEl.removeEventListener("click", onClick, true);
+      _gsReaderOpen = false;
+      _gsReaderClosedAt = Date.now();
+      window.dispatchEvent(new Event("resize"));
+    }
+
+    window.addEventListener("message", onMsg);
+    window.addEventListener("keydown", onKey);
+    window.addEventListener("wheel", onWheel, { passive: false });
+    rowEl.addEventListener("click", onClick, true);
+  }
+}
+
+// Timeline rows (Programme + past archive) open the in-grid reader in
+// place instead of navigating. One document-level delegate covers both
+// timelines, since each re-renders its rows freely on filter changes.
+// cmd/ctrl/shift-click still reaches the real, shareable URL.
+document.addEventListener("click", (e) => {
+  const row = e.target.closest("a.tl-row[data-ev], a.cx-card[data-ev]");
+  if (!row || e.metaKey || e.ctrlKey || e.shiftKey) return;
+  e.preventDefault();
+  if (document.body.classList.contains("gs-reader-open") && !document.querySelector(".gs-card-frame")){
+    _gsHardReset();
+  }
+  if (window.innerWidth <= 700) _gsOpenReaderMobile(row);
+  else _tlOpenReader(row);
+});
 
 function renderFeatured(){
   const outer  = document.getElementById("gs-outer");
@@ -609,17 +1625,29 @@ function renderFeatured(){
   if (btnProject)   btnProject.hidden   = PROJECTS.length === 0;
   if (btnResidency) btnResidency.hidden = RESIDENCIES.length === 0;
 
+  const STICKY_TOP = 54; // matches .gs-sticky's sticky offset (site topbar height)
   function setup(){
+    // While the in-grid reader is open, one card's flexBasis is blown up far
+    // past its normal width — that's a deliberate, temporary state, not a
+    // real resize. Re-running setup() here would read the reader's own huge
+    // track.scrollWidth as the new "real" width and balloon outer's height
+    // to match, which is exactly the page-resize/blank-page bug. A resize
+    // event can still fire during this window (hiding the scrollbar via
+    // overflow:hidden nudges window dimensions in some browsers), so this
+    // guard has to live inside setup()/onScroll() themselves, not just on
+    // the listener registration.
+    if (document.body.classList.contains("gs-reader-open")) return;
     const railWidth = document.querySelector(".gs-rail").getBoundingClientRect().width;
     const visible   = window.innerWidth - railWidth;
     const maxScroll = Math.max(0, track.scrollWidth - visible);
-    outer.style.height = (window.innerHeight + maxScroll) + "px";
+    outer.style.height = (window.innerHeight - STICKY_TOP + maxScroll) + "px";
     outer.dataset.maxScroll = maxScroll;
   }
   function onScroll(){
+    if (document.body.classList.contains("gs-reader-open")) return;
     const maxScroll = parseFloat(outer.dataset.maxScroll || 0);
     const top = outer.getBoundingClientRect().top;
-    const progress = Math.min(Math.max(-top, 0), maxScroll);
+    const progress = Math.min(Math.max(STICKY_TOP - top, 0), maxScroll);
     track.style.transform = `translateX(${-progress}px)`;
   }
 
@@ -632,6 +1660,18 @@ function renderFeatured(){
     kicker.innerHTML = `<span class="en-only">This week</span><span class="ar-only ar" dir="rtl">هذا الأسبوع</span>`;
     range.innerHTML = `<span class="en-only">${start.getDate()}—${end.getDate()} ${MONTH_NAME_EN[MABBR_G[end.getMonth()]]}</span><span class="ar-only ar" dir="rtl">${arNum(start.getDate())}—${arNum(end.getDate())} ${MONTH_NAME_AR[MABBR_G[end.getMonth()]]}</span>`;
     count.innerHTML = `<span class="en-only">${evs.length} ${evs.length === 1 ? "event" : "events"}</span><span class="ar-only ar" dir="rtl">${arNum(evs.length)} فعاليات</span>`;
+    const themeEl = document.getElementById("gs-theme");
+    if (SETTINGS && (SETTINGS.themeDesc || SETTINGS.themeTitle)){
+      themeEl.hidden = false;
+      document.getElementById("gs-theme-quote").innerHTML = SETTINGS.themeDesc
+        ? `<span class="en-only">${SETTINGS.themeDesc}</span><span class="ar-only ar" dir="rtl">${SETTINGS.themeDescAr || SETTINGS.themeDesc}</span>`
+        : "";
+      const titleEn = SETTINGS.themeTitle || "";
+      const titleAr = SETTINGS.themeTitleAr || titleEn;
+      document.getElementById("gs-theme-desc").innerHTML = titleEn
+        ? `<span class="en-only">Explore <mark class="gs-theme-highlight">${titleEn}</mark> through the Wonder Cabinet program this week.</span><span class="ar-only ar" dir="rtl">استكشف <mark class="gs-theme-highlight">${titleAr}</mark> من خلال برنامج وندر كابينت هذا الأسبوع.</span>`
+        : "";
+    }
     link.innerHTML = `<span class="en-only">View full week →</span><span class="ar-only ar" dir="rtl">← عرض الأسبوع كاملاً</span>`;
     link.href = "#programme";
     track.innerHTML = evs.length
@@ -690,6 +1730,32 @@ function renderFeatured(){
   window.addEventListener("scroll", onScroll, { passive: true });
   onScroll();
 
+  // Event cards open the in-grid reader instead of navigating; cmd/ctrl
+  // click (and the reader's own ↗ button) still reach the real URL.
+  track.addEventListener("click", (e) => {
+    const card = e.target.closest("a.gs-card[data-ev]");
+    if (!card || e.metaKey || e.ctrlKey || e.shiftKey) return;
+    e.preventDefault();
+    // Failsafe: if the page thinks a reader is open but there's no live
+    // frame actually in the DOM (a previous open/close got interrupted),
+    // reset everything before opening fresh instead of silently ignoring
+    // the click against a phantom lock.
+    if (document.body.classList.contains("gs-reader-open") && !document.querySelector(".gs-card-frame")){
+      _gsHardReset();
+    }
+    // Below 700px the horizontal scroll-lock rail is off entirely (see the
+    // max-width:700px block in app.css — cards stack in a column instead).
+    // _gsOpenReader's mechanism is built on that rail (flex-basis + track
+    // translateX); on a narrow viewport that axis is vertical instead, so
+    // it needs its own mobile-appropriate version — same "expand in place,
+    // never navigate away" idea, just driven by height, not the rail.
+    if (window.innerWidth <= 700){
+      _gsOpenReaderMobile(card);
+    } else {
+      _gsOpenReader(card);
+    }
+  });
+
   // Featured projects marquee
   const projectsSection = document.getElementById("gs-projects-section");
   const marqueeProjects = document.getElementById("gs-marquee-projects");
@@ -714,16 +1780,15 @@ function renderFeatured(){
       </div>`).join("");
   }
 
-  // Featured artists marquee
+  // Artists in this week — marquee. Links intentionally disabled until
+  // dedicated artist pages exist.
   const artistsSection = document.getElementById("gs-artists-section");
   const marqueeArtists = document.getElementById("gs-marquee-artists");
   if (ARTISTS.length){
     artistsSection.hidden = false;
     marqueeArtists.innerHTML = ARTISTS.map(a => {
       const inner = `<h3 class="gs-m-title">${a.name}</h3><span class="gs-m-sub">${a.discipline || ""}</span>`;
-      return a.slug
-        ? `<a class="gs-m-card" href="#">${inner}</a>`
-        : `<div class="gs-m-card gs-m-card-static">${inner}</div>`;
+      return `<div class="gs-m-card gs-m-card-static">${inner}</div>`;
     }).join("");
   }
 
@@ -788,10 +1853,10 @@ async function _boot(){
       return { key:`${n.toLowerCase()}-${y}`, name:n, year:y };
     }
     const q = encodeURIComponent(`{
-      "events": *[_type == "event"] | order(startDateTime desc) { ..., location->{ name }, relatedArtists[]->{name, slug}, relatedProject->{title, slug} },
+      "events": *[_type == "event"] | order(startDateTime desc) { ..., location->{ name }, relatedArtists[]->{name, "slug": slug.current, discipline, photo}, relatedProject->{title, slug} },
       "projects": *[_type == "project"] | order(year desc) { title, "slug": slug.current, description, year, coverImage },
       "residencies": *[_type == "residency"] | order(year desc) { title, "slug": slug.current, description, year, coverImage },
-      "artists": *[_type == "artist"] { name, "slug": slug.current, discipline, photo }
+      "settings": *[_type == "siteSettings"][0]{ monthlyThemeTitle, monthlyThemeDescription }
     }`);
     const res = await fetch(`https://xdtj605l.api.sanity.io/v2024-01-01/data/query/production?query=${q}`);
     const { result } = await res.json();
@@ -821,6 +1886,12 @@ async function _boot(){
         dayOrdinal: s ? _ordinal(s.getDate()) : '',
         start:    hasTime ? s.toTimeString().slice(0,5) : '',
         end:      e && (e.getHours()||e.getMinutes()) ? e.toTimeString().slice(0,5) : '',
+        // Full end DATE (not just the time) — long-running things like
+        // exhibitions span weeks, and "is this on view right now?" needs
+        // the real closing date, not the start date.
+        endDay:   e ? String(e.getDate()).padStart(2,'0') : '',
+        endMonth: e ? MABBR[e.getMonth()] : '',
+        endYear:  e ? e.getFullYear() : 0,
         location: locationName,
         recurring: !!doc.recurring,
         recurringLabel:   doc.recurringLabel?.en || '',
@@ -838,7 +1909,10 @@ async function _boot(){
         writeupAr: doc.writeup?.ar || '',
         cover:    _sanityImg(doc.cover),
         content:  doc.content || [],
-        relatedArtists: (doc.relatedArtists||[]).map(a => ({ name: _loc(a.name), slug: a.slug?.current || '' })).filter(a => a.name),
+        relatedArtists: (doc.relatedArtists||[]).map(a => ({
+          name: _loc(a.name), slug: a.slug || '',
+          discipline: (a.discipline||[]).join(', '), photo: _sanityImg(a.photo),
+        })).filter(a => a.name),
         relatedProject: doc.relatedProject ? { title: _loc(doc.relatedProject.title), slug: doc.relatedProject.slug?.current || '' } : null,
         season:   s ? _season(s) : { key:'unknown', name:'Unknown', year:new Date().getFullYear() },
       };
@@ -861,9 +1935,24 @@ async function _boot(){
     RESIDENCIES = ((result && result.residencies) || []).map(r => ({
       title: _loc(r.title), slug: r.slug || '', desc: _loc(r.description), year: r.year || 0, cover: _sanityImg(r.coverImage),
     }));
-    ARTISTS = ((result && result.artists) || []).map(a => ({
-      name: _loc(a.name), slug: a.slug || '', discipline: (a.discipline || []).join(', '), photo: _sanityImg(a.photo),
-    })).filter(a => a.name);
+    const settingsDoc = result && result.settings;
+    SETTINGS = settingsDoc ? {
+      themeTitle:   settingsDoc.monthlyThemeTitle?.en || '',
+      themeTitleAr: settingsDoc.monthlyThemeTitle?.ar || '',
+      themeDesc:    settingsDoc.monthlyThemeDescription?.en || '',
+      themeDescAr:  settingsDoc.monthlyThemeDescription?.ar || '',
+    } : null;
+    // Featured artists = everyone actually linked to a (non-past) event —
+    // not a separately curated roster. Deduped by slug, falling back to name.
+    const artistMap = new Map();
+    ALL.forEach(ev => {
+      if (ev.status === 'past') return;
+      (ev.relatedArtists || []).forEach(a => {
+        const key = a.slug || a.name;
+        if (key && !artistMap.has(key)) artistMap.set(key, a);
+      });
+    });
+    ARTISTS = Array.from(artistMap.values());
     window.PROJECTS = PROJECTS;
     window.RESIDENCIES = RESIDENCIES;
     window.ARTISTS = ARTISTS;
@@ -873,19 +1962,22 @@ async function _boot(){
 
   // Render all sections
   renderThisWeek();
+  renderCurrentExhibitions();
   renderFilters();
   renderSeasonRail();
+  renderPastArchive();
   renderTimeline();
   renderFeatured();
   initLogoRotation();
 }
-_boot().then(function(){
-  // Open immediately if ?event= is in the URL — must wait for _boot() to
-  // finish fetching EVENTS_BY_ID, otherwise a direct/shared link to
-  // ?event=<id> silently does nothing on a fresh page load.
+_boot();
+// Backward-compat: old shared links used ?event=<id> to reopen the
+// in-page overlay that used to live here. Events now only ever live on
+// their own real page (event.html?id=<id>), so redirect straight there.
+(function(){
   const id = new URLSearchParams(location.search).get("event");
-  if (id) openOverlay(id);
-});
+  if (id) location.replace(`event.html?id=${encodeURIComponent(id)}`);
+})();
 
 /* ============================================================
    LANGUAGE TOGGLE
@@ -906,398 +1998,7 @@ try {
   }
 } catch(e){}
 
-/* ============================================================
-   EVENT OVERLAY — type-color panel (right-slide) + fullscreen
-   Panel: standard events. Fullscreen: Opening / featured.
-   ============================================================ */
-const TYPE_COLORS = {
-  Performance: { bg: "#cc6698", ink: "#0a0a16" },
-  Film:        { bg: "#ffe600", ink: "#0a0a16" },
-  Class:       { bg: "#c8a0f0", ink: "#0a0a16" },
-  Workshop:    { bg: "#ff5a00", ink: "#f6f3ea" },
-  Radio:       { bg: "#00d26a", ink: "#0a0a16" },
-  Reading:     { bg: "#ffd6c2", ink: "#0a0a16" },
-  Opening:     { bg: "#0a0a16", ink: "#f6f3ea" },
-  Bar:         { bg: "#e8a33d", ink: "#0a0a16" },
-};
-// Admin-selectable overrides (Sanity `colorTheme` field) — keyed lowercase.
-// "paper" is the new plain white/paper option; others mirror TYPE_COLORS
-// so an editor can pin any event to any palette colour regardless of Type.
-const COLOR_THEME_OVERRIDES = {
-  performance: TYPE_COLORS.Performance,
-  film:        TYPE_COLORS.Film,
-  class:       TYPE_COLORS.Class,
-  workshop:    TYPE_COLORS.Workshop,
-  radio:       TYPE_COLORS.Radio,
-  reading:     TYPE_COLORS.Reading,
-  opening:     TYPE_COLORS.Opening,
-  bar:         TYPE_COLORS.Bar,
-  paper:       { bg: "#FCFFE5", ink: "#0a0a16" },
-};
-function _colorFor(ev, fallback){
-  if (ev.colorTheme && COLOR_THEME_OVERRIDES[ev.colorTheme]) return COLOR_THEME_OVERRIDES[ev.colorTheme];
-  return TYPE_COLORS[ev.type] || fallback;
-}
-
-const _backdrop = document.getElementById("overlay-backdrop");
-const _panel    = document.getElementById("event-panel");
-const _full     = document.getElementById("event-fullscreen");
-
-function _overlayDate(ev){
-  const M = MONTH_NAME_EN;
-  return `${parseInt(ev.day)} ${M[ev.month]} ${ev.year}`;
-}
-
-function openOverlay(id, forceFullscreen){
-  const ev = window.EVENTS_BY_ID && window.EVENTS_BY_ID[id];
-  if (!ev) return;
-  const isFullscreen = forceFullscreen || ev.type === "Opening" || ev.featured;
-  if (isFullscreen){
-    _full.innerHTML = _buildFullscreen(ev);
-    _full.classList.add("is-open");
-    document.body.style.overflow = "hidden";
-    _full.querySelector(".efs-close").addEventListener("click", closeOverlay);
-  } else {
-    const tc = _colorFor(ev, { bg: "#1d24ff", ink: "#f6f3ea" });
-    _panel.style.background = tc.bg;
-    _panel.style.color = tc.ink;
-    _panel.innerHTML = _buildPanel(ev);
-    _panel.classList.add("is-open");
-    _panel.querySelector(".ep-close").addEventListener("click", closeOverlay);
-    _panel.scrollTop = 0;
-    _initPanelAudio(_panel);
-  }
-  if (!history.state || !history.state.overlay) history.pushState({ overlay: id }, "", `?event=${id}`);
-}
-
-function closeOverlay(){
-  const wasFullscreen = _full.classList.contains("is-open");
-  _backdrop.classList.remove("is-open");
-  const audio = _panel.querySelector(".epa-audio");
-  if (audio) audio.pause();
-  _panel.classList.remove("is-open");
-  _full.classList.remove("is-open");
-  if (wasFullscreen) document.body.style.overflow = "";
-  if (history.state && history.state.overlay) history.back();
-}
-
-/* Renders typed content blocks — text / image / pullquote / audio / video / gallery.
-   Sanity block _type is "content<Kind>" (e.g. "contentImage"); fields match
-   the schema (contentImage.image, contentAudio.audioFile, etc). */
-function _renderBlocks(content){
-  if (!content || !content.length) return "";
-  return content.map(b => {
-    const kind = (b._type || b.type || '').replace(/^content/, '').toLowerCase();
-    switch(kind){
-      case "text": {
-        const enHtml = (b.en||[]).map(p=>`<p>${p}</p>`).join("");
-        const arHtml = (b.ar||[]).map(p=>`<p>${p}</p>`).join("");
-        return `<div class="cb-text">
-          ${enHtml ? `<div class="en-only">${enHtml}</div>` : ""}
-          ${arHtml ? `<div class="ar-only ar" dir="rtl">${arHtml}</div>` : ""}
-        </div>`;
-      }
-      case "image": {
-        const src = _sanityImg(b.image);
-        if (!src) return "";
-        return `<div class="cb-image">
-          <img src="${src}" alt="${b.captionEn||""}">
-          ${b.captionEn||b.captionAr ? `<div class="cb-caption">
-            <span class="en-only">${b.captionEn||""}</span>
-            <span class="ar-only ar" dir="rtl">${b.captionAr||""}</span>
-          </div>` : ""}
-        </div>`;
-      }
-      case "pullquote":
-        return `<blockquote class="cb-quote">
-          ${b.en ? `<p class="en-only">${b.en}</p>` : ""}
-          ${b.ar ? `<p class="ar-only ar" dir="rtl">${b.ar}</p>` : ""}
-          ${b.attribution ? `<cite>${b.attribution}</cite>` : ""}
-        </blockquote>`;
-      case "audio": {
-        const src = _sanityFile(b.audioFile) || b.externalUrl || '';
-        return `<div class="cb-audio">
-          <div class="cb-audio-head">
-            <span class="cb-audio-icon">◉</span>
-            <span class="cb-audio-title">
-              <span class="en-only">${b.titleEn||"Audio"}</span>
-              <span class="ar-only ar">${b.titleAr||b.titleEn||"صوت"}</span>
-            </span>
-            ${b.durationMin ? `<span class="cb-audio-dur">${b.durationMin} min</span>` : ""}
-          </div>
-          ${src
-            ? `<audio controls src="${src}" style="width:100%;margin-top:10px;"></audio>`
-            : `<div class="cb-audio-placeholder">
-                <span class="en-only">Recording will appear here after the event</span>
-                <span class="ar-only ar" dir="rtl">سيظهر التسجيل هنا بعد الفعالية</span>
-              </div>`}
-        </div>`;
-      }
-      case "video": {
-        const src = _sanityFile(b.videoFile) || '';
-        const cap = (b.captionEn||b.captionAr) ? `<div class="cb-caption"><span class="en-only">${b.captionEn||""}</span><span class="ar-only ar" dir="rtl">${b.captionAr||""}</span></div>` : "";
-        if (b.externalUrl) return `<div class="cb-video"><div class="cb-video-frame"><iframe src="${b.externalUrl}" allowfullscreen></iframe></div>${cap}</div>`;
-        if (src) return `<div class="cb-video"><video controls src="${src}" style="width:100%;display:block;border-radius:16px;"></video>${cap}</div>`;
-        return `<div class="cb-video-placeholder">
-            <span class="en-only">Video</span>
-            <span class="ar-only ar">فيديو</span>
-          </div>`;
-      }
-      case "gallery": {
-        const imgs = (b.images||[]).map(img=>{
-          const s = _sanityImg(img);
-          return s ? `<div class="cb-gal-item"><img src="${s}" alt=""></div>` : '';
-        }).join("");
-        return imgs ? `<div class="cb-gallery">${imgs}</div>` : "";
-      }
-      case "divider":
-        return `<hr class="cb-divider">`;
-      default: return "";
-    }
-  }).join("");
-}
-
-function _findAdjacentEvents(currentId){
-  if (!window.EVENTS) return { prev: null, next: null };
-  const list = window.EVENTS.filter(e => e.type !== "Opening" && !e.featured);
-  const idx = list.findIndex(e => e.id === currentId);
-  if (idx === -1) return { prev: null, next: null };
-  return { prev: idx > 0 ? list[idx - 1] : null, next: idx < list.length - 1 ? list[idx + 1] : null };
-}
-
-function _initPanelAudio(panel){
-  const audio = panel.querySelector(".epa-audio");
-  if (!audio) return;
-  const playBtn   = panel.querySelector(".epa-play");
-  const iconPlay  = panel.querySelector(".epa-icon-play");
-  const iconPause = panel.querySelector(".epa-icon-pause");
-  const fill      = panel.querySelector(".epa-fill");
-  const seek      = panel.querySelector(".epa-seek");
-  const curr      = panel.querySelector(".epa-current");
-  const tot       = panel.querySelector(".epa-total");
-
-  function fmt(s){ if (isNaN(s)||!isFinite(s)) return "--:--"; return Math.floor(s/60)+":"+String(Math.floor(s%60)).padStart(2,"0"); }
-
-  playBtn.addEventListener("click", () => audio.paused ? audio.play() : audio.pause());
-  audio.addEventListener("play",  () => { iconPlay.style.display="none"; iconPause.style.display=""; });
-  audio.addEventListener("pause", () => { iconPlay.style.display="";     iconPause.style.display="none"; });
-  audio.addEventListener("ended", () => { fill.style.width="0%"; seek.value=0; curr.textContent="0:00"; iconPlay.style.display=""; iconPause.style.display="none"; });
-  audio.addEventListener("timeupdate", () => {
-    const pct = audio.duration ? (audio.currentTime/audio.duration)*100 : 0;
-    fill.style.width = pct+"%"; seek.value = pct; curr.textContent = fmt(audio.currentTime);
-  });
-  audio.addEventListener("loadedmetadata", () => { tot.textContent = fmt(audio.duration); });
-  seek.addEventListener("input", () => { if (audio.duration) audio.currentTime = (seek.value/100)*audio.duration; });
-}
-
-function _buildPanel(ev){
-  const tc = _colorFor(ev, { bg: "#1d24ff", ink: "#f6f3ea" });
-  const typeArLabel = TYPE_AR[ev.type] || ev.type;
-  const venue = (ev.location || "").split("·")[0].trim();
-  // Skip the standalone cover slot when authored content[] blocks exist —
-  // their own contentImage block (if any) carries the photo in the right
-  // reading-order position instead of duplicating it up top.
-  const coverHtml = (ev.cover && !(ev.content && ev.content.length))
-    ? `<div class="ep-cover"><img src="${ev.cover}" alt="" style="width:100%;height:220px;object-fit:contain;padding:28px;display:block;"></div>`
-    : "";
-  // Short description + full body are separate fields — show both, short first,
-  // rather than letting body silently hide it when both are filled in.
-  const bodyEnParts = [...(ev.short ? [ev.short] : []), ...(ev.body && ev.body.length ? ev.body : [])];
-  const bodyArParts = [...(ev.shortAr ? [ev.shortAr] : []), ...(ev.bodyAr && ev.bodyAr.length ? ev.bodyAr : [])];
-  const bodyEn = bodyEnParts.map(p => `<p>${p}</p>`).join("");
-  const bodyAr = bodyArParts.map(p => `<p>${p}</p>`).join("");
-  const writeupEn = ev.writeup ? `<p class="ep-writeup">${ev.writeup}</p>` : "";
-  const writeupAr = ev.writeupAr ? `<p class="ep-writeup" dir="rtl">${ev.writeupAr}</p>` : "";
-  const cta = ev.register
-    ? `<a href="${ev.register}" class="ep-register" target="_blank"><span class="en-only">Register →</span><span class="ar-only ar">← التسجيل</span></a>`
-    : `<span class="ep-register ep-free"><span class="en-only">Free entry</span><span class="ar-only ar">دخول حرّ</span></span>`;
-
-  // Audio bar — shown only when a content block has audio with a real src
-  const audioBlock = ev.content && ev.content.find(b => b.type === "audio" && b.src);
-  const audioBar = audioBlock ? `
-<div class="ep-audio-bar">
-  <audio class="epa-audio" src="${audioBlock.src}" preload="metadata"></audio>
-  <button class="epa-play" aria-label="Play / Pause">
-    <svg class="epa-icon-play"  viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M8 5v14l11-7z"/></svg>
-    <svg class="epa-icon-pause" viewBox="0 0 24 24" fill="currentColor" width="20" height="20" style="display:none"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
-  </button>
-  <div class="epa-track">
-    <div class="epa-label"><span class="en-only">${audioBlock.titleEn||"Recording"}</span><span class="ar-only ar">${audioBlock.titleAr||audioBlock.titleEn||"تسجيل"}</span></div>
-    <div class="epa-progress-wrap">
-      <div class="epa-progress"><div class="epa-fill"></div></div>
-      <input type="range" class="epa-seek" min="0" max="100" value="0" step="0.1" aria-label="Seek">
-    </div>
-  </div>
-  <div class="epa-time"><span class="epa-current">0:00</span> / <span class="epa-total">${audioBlock.durationMin ? audioBlock.durationMin+":00" : "--:--"}</span></div>
-</div>` : "";
-
-  // Prev / Next navigation bar
-  const { prev, next } = _findAdjacentEvents(ev.id);
-  const navBar = `
-<div class="ep-nav">
-  ${prev ? `<a href="event.html?id=${prev.id}" class="ep-nav-btn ep-nav-prev">
-    <span class="ep-nav-dir"><span class="en-only">← Prev</span><span class="ar-only ar">التالي →</span></span>
-    <span class="ep-nav-name"><span class="en-only">${prev.title}</span><span class="ar-only ar">${prev.titleAr||prev.title}</span></span>
-  </a>` : `<div class="ep-nav-btn ep-nav-empty"></div>`}
-  ${next ? `<a href="event.html?id=${next.id}" class="ep-nav-btn ep-nav-next">
-    <span class="ep-nav-dir"><span class="en-only">Next →</span><span class="ar-only ar">← السابق</span></span>
-    <span class="ep-nav-name"><span class="en-only">${next.title}</span><span class="ar-only ar">${next.titleAr||next.title}</span></span>
-  </a>` : `<div class="ep-nav-btn ep-nav-empty"></div>`}
-</div>`;
-
-  return `
-${audioBar}
-<div class="ep-header">
-  <button class="ep-close" aria-label="Close">✕</button>
-  <div class="ep-meta">
-    <div class="dt-block">
-      <span class="en-only">${ev.dowFull ? `${ev.dowFull}<br>${ev.monthFull} ${ev.dayOrdinal}, ${ev.year}` : _overlayDate(ev)}</span>
-      <span class="ar-only ar">${ev.dowAr ? `${ev.dowAr}<br>` : ""}${ev.day} ${MONTH_NAME_AR[ev.month]} ${arNum(ev.year)}</span>
-      <span class="ep-time">${ev.start}${ev.end ? " — " + ev.end : ""}</span>
-    </div>
-    <span class="ep-type-tag en-only">${ev.type}</span>
-    <span class="ep-type-tag ar-only ar">${typeArLabel}</span>
-  </div>
-  <h1 class="ep-title">
-    <span class="en-only">${ev.title}</span>
-    <span class="ar-only ar" dir="rtl">${ev.titleAr || ev.title}</span>
-  </h1>
-  ${(ev.subtitle && !(ev.content && ev.content.length)) ? `<p class="ep-subtitle en-only">${ev.subtitle}</p>` : ""}
-</div>
-<div class="ep-body">
-  ${coverHtml}
-  <div class="ep-content">
-    ${ev.content && ev.content.length
-      ? `<div class="ep-content-blocks">${_renderBlocks(ev.content)}</div>`
-      : (bodyEn || bodyAr ? `
-    <div class="ep-text">
-      ${bodyEn ? `<div class="en-only">${bodyEn}</div>` : ""}
-      ${writeupEn ? `<div class="en-only">${writeupEn}</div>` : ""}
-      ${bodyAr ? `<div class="ar-only ar" dir="rtl">${bodyAr}</div>` : ""}
-      ${writeupAr ? `<div class="ar-only ar" dir="rtl">${writeupAr}</div>` : ""}
-    </div>` : "")}
-    ${(ev.subtitle && ev.content && ev.content.length) ? `<p class="ep-subtitle en-only">${ev.subtitle}</p>` : ""}
-    <div class="ep-facts">
-      <div class="ep-fact">
-        <span class="ef-key"><span class="en-only">Venue</span><span class="ar-only ar">المكان</span></span>
-        <span class="ef-leader"></span>
-        <span class="ef-val">${venue || "—"}</span>
-      </div>
-      <div class="ep-fact">
-        <span class="ef-key"><span class="en-only">Time</span><span class="ar-only ar">التوقيت</span></span>
-        <span class="ef-leader"></span>
-        <span class="ef-val">${ev.start}${ev.end ? " — " + ev.end : ""}</span>
-      </div>
-      <div class="ep-fact">
-        <span class="ef-key"><span class="en-only">Date</span><span class="ar-only ar">التاريخ</span></span>
-        <span class="ef-leader"></span>
-        <span class="ef-val en-only">${_overlayDate(ev)}</span>
-        <span class="ef-val ar-only ar">${ev.day} ${MONTH_NAME_AR[ev.month]}</span>
-      </div>
-      <div class="ep-fact">
-        <span class="ef-key"><span class="en-only">Type</span><span class="ar-only ar">النوع</span></span>
-        <span class="ef-leader"></span>
-        <span class="ef-val"><span class="en-only">${ev.type}</span><span class="ar-only ar">${typeArLabel}</span></span>
-      </div>
-      ${ev.relatedArtists && ev.relatedArtists.length ? `<div class="ep-fact">
-        <span class="ef-key"><span class="en-only">Artists</span><span class="ar-only ar">فنانون</span></span>
-        <span class="ef-leader"></span>
-        <span class="ef-val">${ev.relatedArtists.map(a=>a.name).join(', ')}</span>
-      </div>` : ""}
-      ${ev.relatedProject ? `<div class="ep-fact">
-        <span class="ef-key"><span class="en-only">Part of</span><span class="ar-only ar">جزء من</span></span>
-        <span class="ef-leader"></span>
-        <span class="ef-val">${ev.relatedProject.title}</span>
-      </div>` : ""}
-    </div>
-    ${cta}
-  </div>
-  ${navBar}
-</div>`;
-}
-
-function _buildFullscreen(ev){
-  const tc = _colorFor(ev, { bg: "#0a0a16", ink: "#f6f3ea" });
-  const typeArLabel = TYPE_AR[ev.type] || ev.type;
-  const parts = (ev.subtitle || "").split("·").map(s => s.trim()).filter(Boolean);
-  const nameTag = parts.length > 1 ? parts[parts.length - 1] : parts[0] || "";
-  // Short description + full body + retrospective write-up are separate
-  // fields — show all that are filled in, rather than the first one found.
-  const bodyEnParts = [...(ev.short ? [ev.short] : []), ...(ev.body && ev.body.length ? ev.body : []), ...(ev.writeup ? [ev.writeup] : [])];
-  const bodyArParts = [...(ev.shortAr ? [ev.shortAr] : []), ...(ev.bodyAr && ev.bodyAr.length ? ev.bodyAr : []), ...(ev.writeupAr ? [ev.writeupAr] : [])];
-  const bodyEn = bodyEnParts.map(p => `<p>${p}</p>`).join("");
-  const bodyAr = bodyArParts.map(p => `<p>${p}</p>`).join("");
-  const coverHtml = ev.cover
-    ? `<div class="efs-image-wrap"><div class="efs-image"><img src="${ev.cover}" alt="${ev.title}"></div></div>`
-    : "";
-  return `
-<div class="efs-inner" style="background:${tc.bg};color:${tc.ink};">
-  <div class="efs-topbar">
-    <span class="efs-type-label"><span class="en-only">${ev.type}</span><span class="ar-only ar">${typeArLabel}</span></span>
-    <button class="efs-close"><span class="en-only">✕ Close</span><span class="ar-only ar">إغلاق ✕</span></button>
-  </div>
-  <div class="efs-hero">
-    <div class="efs-name-col">
-      ${nameTag ? `<div class="efs-name-box">${nameTag}</div>` : ""}
-      <div class="efs-date">
-        <span class="en-only">${_overlayDate(ev)} · ${ev.start}</span>
-        <span class="ar-only ar">${ev.day} ${MONTH_NAME_AR[ev.month]} ${arNum(ev.year)} · ${ev.start}</span>
-      </div>
-    </div>
-    <div class="efs-title-col">
-      <h1 class="efs-title">
-        <span class="en-only">${ev.title}</span>
-        <span class="ar-only ar" dir="rtl">${ev.titleAr || ev.title}</span>
-      </h1>
-      ${ev.short ? `<p class="efs-short en-only">${ev.short}</p>` : ""}
-      ${ev.shortAr ? `<p class="efs-short ar-only ar" dir="rtl">${ev.shortAr}</p>` : ""}
-    </div>
-  </div>
-  ${coverHtml}
-  ${ev.content && ev.content.length
-    ? `<div class="efs-content-blocks">${_renderBlocks(ev.content)}</div>`
-    : (bodyEn || bodyAr ? `
-  <div class="efs-body">
-    ${bodyEn ? `<div class="en-only">${bodyEn}</div>` : ""}
-    ${bodyAr ? `<div class="ar-only ar" dir="rtl">${bodyAr}</div>` : ""}
-  </div>` : "")}
-</div>`;
-}
-
-/* Intercept all event.html links.
-   Clicks originating inside .gscroll (the homepage teaser) always open fullscreen. */
-document.addEventListener("click", function(e){
-  const link = e.target.closest('a[href*="event.html"]');
-  if (!link) return;
-  try {
-    const url = new URL(link.href, location.href);
-    const id = url.searchParams.get("id");
-    if (id){
-      e.preventDefault();
-      const forceFullscreen = !!e.target.closest(".gscroll");
-      openOverlay(id, forceFullscreen);
-    }
-  } catch(_){}
-});
-
-_backdrop.addEventListener("click", closeOverlay);
-document.addEventListener("keydown", function(e){ if (e.key === "Escape") closeOverlay(); });
-
-window.addEventListener("popstate", function(e){
-  if (!e.state || !e.state.overlay){
-    _backdrop.classList.remove("is-open");
-    const audio = _panel.querySelector(".epa-audio");
-    if (audio) audio.pause();
-    _panel.classList.remove("is-open");
-    if (_full.classList.contains("is-open")){
-      _full.classList.remove("is-open");
-      document.body.style.overflow = "";
-    }
-  }
-});
-
-
 </script>
 
 
-</body></html>
+</body></html><!-- dev environment marker: 2026-07-14T14:17:22Z -->
