@@ -1391,16 +1391,19 @@ function _tlOpenReader(rowEl){
     let visT = 0;      // what's currently painted
     let targetT = 0;   // where the accumulated scroll says we should be
     let closing = false; // terminal shrink to 0 in progress (wheel-through, ✕, Escape, postMessage)
-    const CHASE = 0.22;  // per-tick easing factor (~60ms to cover most of a step)
+    const CHASE = 0.22;      // per-tick easing factor (~60ms to cover most of a step)
+    const MIN_STEP = 0.004;  // floor on per-tick movement — pure exponential decay
+                             // never quite arrives, leaving a floaty half-second
+                             // crawl at the end of every motion; this clips the tail
     const anim = setInterval(() => {
       if (closed) return;
       const d = targetT - visT;
-      if (Math.abs(d) < 0.002){
+      if (Math.abs(d) < 0.006){
         if (visT !== targetT){ visT = targetT; apply(visT); }
         if (closing) finish();
         return;
       }
-      visT += d * CHASE;
+      visT += Math.sign(d) * Math.min(Math.abs(d), Math.max(Math.abs(d) * CHASE, MIN_STEP));
       apply(visT);
     }, 16);
 
