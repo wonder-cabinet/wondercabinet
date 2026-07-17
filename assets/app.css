@@ -1794,6 +1794,7 @@ body.gs-reader-open{ overflow: hidden; }
   position: relative; overflow: hidden;
   z-index: 45;
   display: block;
+  border-top: 2px solid #1d24ff;
 }
 .tl-row-open > :not(.gs-card-frame){ visibility: hidden; }
 .tl-anim{
@@ -1913,19 +1914,23 @@ body.gs-reader-open{ overflow: hidden; }
 }
 .ep-close{
   all: unset; cursor: pointer;
-  position: absolute; top: 15px; right: 15px;
-  width: 24px; height: 24px;
-  display: grid; place-items: center;
-  font-size: 16px; font-weight: 700;
-  opacity: .55; transition: opacity .15s;
+  color: white;
+  font-size: 28px; font-weight: 700;
+  opacity: 1; transition: opacity .15s;
+  line-height: 1;
 }
-.ep-close:hover{ opacity: 1; }
+.ep-close:hover{ opacity: .7; }
 
 .ep-meta{
   font-family: var(--ff-sans); font-weight: 400;
   letter-spacing: 0; text-transform: none; opacity: 1;
-  display: flex; justify-content: space-between; align-items: flex-start; gap: 16px;
-  padding-right: 40px;
+  display: flex; flex-direction: column; gap: 8px;
+}
+.ep-meta-bottom{
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+}
+.ep-header-icons{
+  display: flex; align-items: center; gap: 10px; flex-shrink: 0;
 }
 .ep-meta .dt-block{ display: flex; flex-direction: column; gap: 2px; line-height: 1.4; font-size: 40px; }
 .ep-type-tag{ letter-spacing: 0; font-weight: 400; font-size: 40px; }
