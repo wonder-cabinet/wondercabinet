@@ -11,7 +11,7 @@
 <meta property="og:description" content="A space for art production and cultural development in Bethlehem, Palestine." id="og-desc-meta">
 <meta property="og:image" content="" id="og-image-meta">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="stylesheet" href="assets/app.css?v=37" />
+<link rel="stylesheet" href="assets/app.css?v=38" />
 <style>
   /* This page uses the exact same .ep-* / .event-panel template as every
      other entry point on the site (the homepage hero cards, the Programme
@@ -238,6 +238,19 @@
       content:  doc.content || [],
       relatedArtists: (doc.relatedArtists||[]).map(a => ({ name: _loc(a.name), slug: a.slug || '' })).filter(a => a.name),
       relatedProject: doc.relatedProject ? { title: _loc(doc.relatedProject.title), slug: doc.relatedProject.slug?.current || '' } : null,
+      programmeEvents: (doc.programmeEvents || []).map(pe => {
+        const ps = _iso(pe.startDateTime);
+        return {
+          id: pe._id,
+          title: pe.title?.en || '',
+          titleAr: pe.title?.ar || '',
+          type: pe.eventType || '',
+          day: ps ? String(ps.getDate()).padStart(2,'0') : '',
+          month: ps ? MABBR[ps.getMonth()] : '',
+          monthFull: ps ? MFULL[ps.getMonth()] : '',
+          start: ps && (ps.getHours()||ps.getMinutes()) ? ps.toTimeString().slice(0,5) : '',
+        };
+      }),
     };
   }
 
@@ -385,7 +398,7 @@
 ${audioBar}
 <div class="ep-header">
   <div class="ep-meta">
-    <div class="dt-block">
+    <div class="dt-block${ev.endDate ? ' dt-range' : ''}">
       ${ev.endDate ? `
       <span class="en-only">${ev.monthFull} ${ev.dayOrdinal} —<br>${ev.endDate.monthFull} ${ev.endDate.dayOrdinal}, ${ev.endDate.year}</span>
       <span class="ar-only ar">${ev.day} ${MONTH_NAME_AR[ev.month]} — ${arNum(ev.endDate.day)} ${ev.endDate.monthAr} ${arNum(ev.endDate.year)}</span>
@@ -463,6 +476,23 @@ ${audioBar}
     ${cta}
   </div>
   ${EMBED ? '<div class="ep-embed-spacer" aria-hidden="true"></div>' : ""}
+  ${(ev.programmeEvents && ev.programmeEvents.length) ? `
+  <div class="ep-programme">
+    <div class="ep-programme-head">
+      <span class="en-only">Programme</span>
+      <span class="ar-only ar" dir="rtl">البرنامج</span>
+    </div>
+    ${ev.programmeEvents.map(pe => `
+      <a class="ep-prog-row" href="event.html?id=${pe.id}${navSuffix}">
+        <span class="ep-prog-date">${parseInt(pe.day,10)} ${pe.monthFull}</span>
+        <span class="ep-prog-type">${pe.type}</span>
+        <span class="ep-prog-name">
+          <span class="en-only">${pe.title}</span>
+          <span class="ar-only ar" dir="rtl">${pe.titleAr||pe.title}</span>
+        </span>
+        <span class="ep-prog-arrow">→</span>
+      </a>`).join("")}
+  </div>` : ""}
   ${navBar}
 </div>`;
   }
@@ -478,7 +508,7 @@ ${audioBar}
   let ev, all = [];
   try {
     const [docs, settingsDoc] = await Promise.all([
-      groq(`*[_type == "event"] | order(startDateTime desc) { ..., location->{ name }, relatedArtists[]->{name, "slug": slug.current}, relatedProject->{title, slug} }`),
+      groq(`*[_type == "event"] | order(startDateTime desc) { ..., location->{ name }, relatedArtists[]->{name, "slug": slug.current}, relatedProject->{title, slug}, programmeEvents[]->{_id, title, eventType, startDateTime} }`),
       groq(`*[_type == "siteSettings"][0]{ address, hours, mapsUrl }`),
     ]);
     all = (docs || []).map(docToEv);
