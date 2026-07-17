@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Programme · The Wonder Cabinet</title>
-<link rel="stylesheet" href="assets/app.css?v=32">
+<link rel="stylesheet" href="assets/app.css?v=33">
 </head>
 <body data-view="list">
 
@@ -989,6 +989,7 @@ function _gsHardReset(){
   document.querySelectorAll(".tl-row-open").forEach(r => {
     r.classList.remove("tl-row-open", "tl-anim");
     r.style.height = "";
+    r.style.transform = "";
   });
   const track = document.getElementById("gs-track");
   if (track) track.classList.remove("gs-anim");
@@ -1328,23 +1329,21 @@ function _tlOpenReader(rowEl){
 
   const TOP = 56; // reading position: just below the fixed topbar
 
-  // Glide the row up to the reading position first (quick eased scroll,
-  // not a jump), THEN freeze the page and start the reader — the lock
-  // needs a settled scroll position to restore on close.
-  const fromY = window.scrollY;
-  const toY = Math.max(0, fromY + rowEl.getBoundingClientRect().top - TOP);
-  const GLIDE_MS = 300;
-  const g0 = performance.now();
-  const easeInOut = t => t < .5 ? 2*t*t : 1 - Math.pow(-2*t + 2, 2) / 2;
-  const glide = setInterval(() => {
-    const t = Math.min(1, (performance.now() - g0) / GLIDE_MS);
-    window.scrollTo(0, fromY + (toY - fromY) * easeInOut(t));
-    if (t >= 1){ clearInterval(glide); begin(); }
-  }, 16);
+  begin();
 
   function begin(){
-    const startH = rowEl.getBoundingClientRect().height;
+    // The row expands from BOTH edges, right where it sits: the page is
+    // frozen at the click, and every step of the expansion grows the
+    // bottom edge (height) while sliding the top edge up (translateY),
+    // both mapped to the same eased progress — so the block visually
+    // opens outward from its own position and the two edges arrive at
+    // the reading frame (topbar → viewport bottom) together at t=1. No
+    // pre-scroll glide: the motion is one continuous thing, driven first
+    // by the click nudge, then by the wheel.
+    const r0 = rowEl.getBoundingClientRect();
+    const startH = r0.height;
     const targetH = window.innerHeight - TOP;
+    const rise = r0.top - TOP; // how far the top edge travels up (can be negative if the row is already above the reading line — then it slides down into place instead)
 
     const _lockScrollY = window.scrollY;
     document.body.style.position = "fixed";
@@ -1377,6 +1376,7 @@ function _tlOpenReader(rowEl){
 
     function apply(t){
       rowEl.style.height = lerp(startH, targetH, t) + "px";
+      rowEl.style.transform = `translateY(${(-rise * t).toFixed(2)}px)`;
     }
     function animateOnce(){
       rowEl.classList.add("tl-anim");
@@ -1472,6 +1472,7 @@ function _tlOpenReader(rowEl){
         frame.remove();
         rowEl.classList.remove("tl-row-open", "tl-anim");
         rowEl.style.height = "";
+        rowEl.style.transform = "";
         document.body.style.position = "";
         document.body.style.top = "";
         document.body.style.left = "";

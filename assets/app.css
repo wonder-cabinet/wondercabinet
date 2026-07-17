@@ -1796,7 +1796,11 @@ body.gs-reader-open{ overflow: hidden; }
   display: block;
 }
 .tl-row-open > :not(.gs-card-frame){ visibility: hidden; }
-.tl-anim{ transition: height .45s cubic-bezier(.2,.8,.2,1); }
+.tl-anim{
+  transition:
+    height .45s cubic-bezier(.2,.8,.2,1),
+    transform .45s cubic-bezier(.2,.8,.2,1);
+}
 
 /* Mobile equivalent (see _gsOpenReaderMobile in index.html): below 700px
    cards stack in a column with natural height instead of the horizontal
