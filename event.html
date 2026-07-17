@@ -241,7 +241,7 @@
       programmeEvents: (doc.programmeEvents || []).map(pe => {
         const ps = _iso(pe.startDateTime);
         return {
-          id: pe._id,
+          id: pe.slug || pe._id,
           title: pe.title?.en || '',
           titleAr: pe.title?.ar || '',
           type: pe.eventType || '',
@@ -508,7 +508,7 @@ ${audioBar}
   let ev, all = [];
   try {
     const [docs, settingsDoc] = await Promise.all([
-      groq(`*[_type == "event"] | order(startDateTime desc) { ..., location->{ name }, relatedArtists[]->{name, "slug": slug.current}, relatedProject->{title, slug}, programmeEvents[]->{_id, title, eventType, startDateTime} }`),
+      groq(`*[_type == "event"] | order(startDateTime desc) { ..., location->{ name }, relatedArtists[]->{name, "slug": slug.current}, relatedProject->{title, slug}, programmeEvents[]->{_id, "slug": slug.current, title, eventType, startDateTime} }`),
       groq(`*[_type == "siteSettings"][0]{ address, hours, mapsUrl }`),
     ]);
     all = (docs || []).map(docToEv);
