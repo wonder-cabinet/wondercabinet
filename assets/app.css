@@ -2758,6 +2758,8 @@ html[data-lang="ar"] .footer-col { text-align: right; }
 /* Event page */
 html[data-lang="ar"] .ep-meta { text-align: right; }
 html[data-lang="ar"] .ep-meta .dt-block { align-items: flex-end; }
+/* Embed (homepage reader) only: icons move to LEFT corner for Arabic RTL */
+html[data-lang="ar"].embed .ep-header-icons { order: -1; }
 
 html[data-lang="ar"] .ep-title { text-align: right; }
 html[data-lang="ar"] .ep-register-header { direction: rtl; }
