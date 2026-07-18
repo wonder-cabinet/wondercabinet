@@ -2730,3 +2730,27 @@ body.gs-reader-open{ overflow: hidden; }
   .prj-dark-spread{ grid-template-columns: 1fr; }
   .prj-section-label{ display: none; }
 }
+
+/* =========================================================
+   ARABIC / RTL — text-align overrides
+   Applied when html[data-lang="ar"] (the site default).
+   Text-align right; flex containers that have text reverse their
+   justify-content so the text sits at the natural RTL start.
+   ========================================================= */
+html[data-lang="ar"] .gs-rail { text-align: right; }
+html[data-lang="ar"] .gs-card-inner { text-align: right; }
+html[data-lang="ar"] .gs-theme { text-align: right; }
+html[data-lang="ar"] .gs-c-desc { margin-left: auto; margin-right: 0; }
+
+/* Programme timeline rows */
+html[data-lang="ar"] .tl-row { text-align: right; }
+html[data-lang="ar"] .tl-month-head { text-align: right; }
+html[data-lang="ar"] .tl-tags { justify-content: flex-end; }
+
+/* Exhibition section */
+html[data-lang="ar"] .cx-card { text-align: right; }
+html[data-lang="ar"] .cx-programme { text-align: right; }
+html[data-lang="ar"] .cx-prog-row { direction: rtl; }
+
+/* Footer */
+html[data-lang="ar"] .footer-col { text-align: right; }
