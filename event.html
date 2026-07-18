@@ -69,6 +69,10 @@
   html.embed .ep-close, html.embed .ep-pop{ position: fixed; top: 14px; z-index: 60; }
   html.embed .ep-close{ right: 14px; }
   html.embed .ep-pop{ right: 46px; }
+  /* Arabic: flip to left side */
+  html[data-lang="ar"].embed .ep-title{ padding: 10px 0 10px 80px; }
+  html[data-lang="ar"].embed .ep-close{ right: auto; left: 14px; }
+  html[data-lang="ar"].embed .ep-pop{ right: auto; left: 46px; }
   .ep-hero-video video{ width: 100%; display: block; }
   /* Extra runway at the very end of the article — reaching the true bottom
      shouldn't feel like slamming into a wall right as the content stops, so
@@ -78,12 +82,12 @@
   .ep-pop{
     all: unset; cursor: pointer;
     display: grid; place-items: center;
-    color: white;
-    font-size: 24px; font-weight: 700;
-    opacity: 1; transition: opacity .15s;
-    line-height: 1;
+    color: currentColor;
+    width: 28px; height: 28px;
+    opacity: .75; transition: opacity .15s;
   }
-  .ep-pop:hover{ opacity: .7; }
+  .ep-pop svg{ display: block; width: 18px; height: 18px; }
+  .ep-pop:hover{ opacity: 1; }
 </style>
 </head>
 <body>
@@ -394,7 +398,7 @@
       }
     }
     const popBtn = EMBED
-      ? `<a class="ep-pop" href="event.html?id=${encodeURIComponent(ev.id)}" target="_top" aria-label="Open as its own page">↗</a>`
+      ? `<a class="ep-pop" href="event.html?id=${encodeURIComponent(ev.id)}" target="_top" aria-label="Open as its own page"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3H3v12h12v-4M10 3h5v5M14 4l-7 7"/></svg></a>`
       : "";
 
     return `
