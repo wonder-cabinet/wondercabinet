@@ -2758,7 +2758,7 @@ html[data-lang="ar"] .footer-col { text-align: right; }
 /* Event page */
 html[data-lang="ar"] .ep-meta { text-align: right; }
 html[data-lang="ar"] .ep-meta .dt-block { align-items: flex-end; }
-html[data-lang="ar"] .ep-meta-bottom { flex-direction: row-reverse; }
+
 html[data-lang="ar"] .ep-title { text-align: right; }
 html[data-lang="ar"] .ep-register-header { direction: rtl; }
 html[data-lang="ar"] .ep-programme { text-align: right; }
