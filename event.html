@@ -179,8 +179,9 @@
   function _ordinal(n){ const s = ["th","st","nd","rd"], v = n % 100; return n + (s[(v-20)%10] || s[v] || s[0]); }
 
   function _iso(dt){
-    const m = dt && dt.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/);
-    return m ? new Date(+m[1], +m[2]-1, +m[3], +m[4], +m[5]) : null;
+    if (!dt) return null;
+    const d = new Date(dt);
+    return isNaN(d) ? null : d;
   }
   function _sanityImg(ref){
     const r = typeof ref === 'string' ? ref : (ref && ref.asset && ref.asset._ref) || '';
@@ -198,7 +199,8 @@
 
   function docToEv(doc){
     const s = _iso(doc.startDateTime), e = _iso(doc.endDateTime);
-    const hasTime = s && (s.getHours() || s.getMinutes());
+    // hasTime: check UTC hours in raw string (midnight UTC = 00:00Z = all-day, no display time)
+    const hasTime = doc.startDateTime && (+doc.startDateTime.slice(11,13) || +doc.startDateTime.slice(14,16));
     const locationName = typeof doc.location === 'object' && doc.location !== null ? (doc.location.name || '') : (doc.location || '');
     return {
       id:       doc.slug?.current || doc._id,
@@ -217,7 +219,7 @@
       monthFull: s ? MFULL[s.getMonth()] : '',
       dayOrdinal: s ? _ordinal(s.getDate()) : '',
       start:    hasTime ? s.toTimeString().slice(0,5) : '',
-      end:      e && (e.getHours()||e.getMinutes()) ? e.toTimeString().slice(0,5) : '',
+      end:      doc.endDateTime && (+doc.endDateTime.slice(11,13)||+doc.endDateTime.slice(14,16)) ? e.toTimeString().slice(0,5) : '',
       // Multi-day (exhibitions and other long-running things): keep the
       // closing DATE so the header can show a range instead of times.
       endDate:  (e && (e.getFullYear() !== s.getFullYear() || e.getMonth() !== s.getMonth() || e.getDate() !== s.getDate()))
