@@ -230,6 +230,7 @@
       status:   doc.status || 'upcoming',
       featured: !!doc.featured,
       register: doc.registerUrl || '',
+      isPast:   s ? s < new Date() : (doc.status === 'past'),
       short:    doc.shortDescription?.en || '',
       shortAr:  doc.shortDescription?.ar || '',
       body:     doc.body?.en ? doc.body.en.split(/\n\n+/).map(p=>p.trim()).filter(Boolean) : [],
@@ -334,9 +335,9 @@
     const bodyAr = bodyArParts.map(p => `<p>${p}</p>`).join("");
     const writeupEn = ev.writeup ? `<p class="ep-writeup">${ev.writeup}</p>` : "";
     const writeupAr = ev.writeupAr ? `<p class="ep-writeup" dir="rtl">${ev.writeupAr}</p>` : "";
-    const cta = ev.register
+    const cta = (ev.register && !ev.isPast)
       ? `<a href="${ev.register}" class="ep-register" target="_blank"><span class="en-only">Register →</span><span class="ar-only ar">← التسجيل</span></a>`
-      : `<span class="ep-register ep-free"><span class="en-only">Free entry</span><span class="ar-only ar">دخول حرّ</span></span>`;
+      : (!ev.isPast ? `<span class="ep-register ep-free"><span class="en-only">Free entry</span><span class="ar-only ar">دخول حرّ</span></span>` : "");
 
     // Audio bar sourced from a contentAudio block, if present.
     const audioSrcBlock = (ev.content || []).find(b => (b._type||'') === 'contentAudio');
@@ -410,7 +411,7 @@ ${audioBar}
       <span class="ep-time">${ev.start}${ev.end ? " — " + ev.end : ""}</span>
       `}
     </div>
-    ${ev.register ? `<a href="${ev.register}" class="ep-register-header" target="_blank" rel="noopener">
+    ${ev.register && !ev.isPast ? `<a href="${ev.register}" class="ep-register-header" target="_blank" rel="noopener">
       <span class="en-only">Register →</span><span class="ar-only ar" dir="rtl">← سجّل الآن</span>
     </a>` : ""}
     <div class="ep-meta-bottom">
