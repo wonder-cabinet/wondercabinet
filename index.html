@@ -12,7 +12,7 @@
 <meta property="og:url" content="https://wondercabinet.space">
 <meta property="og:image" content="" id="og-image-meta">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="stylesheet" href="assets/app.css?v=39">
+<link rel="stylesheet" href="assets/app.css?v=40">
 </head>
 <body data-view="list">
 
@@ -1392,7 +1392,7 @@ function _gsOpenReaderMobile(cardEl){
   // Timeline rows and exhibition cards reuse this whole path on narrow
   // viewports — they just need their own "host an absolute frame, hide my
   // own content" class since the gs-card one is scoped to card children.
-  if (cardEl.matches(".tl-row, .cx-card")) cardEl.classList.add("tl-row-open");
+  if (cardEl.matches(".tl-row, .cx-card, .cx-prog-row")) cardEl.classList.add("tl-row-open");
   cardEl.style.height = startH + "px";
 
   const frame = document.createElement("iframe");
