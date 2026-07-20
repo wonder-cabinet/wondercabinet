@@ -64,6 +64,16 @@ img{ display:block; max-width:100%; }
 body.viewing-past .topbar{
   position: sticky; top: 0; bottom: 0;
 }
+/* This Week hero: once the archive is open it sits far down a much
+   taller page, and its scroll-lock (position:sticky + a JS-computed
+   height runway driving the horizontal card slide) no longer
+   corresponds to anything sensible there — release the pin and let it
+   flow as an ordinary block so it doesn't sit frozen mid-transform
+   while the user browses history. See revealPastArchive() in index.html,
+   which also zeroes its inline height/maxScroll/transform to match. */
+body.viewing-past .gs-sticky{
+  position: static; height: auto;
+}
 .topbar-inner{
   display: flex;
   align-items: stretch;
