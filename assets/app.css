@@ -2742,11 +2742,19 @@ html[data-lang="ar"] .gs-card-inner { text-align: right; }
 html[data-lang="ar"] .gs-theme { text-align: right; }
 html[data-lang="ar"] .gs-c-desc { margin-left: auto; margin-right: 0; }
 
-/* Hero featured section — flip for RTL */
-html[data-lang="ar"] .gs-sticky { flex-direction: row-reverse; }
-html[data-lang="ar"] .gs-rail { border-right: 0; border-left: 2px solid var(--gs-fg); }
-/* Reverse card order so today is on the right (RTL start) */
-html[data-lang="ar"] .gs-track { flex-direction: row-reverse; }
+/* Hero featured section — flip for RTL.
+   Scoped to the desktop scroll-lock breakpoint (matches the
+   min-width companion of the @media(max-width:700px) mobile stack
+   below) — otherwise these selectors' higher specificity beats the
+   mobile media query's plain .gs-sticky/.gs-track rules and the
+   horizontal reversed layout leaks into the mobile column stack,
+   breaking it entirely. */
+@media (min-width: 701px){
+  html[data-lang="ar"] .gs-sticky { flex-direction: row-reverse; }
+  html[data-lang="ar"] .gs-rail { border-right: 0; border-left: 2px solid var(--gs-fg); }
+  /* Reverse card order so today is on the right (RTL start) */
+  html[data-lang="ar"] .gs-track { flex-direction: row-reverse; }
+}
 /* Arabic font renders visually larger — scale meta/cta down a touch */
 html[data-lang="ar"] .gs-c-meta { font-size: 22px; opacity: 1; }
 html[data-lang="ar"] .gs-c-cta { font-size: 10px; }

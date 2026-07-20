@@ -12,7 +12,7 @@
 <meta property="og:url" content="https://wondercabinet.space">
 <meta property="og:image" content="" id="og-image-meta">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="stylesheet" href="assets/app.css?v=46">
+<link rel="stylesheet" href="assets/app.css?v=47">
 </head>
 <body data-view="list">
 
@@ -1697,7 +1697,7 @@ function renderFeatured(){
     const maxScroll = parseFloat(outer.dataset.maxScroll || 0);
     const top = outer.getBoundingClientRect().top;
     const progress = Math.min(Math.max(STICKY_TOP - top, 0), maxScroll);
-    const isRtl = document.documentElement.dataset.lang === 'ar';
+    const isRtl = document.documentElement.dataset.lang === 'ar' && window.innerWidth > 700;
     // RTL: both gs-sticky (rail/track swap) and gs-track (card order) are
     // row-reversed, which places the track's static rest position at
     // -maxScroll globally and puts "today" at the track's local right edge.
