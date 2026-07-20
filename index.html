@@ -12,7 +12,7 @@
 <meta property="og:url" content="https://wondercabinet.space">
 <meta property="og:image" content="" id="og-image-meta">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="stylesheet" href="assets/app.css?v=43">
+<link rel="stylesheet" href="assets/app.css?v=44">
 </head>
 <body data-view="list">
 
@@ -1697,7 +1697,12 @@ function renderFeatured(){
     const maxScroll = parseFloat(outer.dataset.maxScroll || 0);
     const top = outer.getBoundingClientRect().top;
     const progress = Math.min(Math.max(STICKY_TOP - top, 0), maxScroll);
-    track.style.transform = `translateX(${-progress}px)`;
+    const isRtl = document.documentElement.dataset.lang === 'ar';
+    // RTL: track is row-reversed so today is at the right end; start at -maxScroll
+    // and travel toward 0 to reveal earlier-in-week cards leftward.
+    track.style.transform = isRtl
+      ? `translateX(${progress - maxScroll}px)`
+      : `translateX(${-progress}px)`;
   }
 
   function renderWeekMode(){
