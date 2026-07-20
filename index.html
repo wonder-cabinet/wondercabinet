@@ -1595,6 +1595,9 @@ function renderFeatured(){
   // in-flight animation rather than stacking another one.
   let currentProgress = 0;
   let catchUpRAF = null;
+  let catchUpWatchdog = null;
+  let catchUpGen = 0; // bumped every time a new catch-up starts, so a stale watchdog
+                       // from an interrupted animation can tell it's no longer current
   let progressInitialized = false; // first onScroll() call always snaps, never animates —
                                     // a browser-restored mid-scroll position on load/refresh
                                     // shouldn't play a catch-up animation on first paint.
@@ -1622,6 +1625,7 @@ function renderFeatured(){
     const isRtl = document.documentElement.dataset.lang === 'ar' && window.innerWidth > 700;
 
     if (catchUpRAF) cancelAnimationFrame(catchUpRAF);
+    if (catchUpWatchdog) clearTimeout(catchUpWatchdog);
 
     if (!progressInitialized || Math.abs(target - currentProgress) <= SNAP_THRESHOLD){
       progressInitialized = true;
@@ -1632,12 +1636,26 @@ function renderFeatured(){
 
     const from = currentProgress;
     const t0 = performance.now();
+    const myGen = ++catchUpGen;
     (function step(now){
       const t = Math.min(1, (now - t0) / CATCHUP_MS);
       currentProgress = from + (target - from) * easeInOutQuad(t);
       applyProgress(currentProgress, isRtl);
       catchUpRAF = t < 1 ? requestAnimationFrame(step) : null;
     })(t0);
+    // Watchdog: requestAnimationFrame can stall if the tab gets backgrounded/
+    // throttled mid-animation (observed during testing) — if that happens the
+    // hero would otherwise freeze forever on a half-transitioned, in-between
+    // position instead of either finishing the catch-up or landing on the
+    // correct card. Force-snap to the target once CATCHUP_MS has elapsed
+    // regardless of whether rAF kept ticking, but only if nothing newer
+    // (another scroll event) has already taken over in the meantime.
+    catchUpWatchdog = setTimeout(() => {
+      if (myGen !== catchUpGen) return;
+      if (catchUpRAF) cancelAnimationFrame(catchUpRAF);
+      currentProgress = target;
+      applyProgress(currentProgress, isRtl);
+    }, CATCHUP_MS + 150);
   }
 
   function renderWeekMode(){
