@@ -2759,15 +2759,22 @@ html[data-lang="ar"] .gs-c-desc { margin-left: auto; margin-right: 0; }
 html[data-lang="ar"] .gs-c-meta { font-size: 22px; opacity: 1; }
 html[data-lang="ar"] .gs-c-cta { font-size: 10px; }
 
+/* "Artists this week" / featured project / residency section titles */
+html[data-lang="ar"] .gs-vsection h2 { text-align: right; }
+
 /* Programme timeline rows */
 html[data-lang="ar"] .tl-row { text-align: right; }
 html[data-lang="ar"] .tl-month-head { text-align: right; }
 html[data-lang="ar"] .tl-tags { justify-content: flex-end; }
 
 /* Exhibition section */
+html[data-lang="ar"] .cx-head { direction: rtl; }
+html[data-lang="ar"] .cx-title-head { text-align: right; }
 html[data-lang="ar"] .cx-card { text-align: right; }
+html[data-lang="ar"] .cx-row-top, html[data-lang="ar"] .cx-row-bottom { direction: rtl; }
 html[data-lang="ar"] .cx-programme { text-align: right; }
 html[data-lang="ar"] .cx-prog-row { direction: rtl; }
+html[data-lang="ar"] .cx-programme-head { text-align: right; }
 
 /* Footer */
 html[data-lang="ar"] .footer-col { text-align: right; }
