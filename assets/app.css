@@ -66,36 +66,27 @@ body.viewing-past .topbar{
 }
 /* This Week hero: once the archive is open it sits far down a much
    taller page, and its scroll-lock (position:sticky + a JS-computed
-   height runway driving the horizontal card slide) no longer
-   corresponds to anything sensible there. Releasing just the sticky
-   pin (position:static/height:auto) isn't enough on its own: the rail
-   stays flex-basis 320px and the track's cards stay in a single
-   un-wrapped row (flex-direction:row, no scroll-lock transform to move
-   it), so only the first ~2.5 cards are visible and the rest are
-   permanently clipped out of view with no way to reach them — reads as
-   a broken, stuck slider, not a clean static block.
-   Fix: reuse the exact same "give up, stack it" treatment already
-   proven on mobile (see the max-width:700px block below) — column
-   stack, natural height, full-width cards, one under another. Every
-   card is visible, nothing is unreachable, no scroll-lock math applies
-   at all. !important on the direction/border rules because this must
-   win over the RTL hero flip below (html[data-lang="ar"] .gs-sticky /
-   .gs-track flex-direction:row-reverse) regardless of language — the
-   archive-open state always stacks, in both English and Arabic. */
-body.viewing-past .gs-outer{ height: auto !important; }
+   height runway driving the horizontal card slide via page scroll) no
+   longer corresponds to anything sensible there — page scroll is now
+   dedicated to browsing the archive above. The hero itself must keep
+   its normal "This Week" look exactly as-is (rail + row of cards,
+   same size, same RTL flip) — it does NOT redesign into a stacked
+   list. Only the interaction changes: release the sticky pin/page-
+   scroll-lock (position:static, same fixed height as at rest so
+   nothing resizes) and let the card row become its own natively
+   scrollable strip (overflow-x:auto) so every card stays reachable —
+   via trackpad/swipe directly on it — without ever looking stuck or
+   clipping cards out of view. Flex-direction is left untouched here on
+   purpose, so the existing RTL flip below (html[data-lang="ar"]
+   .gs-sticky/.gs-track flex-direction:row-reverse) still applies
+   exactly as it does at rest. */
 body.viewing-past .gs-sticky{
-  position: static; height: auto; flex-direction: column !important;
-}
-body.viewing-past .gs-rail{
-  border-right: 0 !important; border-left: 0 !important;
-  border-bottom: 2px solid var(--gs-fg);
+  position: static; height: calc(100vh - 54px);
 }
 body.viewing-past .gs-track{
-  flex-direction: column !important; transform: none !important; height: auto;
-}
-body.viewing-past .gs-card{
-  flex: none; height: auto; border-right: 0 !important;
-  border-bottom: 2px solid var(--gs-fg);
+  overflow-x: auto; overflow-y: hidden;
+  transform: none !important;
+  flex: 1 1 auto; min-width: 0;
 }
 .topbar-inner{
   display: flex;
