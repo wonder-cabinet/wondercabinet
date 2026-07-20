@@ -64,30 +64,17 @@ img{ display:block; max-width:100%; }
 body.viewing-past .topbar{
   position: sticky; top: 0; bottom: 0;
 }
-/* This Week hero: once the archive is open it sits far down a much
-   taller page, and its scroll-lock (position:sticky + a JS-computed
-   height runway driving the horizontal card slide via page scroll) no
-   longer corresponds to anything sensible there — page scroll is now
-   dedicated to browsing the archive above. The hero itself must keep
-   its normal "This Week" look exactly as-is (rail + row of cards,
-   same size, same RTL flip) — it does NOT redesign into a stacked
-   list. Only the interaction changes: release the sticky pin/page-
-   scroll-lock (position:static, same fixed height as at rest so
-   nothing resizes) and let the card row become its own natively
-   scrollable strip (overflow-x:auto) so every card stays reachable —
-   via trackpad/swipe directly on it — without ever looking stuck or
-   clipping cards out of view. Flex-direction is left untouched here on
-   purpose, so the existing RTL flip below (html[data-lang="ar"]
-   .gs-sticky/.gs-track flex-direction:row-reverse) still applies
-   exactly as it does at rest. */
-body.viewing-past .gs-sticky{
-  position: static; height: calc(100vh - 54px);
-}
-body.viewing-past .gs-track{
-  overflow-x: auto; overflow-y: hidden;
-  transform: none !important;
-  flex: 1 1 auto; min-width: 0;
-}
+/* This Week hero: deliberately UNCHANGED while viewing past — no
+   position/height/transform override here. The whole site is one
+   continuous timeline (archive above, this week's cards in the middle,
+   future programme below): scrolling through any of it, in either
+   direction, should always "go through" the hero's card-flip rather
+   than have it disengage once the archive is open. Its scroll-lock
+   (position:sticky + a JS runway keyed off the hero's own
+   getBoundingClientRect().top) is entirely viewport-relative, so it
+   pins and flips correctly no matter how far down the document the
+   archive has pushed it — see setup()/onScroll() in index.html, which
+   no longer special-case body.viewing-past either. */
 .topbar-inner{
   display: flex;
   align-items: stretch;
