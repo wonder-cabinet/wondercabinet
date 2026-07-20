@@ -1580,21 +1580,64 @@ function renderFeatured(){
     outer.style.height = (window.innerHeight - STICKY_TOP + maxScroll) + "px";
     outer.dataset.maxScroll = maxScroll;
   }
+  // currentProgress/catchUpRAF implement the requirement that scrolling
+  // through the week — in either direction — must always "go through" every
+  // card, never skip one. onScroll's progress is a pure function of the
+  // current scrollY, so a single fast scroll tick (a hard trackpad swipe, or
+  // momentum resuming right after closing the in-grid reader) can jump
+  // scrollY — and therefore progress — past several cards in one native
+  // scroll event. Snapping the transform straight to that target would
+  // visually skip the cards in between. Instead: small movements (normal,
+  // deliberate scrolling) still snap instantly for a responsive feel; jumps
+  // bigger than SNAP_THRESHOLD animate the transform smoothly from where it
+  // was to the new target over CATCHUP_MS, so every card in between is still
+  // actually seen. A new scroll event mid-catch-up just retargets the
+  // in-flight animation rather than stacking another one.
+  let currentProgress = 0;
+  let catchUpRAF = null;
+  let progressInitialized = false; // first onScroll() call always snaps, never animates —
+                                    // a browser-restored mid-scroll position on load/refresh
+                                    // shouldn't play a catch-up animation on first paint.
+  const SNAP_THRESHOLD = 180; // px
+  const CATCHUP_MS = 260;
+  const easeInOutQuad = t => t < 0.5 ? 2*t*t : 1 - Math.pow(-2*t + 2, 2) / 2;
+
+  function applyProgress(p, isRtl){
+    track.style.transform = isRtl
+      ? `translateX(${p}px)`
+      : `translateX(${-p}px)`;
+  }
+
   function onScroll(){
     if (document.body.classList.contains("gs-reader-open")) return;
     const maxScroll = parseFloat(outer.dataset.maxScroll || 0);
     const top = outer.getBoundingClientRect().top;
-    const progress = Math.min(Math.max(STICKY_TOP - top, 0), maxScroll);
-    const isRtl = document.documentElement.dataset.lang === 'ar' && window.innerWidth > 700;
+    const target = Math.min(Math.max(STICKY_TOP - top, 0), maxScroll);
     // RTL: both gs-sticky (rail/track swap) and gs-track (card order) are
     // row-reversed, which places the track's static rest position at
     // -maxScroll globally and puts "today" at the track's local right edge.
     // At progress=0 that already lines up today next to the rail with
     // transform 0 — scrolling forward needs +progress (not -progress) to
     // slide later-in-week cards in from the left as today exits right.
-    track.style.transform = isRtl
-      ? `translateX(${progress}px)`
-      : `translateX(${-progress}px)`;
+    const isRtl = document.documentElement.dataset.lang === 'ar' && window.innerWidth > 700;
+
+    if (catchUpRAF) cancelAnimationFrame(catchUpRAF);
+
+    if (!progressInitialized || Math.abs(target - currentProgress) <= SNAP_THRESHOLD){
+      progressInitialized = true;
+      currentProgress = target;
+      applyProgress(currentProgress, isRtl);
+      return;
+    }
+
+    const from = currentProgress;
+    const t0 = performance.now();
+    (function step(now){
+      const t = Math.min(1, (now - t0) / CATCHUP_MS);
+      currentProgress = from + (target - from) * easeInOutQuad(t);
+      applyProgress(currentProgress, isRtl);
+      catchUpRAF = t < 1 ? requestAnimationFrame(step) : null;
+    })(t0);
   }
 
   function renderWeekMode(){
