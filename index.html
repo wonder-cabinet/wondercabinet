@@ -618,6 +618,7 @@ function armPastGravity(){
   function setHeight(px){
     outer.classList.add("is-tracking");
     outer.style.maxHeight = px + "px";
+    resyncHero();
   }
   function closeAll(){
     stage = "idle";
@@ -625,6 +626,7 @@ function armPastGravity(){
     clearTimeout(springTimer);
     outer.classList.remove("is-tracking", "is-peeking");
     outer.style.maxHeight = "";
+    resyncHero();
   }
   // Settles into the peek stage at a fixed height, message visible. Left
   // alone, it springs shut again after a few seconds — it's a hint, not a
@@ -646,6 +648,7 @@ function armPastGravity(){
     window.removeEventListener("touchmove", onTouchMove);
     outer.classList.remove("is-tracking", "is-peeking");
     outer.style.maxHeight = "";
+    resyncHero();
     revealPastArchive();
   }
 
@@ -669,6 +672,17 @@ function armPastGravity(){
       springTimer = setTimeout(settlePeek, 500); // let go mid-pull -> back to just the message
     }
   }
+
+  // The peek/commit stages grow "outer" (a normal block element sitting
+  // above the topbar) up to 140px tall, which pushes the topbar and the
+  // whole This Week hero down the page in real time. That's a genuine
+  // layout shift, but at scrollY clamped to 0 it doesn't necessarily fire
+  // a native 'scroll' event — so the hero's own onScroll (which only
+  // recomputes on 'scroll') can go stale mid-gesture and its transform
+  // freezes until some later, unrelated scroll nudges it back in sync.
+  // Force that resync ourselves after every height change here so the
+  // hero never visibly "gets stuck" during this gesture.
+  function resyncHero(){ window.dispatchEvent(new Event("scroll")); }
 
   function onWheel(e){
     if (readerOpen()) return;
