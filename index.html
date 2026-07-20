@@ -1163,13 +1163,25 @@ function _gsOpenReader(cardEl){
   const baseX = m ? parseFloat(m[1]) : 0;
   const startW = cardEl.getBoundingClientRect().width;
   const targetW = window.innerWidth - railW; // full area beside the rail
+  // Card's un-transformed offset within the track, measured via
+  // getBoundingClientRect rather than cardEl.offsetLeft. Both track and
+  // card currently share the same translateX(baseX) (the card hasn't
+  // moved independently yet), so that shift cancels out of the
+  // difference between their rects, leaving the plain layout offset —
+  // this only relies on getBoundingClientRect, which is unambiguous, and
+  // sidesteps offsetLeft's cross-browser inconsistency inside a
+  // flex-direction:row-reverse container (confirmed on Safari: it can
+  // return a wildly wrong value there, which fed a huge/NaN translateX
+  // below and blanked the whole hero until a full page reload). Chrome
+  // never showed this, which is why it only ever surfaced in Arabic.
+  const cardOffsetInTrack = cardEl.getBoundingClientRect().left - track.getBoundingClientRect().left;
   // In Arabic (desktop), the rail sits on the RIGHT and the track is
   // row-reversed, so the card's RIGHT border (not left) needs to land
   // against the rail — mirror image of the LTR math below.
   const isRtl = document.documentElement.dataset.lang === "ar" && window.innerWidth > 700;
   const targetX = isRtl
-    ? track.scrollWidth - (cardEl.offsetLeft + startW) // card's right border lands on the rail
-    : -cardEl.offsetLeft;                              // card's left border lands on the rail
+    ? track.scrollWidth - (cardOffsetInTrack + startW) // card's right border lands on the rail
+    : -cardOffsetInTrack;                              // card's left border lands on the rail
 
   // Freeze the background page. overflow:hidden alone is not reliable here
   // — some wheel/trackpad gestures still nudge window.scrollY through it,
