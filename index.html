@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="ar" data-lang="ar" style="--bg: #f6f3ea; --ink: #1d24ff; --highlight: #ffe65c; --paper: #f6f3ea; --card: #f6f3ea; --rule: #1d24ff; --rule-strong: #1d24ff;"><head>
+<!DOCTYPE html><html lang="en" data-lang="en" style="--bg: #f6f3ea; --ink: #1d24ff; --highlight: #ffe65c; --paper: #f6f3ea; --card: #f6f3ea; --rule: #1d24ff; --rule-strong: #1d24ff;"><head>
 
 
 <meta charset="utf-8">
@@ -16,27 +16,16 @@
 </head>
 <body data-view="list">
 
-<!-- Archive — everything before the current calendar week. Collapsed to
-     zero height at rest, sitting ABOVE the topbar, so the page looks
-     completely normal until the user scrolls up: a first upward
-     scroll/wheel/touch gesture at the top peeks it open, a second commits
-     and loads the full archive (see armPastGravity/revealPastArchive).
+<!-- Archive — everything before the current calendar week. This is just an
+     empty insertion anchor now: revealPastArchive() replaces it with the
+     full archive in place, right above the topbar. Reached via the
+     "Archive" link in the topbar nav (see tb-archive below) — no scroll
+     gesture involved anymore, the button jumps straight there.
      Treat the whole site as one continuous timeline with THIS WEEK (below)
      as the "magazine cover" sitting in the middle, past behind it
      (revealed here, above), future ahead of it (the Programme section
      further down, which starts at *next* week). -->
-<div class="tl-past-toggle" id="pt-outer" hidden>
-  <div class="tl-past-peek">
-    <span class="en-only">↑ Scroll to explore our past</span>
-    <span class="ar-only ar" dir="rtl">↑ مرر لاستكشاف أرشيفنا</span>
-  </div>
-  <button class="tl-past-btn" id="pt-toggle" type="button">
-    <span class="tl-past-arrow">↑</span>
-    <span class="en-only">View past events</span>
-    <span class="ar-only ar" dir="rtl">عرض الفعاليات السابقة</span>
-    <span class="tl-past-count" id="pt-count"></span>
-  </button>
-</div>
+<div id="pt-outer" hidden></div>
 
 <header class="topbar">
   <div class="topbar-inner">
@@ -45,9 +34,10 @@
     </a>
     <nav class="tpb-nav">
       <a href="#programme"><span class="en-only">Programme</span><span class="ar-only ar">البرنامج</span></a>
+      <a href="#" id="tb-archive" hidden><span class="en-only">Archive</span><span class="ar-only ar">الأرشيف</span></a>
       <div class="lang-toggle" role="group" aria-label="Language">
-        <button data-lang-btn="en" aria-pressed="false">EN</button>
-        <button data-lang-btn="ar" aria-pressed="true">AR</button>
+        <button data-lang-btn="en" aria-pressed="true">EN</button>
+        <button data-lang-btn="ar" aria-pressed="false">AR</button>
       </div>
       <a class="ph-exit" id="tb-exit" href="index.html" hidden>
         <span class="ph-exit-x">✕</span>
@@ -216,7 +206,7 @@ let RESIDENCIES = [];
 let SETTINGS = null;
 let ARTISTS = [];
 let PAST_EVENTS = []; // everything strictly before this week; populated by renderPastArchive()
-let archiveState = "idle"; // idle -> peek -> loaded, drives the scroll-gravity reveal
+let archiveState = "idle"; // idle -> loaded, set once the Archive link is clicked and the archive is inserted
 
 // Helpers
 const MONTH_ORDER = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
@@ -536,177 +526,18 @@ function renderTimeline(){
 
 // The pre-hero archive — everything strictly before this week. Built once
 // at boot (not tied to the Programme type filter, since it now lives in a
-// completely separate part of the page). The toggle sits above the
-// topbar, collapsed to nothing — armPastGravity() wires up the
-// scroll/wheel/touch gesture that reveals and eventually loads it.
+// completely separate part of the page). Reached via the "Archive" link in
+// the topbar nav (see tb-archive wiring below), which calls
+// revealPastArchive() directly — no scroll/wheel/touch gesture anymore.
 function renderPastArchive(){
-  const outer = document.getElementById("pt-outer");
-  if (!outer) return;
   const { start: weekStart } = currentWeekRange();
   // An event belongs to the past only once it's fully OVER — a running
   // exhibition starts weeks back but is current, not archive material.
   PAST_EVENTS = ALL.filter(e => eventDateOnly(e) < weekStart && eventEndDateOnly(e) < weekStart)
     .sort((a,b) => eventTimestamp(a) - eventTimestamp(b));
 
-  outer.hidden = PAST_EVENTS.length === 0;
-  const count = document.getElementById("pt-count");
-  if (count) count.textContent = PAST_EVENTS.length;
-
-  if (!outer.hidden) armPastGravity();
-}
-
-// Scroll-gravity gesture: the toggle lives above the topbar, collapsed to
-// zero height, so at rest the page looks completely normal. Scrolling up
-// while already at the top of the page (wheel/touch, since scrollY can't
-// go below 0 on its own) streams a live "pull" into the toggle — it
-// squeezes open proportionally to how hard/long you keep pulling, and
-// springs back shut if you let go before the threshold. A sustained pull
-// past the threshold commits: the full archive loads and the viewport is
-// pulled into it with a smooth scroll, landing at the seam so the user can
-// keep scrolling up manually through the rest of history. Same gravity
-// language as the in-grid reader's end-of-scroll gesture, on purpose.
-// Guarded against the reader: while it's open (gs-reader-open), scroll
-// chaining out of its iframe must never leak into this gesture.
-function armPastGravity(){
-  const outer = document.getElementById("pt-outer");
-  const btn = document.getElementById("pt-toggle");
-  if (!outer) return;
-
-  const PEEK_HEIGHT = 70;   // px — first stage: just enough to show the hint message
-  const FULL_HEIGHT = 140;  // px — second stage: message + the toggle button beneath it
-  const PEEK_PULL = 150;    // wheel px (stage 1) to settle into the peek/message state
-  const COMMIT_PULL = 550;  // further wheel px (stage 2, heavier) to actually commit
-  const PEEK_HOLD_MS = 2400; // how long the peek sits on its own before springing shut
-  let stage = "idle";  // idle -> peek (commit itself is handled by revealPastArchive)
-  let pull = 0;        // accumulator for whichever stage is currently active
-  let springTimer = null;
-
-  // True while the in-grid reader is open, and for a cooldown after it
-  // closes. The cooldown is a SLIDING window: any wheel/touch activity
-  // during it pushes it forward, so a single continuous gesture (incl.
-  // trackpad inertia, which can keep emitting ticks for a second or more
-  // after the fingers lift) can never carry over from closing the reader
-  // into arming the archive — no matter how long it coasts. Only after a
-  // genuine pause in input does the archive gesture re-arm.
-  const READER_COOLDOWN_MS = 400;
-  function readerOpen(){
-    if (document.body.classList.contains("gs-reader-open")) return true;
-    if ((Date.now() - _gsReaderClosedAt) < READER_COOLDOWN_MS){
-      _gsReaderClosedAt = Date.now(); // still coasting — keep the window sliding
-      return true;
-    }
-    return false;
-  }
-
-  // "Top" means the very start of the timeline: page scrollY at 0 AND (if
-  // the This Week rail is present) its horizontal scroll fully retracted —
-  // otherwise a wheel-up mid-rail could be misread as reaching for history.
-  function nearTop(){
-    if (window.scrollY > 2) return false;
-    const rail = document.getElementById("gs-outer");
-    if (rail && !rail.hidden && rail.dataset.maxScroll) {
-      const maxScroll = parseFloat(rail.dataset.maxScroll || 0);
-      if (maxScroll > 0) {
-        const top = rail.getBoundingClientRect().top;
-        const progress = Math.min(Math.max(54 - top, 0), maxScroll);
-        if (progress > 2) return false;
-      }
-    }
-    return true;
-  }
-
-  function setHeight(px){
-    outer.classList.add("is-tracking");
-    outer.style.maxHeight = px + "px";
-    resyncHero();
-  }
-  function closeAll(){
-    stage = "idle";
-    pull = 0;
-    clearTimeout(springTimer);
-    outer.classList.remove("is-tracking", "is-peeking");
-    outer.style.maxHeight = "";
-    resyncHero();
-  }
-  // Settles into the peek stage at a fixed height, message visible. Left
-  // alone, it springs shut again after a few seconds — it's a hint, not a
-  // commitment.
-  function settlePeek(){
-    stage = "peek";
-    pull = 0;
-    outer.classList.add("is-peeking");
-    setHeight(PEEK_HEIGHT);
-    clearTimeout(springTimer);
-    springTimer = setTimeout(closeAll, PEEK_HOLD_MS);
-  }
-
-  function commit(){
-    if (archiveState === "loaded") return;
-    clearTimeout(springTimer);
-    window.removeEventListener("wheel", onWheel);
-    window.removeEventListener("touchstart", onTouchStart);
-    window.removeEventListener("touchmove", onTouchMove);
-    outer.classList.remove("is-tracking", "is-peeking");
-    outer.style.maxHeight = "";
-    resyncHero();
-    revealPastArchive();
-  }
-
-  function advance(pullAmount){
-    pull = pullAmount;
-    if (stage === "idle"){
-      // Stage 1 — pulling the toggle open just enough to show the hint.
-      if (pull >= PEEK_PULL){ settlePeek(); return; }
-      setHeight(PEEK_HEIGHT * Math.min(1, pull / PEEK_PULL));
-      clearTimeout(springTimer);
-      springTimer = setTimeout(closeAll, 500);
-    } else {
-      // Stage 2 — already peeking; a heavier, sustained pull (quadratic
-      // ease-in, same "have to force it" gravity as the reader's own
-      // end-of-scroll) reveals the toggle button beneath the message and
-      // finally commits.
-      if (pull >= COMMIT_PULL){ commit(); return; }
-      const s = Math.min(1, pull / COMMIT_PULL);
-      setHeight(PEEK_HEIGHT + (FULL_HEIGHT - PEEK_HEIGHT) * (s * s));
-      clearTimeout(springTimer);
-      springTimer = setTimeout(settlePeek, 500); // let go mid-pull -> back to just the message
-    }
-  }
-
-  // The peek/commit stages grow "outer" (a normal block element sitting
-  // above the topbar) up to 140px tall, which pushes the topbar and the
-  // whole This Week hero down the page in real time. That's a genuine
-  // layout shift, but at scrollY clamped to 0 it doesn't necessarily fire
-  // a native 'scroll' event — so the hero's own onScroll (which only
-  // recomputes on 'scroll') can go stale mid-gesture and its transform
-  // freezes until some later, unrelated scroll nudges it back in sync.
-  // Force that resync ourselves after every height change here so the
-  // hero never visibly "gets stuck" during this gesture.
-  function resyncHero(){ window.dispatchEvent(new Event("scroll")); }
-
-  function onWheel(e){
-    if (readerOpen()) return;
-    if (!nearTop() || e.deltaY >= 0){
-      if (stage !== "idle" || pull > 0) closeAll();
-      return;
-    }
-    advance(pull + Math.abs(e.deltaY));
-  }
-
-  let touchStartY = 0;
-  function onTouchStart(e){ touchStartY = e.touches[0].clientY; }
-  function onTouchMove(e){
-    if (readerOpen()) return;
-    if (!nearTop()){ if (stage !== "idle" || pull > 0) closeAll(); return; }
-    const dy = e.touches[0].clientY - touchStartY;
-    if (dy <= 0){ if (stage !== "idle" || pull > 0) closeAll(); return; } // dragging down while at the top = trying to scroll up
-    advance(dy * 3); // touch drags are shorter than wheel deltas — scale up
-  }
-
-  window.addEventListener("wheel", onWheel, { passive: true });
-  window.addEventListener("touchstart", onTouchStart, { passive: true });
-  window.addEventListener("touchmove", onTouchMove, { passive: true });
-  if (btn) btn.addEventListener("click", commit);
+  const archiveBtn = document.getElementById("tb-archive");
+  if (archiveBtn) archiveBtn.hidden = PAST_EVENTS.length === 0;
 }
 
 // Expands the archive above the This Week hero — prepends the past events
@@ -2131,6 +1962,20 @@ _boot();
 (function(){
   const id = new URLSearchParams(location.search).get("event");
   if (id) location.replace(`event.html?id=${encodeURIComponent(id)}`);
+})();
+
+/* ============================================================
+   ARCHIVE LINK — jumps straight to the past archive, no scroll gesture.
+   revealPastArchive() re-anchors scroll to the seam itself, so this works
+   correctly no matter where on the page the user clicks it from.
+   ============================================================ */
+(function(){
+  const btn = document.getElementById("tb-archive");
+  if (!btn) return;
+  btn.addEventListener("click", (e) => {
+    e.preventDefault();
+    if (PAST_EVENTS.length) revealPastArchive();
+  });
 })();
 
 /* ============================================================
