@@ -12,7 +12,7 @@
 <meta property="og:url" content="https://wondercabinet.space">
 <meta property="og:image" content="" id="og-image-meta">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="stylesheet" href="assets/app.css?v=49">
+<link rel="stylesheet" href="assets/app.css?v=50">
 </head>
 <body data-view="list">
 
@@ -1375,7 +1375,19 @@ function _gsOpenReader(cardEl){
       // genuinely changed (viewport resize, scrollbar reappearing) while
       // they weren't watching.
       window.dispatchEvent(new Event("resize"));
-    }, instant ? 0 : 480);
+      window.dispatchEvent(new Event("scroll"));
+    }, instant ? 0 : 520);
+    // 520ms — comfortably past the 500ms gs-anim transition (see
+    // animateOnce below) that's still shrinking cardEl's flex-basis back
+    // down at this point. The old 480ms fired 20ms BEFORE that transition
+    // finished, so setup()'s track.scrollWidth measurement above caught
+    // the card still mid-shrink and baked in an inflated maxScroll —
+    // permanently miscalibrating the whole slider's scroll runway after
+    // every single open/close of a card (confirmed via direct measurement:
+    // 960px correct vs 1068px after one cycle). Also fire 'scroll' here,
+    // not just 'resize' — setup() alone recomputes maxScroll/height but
+    // never reapplies the transform, so onScroll must run too or the
+    // track's translateX stays stale until the next unrelated scroll.
   }
 
   window.addEventListener("message", onMsg);
