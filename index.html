@@ -12,7 +12,7 @@
 <meta property="og:url" content="https://wondercabinet.space">
 <meta property="og:image" content="" id="og-image-meta">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="stylesheet" href="assets/app.css?v=48">
+<link rel="stylesheet" href="assets/app.css?v=49">
 </head>
 <body data-view="list">
 
@@ -1135,8 +1135,14 @@ function _gsOpenReader(cardEl){
   const m = /translateX\((-?[\d.]+)px\)/.exec(track.style.transform || "");
   const baseX = m ? parseFloat(m[1]) : 0;
   const startW = cardEl.getBoundingClientRect().width;
-  const targetW = window.innerWidth - railW; // full area right of the rail
-  const targetX = -cardEl.offsetLeft;        // card's left border lands on the rail
+  const targetW = window.innerWidth - railW; // full area beside the rail
+  // In Arabic (desktop), the rail sits on the RIGHT and the track is
+  // row-reversed, so the card's RIGHT border (not left) needs to land
+  // against the rail — mirror image of the LTR math below.
+  const isRtl = document.documentElement.dataset.lang === "ar" && window.innerWidth > 700;
+  const targetX = isRtl
+    ? track.scrollWidth - (cardEl.offsetLeft + startW) // card's right border lands on the rail
+    : -cardEl.offsetLeft;                              // card's left border lands on the rail
 
   // Freeze the background page. overflow:hidden alone is not reliable here
   // — some wheel/trackpad gestures still nudge window.scrollY through it,
