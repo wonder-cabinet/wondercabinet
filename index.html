@@ -12,7 +12,7 @@
 <meta property="og:url" content="https://wondercabinet.space">
 <meta property="og:image" content="" id="og-image-meta">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="stylesheet" href="assets/app.css?v=45">
+<link rel="stylesheet" href="assets/app.css?v=46">
 </head>
 <body data-view="list">
 
@@ -1698,10 +1698,14 @@ function renderFeatured(){
     const top = outer.getBoundingClientRect().top;
     const progress = Math.min(Math.max(STICKY_TOP - top, 0), maxScroll);
     const isRtl = document.documentElement.dataset.lang === 'ar';
-    // RTL: track is row-reversed so today is at the right end; start at -maxScroll
-    // and travel toward 0 to reveal earlier-in-week cards leftward.
+    // RTL: both gs-sticky (rail/track swap) and gs-track (card order) are
+    // row-reversed, which places the track's static rest position at
+    // -maxScroll globally and puts "today" at the track's local right edge.
+    // At progress=0 that already lines up today next to the rail with
+    // transform 0 — scrolling forward needs +progress (not -progress) to
+    // slide later-in-week cards in from the left as today exits right.
     track.style.transform = isRtl
-      ? `translateX(${progress - maxScroll}px)`
+      ? `translateX(${progress}px)`
       : `translateX(${-progress}px)`;
   }
 
