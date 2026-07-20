@@ -67,12 +67,35 @@ body.viewing-past .topbar{
 /* This Week hero: once the archive is open it sits far down a much
    taller page, and its scroll-lock (position:sticky + a JS-computed
    height runway driving the horizontal card slide) no longer
-   corresponds to anything sensible there — release the pin and let it
-   flow as an ordinary block so it doesn't sit frozen mid-transform
-   while the user browses history. See revealPastArchive() in index.html,
-   which also zeroes its inline height/maxScroll/transform to match. */
+   corresponds to anything sensible there. Releasing just the sticky
+   pin (position:static/height:auto) isn't enough on its own: the rail
+   stays flex-basis 320px and the track's cards stay in a single
+   un-wrapped row (flex-direction:row, no scroll-lock transform to move
+   it), so only the first ~2.5 cards are visible and the rest are
+   permanently clipped out of view with no way to reach them — reads as
+   a broken, stuck slider, not a clean static block.
+   Fix: reuse the exact same "give up, stack it" treatment already
+   proven on mobile (see the max-width:700px block below) — column
+   stack, natural height, full-width cards, one under another. Every
+   card is visible, nothing is unreachable, no scroll-lock math applies
+   at all. !important on the direction/border rules because this must
+   win over the RTL hero flip below (html[data-lang="ar"] .gs-sticky /
+   .gs-track flex-direction:row-reverse) regardless of language — the
+   archive-open state always stacks, in both English and Arabic. */
+body.viewing-past .gs-outer{ height: auto !important; }
 body.viewing-past .gs-sticky{
-  position: static; height: auto;
+  position: static; height: auto; flex-direction: column !important;
+}
+body.viewing-past .gs-rail{
+  border-right: 0 !important; border-left: 0 !important;
+  border-bottom: 2px solid var(--gs-fg);
+}
+body.viewing-past .gs-track{
+  flex-direction: column !important; transform: none !important; height: auto;
+}
+body.viewing-past .gs-card{
+  flex: none; height: auto; border-right: 0 !important;
+  border-bottom: 2px solid var(--gs-fg);
 }
 .topbar-inner{
   display: flex;
