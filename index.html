@@ -911,6 +911,18 @@ function renderCurrentExhibitions(){
       const t0 = performance.now();
       const myGen = ++catchUpGen;
       (function step(now){
+        // The in-grid reader can open mid-chase (a fast trackpad fling's
+        // momentum keeps firing scroll events, whose catch-up animation is
+        // still stepping via rAF when the user clicks a card) — this loop
+        // was scheduling itself via requestAnimationFrame with no way to
+        // know that had happened, so it kept overwriting track.style.
+        // transform out from under the reader's own apply() for up to
+        // CATCHUP_MS after it opened, fighting the reader's geometry and
+        // leaving the track transformed to an unrelated position (confirmed
+        // as a real, reachable race by reading the code — this rAF chain
+        // has no gate anywhere else). Bail without rescheduling once the
+        // reader is open; it snaps the transform back on close anyway.
+        if (document.body.classList.contains('gs-reader-open')){ catchUpRAF = null; return; }
         const t = Math.min(1, (now - t0) / CATCHUP_MS);
         currentProgress = from + (target - from) * easeInOutQuad(t);
         applyTrack(currentProgress);
@@ -918,6 +930,7 @@ function renderCurrentExhibitions(){
       })(t0);
       catchUpWatchdog = setTimeout(function(){
         if (myGen !== catchUpGen) return;
+        if (document.body.classList.contains('gs-reader-open')) return;
         if (catchUpRAF) cancelAnimationFrame(catchUpRAF);
         currentProgress = target;
         applyTrack(currentProgress);
@@ -1092,6 +1105,25 @@ function _gsEmptyCard(en, ar){
      ✕            → collapses immediately.  ↗ (next to it) → opens the
                     same page standalone at its real, shareable URL.
    ============================================================ */
+// Firefox (and any browser honoring the wheel-event spec literally) fires
+// wheel events with deltaMode=1 ("line") for a plain mouse wheel — deltaY
+// there is a small integer count of lines (commonly 1-3 per notch), not a
+// pixel distance. Chrome normalizes mouse-wheel input to pixel deltas
+// (deltaMode=0) even for stepped wheels, which is what every one of this
+// file's wheel handlers assumes when it adds e.deltaY straight into a
+// pixel-based progress counter (EXPAND_PX/CLOSE_PX = 320, PULL_MAX = 700,
+// etc). Left unnormalized, the exact same physical scroll gesture moves
+// those counters roughly 30-40x slower in Firefox on a plain wheel —
+// which reads as "the reader won't fully open" (stuck at a small nudge)
+// or "stuck mid-expansion with the next card/rail content still peeking
+// through", not a crash, just a badly mis-scaled gesture. DOM_DELTA_PAGE
+// (deltaMode=2) is rare but handled too, scaled by viewport height.
+function _wcWheelDeltaY(e){
+  var d = e.deltaY;
+  if (e.deltaMode === 1) d *= 16;                    // DOM_DELTA_LINE
+  else if (e.deltaMode === 2) d *= (window.innerHeight || 800); // DOM_DELTA_PAGE
+  return d;
+}
 let _gsReaderOpen = false;
 // Timestamp of the last reader close — a fast, sustained upward scroll used
 // to close the reader (pulling past the top of the article) can keep firing
@@ -1140,7 +1172,13 @@ function _cxOpenReader(posterEl){
   _gsReaderOpen = true;
 
   const startW = posterEl.getBoundingClientRect().width;
-  const targetW = window.innerWidth;
+  // documentElement.clientWidth (not window.innerWidth) — innerWidth
+  // includes the vertical scrollbar's own width, but the actual CSS layout
+  // box these flex children lay out inside does not (Windows Firefox shows
+  // a classic, space-reserving scrollbar; innerWidth there is ~17px wider
+  // than what the flex row can actually give the expanding poster, leaving
+  // a persistent gap the size of the scrollbar at full expansion).
+  const targetW = document.documentElement.clientWidth;
 
   const _lockScrollY = window.scrollY;
   document.body.style.position = 'fixed';
@@ -1195,8 +1233,9 @@ function _cxOpenReader(posterEl){
     }
   }
   function onWheelInner(ev){
+    const dy = _wcWheelDeltaY(ev); // normalize Firefox's line-mode deltaY to pixels
     if (scrollT < 1){
-      rawY = Math.min(EXPAND_PX, Math.max(-CLOSE_PX, rawY + ev.deltaY));
+      rawY = Math.min(EXPAND_PX, Math.max(-CLOSE_PX, rawY + dy));
       scrollT = rawY >= 0
         ? CLICK_T + (1 - CLICK_T) * ease(rawY / EXPAND_PX)
         : CLICK_T * (1 - ease(-rawY / CLOSE_PX));
@@ -1207,7 +1246,7 @@ function _cxOpenReader(posterEl){
     const doc = frame.contentDocument, win = frame.contentWindow;
     if (!doc || !win) return;
     if (closeDir !== 0){
-      closeRawY = Math.min(CLOSE_PX, Math.max(0, closeRawY + closeDir * ev.deltaY));
+      closeRawY = Math.min(CLOSE_PX, Math.max(0, closeRawY + closeDir * dy));
       apply(1 - ease(closeRawY / CLOSE_PX));
       if (closeRawY <= 0){ closeDir = 0; return; }
       if (closeRawY >= CLOSE_PX){ collapse(true); return; }
@@ -1216,16 +1255,16 @@ function _cxOpenReader(posterEl){
     const max = doc.documentElement.scrollHeight - win.innerHeight;
     const atTop = win.scrollY <= 1;
     const atBottom = win.scrollY >= max - 2;
-    if (ev.deltaY > 0 && atBottom){
+    if (dy > 0 && atBottom){
       closeDir = 1;
-      closeRawY = Math.min(CLOSE_PX, ev.deltaY);
+      closeRawY = Math.min(CLOSE_PX, dy);
       apply(1 - ease(closeRawY / CLOSE_PX));
-    } else if (ev.deltaY < 0 && atTop){
+    } else if (dy < 0 && atTop){
       closeDir = -1;
-      closeRawY = Math.min(CLOSE_PX, -ev.deltaY);
+      closeRawY = Math.min(CLOSE_PX, -dy);
       apply(1 - ease(closeRawY / CLOSE_PX));
     } else {
-      win.scrollBy(0, ev.deltaY);
+      win.scrollBy(0, dy);
     }
   }
 
@@ -1297,7 +1336,11 @@ function _gsOpenReader(cardEl){
   const m = /translateX\((-?[\d.]+)px\)/.exec(track.style.transform || "");
   const baseX = m ? parseFloat(m[1]) : 0;
   const startW = cardEl.getBoundingClientRect().width;
-  const targetW = window.innerWidth - railW; // full area beside the rail
+  // documentElement.clientWidth, not window.innerWidth — see the identical
+  // note in _cxOpenReader; innerWidth includes the scrollbar's own width,
+  // which overshoots the real available flex-row width on any browser with
+  // a classic (non-overlay) scrollbar, e.g. Windows Firefox.
+  const targetW = document.documentElement.clientWidth - railW; // full area beside the rail
   // Card's un-transformed offset within the track, measured via
   // getBoundingClientRect rather than cardEl.offsetLeft. Both track and
   // card currently share the same translateX(baseX) (the card hasn't
@@ -1410,13 +1453,14 @@ function _gsOpenReader(cardEl){
     }
   }
   function onWheelInner(e){
+    const dy = _wcWheelDeltaY(e); // normalize Firefox's line-mode deltaY to pixels
     if (scrollT < 1){
       // Pre-full-expansion — a single continuous scale from fully closed
       // (rawY = -CLOSE_PX) through the click-nudge (rawY = 0) up to fully
       // open (rawY = EXPAND_PX), driven directly and reversibly by the
       // wheel. No thresholds: scrolling back down at any point just grows
       // it again; only actually reaching either end does anything final.
-      rawY = Math.min(EXPAND_PX, Math.max(-CLOSE_PX, rawY + e.deltaY));
+      rawY = Math.min(EXPAND_PX, Math.max(-CLOSE_PX, rawY + dy));
       scrollT = rawY >= 0
         ? CLICK_T + (1 - CLICK_T) * ease(rawY / EXPAND_PX)
         : CLICK_T * (1 - ease(-rawY / CLOSE_PX));
@@ -1436,7 +1480,7 @@ function _gsOpenReader(cardEl){
       // reversible motion as the pre-expansion phase, just mirrored: keep
       // pulling the same way and it shrinks all the way to closed;
       // reverse and it grows back to full size and resumes reading.
-      closeRawY = Math.min(CLOSE_PX, Math.max(0, closeRawY + closeDir * e.deltaY));
+      closeRawY = Math.min(CLOSE_PX, Math.max(0, closeRawY + closeDir * dy));
       apply(1 - ease(closeRawY / CLOSE_PX));
       if (closeRawY <= 0){ closeDir = 0; return; }
       if (closeRawY >= CLOSE_PX){ collapse(true); return; }
@@ -1446,16 +1490,16 @@ function _gsOpenReader(cardEl){
     const max = doc.documentElement.scrollHeight - win.innerHeight;
     const atTop = win.scrollY <= 1;
     const atBottom = win.scrollY >= max - 2;
-    if (e.deltaY > 0 && atBottom){
+    if (dy > 0 && atBottom){
       closeDir = 1;
-      closeRawY = Math.min(CLOSE_PX, e.deltaY);
+      closeRawY = Math.min(CLOSE_PX, dy);
       apply(1 - ease(closeRawY / CLOSE_PX));
-    } else if (e.deltaY < 0 && atTop){
+    } else if (dy < 0 && atTop){
       closeDir = -1;
-      closeRawY = Math.min(CLOSE_PX, -e.deltaY);
+      closeRawY = Math.min(CLOSE_PX, -dy);
       apply(1 - ease(closeRawY / CLOSE_PX));
     } else {
-      win.scrollBy(0, e.deltaY);
+      win.scrollBy(0, dy);
     }
   }
 
@@ -1742,9 +1786,10 @@ function _tlOpenReader(rowEl){
       }
     }
     function onWheelInner(e){
+      const dy = _wcWheelDeltaY(e); // normalize Firefox's line-mode deltaY to pixels
       if (closing) return; // terminal shrink is already in flight — let it land
       if (scrollT < 1){
-        rawY = Math.min(EXPAND_PX, Math.max(-CLOSE_PX, rawY + e.deltaY));
+        rawY = Math.min(EXPAND_PX, Math.max(-CLOSE_PX, rawY + dy));
         scrollT = rawY >= 0
           ? CLICK_T + (1 - CLICK_T) * ease(rawY / EXPAND_PX)
           : CLICK_T * (1 - ease(-rawY / CLOSE_PX));
@@ -1755,7 +1800,7 @@ function _tlOpenReader(rowEl){
       const doc = frame.contentDocument, win = frame.contentWindow;
       if (!doc || !win) return;
       if (closeDir !== 0){
-        closeRawY = Math.min(CLOSE_PX, Math.max(0, closeRawY + closeDir * e.deltaY));
+        closeRawY = Math.min(CLOSE_PX, Math.max(0, closeRawY + closeDir * dy));
         targetT = 1 - ease(closeRawY / CLOSE_PX);
         if (closeRawY <= 0){ closeDir = 0; return; }
         if (closeRawY >= CLOSE_PX) requestClose();
@@ -1764,16 +1809,16 @@ function _tlOpenReader(rowEl){
       const max = doc.documentElement.scrollHeight - win.innerHeight;
       const atTop = win.scrollY <= 1;
       const atBottom = win.scrollY >= max - 2;
-      if (e.deltaY > 0 && atBottom){
+      if (dy > 0 && atBottom){
         closeDir = 1;
-        closeRawY = Math.min(CLOSE_PX, e.deltaY);
+        closeRawY = Math.min(CLOSE_PX, dy);
         targetT = 1 - ease(closeRawY / CLOSE_PX);
-      } else if (e.deltaY < 0 && atTop){
+      } else if (dy < 0 && atTop){
         closeDir = -1;
-        closeRawY = Math.min(CLOSE_PX, -e.deltaY);
+        closeRawY = Math.min(CLOSE_PX, -dy);
         targetT = 1 - ease(closeRawY / CLOSE_PX);
       } else {
-        win.scrollBy(0, e.deltaY);
+        win.scrollBy(0, dy);
       }
     }
 
@@ -1942,6 +1987,14 @@ function renderFeatured(){
     const t0 = performance.now();
     const myGen = ++catchUpGen;
     (function step(now){
+      // See the identical guard + note in renderCurrentExhibitions' onScroll:
+      // the reader can open mid-chase (fast trackpad momentum keeps this
+      // rAF loop running past the click), and with nothing checking for
+      // that here it kept clobbering track.style.transform out from under
+      // _gsOpenReader's own apply() for up to CATCHUP_MS afterward —
+      // fighting the reader's geometry right as it opens. Bail without
+      // rescheduling once the reader is open.
+      if (document.body.classList.contains("gs-reader-open")){ catchUpRAF = null; return; }
       const t = Math.min(1, (now - t0) / CATCHUP_MS);
       currentProgress = from + (target - from) * easeInOutQuad(t);
       applyProgress(currentProgress, isRtl);
@@ -1956,6 +2009,7 @@ function renderFeatured(){
     // (another scroll event) has already taken over in the meantime.
     catchUpWatchdog = setTimeout(() => {
       if (myGen !== catchUpGen) return;
+      if (document.body.classList.contains("gs-reader-open")) return;
       if (catchUpRAF) cancelAnimationFrame(catchUpRAF);
       currentProgress = target;
       applyProgress(currentProgress, isRtl);

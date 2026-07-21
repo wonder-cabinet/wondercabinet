@@ -615,18 +615,31 @@ ${audioBar}
     // collapses the page back into the grid. Letting go springs it back.
     const PULL_MAX = 700;
     let _pull = 0, _pullTimer = null;
+    // Firefox fires wheel events with deltaMode=1 ("line") for a plain mouse
+    // wheel, where deltaY is a small line count instead of a pixel distance
+    // (Chrome normalizes wheel input to pixel deltas regardless of device).
+    // PULL_MAX is a pixel-scale threshold, so without normalizing this the
+    // same physical gesture takes far more ticks to trigger the collapse in
+    // Firefox on a plain wheel than it does in Chrome.
+    function _epWheelDeltaY(e){
+      var d = e.deltaY;
+      if (e.deltaMode === 1) d *= 16;
+      else if (e.deltaMode === 2) d *= (window.innerHeight || 800);
+      return d;
+    }
     window.addEventListener('wheel', (e) => {
+      const dy = _epWheelDeltaY(e);
       const max = document.documentElement.scrollHeight - window.innerHeight;
       const atBottom = window.scrollY >= max - 2;
       const atTop = window.scrollY <= 1;
-      if ((e.deltaY > 0 && atBottom) || (e.deltaY < 0 && atTop)) {
+      if ((dy > 0 && atBottom) || (dy < 0 && atTop)) {
         // Consume the gesture ourselves — without this, the browser's own
         // overscroll/rubber-band still runs in parallel and once this
         // iframe's document can't scroll any further, it chains the
         // leftover delta out to the PARENT page's scroll, which is exactly
         // what was wrongly arming the past-archive gravity up there.
         e.preventDefault();
-        _pull += Math.abs(e.deltaY);
+        _pull += Math.abs(dy);
         if (_pull >= PULL_MAX) {
           _pull = -1e9;
           clearTimeout(_pullTimer);
