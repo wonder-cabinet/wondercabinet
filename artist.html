@@ -64,6 +64,20 @@
   }
   html.embed .art-close{ position: fixed; top: 14px; right: 14px; z-index: 60; }
   html[data-lang="ar"].embed .art-close{ right: auto; left: 14px; }
+  /* Embedded specifically inside the homepage's dark "Artists this week"
+     stack — match that section's own dark/cream treatment (var(--night)/
+     var(--paper)) instead of the light reader-panel look artist.html uses
+     standalone, so the panel reads as part of the same block, not a
+     separate light card dropped on top of it. */
+  html.embed #arRoot{ background: var(--night) !important; color: var(--paper) !important; }
+  html.embed .art-close{ color: var(--paper); }
+
+  /* app.css hides .ep-facts globally ("Facts leader-list ... hidden for
+     now per request" on event.html) — that request never applied to the
+     artist page, where the same markup is repurposed for Instagram/
+     Website links and is meant to show. Scope the un-hide to this page
+     only. */
+  #arRoot .ep-facts{ display: flex !important; }
 </style>
 </head>
 <body>
