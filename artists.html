@@ -10,7 +10,7 @@
 <meta property="og:title" content="All Artists – The Wonder Cabinet">
 <meta property="og:description" content="Artists working with The Wonder Cabinet in Bethlehem, Palestine.">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="stylesheet" href="assets/app.css?v=58" />
+<link rel="stylesheet" href="assets/app.css?v=59" />
 <style>
   body{ background: var(--night); color: var(--paper); min-height: 100vh; }
   .ev-lang-toggle{
@@ -56,7 +56,7 @@
     <span class="en-only">All artists</span>
     <span class="ar-only ar" dir="rtl">جميع الفنانين</span>
   </div>
-  <div class="gs-artist-list" id="artistsList"></div>
+  <div class="gs-lineup-list" id="artistsList"></div>
 </main>
 
 <script>
@@ -78,8 +78,8 @@
       listEl.innerHTML = artists.map(a => {
         const inner = `<span class="en-only">${a.name}</span><span class="ar-only ar" dir="rtl">${a.nameAr || a.name}</span>`;
         return a.slug
-          ? `<a class="gs-artist-name" href="artist.html?id=${encodeURIComponent(a.slug)}">${inner}</a>`
-          : `<span class="gs-artist-name" style="cursor:default;">${inner}</span>`;
+          ? `<a class="gs-lineup-name" href="artist.html?id=${encodeURIComponent(a.slug)}">${inner}</a>`
+          : `<span class="gs-lineup-name" style="cursor:default;">${inner}</span>`;
       }).join('');
     } else {
       listEl.innerHTML = `<p class="artists-empty"><span class="en-only">No artists yet.</span><span class="ar-only ar" dir="rtl">لا يوجد فنانون بعد.</span></p>`;

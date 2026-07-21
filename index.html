@@ -12,7 +12,7 @@
 <meta property="og:url" content="https://wondercabinet.space">
 <meta property="og:image" content="" id="og-image-meta">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="stylesheet" href="assets/app.css?v=58">
+<link rel="stylesheet" href="assets/app.css?v=59">
 </head>
 <body data-view="list">
 
@@ -89,7 +89,7 @@
 
   <section class="gs-vsection gs-dark" id="gs-artists-section" hidden>
     <h2><span class="en-only">Artists this week</span><span class="ar-only ar" dir="rtl">فنانو هذا الأسبوع</span></h2>
-    <div class="gs-artist-list" id="gs-artist-list"></div>
+    <div class="gs-lineup-list" id="gs-lineup-list"></div>
   </section>
 
 </section>
@@ -2148,15 +2148,15 @@ function renderFeatured(){
   // Artists this week — pure typography, festival-poster style. Each name
   // links to its own artist page; "All artists" links to the full index.
   const artistsSection = document.getElementById("gs-artists-section");
-  const artistList = document.getElementById("gs-artist-list");
+  const artistList = document.getElementById("gs-lineup-list");
   if (ARTISTS.length){
     artistsSection.hidden = false;
     artistList.innerHTML = ARTISTS.map(a => {
       const inner = `<span class="en-only">${a.name}</span><span class="ar-only ar" dir="rtl">${a.nameAr || a.name}</span>`;
       return a.slug
-        ? `<a class="gs-artist-name" href="artist.html?id=${encodeURIComponent(a.slug)}">${inner}</a>`
-        : `<span class="gs-artist-name" style="cursor:default;">${inner}</span>`;
-    }).join("") + `<a class="gs-artist-all" href="artists.html">
+        ? `<a class="gs-lineup-name" href="artist.html?id=${encodeURIComponent(a.slug)}">${inner}</a>`
+        : `<span class="gs-lineup-name" style="cursor:default;">${inner}</span>`;
+    }).join("") + `<a class="gs-lineup-all" href="artists.html">
       <span class="en-only">All artists →</span>
       <span class="ar-only ar" dir="rtl">← جميع الفنانين</span>
     </a>`;
