@@ -11,7 +11,7 @@
 <meta property="og:description" content="A space for art production and cultural development in Bethlehem, Palestine." id="og-desc-meta">
 <meta property="og:image" content="" id="og-image-meta">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="stylesheet" href="assets/app.css?v=65" />
+<link rel="stylesheet" href="assets/app.css?v=66" />
 <style>
   /* Same reader-mode template shell as event.html, in-flow instead of a
      slide-in panel — see event.html for the canonical version of this
@@ -43,6 +43,27 @@
   }
   .art-close:hover{ opacity: 1; }
   html[data-lang="ar"] .art-close{ right: auto; left: 24px; }
+
+  /* ---- EMBED MODE (?embed=1) ----
+     Same content, hosted inline inside the homepage's "Artists this week"
+     in-grid reader (an iframe) — see event.html for the canonical version
+     of this mode. Chrome that makes no sense inside an iframe on the
+     homepage (language toggle, footer) is stripped, the panel fills the
+     frame edge-to-edge, and the header stays sticky while the rest
+     scrolls beneath it. */
+  html.embed{ overscroll-behavior: none; }
+  html.embed .ev-lang-toggle{ display: none; }
+  html.embed .foot{ display: none !important; }
+  html.embed .event-page-wrap{ padding-top: 0; min-height: 0; }
+  html.embed .event-panel.is-page{ max-width: none; margin: 0; min-height: 100vh; }
+  html.embed .ep-header{
+    position: sticky;
+    top: 0;
+    z-index: 30;
+    background: inherit;
+  }
+  html.embed .art-close{ position: fixed; top: 14px; right: 14px; z-index: 60; }
+  html[data-lang="ar"].embed .art-close{ right: auto; left: 14px; }
 </style>
 </head>
 <body>
@@ -170,7 +191,12 @@
   }
 
   function eventRowHtml(ev){
-    return `<a class="ep-prog-row" href="event.html?id=${encodeURIComponent(ev.slug)}">
+    // Inside the homepage's in-grid reader (EMBED), following one of these
+    // must navigate the TOP window rather than trying to load event.html
+    // inside this artist iframe inside the homepage — which would nest
+    // awkwardly. target="_top" is the same simple choice event.html's own
+    // artist-name links already make when they're inside an embed reader.
+    return `<a class="ep-prog-row" href="event.html?id=${encodeURIComponent(ev.slug)}"${EMBED ? ' target="_top"' : ''}>
       <span class="ep-prog-date">${ev.day} ${ev.monthAbbrEn}</span>
       <span class="ep-prog-type"><span class="en-only">${ev.type}</span><span class="ar-only ar">${TYPE_AR[ev.type] || ev.type}</span></span>
       <span class="ep-prog-name">
@@ -245,6 +271,9 @@
 
   const params = new URLSearchParams(location.search);
   const id = params.get('id') || '';
+  const EMBED = params.get('embed') === '1';
+  if (EMBED) document.documentElement.classList.add('embed');
+  const _post = m => { try { if (window.parent !== window) window.parent.postMessage(m, '*'); } catch(_){} };
 
   let artist, artists = [];
   try {
@@ -292,6 +321,16 @@
     const expanded = toggle.getAttribute('aria-expanded') === 'true';
     toggle.setAttribute('aria-expanded', String(!expanded));
     if (list) list.hidden = expanded;
+  });
+
+  // Close (✕) — in embed mode there's no "page" to navigate back from
+  // (this is an iframe inside the homepage's in-grid reader), so tell the
+  // parent to close it instead, same mechanism as event.html's own close.
+  document.addEventListener('click', (e) => {
+    if (!EMBED) return;
+    if (!e.target.closest('#artClose, .art-close')) return;
+    e.preventDefault();
+    _post({ type: 'wc-close' });
   });
 
   // Language toggle
