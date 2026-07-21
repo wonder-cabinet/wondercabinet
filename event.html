@@ -11,7 +11,7 @@
 <meta property="og:description" content="A space for art production and cultural development in Bethlehem, Palestine." id="og-desc-meta">
 <meta property="og:image" content="" id="og-image-meta">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="stylesheet" href="assets/app.css?v=60" />
+<link rel="stylesheet" href="assets/app.css?v=61" />
 <style>
   /* This page uses the exact same .ep-* / .event-panel template as every
      other entry point on the site (the homepage hero cards, the Programme
@@ -333,7 +333,7 @@
     const typeArLabel = TYPE_AR[ev.type] || ev.type;
     const venue = (ev.location || "").split("·")[0].trim();
     const coverHtml = (ev.cover && !(ev.content && ev.content.length))
-      ? `<div class="ep-cover"><img src="${ev.cover}" alt="" style="width:100%;height:220px;object-fit:contain;padding:28px;display:block;"></div>`
+      ? `<div class="ep-cover ep-cover-full"><img src="${ev.cover}" alt="" style="width:100%;height:auto;display:block;"></div>`
       : "";
     const bodyEnParts = [...(ev.short ? [ev.short] : []), ...(ev.body && ev.body.length ? ev.body : [])];
     const bodyArParts = [...(ev.shortAr ? [ev.shortAr] : []), ...(ev.bodyAr && ev.bodyAr.length ? ev.bodyAr : [])];
@@ -549,12 +549,66 @@ ${audioBar}
 
   const root = document.getElementById('epRoot');
 
+  // Sample a poster/cover image's dominant color so the reader page can
+  // match the same accent used for its card/poster elsewhere on the site
+  // (e.g. the Current Exhibitions unit). Same algorithm as index.html's
+  // cxThemeFromPoster — kept in sync deliberately, not shared via import
+  // since this is a static, no-build site.
+  function _themeFromCover(coverUrl, apply){
+    if (!coverUrl) return;
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = function(){
+      try {
+        const W = 40, H = 40;
+        const cv = document.createElement('canvas');
+        cv.width = W; cv.height = H;
+        const ctx = cv.getContext('2d', { willReadFrequently: true });
+        ctx.drawImage(img, 0, 0, W, H);
+        const px = ctx.getImageData(0, 0, W, H).data;
+        const buckets = {};
+        for (let i = 0; i < px.length; i += 4){
+          if (px[i+3] < 200) continue;
+          const r = px[i], g = px[i+1], b = px[i+2];
+          const max = Math.max(r,g,b), min = Math.min(r,g,b);
+          const sat = max === 0 ? 0 : (max - min) / max;
+          const key = (r>>5) + ',' + (g>>5) + ',' + (b>>5);
+          if (!buckets[key]) buckets[key] = { n:0, r:0, g:0, b:0, s:0 };
+          const bk = buckets[key];
+          bk.n++; bk.r += r; bk.g += g; bk.b += b; bk.s += sat;
+        }
+        let best = null, bestScore = -1;
+        for (const k in buckets){
+          const bk = buckets[k];
+          const score = bk.n * (0.35 + (bk.s / bk.n));
+          if (score > bestScore){ bestScore = score; best = bk; }
+        }
+        if (!best) return;
+        const r = Math.round(best.r/best.n), g = Math.round(best.g/best.n), b = Math.round(best.b/best.n);
+        const lum = (0.299*r + 0.587*g + 0.114*b) / 255;
+        const ink = lum > 0.55 ? '#111318' : '#f6f3ea';
+        apply({ bg: 'rgb(' + r + ',' + g + ',' + b + ')', ink });
+      } catch(err){ /* tainted canvas or decode issue — keep default theme */ }
+    };
+    img.src = coverUrl;
+  }
+
   // Mount an event into the page — called on first load and on programme-row clicks.
   function mountEvent(targetEv) {
     const tc = _colorFor(targetEv, { bg: "#1d24ff", ink: "#f6f3ea" });
     root.style.background = tc.bg;
     root.style.color = tc.ink;
     root.innerHTML = buildEventPanel(targetEv, all);
+    if (targetEv.type === 'Exhibition' && targetEv.cover) {
+      _themeFromCover(targetEv.cover, theme => {
+        root.style.background = theme.bg;
+        root.style.color = theme.ink;
+        if (EMBED) {
+          document.documentElement.style.setProperty('--bg', theme.bg);
+          document.body.style.background = theme.bg;
+        }
+      });
+    }
     _initPanelAudio(root);
     window.scrollTo(0, 0);
     // Update title + OG
