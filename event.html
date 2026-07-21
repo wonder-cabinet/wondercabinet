@@ -201,6 +201,24 @@
   }
   function _loc(v){ return typeof v === 'object' && v !== null ? (v.en || v.ar || '') : (v || ''); }
 
+  /* Sanity auto-computes a color palette for every uploaded image
+     (metadata.palette). Prefer darkVibrant when it's meaningfully present
+     in the image (population > 5%) — it tends to give the richest,
+     most "poster-like" color. Fall back to dominant (always representative,
+     even for muted/grayscale art), then vibrant, then null (no palette —
+     e.g. very old assets or SVGs, which Sanity doesn't palette-analyze).
+     Kept in sync with the identical picker in index.html — not shared via
+     import since this is a static, no-build site. */
+  function _pickPalette(p){
+    if (!p) return null;
+    let sw = null;
+    if (p.darkVibrant && p.darkVibrant.background && p.darkVibrant.population > 5) sw = p.darkVibrant;
+    else if (p.dominant && p.dominant.background) sw = p.dominant;
+    else if (p.vibrant && p.vibrant.background) sw = p.vibrant;
+    if (!sw) return null;
+    return { bg: sw.background, ink: sw.foreground || '#111318' };
+  }
+
   function docToEv(doc){
     const s = _iso(doc.startDateTime), e = _iso(doc.endDateTime);
     // hasTime: check UTC hours in raw string (midnight UTC = 00:00Z = all-day, no display time)
@@ -242,6 +260,7 @@
       writeup:   doc.writeup?.en || '',
       writeupAr: doc.writeup?.ar || '',
       cover:    _sanityImg(doc.cover),
+      coverPalette: _pickPalette(doc.coverPalette),
       content:  doc.content || [],
       relatedArtists: (doc.relatedArtists||[]).map(a => ({
         name: a.name?.en || a.name?.ar || '', nameAr: a.name?.ar || '', slug: a.slug || '',
@@ -522,7 +541,7 @@ ${audioBar}
   let ev, all = [];
   try {
     const [docs, settingsDoc] = await Promise.all([
-      groq(`*[_type == "event"] | order(startDateTime desc) { ..., location->{ name }, relatedArtists[]->{name, "slug": slug.current}, relatedProject->{title, slug}, programmeEvents[]->{_id, "slug": slug.current, title, eventType, startDateTime} }`),
+      groq(`*[_type == "event"] | order(startDateTime desc) { ..., location->{ name }, relatedArtists[]->{name, "slug": slug.current}, relatedProject->{title, slug}, programmeEvents[]->{_id, "slug": slug.current, title, eventType, startDateTime}, "coverPalette": cover.asset->metadata.palette }`),
       groq(`*[_type == "siteSettings"][0]{ address, hours, mapsUrl }`),
     ]);
     all = (docs || []).map(docToEv);
@@ -549,65 +568,24 @@ ${audioBar}
 
   const root = document.getElementById('epRoot');
 
-  // Sample a poster/cover image's dominant color so the reader page can
-  // match the same accent used for its card/poster elsewhere on the site
-  // (e.g. the Current Exhibitions unit). Same algorithm as index.html's
-  // cxThemeFromPoster — kept in sync deliberately, not shared via import
-  // since this is a static, no-build site.
-  function _themeFromCover(coverUrl, apply){
-    if (!coverUrl) return;
-    const img = new Image();
-    img.crossOrigin = 'anonymous';
-    img.onload = function(){
-      try {
-        const W = 40, H = 40;
-        const cv = document.createElement('canvas');
-        cv.width = W; cv.height = H;
-        const ctx = cv.getContext('2d', { willReadFrequently: true });
-        ctx.drawImage(img, 0, 0, W, H);
-        const px = ctx.getImageData(0, 0, W, H).data;
-        const buckets = {};
-        for (let i = 0; i < px.length; i += 4){
-          if (px[i+3] < 200) continue;
-          const r = px[i], g = px[i+1], b = px[i+2];
-          const max = Math.max(r,g,b), min = Math.min(r,g,b);
-          const sat = max === 0 ? 0 : (max - min) / max;
-          const key = (r>>5) + ',' + (g>>5) + ',' + (b>>5);
-          if (!buckets[key]) buckets[key] = { n:0, r:0, g:0, b:0, s:0 };
-          const bk = buckets[key];
-          bk.n++; bk.r += r; bk.g += g; bk.b += b; bk.s += sat;
-        }
-        let best = null, bestScore = -1;
-        for (const k in buckets){
-          const bk = buckets[k];
-          const score = bk.n * (0.35 + (bk.s / bk.n));
-          if (score > bestScore){ bestScore = score; best = bk; }
-        }
-        if (!best) return;
-        const r = Math.round(best.r/best.n), g = Math.round(best.g/best.n), b = Math.round(best.b/best.n);
-        const lum = (0.299*r + 0.587*g + 0.114*b) / 255;
-        const ink = lum > 0.55 ? '#111318' : '#f6f3ea';
-        apply({ bg: 'rgb(' + r + ',' + g + ',' + b + ')', ink });
-      } catch(err){ /* tainted canvas or decode issue — keep default theme */ }
-    };
-    img.src = coverUrl;
-  }
-
   // Mount an event into the page — called on first load and on programme-row clicks.
   function mountEvent(targetEv) {
     const tc = _colorFor(targetEv, { bg: "#1d24ff", ink: "#f6f3ea" });
     root.style.background = tc.bg;
     root.style.color = tc.ink;
     root.innerHTML = buildEventPanel(targetEv, all);
-    if (targetEv.type === 'Exhibition' && targetEv.cover) {
-      _themeFromCover(targetEv.cover, theme => {
-        root.style.background = theme.bg;
-        root.style.color = theme.ink;
-        if (EMBED) {
-          document.documentElement.style.setProperty('--bg', theme.bg);
-          document.body.style.background = theme.bg;
-        }
-      });
+    // Theme the reader from Sanity's precomputed image palette, matching
+    // the same accent used elsewhere on the site (e.g. the Current
+    // Exhibitions unit). Falls back to the static type color when no
+    // palette exists (old assets, SVGs).
+    if (targetEv.type === 'Exhibition' && targetEv.coverPalette) {
+      const theme = targetEv.coverPalette;
+      root.style.background = theme.bg;
+      root.style.color = theme.ink;
+      if (EMBED) {
+        document.documentElement.style.setProperty('--bg', theme.bg);
+        document.body.style.background = theme.bg;
+      }
     }
     _initPanelAudio(root);
     window.scrollTo(0, 0);

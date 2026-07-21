@@ -858,58 +858,18 @@ function renderCurrentExhibitions(){
     </div>`;
   }).join('');
 
-  // Extract a dominant color from each poster and theme its unit with it,
-  // so band/rail/borders stay consistent with the artwork. Sanity CDN sends
-  // CORS headers, so canvas sampling is allowed with crossOrigin.
-  function cxThemeFromPoster(unitEl, coverUrl){
-    if (!unitEl || !coverUrl) return;
-    const img = new Image();
-    img.crossOrigin = 'anonymous';
-    img.onload = function(){
-      try {
-        const W = 40, H = 40;
-        const cv = document.createElement('canvas');
-        cv.width = W; cv.height = H;
-        const ctx = cv.getContext('2d', { willReadFrequently: true });
-        ctx.drawImage(img, 0, 0, W, H);
-        const px = ctx.getImageData(0, 0, W, H).data;
-        // Pick the most frequent quantized color, preferring saturated ones.
-        const buckets = {};
-        for (let i = 0; i < px.length; i += 4){
-          if (px[i+3] < 200) continue;
-          const r = px[i], g = px[i+1], b = px[i+2];
-          const max = Math.max(r,g,b), min = Math.min(r,g,b);
-          const sat = max === 0 ? 0 : (max - min) / max;
-          const key = (r>>5) + ',' + (g>>5) + ',' + (b>>5);
-          if (!buckets[key]) buckets[key] = { n:0, r:0, g:0, b:0, s:0 };
-          const bk = buckets[key];
-          bk.n++; bk.r += r; bk.g += g; bk.b += b; bk.s += sat;
-        }
-        let best = null, bestScore = -1;
-        for (const k in buckets){
-          const bk = buckets[k];
-          const score = bk.n * (0.35 + (bk.s / bk.n)); // frequency, saturation-weighted
-          if (score > bestScore){ bestScore = score; best = bk; }
-        }
-        if (!best) return;
-        const r = Math.round(best.r/best.n), g = Math.round(best.g/best.n), b = Math.round(best.b/best.n);
-        // Perceived luminance decides ink color for contrast.
-        const lum = (0.299*r + 0.587*g + 0.114*b) / 255;
-        const ink = lum > 0.55 ? '#111318' : '#f6f3ea';
-        unitEl.style.setProperty('--cx-accent', 'rgb(' + r + ',' + g + ',' + b + ')');
-        unitEl.style.setProperty('--cx-ink', ink);
-      } catch(err){ /* tainted canvas or decode issue — keep default theme */ }
-    };
-    img.src = coverUrl;
-  }
-
   // Set up scroll machinery + interactions for each exhibition unit
   cur.forEach(e => {
     const outer = document.getElementById('cx-outer-' + e.id);
     const track = document.getElementById('cx-track-' + e.id);
     const posterEl = document.getElementById('cx-poster-' + e.id);
     if (!outer || !track) return;
-    cxThemeFromPoster(outer, e.cover);
+    // Theme the unit (band/rail/ink) from Sanity's precomputed image
+    // palette — no image loading or canvas needed, data's already in hand.
+    if (e.coverPalette){
+      outer.style.setProperty('--cx-accent', e.coverPalette.bg);
+      outer.style.setProperty('--cx-ink', e.coverPalette.ink);
+    }
 
     let currentProgress = 0;
     let catchUpRAF = null, catchUpWatchdog = null, catchUpGen = 0;
@@ -2244,6 +2204,22 @@ function _sanityFile(ref){
 }
 function _loc(v){ return typeof v === 'object' && v !== null ? (v.en || v.ar || '') : (v || ''); }
 
+/* Sanity auto-computes a color palette for every uploaded image
+   (metadata.palette). Prefer darkVibrant when it's meaningfully present
+   in the image (population > 5%) — it tends to give the richest,
+   most "poster-like" color. Fall back to dominant (always representative,
+   even for muted/grayscale art), then vibrant, then null (no palette —
+   e.g. very old assets or SVGs, which Sanity doesn't palette-analyze). */
+function _pickPalette(p){
+  if (!p) return null;
+  let sw = null;
+  if (p.darkVibrant && p.darkVibrant.background && p.darkVibrant.population > 5) sw = p.darkVibrant;
+  else if (p.dominant && p.dominant.background) sw = p.dominant;
+  else if (p.vibrant && p.vibrant.background) sw = p.vibrant;
+  if (!sw) return null;
+  return { bg: sw.background, ink: sw.foreground || '#111318' };
+}
+
 /* ============================================================
    BOOT — fetch live events from Sanity, then render everything
    ============================================================ */
@@ -2270,7 +2246,7 @@ async function _boot(){
       return { key:`${n.toLowerCase()}-${y}`, name:n, year:y };
     }
     const q = encodeURIComponent(`{
-      "events": *[_type == "event"] | order(startDateTime desc) { ..., location->{ name }, relatedArtists[]->{name, "slug": slug.current}, relatedProject->{title, slug}, programmeEvents[]->{_id, "slug": slug.current, title, eventType, startDateTime} },
+      "events": *[_type == "event"] | order(startDateTime desc) { ..., location->{ name }, relatedArtists[]->{name, "slug": slug.current}, relatedProject->{title, slug}, programmeEvents[]->{_id, "slug": slug.current, title, eventType, startDateTime}, "coverPalette": cover.asset->metadata.palette },
       "projects": *[_type == "project"] | order(year desc) { title, "slug": slug.current, description, year, coverImage },
       "residencies": *[_type == "residency"] | order(year desc) { title, "slug": slug.current, description, year, coverImage },
       "settings": *[_type == "siteSettings"][0]{ monthlyThemeTitle, monthlyThemeDescription, ogImage, address, hours, mapsUrl }
@@ -2325,6 +2301,7 @@ async function _boot(){
         writeup:   doc.writeup?.en || '',
         writeupAr: doc.writeup?.ar || '',
         cover:    _sanityImg(doc.cover),
+        coverPalette: _pickPalette(doc.coverPalette),
         content:  doc.content || [],
         relatedArtists: (doc.relatedArtists||[]).map(a => ({
           name: a.name?.en || a.name?.ar || '',
