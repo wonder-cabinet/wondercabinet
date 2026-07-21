@@ -1,0 +1,316 @@
+<!doctype html>
+<html lang="en" data-lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>The Wonder Cabinet – مجلس العجب · Bethlehem, Palestine</title>
+<meta name="description" content="A space for art production and cultural development in Bethlehem, Palestine.">
+<meta property="og:type" content="profile">
+<meta property="og:site_name" content="The Wonder Cabinet">
+<meta property="og:title" content="The Wonder Cabinet" id="og-title-meta">
+<meta property="og:description" content="A space for art production and cultural development in Bethlehem, Palestine." id="og-desc-meta">
+<meta property="og:image" content="" id="og-image-meta">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="assets/app.css?v=62" />
+<style>
+  /* Same reader-mode template shell as event.html, in-flow instead of a
+     slide-in panel — see event.html for the canonical version of this
+     comment/pattern. */
+  .event-panel.is-page{
+    position: static;
+    width: 100%; max-width: 860px; margin: 0 auto;
+    min-height: 50vh;
+    transform: none; box-shadow: none;
+    overflow: visible;
+  }
+  .ev-lang-toggle{
+    position: fixed; top: 20px; left: 24px; z-index: 50;
+    display: inline-flex; gap: 16px; border: none; background: none;
+  }
+  .ev-lang-toggle button{
+    border: none !important; background: none !important;
+    color: var(--ink) !important; opacity: .5;
+    font-family: var(--ff-sans); font-size: 12px; letter-spacing: 0; font-weight: 700;
+    padding: 0;
+  }
+  .ev-lang-toggle button[aria-pressed="true"]{ opacity: 1; }
+  .event-page-wrap{ padding-top: clamp(24px, 4vw, 48px); min-height: 60vh; }
+  .art-close{
+    all: unset; cursor: pointer;
+    position: fixed; top: 18px; right: 24px; z-index: 50;
+    color: var(--ink); font-size: 24px; font-weight: 700; line-height: 1;
+    opacity: .6; transition: opacity .15s;
+  }
+  .art-close:hover{ opacity: 1; }
+  html[data-lang="ar"] .art-close{ right: auto; left: 24px; }
+</style>
+</head>
+<body>
+
+<div class="ev-lang-toggle lang-toggle" role="group" aria-label="Language">
+  <button data-lang-btn="en" aria-pressed="true">EN</button>
+  <button data-lang-btn="ar" aria-pressed="false">AR</button>
+</div>
+<a class="art-close" id="artClose" href="index.html#gs-artists-section" aria-label="Back">✕</a>
+
+<main class="event-page-wrap">
+  <div class="event-panel is-page" id="arRoot" style="background:var(--paper);color:var(--night);"></div>
+</main>
+
+<footer class="foot" id="visit">
+  <div class="foot-cols">
+    <div class="foot-col">
+      <div class="foot-col-head">The Wonder Cabinet</div>
+      <div class="foot-col-body">
+        <p id="footer-address">Karkafeh Street<br>Bethlehem, Palestine<br>(Next to Arij)</p>
+        <p id="footer-hours">Every day<br>9:00 – 23:00</p>
+        <a id="footer-maps" href="https://goo.gl/maps/9BhxnnrTfYZZVoMU9" target="_blank" rel="noopener">Google Maps →</a>
+      </div>
+    </div>
+    <div class="foot-col">
+      <div class="foot-col-head">Programme</div>
+      <div class="foot-col-body">
+        <a href="index.html#programme">Events</a>
+        <a href="index.html">Archive</a>
+        <a href="index.html">Contribute</a>
+        <a href="index.html">About</a>
+      </div>
+    </div>
+    <div class="foot-col">
+      <div class="foot-col-head">Follow</div>
+      <div class="foot-col-body">
+        <a href="https://www.instagram.com/wonder.cabinet/" target="_blank" rel="noopener">Instagram</a>
+        <a href="https://www.facebook.com/wondercabinetbethlehem" target="_blank" rel="noopener">Facebook</a>
+        <a href="https://chat.whatsapp.com/I8ETsHie2Ye87kURhWnZY1" target="_blank" rel="noopener">WhatsApp</a>
+        <button class="foot-newsletter-btn">Subscribe to Newsletter</button>
+      </div>
+    </div>
+    <div class="foot-col">
+      <div class="foot-col-head">Contact</div>
+      <div class="foot-col-body">
+        <a href="mailto:office@wondercabinet.space">office@wondercabinet.space</a>
+        <a href="https://radioalhara.net" target="_blank" rel="noopener">Radio Alhara</a>
+        <a href="index.html">Local Industries</a>
+        <a href="https://www.aauanastas.com" target="_blank" rel="noopener">AAU Anastas</a>
+      </div>
+    </div>
+  </div>
+  <div class="foot-base">
+    <span>© The Wonder Cabinet · Bethlehem, Palestine</span>
+    <span><a href="index.html">مجلس العجب</a></span>
+  </div>
+</footer>
+
+<script>
+(async function(){
+  const SANITY_PROJECT = 'xdtj605l', SANITY_DATASET = 'production';
+  const MABBR = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  const TYPE_AR = { Class:"صف", Film:"فيلم", Performance:"عرض", Radio:"إذاعة", Reading:"قراءة", Workshop:"ورشة", Opening:"افتتاح", Bar:"بار", Exhibition:"معرض" };
+
+  function arNum(s){ return String(s).replace(/[0-9]/g, d => "٠١٢٣٤٥٦٧٨٩"[d]); }
+  function _iso(dt){
+    if (!dt) return null;
+    const d = new Date(dt);
+    return isNaN(d) ? null : d;
+  }
+  function _sanityImg(ref){
+    const r = typeof ref === 'string' ? ref : (ref && ref.asset && ref.asset._ref) || '';
+    if (!r) return '';
+    const id = r.replace(/^image-/, '').replace(/-([a-z0-9]+)$/, '.$1');
+    return `https://cdn.sanity.io/images/${SANITY_PROJECT}/${SANITY_DATASET}/${id}`;
+  }
+
+  const BASE = `https://${SANITY_PROJECT}.api.sanity.io/v2024-01-01/data/query/${SANITY_DATASET}?query=`;
+  async function groq(query){ const res = await fetch(BASE + encodeURIComponent(query)); const json = await res.json(); return json.result; }
+
+  function docToArtist(doc){
+    // Links: a dedicated `links` array (if populated) plus the discrete
+    // website/instagram fields, deduped by URL — every optional source
+    // "lights up" automatically as it's filled in, none of them required.
+    const links = [];
+    const seen = new Set();
+    function addLink(label, url){
+      if (!url || seen.has(url)) return;
+      seen.add(url);
+      links.push({ label, url });
+    }
+    (doc.links || []).forEach(l => { if (l && l.url) addLink(l.label || l.url, l.url); });
+    if (doc.website) addLink('Website', doc.website);
+    if (doc.instagram) addLink('Instagram', /^https?:\/\//.test(doc.instagram) ? doc.instagram : `https://instagram.com/${doc.instagram.replace(/^@/, '')}`);
+
+    const events = (doc.events || []).map(ev => {
+      const s = _iso(ev.startDateTime);
+      return {
+        slug: ev.slug || '',
+        title: ev.title?.en || '',
+        titleAr: ev.title?.ar || '',
+        type: ev.eventType || '',
+        start: s,
+        day: s ? String(s.getDate()).padStart(2, '0') : '',
+        monthAbbrEn: s ? MABBR[s.getMonth()] : '',
+        isPast: s ? s.getTime() < Date.now() : false,
+      };
+    }).filter(ev => ev.slug && ev.title);
+    const upcoming = events.filter(ev => !ev.isPast).sort((a, b) => (a.start ? a.start.getTime() : 0) - (b.start ? b.start.getTime() : 0));
+    const past = events.filter(ev => ev.isPast).sort((a, b) => (b.start ? b.start.getTime() : 0) - (a.start ? a.start.getTime() : 0));
+
+    return {
+      slug: doc.slug || '',
+      name: doc.name?.en || doc.name?.ar || '',
+      nameAr: doc.name?.ar || '',
+      discipline: doc.discipline?.en || '',
+      disciplineAr: doc.discipline?.ar || doc.discipline?.en || '',
+      location: doc.currentLocation || '',
+      bio: doc.bio?.en ? doc.bio.en.split(/\n\n+/).map(p => p.trim()).filter(Boolean) : [],
+      bioAr: doc.bio?.ar ? doc.bio.ar.split(/\n\n+/).map(p => p.trim()).filter(Boolean) : [],
+      photo: _sanityImg(doc.photo),
+      links,
+      upcoming, past,
+    };
+  }
+
+  function eventRowHtml(ev){
+    return `<a class="ep-prog-row" href="event.html?id=${encodeURIComponent(ev.slug)}">
+      <span class="ep-prog-date">${ev.day} ${ev.monthAbbrEn}</span>
+      <span class="ep-prog-type"><span class="en-only">${ev.type}</span><span class="ar-only ar">${TYPE_AR[ev.type] || ev.type}</span></span>
+      <span class="ep-prog-name">
+        <span class="en-only">${ev.title}</span>
+        <span class="ar-only ar" dir="rtl">${ev.titleAr || ev.title}</span>
+      </span>
+      <span class="ep-prog-arrow">→</span>
+    </a>`;
+  }
+
+  function buildArtistPanel(a){
+    const metaEn = [a.discipline, a.location].filter(Boolean).join(' — ');
+    const metaAr = [a.disciplineAr, a.location].filter(Boolean).join(' — ');
+    const metaHtml = (metaEn || metaAr) ? `<p class="art-meta-line">
+      ${metaEn ? `<span class="en-only">${metaEn}</span>` : ''}
+      ${metaAr ? `<span class="ar-only ar" dir="rtl">${metaAr}</span>` : ''}
+    </p>` : '';
+
+    const photoHtml = a.photo ? `<div class="art-photo-wrap"><img src="${a.photo}" alt=""></div>` : '';
+
+    const bioHtml = (a.bio.length || a.bioAr.length) ? `<div class="ep-text" style="margin-top:8px;">
+      ${a.bio.length ? `<div class="en-only">${a.bio.map(p => `<p>${p}</p>`).join('')}</div>` : ''}
+      ${a.bioAr.length ? `<div class="ar-only ar" dir="rtl">${a.bioAr.map(p => `<p>${p}</p>`).join('')}</div>` : ''}
+    </div>` : '';
+
+    const linksHtml = a.links.length ? `<div class="ep-facts" style="margin-top:8px;">
+      ${a.links.map(l => `<div class="ep-fact">
+        <span class="ef-key">${l.label}</span>
+        <span class="ef-leader"></span>
+        <span class="ef-val"><a class="ep-person-link" href="${l.url}" target="_blank" rel="noopener">${l.url.replace(/^https?:\/\//, '').replace(/\/$/, '')}</a></span>
+      </div>`).join('')}
+    </div>` : '';
+
+    const totalEvents = a.upcoming.length + a.past.length;
+    const eventsHtml = totalEvents ? `<div class="ep-programme">
+      <div class="ep-programme-head"><span class="en-only">Events</span><span class="ar-only ar" dir="rtl">الفعاليات</span></div>
+      ${a.upcoming.length
+        ? a.upcoming.map(eventRowHtml).join('')
+        : `<p class="art-meta-line"><span class="en-only">No upcoming events.</span><span class="ar-only ar" dir="rtl">لا توجد فعاليات قادمة حالياً.</span></p>`}
+      ${a.past.length ? `
+      <div class="art-past-toggle" id="artPastToggle" aria-expanded="false">
+        <span>
+          <span class="en-only">Past events (${a.past.length})</span>
+          <span class="ar-only ar" dir="rtl">الفعاليات السابقة (${arNum(a.past.length)})</span>
+          <span class="art-past-arrow">↓</span>
+        </span>
+      </div>
+      <div class="art-past-list" id="artPastList" hidden>${a.past.map(eventRowHtml).join('')}</div>` : ''}
+    </div>` : '';
+
+    return `
+<div class="ep-header">
+  <div class="art-header">
+    <div class="art-header-text">
+      <h1 class="ep-title">
+        <span class="en-only">${a.name}</span>
+        <span class="ar-only ar" dir="rtl">${a.nameAr || a.name}</span>
+      </h1>
+      ${metaHtml}
+    </div>
+    ${photoHtml}
+  </div>
+</div>
+<div class="ep-body">
+  <div class="ep-content">
+    ${bioHtml}
+    ${linksHtml}
+  </div>
+  ${eventsHtml}
+</div>`;
+  }
+
+  const params = new URLSearchParams(location.search);
+  const id = params.get('id') || '';
+
+  let artist, artists = [];
+  try {
+    const [docs, settingsDoc] = await Promise.all([
+      groq(`*[_type == "artist"] | order(name.en asc) { name, "slug": slug.current, bio, photo, discipline, currentLocation, website, instagram, links, "events": *[_type == "event" && references(^._id)] | order(startDateTime desc) { _id, title, "slug": slug.current, eventType, startDateTime, endDateTime } }`),
+      groq(`*[_type == "siteSettings"][0]{ address, hours, mapsUrl }`),
+    ]);
+    artists = (docs || []).map(docToArtist);
+    artist = artists.find(a => a.slug === id);
+    if (settingsDoc) {
+      const fAddr = document.getElementById('footer-address');
+      const fHours = document.getElementById('footer-hours');
+      const fMaps = document.getElementById('footer-maps');
+      if (fAddr && settingsDoc.address?.en) fAddr.innerHTML =
+        `<span class="en-only">${settingsDoc.address.en.replace(/\n/g, '<br>')}</span>` +
+        (settingsDoc.address.ar ? `<span class="ar-only ar" dir="rtl">${settingsDoc.address.ar.replace(/\n/g, '<br>')}</span>` : '');
+      if (fHours && settingsDoc.hours?.en) fHours.innerHTML =
+        `<span class="en-only">${settingsDoc.hours.en}</span>` +
+        (settingsDoc.hours.ar ? `<span class="ar-only ar" dir="rtl">${settingsDoc.hours.ar}</span>` : '');
+      if (fMaps && settingsDoc.mapsUrl) { fMaps.href = settingsDoc.mapsUrl; }
+    }
+  } catch (err) { console.warn('[WC] artist fetch failed', err); }
+
+  const root = document.getElementById('arRoot');
+
+  if (!artist) {
+    root.innerHTML = `<div class="ep-header"><h1 class="ep-title">Artist not found.</h1><p class="ep-subtitle"><a href="artists.html">← All artists</a></p></div>`;
+  } else {
+    root.innerHTML = buildArtistPanel(artist);
+
+    document.title = `${artist.name}${artist.nameAr ? ' · ' + artist.nameAr : ''} – The Wonder Cabinet`;
+    const ogTitle = document.getElementById('og-title-meta');
+    const ogDesc = document.getElementById('og-desc-meta');
+    const ogImg = document.getElementById('og-image-meta');
+    if (ogTitle) ogTitle.setAttribute('content', `${artist.name} – The Wonder Cabinet`);
+    if (ogDesc && artist.bio.length) ogDesc.setAttribute('content', artist.bio[0].slice(0, 200));
+    if (ogImg && artist.photo) ogImg.setAttribute('content', artist.photo);
+  }
+
+  // Past-events toggle — delegated so it survives the innerHTML swap above.
+  document.addEventListener('click', (e) => {
+    const toggle = e.target.closest('#artPastToggle');
+    if (!toggle) return;
+    const list = document.getElementById('artPastList');
+    const expanded = toggle.getAttribute('aria-expanded') === 'true';
+    toggle.setAttribute('aria-expanded', String(!expanded));
+    if (list) list.hidden = expanded;
+  });
+
+  // Language toggle
+  document.querySelectorAll('[data-lang-btn]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('[data-lang-btn]').forEach(b => b.setAttribute('aria-pressed', 'false'));
+      btn.setAttribute('aria-pressed', 'true');
+      document.documentElement.setAttribute('data-lang', btn.dataset.langBtn);
+      try { localStorage.setItem('twc-lang', btn.dataset.langBtn); } catch (e) {}
+    });
+  });
+  try {
+    const saved = localStorage.getItem('twc-lang');
+    if (saved) {
+      document.documentElement.setAttribute('data-lang', saved);
+      document.querySelectorAll('[data-lang-btn]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.langBtn === saved)));
+    }
+  } catch (e) {}
+})();
+</script>
+</body>
+</html>

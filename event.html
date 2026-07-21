@@ -11,7 +11,7 @@
 <meta property="og:description" content="A space for art production and cultural development in Bethlehem, Palestine." id="og-desc-meta">
 <meta property="og:image" content="" id="og-image-meta">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="stylesheet" href="assets/app.css?v=56" />
+<link rel="stylesheet" href="assets/app.css?v=62" />
 <style>
   /* This page uses the exact same .ep-* / .event-panel template as every
      other entry point on the site (the homepage hero cards, the Programme
@@ -201,6 +201,24 @@
   }
   function _loc(v){ return typeof v === 'object' && v !== null ? (v.en || v.ar || '') : (v || ''); }
 
+  /* Sanity auto-computes a color palette for every uploaded image
+     (metadata.palette). Prefer darkVibrant when it's meaningfully present
+     in the image (population > 5%) — it tends to give the richest,
+     most "poster-like" color. Fall back to dominant (always representative,
+     even for muted/grayscale art), then vibrant, then null (no palette —
+     e.g. very old assets or SVGs, which Sanity doesn't palette-analyze).
+     Kept in sync with the identical picker in index.html — not shared via
+     import since this is a static, no-build site. */
+  function _pickPalette(p){
+    if (!p) return null;
+    let sw = null;
+    if (p.darkVibrant && p.darkVibrant.background && p.darkVibrant.population > 5) sw = p.darkVibrant;
+    else if (p.dominant && p.dominant.background) sw = p.dominant;
+    else if (p.vibrant && p.vibrant.background) sw = p.vibrant;
+    if (!sw) return null;
+    return { bg: sw.background, ink: sw.foreground || '#111318' };
+  }
+
   function docToEv(doc){
     const s = _iso(doc.startDateTime), e = _iso(doc.endDateTime);
     // hasTime: check UTC hours in raw string (midnight UTC = 00:00Z = all-day, no display time)
@@ -242,8 +260,11 @@
       writeup:   doc.writeup?.en || '',
       writeupAr: doc.writeup?.ar || '',
       cover:    _sanityImg(doc.cover),
+      coverPalette: _pickPalette(doc.coverPalette),
       content:  doc.content || [],
-      relatedArtists: (doc.relatedArtists||[]).map(a => ({ name: _loc(a.name), slug: a.slug || '' })).filter(a => a.name),
+      relatedArtists: (doc.relatedArtists||[]).map(a => ({
+        name: a.name?.en || a.name?.ar || '', nameAr: a.name?.ar || '', slug: a.slug || '',
+      })).filter(a => a.name),
       relatedProject: doc.relatedProject ? { title: _loc(doc.relatedProject.title), slug: doc.relatedProject.slug?.current || '' } : null,
       programmeEvents: (doc.programmeEvents || []).map(pe => {
         const ps = _iso(pe.startDateTime);
@@ -331,7 +352,7 @@
     const typeArLabel = TYPE_AR[ev.type] || ev.type;
     const venue = (ev.location || "").split("·")[0].trim();
     const coverHtml = (ev.cover && !(ev.content && ev.content.length))
-      ? `<div class="ep-cover"><img src="${ev.cover}" alt="" style="width:100%;height:220px;object-fit:contain;padding:28px;display:block;"></div>`
+      ? `<div class="ep-cover ep-cover-full"><img src="${ev.cover}" alt="" style="width:100%;height:auto;display:block;"></div>`
       : "";
     const bodyEnParts = [...(ev.short ? [ev.short] : []), ...(ev.body && ev.body.length ? ev.body : [])];
     const bodyArParts = [...(ev.shortAr ? [ev.shortAr] : []), ...(ev.bodyAr && ev.bodyAr.length ? ev.bodyAr : [])];
@@ -472,7 +493,12 @@ ${audioBar}
       ${ev.relatedArtists && ev.relatedArtists.length ? `<div class="ep-fact">
         <span class="ef-key"><span class="en-only">Artists</span><span class="ar-only ar">فنانون</span></span>
         <span class="ef-leader"></span>
-        <span class="ef-val">${ev.relatedArtists.map(a=>a.name).join(', ')}</span>
+        <span class="ef-val">${ev.relatedArtists.map(a => {
+          const inner = `<span class="en-only">${a.name}</span><span class="ar-only ar">${a.nameAr || a.name}</span>`;
+          return a.slug
+            ? `<a class="ep-person-link" href="artist.html?id=${encodeURIComponent(a.slug)}"${EMBED ? ' target="_top"' : ''}>${inner}</a>`
+            : inner;
+        }).join(', ')}</span>
       </div>` : ""}
       ${ev.relatedProject ? `<div class="ep-fact">
         <span class="ef-key"><span class="en-only">Part of</span><span class="ar-only ar">جزء من</span></span>
@@ -515,7 +541,7 @@ ${audioBar}
   let ev, all = [];
   try {
     const [docs, settingsDoc] = await Promise.all([
-      groq(`*[_type == "event"] | order(startDateTime desc) { ..., location->{ name }, relatedArtists[]->{name, "slug": slug.current}, relatedProject->{title, slug}, programmeEvents[]->{_id, "slug": slug.current, title, eventType, startDateTime} }`),
+      groq(`*[_type == "event"] | order(startDateTime desc) { ..., location->{ name }, relatedArtists[]->{name, "slug": slug.current}, relatedProject->{title, slug}, programmeEvents[]->{_id, "slug": slug.current, title, eventType, startDateTime}, "coverPalette": cover.asset->metadata.palette }`),
       groq(`*[_type == "siteSettings"][0]{ address, hours, mapsUrl }`),
     ]);
     all = (docs || []).map(docToEv);
@@ -548,6 +574,19 @@ ${audioBar}
     root.style.background = tc.bg;
     root.style.color = tc.ink;
     root.innerHTML = buildEventPanel(targetEv, all);
+    // Theme the reader from Sanity's precomputed image palette, matching
+    // the same accent used elsewhere on the site (e.g. the Current
+    // Exhibitions unit). Falls back to the static type color when no
+    // palette exists (old assets, SVGs).
+    if (targetEv.type === 'Exhibition' && targetEv.coverPalette) {
+      const theme = targetEv.coverPalette;
+      root.style.background = theme.bg;
+      root.style.color = theme.ink;
+      if (EMBED) {
+        document.documentElement.style.setProperty('--bg', theme.bg);
+        document.body.style.background = theme.bg;
+      }
+    }
     _initPanelAudio(root);
     window.scrollTo(0, 0);
     // Update title + OG
@@ -608,18 +647,31 @@ ${audioBar}
     // collapses the page back into the grid. Letting go springs it back.
     const PULL_MAX = 700;
     let _pull = 0, _pullTimer = null;
+    // Firefox fires wheel events with deltaMode=1 ("line") for a plain mouse
+    // wheel, where deltaY is a small line count instead of a pixel distance
+    // (Chrome normalizes wheel input to pixel deltas regardless of device).
+    // PULL_MAX is a pixel-scale threshold, so without normalizing this the
+    // same physical gesture takes far more ticks to trigger the collapse in
+    // Firefox on a plain wheel than it does in Chrome.
+    function _epWheelDeltaY(e){
+      var d = e.deltaY;
+      if (e.deltaMode === 1) d *= 16;
+      else if (e.deltaMode === 2) d *= (window.innerHeight || 800);
+      return d;
+    }
     window.addEventListener('wheel', (e) => {
+      const dy = _epWheelDeltaY(e);
       const max = document.documentElement.scrollHeight - window.innerHeight;
       const atBottom = window.scrollY >= max - 2;
       const atTop = window.scrollY <= 1;
-      if ((e.deltaY > 0 && atBottom) || (e.deltaY < 0 && atTop)) {
+      if ((dy > 0 && atBottom) || (dy < 0 && atTop)) {
         // Consume the gesture ourselves — without this, the browser's own
         // overscroll/rubber-band still runs in parallel and once this
         // iframe's document can't scroll any further, it chains the
         // leftover delta out to the PARENT page's scroll, which is exactly
         // what was wrongly arming the past-archive gravity up there.
         e.preventDefault();
-        _pull += Math.abs(e.deltaY);
+        _pull += Math.abs(dy);
         if (_pull >= PULL_MAX) {
           _pull = -1e9;
           clearTimeout(_pullTimer);

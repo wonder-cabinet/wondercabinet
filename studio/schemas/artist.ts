@@ -15,10 +15,22 @@ export const artist = defineType({
     defineField({name: 'slug', title: 'Slug', type: 'slug', options: {source: 'name.en'}}),
     defineField({name: 'bio', title: 'Bio', type: 'localeText'}),
     defineField({name: 'photo', title: 'Photo', type: 'image', options: {hotspot: true}}),
-    defineField({name: 'discipline', title: 'Discipline', type: 'array', of: [{type: 'string'}]}),
+    defineField({
+      name: 'discipline',
+      title: 'Discipline',
+      description: 'Short line, e.g. "Photographer" / "Multidisciplinary artist". Shown under the artist\'s name.',
+      type: 'localeString',
+    }),
     defineField({name: 'currentLocation', title: 'Current location', type: 'string'}),
     defineField({name: 'website', title: 'Website', type: 'url'}),
     defineField({name: 'instagram', title: 'Instagram', type: 'string'}),
+    defineField({
+      name: 'links',
+      title: 'Links',
+      description: 'Extra links shown on the artist page (portfolio, press, etc). Website/Instagram above are shown automatically too.',
+      type: 'array',
+      of: [{type: 'linkItem'}],
+    }),
     defineField({
       name: 'residencies',
       title: 'Residencies',
