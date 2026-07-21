@@ -1864,6 +1864,8 @@ body.gs-reader-open{ overflow: hidden; }
   flex-direction: row;
   overflow: hidden;
   border-bottom: 2px solid currentColor;
+  background: var(--cx-accent, transparent);
+  color: var(--cx-ink, inherit);
 }
 
 /* Poster — left 50% */
@@ -1872,7 +1874,7 @@ body.gs-reader-open{ overflow: hidden; }
   position: relative;
   overflow: hidden;
   cursor: pointer;
-  background: #0d15c8;
+  background: var(--cx-accent, #0d15c8);
   border-right: 2px solid currentColor;
   box-sizing: border-box;
 }
@@ -1886,7 +1888,7 @@ body.gs-reader-open{ overflow: hidden; }
 .cx-poster-band{
   position: absolute;
   bottom: 0; left: 0; right: 0;
-  background: #1d24ff;
+  background: var(--cx-accent, #1d24ff);
   border-top: 2px solid currentColor;
   padding: 18px 28px 22px;
 }
@@ -1896,7 +1898,7 @@ body.gs-reader-open{ overflow: hidden; }
   text-transform: uppercase; letter-spacing: .05em;
   margin-bottom: 10px;
 }
-.cx-poster-range{ font-variant-numeric: lining-nums tabular-nums; }
+.cx-poster-range{ font-variant-numeric: lining-nums tabular-nums; font-size: 14px; }
 .cx-poster-tag{
   border: 2px solid currentColor; padding: 3px 10px;
   white-space: nowrap; flex-shrink: 0;
@@ -1950,7 +1952,7 @@ body.gs-reader-open{ overflow: hidden; }
 .cx-row.is-past{ opacity: .55; }
 .cx-row.is-past:hover{ opacity: 1; }
 .cx-row-date{
-  font-family: var(--ff-sans); font-size: 12px; font-weight: 700;
+  font-family: var(--ff-sans); font-size: 16px; font-weight: 700;
   text-transform: uppercase; font-variant-numeric: tabular-nums;
   opacity: .65; margin-bottom: 6px;
 }
@@ -1971,7 +1973,7 @@ body.gs-reader-open{ overflow: hidden; }
   font-family: var(--ff-ar); text-transform: none; line-height: 1.1;
 }
 .cx-row-time{
-  font-family: var(--ff-sans); font-size: 12px; font-weight: 600;
+  font-family: var(--ff-sans); font-size: 16px; font-weight: 600;
   opacity: .6; margin-top: 8px; font-variant-numeric: tabular-nums;
 }
 

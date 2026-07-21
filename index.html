@@ -12,7 +12,7 @@
 <meta property="og:url" content="https://wondercabinet.space">
 <meta property="og:image" content="" id="og-image-meta">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="stylesheet" href="assets/app.css?v=59">
+<link rel="stylesheet" href="assets/app.css?v=60">
 </head>
 <body data-view="list">
 
@@ -858,12 +858,58 @@ function renderCurrentExhibitions(){
     </div>`;
   }).join('');
 
+  // Extract a dominant color from each poster and theme its unit with it,
+  // so band/rail/borders stay consistent with the artwork. Sanity CDN sends
+  // CORS headers, so canvas sampling is allowed with crossOrigin.
+  function cxThemeFromPoster(unitEl, coverUrl){
+    if (!unitEl || !coverUrl) return;
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = function(){
+      try {
+        const W = 40, H = 40;
+        const cv = document.createElement('canvas');
+        cv.width = W; cv.height = H;
+        const ctx = cv.getContext('2d', { willReadFrequently: true });
+        ctx.drawImage(img, 0, 0, W, H);
+        const px = ctx.getImageData(0, 0, W, H).data;
+        // Pick the most frequent quantized color, preferring saturated ones.
+        const buckets = {};
+        for (let i = 0; i < px.length; i += 4){
+          if (px[i+3] < 200) continue;
+          const r = px[i], g = px[i+1], b = px[i+2];
+          const max = Math.max(r,g,b), min = Math.min(r,g,b);
+          const sat = max === 0 ? 0 : (max - min) / max;
+          const key = (r>>5) + ',' + (g>>5) + ',' + (b>>5);
+          if (!buckets[key]) buckets[key] = { n:0, r:0, g:0, b:0, s:0 };
+          const bk = buckets[key];
+          bk.n++; bk.r += r; bk.g += g; bk.b += b; bk.s += sat;
+        }
+        let best = null, bestScore = -1;
+        for (const k in buckets){
+          const bk = buckets[k];
+          const score = bk.n * (0.35 + (bk.s / bk.n)); // frequency, saturation-weighted
+          if (score > bestScore){ bestScore = score; best = bk; }
+        }
+        if (!best) return;
+        const r = Math.round(best.r/best.n), g = Math.round(best.g/best.n), b = Math.round(best.b/best.n);
+        // Perceived luminance decides ink color for contrast.
+        const lum = (0.299*r + 0.587*g + 0.114*b) / 255;
+        const ink = lum > 0.55 ? '#111318' : '#f6f3ea';
+        unitEl.style.setProperty('--cx-accent', 'rgb(' + r + ',' + g + ',' + b + ')');
+        unitEl.style.setProperty('--cx-ink', ink);
+      } catch(err){ /* tainted canvas or decode issue — keep default theme */ }
+    };
+    img.src = coverUrl;
+  }
+
   // Set up scroll machinery + interactions for each exhibition unit
   cur.forEach(e => {
     const outer = document.getElementById('cx-outer-' + e.id);
     const track = document.getElementById('cx-track-' + e.id);
     const posterEl = document.getElementById('cx-poster-' + e.id);
     if (!outer || !track) return;
+    cxThemeFromPoster(outer, e.cover);
 
     let currentProgress = 0;
     let catchUpRAF = null, catchUpWatchdog = null, catchUpGen = 0;
