@@ -989,9 +989,28 @@ function renderCurrentExhibitions(){
       });
     }
 
-    // Row clicks are plain <a> navigations — stop propagation to poster parent
+    // Row clicks open the same in-grid reader as the poster (not a page
+    // navigation) — the poster's expanding frame is reused, just pointed
+    // at the clicked row's event id instead of the exhibition's own id.
+    // Middle/Cmd/Ctrl/Shift-click still navigates normally (new tab), so
+    // opening in a new tab / copying the link keeps working as expected.
     Array.prototype.forEach.call(track.querySelectorAll('a.cx-row'), function(row){
-      row.addEventListener('click', function(ev){ ev.stopPropagation(); });
+      row.addEventListener('click', function(ev){
+        ev.stopPropagation();
+        if (ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.button === 1) return;
+        ev.preventDefault();
+        if (document.body.classList.contains('gs-reader-open') && !posterEl.querySelector('.gs-card-frame') && !row.querySelector('.gs-card-frame')){
+          _gsHardReset();
+        }
+        if (window.innerWidth <= 700){
+          _gsOpenReaderMobile(row);
+        } else if (posterEl){
+          const exhibitionEv = posterEl.dataset.ev;
+          posterEl.dataset.ev = row.dataset.ev;
+          _cxOpenReader(posterEl);
+          posterEl.dataset.ev = exhibitionEv;
+        }
+      });
     });
 
     setup();
@@ -1646,7 +1665,7 @@ function _gsOpenReaderMobile(cardEl){
   // Timeline rows and exhibition cards reuse this whole path on narrow
   // viewports — they just need their own "host an absolute frame, hide my
   // own content" class since the gs-card one is scoped to card children.
-  if (cardEl.matches(".tl-row, .cx-card, .cx-prog-row")) cardEl.classList.add("tl-row-open");
+  if (cardEl.matches(".tl-row, .cx-card, .cx-prog-row, .cx-row")) cardEl.classList.add("tl-row-open");
   cardEl.style.height = startH + "px";
 
   const frame = document.createElement("iframe");
