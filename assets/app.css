@@ -1947,8 +1947,20 @@ body.gs-reader-open{ overflow: hidden; }
   color: inherit;
   transition: background .12s;
   box-sizing: border-box;
+  position: relative; overflow: hidden;
 }
 .cx-row:hover{ background: rgba(255,255,255,.07); }
+/* Row in-grid reader (see _cxRowOpenReader in index.html) — the clicked
+   row grows its own height in place inside .cx-track, which shifts via
+   translateY to bring the row flush with the top of the rail. Same
+   grammar as .gs-card-open/.tl-row-open: hide the row's own text while
+   the iframe hosts the event page. */
+.cx-row-open > :not(.gs-card-frame){ visibility: hidden; }
+.cx-row-anim{
+  transition:
+    height .45s cubic-bezier(.2,.8,.2,1),
+    transform .45s cubic-bezier(.2,.8,.2,1);
+}
 .cx-row.is-past{ opacity: .55; }
 .cx-row.is-past:hover{ opacity: 1; }
 .cx-row-date{

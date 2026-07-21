@@ -12,7 +12,7 @@
 <meta property="og:url" content="https://wondercabinet.space">
 <meta property="og:image" content="" id="og-image-meta">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="stylesheet" href="assets/app.css?v=64">
+<link rel="stylesheet" href="assets/app.css?v=65">
 </head>
 <body data-view="list">
 
@@ -989,26 +989,24 @@ function renderCurrentExhibitions(){
       });
     }
 
-    // Row clicks open the same in-grid reader as the poster (not a page
-    // navigation) — the poster's expanding frame is reused, just pointed
-    // at the clicked row's event id instead of the exhibition's own id.
-    // Middle/Cmd/Ctrl/Shift-click still navigates normally (new tab), so
-    // opening in a new tab / copying the link keeps working as expected.
+    // Row clicks open the in-grid reader in place — the ROW itself grows
+    // (same grammar as the This Week hero cards: the clicked element grows
+    // itself, not some other element), sliding the rest of the rail out of
+    // view via the track's translateY. The poster is left completely
+    // untouched. Middle/Cmd/Ctrl/Shift-click still navigates normally (new
+    // tab), so opening in a new tab / copying the link keeps working.
     Array.prototype.forEach.call(track.querySelectorAll('a.cx-row'), function(row){
       row.addEventListener('click', function(ev){
         ev.stopPropagation();
         if (ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.button === 1) return;
         ev.preventDefault();
-        if (document.body.classList.contains('gs-reader-open') && !posterEl.querySelector('.gs-card-frame') && !row.querySelector('.gs-card-frame')){
+        if (document.body.classList.contains('gs-reader-open') && !row.querySelector('.gs-card-frame')){
           _gsHardReset();
         }
         if (window.innerWidth <= 700){
           _gsOpenReaderMobile(row);
-        } else if (posterEl){
-          const exhibitionEv = posterEl.dataset.ev;
-          posterEl.dataset.ev = row.dataset.ev;
-          _cxOpenReader(posterEl);
-          posterEl.dataset.ev = exhibitionEv;
+        } else {
+          _cxRowOpenReader(row, track);
         }
       });
     });
@@ -1190,6 +1188,19 @@ function _gsHardReset(){
     r.style.height = "";
     r.style.transform = "";
   });
+  // .cx-row-open rows don't drive their own transform (unlike .tl-row-open)
+  // — their height grows in place, but the horizontal shift onto the
+  // reading position lives on the enclosing .cx-track via translateY. That
+  // track gets resynced for free below: removing gs-reader-open + firing
+  // resize lets renderCurrentExhibitions' own resize listener (setup() +
+  // onScroll()) recompute and reapply the correct translateY from the
+  // actual current scroll position, same as it does after a clean close.
+  document.querySelectorAll(".cx-row-open").forEach(r => {
+    const trk = r.closest(".cx-track");
+    if (trk) trk.classList.remove("cx-row-anim");
+    r.classList.remove("cx-row-open", "cx-row-anim");
+    r.style.height = "";
+  });
   const track = document.getElementById("gs-track");
   if (track) track.classList.remove("gs-anim");
   document.body.style.position = "";
@@ -1358,6 +1369,218 @@ function _cxOpenReader(posterEl){
   window.addEventListener('keydown', onKey);
   window.addEventListener('wheel', onWheel, { passive: false });
   posterEl.addEventListener('click', onClick, true);
+}
+
+/* ---------- CX ROW IN-GRID READER ----------
+   A programme row grows ITSELF in place inside the rail — the same
+   grammar as _gsOpenReader (This Week hero cards): the clicked element is
+   the one that expands, not some other element. Axis swap vs the hero:
+   height/translateY instead of flex-basis/translateX. The row's height
+   lerps from its current 35vh up to the full rail viewport height, while
+   trackEl's translateY lerps from its current scroll-lock position to
+   whatever brings the row's top flush with the top of the sticky rail
+   area — sliding every other row out of view, exactly like the hero
+   pushes neighboring cards aside. The poster is a separate flex child and
+   is never touched here. There's no RTL mirroring needed on this axis —
+   top/bottom don't flip for Arabic, only left/right does (see the hero's
+   isRtl branch, which has no vertical equivalent). */
+function _cxRowOpenReader(rowEl, trackEl){
+  if (_gsReaderOpen) return;
+  _gsReaderOpen = true;
+
+  const STICKY_TOP = 54; // matches .cx-sticky's sticky offset, same constant as the hero rail
+
+  // Current track translate (the vertical scroll-lock position) — the
+  // page scroll is frozen while reading, so this stays our baseline.
+  const m = /translateY\((-?[\d.]+)px\)/.exec(trackEl.style.transform || "");
+  const baseY = m ? parseFloat(m[1]) : 0;
+  const startH = rowEl.getBoundingClientRect().height;
+  const targetH = window.innerHeight - STICKY_TOP; // full rail viewport height — same idea as the hero card filling the full width beside its rail
+
+  // Row's un-transformed offset within the track, measured via
+  // getBoundingClientRect rather than any offset* property — see the
+  // identical note in _gsOpenReader on why offsetLeft/offsetTop can't be
+  // trusted here (confirmed Safari bug in a flex row-reverse container).
+  // Both track and row currently share the same translateY(baseY) (the
+  // row hasn't moved independently yet), so that shift cancels out of the
+  // difference between their rects, leaving the plain layout offset.
+  const rowOffsetInTrack = rowEl.getBoundingClientRect().top - trackEl.getBoundingClientRect().top;
+  const targetY = -rowOffsetInTrack; // row's top border lands flush with the top of the rail
+
+  // Freeze the background page exactly like _gsOpenReader/_cxOpenReader —
+  // position:fixed removes the body from scrollable flow entirely, so no
+  // scroll can occur and sticky computations elsewhere are untouched.
+  const _lockScrollY = window.scrollY;
+  document.body.style.position = "fixed";
+  document.body.style.top = `-${_lockScrollY}px`;
+  document.body.style.left = "0";
+  document.body.style.right = "0";
+  document.body.classList.add("gs-reader-open");
+
+  rowEl.classList.add("cx-row-open");
+  const frame = document.createElement("iframe");
+  frame.className = "gs-card-frame";
+  frame.title = "Event";
+  frame.src = `event.html?id=${encodeURIComponent(rowEl.dataset.ev)}&embed=1`;
+  // Permanently pointer-events:none — the outer page drives everything
+  // (expansion, forwarded reading scroll, click forwarding) for as long as
+  // the reader is open. See _gsOpenReader for the two confirmed bugs
+  // (short-content boundary-pull swallowing, unreliable post-expansion
+  // wheel delivery into a same-origin iframe) that this works around.
+  frame.style.pointerEvents = "none";
+  rowEl.appendChild(frame);
+
+  const ease = t => 1 - Math.pow(1 - t, 3);
+  const lerp = (a, b, t) => a + (b - a) * t;
+  const CLICK_T = 0.18;   // borders nudge open on click
+  const EXPAND_PX = 320;  // wheel-px from nudge to fully open
+  const CLOSE_PX = 320;   // wheel-px from fully open back to closed — used symmetrically at both ends
+  let scrollT = 0;
+  let rawY = 0;
+  let closeRawY = 0;
+  let closeDir = 0;
+
+  function apply(t){
+    rowEl.style.height = lerp(startH, targetH, t) + "px";
+    trackEl.style.transform = `translateY(${lerp(baseY, targetY, t)}px)`;
+  }
+  function animateOnce(){
+    rowEl.classList.add("cx-row-anim");
+    trackEl.classList.add("cx-row-anim");
+    setTimeout(() => {
+      rowEl.classList.remove("cx-row-anim");
+      trackEl.classList.remove("cx-row-anim");
+    }, 500);
+  }
+  animateOnce();
+  // Force a reflow so the transition class is live before the first apply.
+  void rowEl.offsetHeight;
+  apply(CLICK_T);
+
+  function onWheel(e){
+    e.preventDefault();
+    try{ onWheelInner(e); }
+    catch(err){
+      console.warn("[WC] cx row reader wheel error, resetting", err);
+      closed = true;
+      window.removeEventListener("message", onMsg);
+      window.removeEventListener("keydown", onKey);
+      window.removeEventListener("wheel", onWheel);
+      rowEl.removeEventListener("click", onClick, true);
+      _gsHardReset();
+      _gsReaderClosedAt = Date.now();
+    }
+  }
+  function onWheelInner(e){
+    const dy = _wcWheelDeltaY(e); // normalize Firefox's line-mode deltaY to pixels
+    if (scrollT < 1){
+      rawY = Math.min(EXPAND_PX, Math.max(-CLOSE_PX, rawY + dy));
+      scrollT = rawY >= 0
+        ? CLICK_T + (1 - CLICK_T) * ease(rawY / EXPAND_PX)
+        : CLICK_T * (1 - ease(-rawY / CLOSE_PX));
+      apply(scrollT);
+      if (rawY <= -CLOSE_PX){ collapse(true); return; }
+      return;
+    }
+
+    const doc = frame.contentDocument, win = frame.contentWindow;
+    if (!doc || !win) return;
+
+    if (closeDir !== 0){
+      closeRawY = Math.min(CLOSE_PX, Math.max(0, closeRawY + closeDir * dy));
+      apply(1 - ease(closeRawY / CLOSE_PX));
+      if (closeRawY <= 0){ closeDir = 0; return; }
+      if (closeRawY >= CLOSE_PX){ collapse(true); return; }
+      return;
+    }
+
+    const max = doc.documentElement.scrollHeight - win.innerHeight;
+    const atTop = win.scrollY <= 1;
+    const atBottom = win.scrollY >= max - 2;
+    if (dy > 0 && atBottom){
+      closeDir = 1;
+      closeRawY = Math.min(CLOSE_PX, dy);
+      apply(1 - ease(closeRawY / CLOSE_PX));
+    } else if (dy < 0 && atTop){
+      closeDir = -1;
+      closeRawY = Math.min(CLOSE_PX, -dy);
+      apply(1 - ease(closeRawY / CLOSE_PX));
+    } else {
+      win.scrollBy(0, dy);
+    }
+  }
+
+  // pointer-events:none on the frame blocks native click routing too, so
+  // clicks (close ✕, pop-out ↗, register link, prev/next nav) are
+  // forwarded the same way as _gsOpenReader: find what's under the click
+  // inside the (same-origin) iframe document and trigger it directly.
+  function onClick(e){
+    const rect = frame.getBoundingClientRect();
+    const x = e.clientX - rect.left, y = e.clientY - rect.top;
+    if (x < 0 || y < 0 || x > rect.width || y > rect.height) return;
+    const doc = frame.contentDocument;
+    if (!doc) return;
+    const inner = doc.elementFromPoint(x, y);
+    const clickable = inner && inner.closest("a,button");
+    if (!clickable) return;
+    e.preventDefault();
+    e.stopPropagation();
+    const href = clickable.getAttribute && clickable.getAttribute("href");
+    if (href && href.indexOf("event.html?id=") === 0 && href.indexOf("embed=1") === -1 && !clickable.target){
+      // Internal event nav links must stay in embed mode — rewrite them
+      // rather than letting them navigate the iframe to the standalone page.
+      frame.contentWindow.location.replace(href + "&embed=1");
+      return;
+    }
+    clickable.click();
+  }
+
+  function onMsg(e){
+    const d = e.data || {};
+    if (d.type === "wc-close" || d.type === "wc-collapse") collapse();
+  }
+  function onKey(e){ if (e.key === "Escape") collapse(); }
+
+  let closed = false;
+  function collapse(instant){
+    if (closed) return;
+    closed = true;
+    if (!instant){
+      animateOnce();
+      apply(0);
+    }
+    setTimeout(() => {
+      frame.remove();
+      rowEl.classList.remove("cx-row-open");
+      rowEl.style.height = "";
+      trackEl.style.transform = `translateY(${baseY}px)`;
+      document.body.style.position = "";
+      document.body.style.top = "";
+      document.body.style.left = "";
+      document.body.style.right = "";
+      document.body.classList.remove("gs-reader-open");
+      window.scrollTo(0, _lockScrollY);
+      window.removeEventListener("message", onMsg);
+      window.removeEventListener("keydown", onKey);
+      window.removeEventListener("wheel", onWheel);
+      rowEl.removeEventListener("click", onClick, true);
+      _gsReaderOpen = false;
+      _gsReaderClosedAt = Date.now();
+      // setup()/onScroll() were locked out while the reader was open —
+      // resync them now via the existing resize/scroll listeners (see the
+      // identical note + confirmed 480ms-vs-520ms bug in _gsOpenReader's
+      // collapse — the same 520ms delay applies here, past the 500ms
+      // cx-row-anim height transition, for the same reason).
+      window.dispatchEvent(new Event("resize"));
+      window.dispatchEvent(new Event("scroll"));
+    }, instant ? 0 : 520);
+  }
+
+  window.addEventListener("message", onMsg);
+  window.addEventListener("keydown", onKey);
+  window.addEventListener("wheel", onWheel, { passive: false });
+  // Capture phase so this runs before any track-level click delegate.
+  rowEl.addEventListener("click", onClick, true);
 }
 
 function _gsOpenReader(cardEl){
