@@ -1,0 +1,28 @@
+name: Google Calendar → Sanity sync
+
+on:
+  schedule:
+    # Hourly, offset from the top of the hour.
+    - cron: "17 * * * *"
+  workflow_dispatch: {}
+
+concurrency:
+  group: calendar-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Run calendar sync
+        env:
+          SANITY_TOKEN: ${{ secrets.SANITY_TOKEN }}
+        run: node scripts/calendar-sync.mjs
