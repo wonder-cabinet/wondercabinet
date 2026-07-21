@@ -12,7 +12,7 @@
 <meta property="og:url" content="https://wondercabinet.space">
 <meta property="og:image" content="" id="og-image-meta">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="stylesheet" href="assets/app.css?v=63">
+<link rel="stylesheet" href="assets/app.css?v=64">
 </head>
 <body data-view="list">
 
@@ -776,6 +776,18 @@ function renderCurrentExhibitions(){
   if (count) count.innerHTML =
     `<span class="en-only">${String(cur.length).padStart(2,"0")} on view</span>` +
     `<span class="ar-only ar" dir="rtl">${arNum(cur.length)} معروض</span>`;
+
+  // Theme the whole section band (header + border) off the first current
+  // exhibition's poster palette, same source as each unit's own accent —
+  // falls back to the static brand blue when no palette data exists.
+  const headTheme = cur[0] && cur[0].coverPalette;
+  if (headTheme){
+    sec.style.setProperty('--cx-accent', headTheme.bg);
+    sec.style.setProperty('--cx-ink', headTheme.ink);
+  } else {
+    sec.style.removeProperty('--cx-accent');
+    sec.style.removeProperty('--cx-ink');
+  }
 
   const STICKY_TOP = 54;
 

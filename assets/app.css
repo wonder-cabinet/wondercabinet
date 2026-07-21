@@ -1826,7 +1826,7 @@ body.gs-reader-open{ overflow: hidden; }
    Right 50vw: programme event rail, scroll-locked (translateY).
    Flat style — no gradients, no border-radius, 2px rules. */
 .cx{
-  background: #1d24ff; color: #f6f3ea;
+  background: var(--cx-accent, #1d24ff); color: var(--cx-ink, #f6f3ea);
   border-top: 2px solid var(--ink);
   border-bottom: 2px solid var(--ink);
 }
