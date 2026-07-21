@@ -1819,20 +1819,21 @@ body.gs-reader-open{ overflow: hidden; }
     transform .45s cubic-bezier(.2,.8,.2,1);
 }
 
-/* ---------- CURRENT EXHIBITIONS ----------
-   Full-bleed band in the Exhibition type color, sitting between the
-   This Week rail and the Programme. Cards are huge stacked rows — same
-   typographic language as the timeline, scaled up for something that's
-   on view for weeks, not hours. Hover inverts; click opens the in-grid
-   reader (vertical expansion, .tl-row-open machinery). */
+/* ---------- CURRENT EXHIBITIONS — WS3 redesign ----------
+   Poster + rail split-screen per exhibition.
+   Left 50vw: sticky cover poster (opens in-grid reader on click).
+   Right 50vw: programme event rail, scroll-locked (translateY).
+   Flat style — no gradients, no border-radius, 2px rules. */
 .cx{
   background: #1d24ff; color: #f6f3ea;
   border-top: 2px solid var(--ink);
   border-bottom: 2px solid var(--ink);
 }
+/* Section header */
 .cx-head{
   display: flex; align-items: baseline; justify-content: space-between; gap: 20px;
-  padding: clamp(28px, 4vw, 52px) var(--pad) 0;
+  padding: clamp(28px, 4vw, 52px) var(--pad) clamp(20px, 3vw, 36px);
+  border-bottom: 2px solid currentColor;
 }
 .cx-title-head{
   margin: 0;
@@ -1847,66 +1848,173 @@ body.gs-reader-open{ overflow: hidden; }
   text-transform: uppercase; font-weight: 700; opacity: .7;
   white-space: nowrap;
 }
-.cx-list{ margin-top: clamp(20px, 3vw, 36px); }
-.cx-card{
-  display: block;
-  padding: clamp(20px, 2.6vw, 34px) var(--pad) clamp(26px, 3vw, 40px);
-  border-top: 2px solid currentColor;
-  text-decoration: none; color: inherit;
-  transition: background .15s ease, color .15s ease;
-}
-.cx-card:hover{ background: #f6f3ea; color: #1d24ff; }
-.cx-row-top, .cx-row-bottom{
-  display: flex; align-items: baseline; justify-content: space-between; gap: 16px;
-  font-family: var(--ff-sans); font-size: 12px; letter-spacing: 0;
-  text-transform: uppercase; font-weight: 700;
-}
-.cx-range{ font-variant-numeric: lining-nums tabular-nums; }
-.cx-tag{
-  border: 2px solid currentColor; padding: 4px 12px;
-  white-space: nowrap;
-}
-.cx-name{
-  margin: clamp(10px, 1.6vw, 20px) 0 clamp(14px, 2vw, 24px);
-  font-family: var(--ff-sans); font-weight: 700;
-  font-size: clamp(44px, 7.5vw, 118px);
-  line-height: .92; letter-spacing: 0; text-transform: uppercase;
-}
-.cx-name .ar{ font-family: var(--ff-ar); text-transform: none; line-height: 1.05; }
-.cx-row-bottom{ opacity: .8; }
 
-/* Exhibition programme list — below the cx-card on the homepage */
-.cx-programme{
-  border-top: 1px solid currentColor;
-  margin-top: 0;
+/* Per-exhibition scroll unit */
+.cx-outer{
+  /* height computed by JS: (100vh - 54) + railRunway */
 }
-.cx-programme-head{
-  padding: 14px var(--pad) 10px;
+
+/* Sticky frame — holds poster + rail side by side */
+.cx-sticky{
+  position: sticky;
+  top: 54px;
+  height: calc(100vh - 54px);
+  display: flex;
+  flex-direction: row;
+  overflow: hidden;
+  border-bottom: 2px solid currentColor;
+}
+
+/* Poster — left 50% */
+.cx-poster{
+  flex: 0 0 50%;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  background: #0d15c8;
+  border-right: 2px solid currentColor;
+  box-sizing: border-box;
+}
+.cx-poster-img{
+  position: absolute;
+  inset: 0; width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+}
+/* Solid color band at the poster bottom for legible text */
+.cx-poster-band{
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  background: #1d24ff;
+  border-top: 2px solid currentColor;
+  padding: 18px 28px 22px;
+}
+.cx-poster-meta{
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
   font-family: var(--ff-sans); font-size: 11px; font-weight: 700;
-  text-transform: uppercase; letter-spacing: .08em; opacity: .55;
+  text-transform: uppercase; letter-spacing: .05em;
+  margin-bottom: 10px;
 }
-.cx-prog-row{
-  display: grid;
-  grid-template-columns: 70px 90px 1fr;
-  gap: 12px;
-  align-items: center;
-  padding: 12px var(--pad);
-  border-top: 1px solid currentColor;
+.cx-poster-range{ font-variant-numeric: lining-nums tabular-nums; }
+.cx-poster-tag{
+  border: 2px solid currentColor; padding: 3px 10px;
+  white-space: nowrap; flex-shrink: 0;
+}
+.cx-poster-title{
+  margin: 0;
+  font-family: var(--ff-sans); font-weight: 700;
+  font-size: clamp(22px, 3vw, 46px);
+  line-height: .92; text-transform: uppercase; letter-spacing: 0;
+}
+.cx-poster-title .ar{
+  font-family: var(--ff-ar); text-transform: none; line-height: 1.05;
+}
+/* Transition class applied momentarily during reader open/close */
+.cx-poster-anim{
+  transition: flex-basis 500ms cubic-bezier(.2,.8,.2,1);
+}
+/* Iframe hosted inside poster during in-grid reading */
+.cx-poster .gs-card-frame{
+  position: absolute;
+  inset: 0; width: 100%; height: 100%;
+  border: none; display: block;
+  pointer-events: none;
+}
+
+/* Rail — right 50% */
+.cx-rail{
+  flex: 0 0 50%;
+  overflow: hidden;
+  position: relative;
+  box-sizing: border-box;
+}
+.cx-track{
+  will-change: transform;
+}
+
+/* Programme event rows */
+.cx-row{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 35vh;
+  padding: 0 28px;
+  border-bottom: 2px solid currentColor;
   text-decoration: none;
   color: inherit;
-  font-family: var(--ff-sans);
-  opacity: .85;
-  transition: opacity .12s, background .12s;
+  transition: background .12s;
+  box-sizing: border-box;
 }
-.cx-prog-row:hover{ opacity: 1; background: rgba(0,0,0,.04); }
-.cx-prog-date{ font-size: 12px; font-weight: 700; opacity: .6; font-variant-numeric: tabular-nums; }
-.cx-prog-type{ font-size: 11px; font-weight: 700; text-transform: uppercase; opacity: .5; }
-.cx-prog-name{ font-size: 14px; font-weight: 600; }
+.cx-row:hover{ background: rgba(255,255,255,.07); }
+.cx-row.is-past{ opacity: .55; }
+.cx-row.is-past:hover{ opacity: 1; }
+.cx-row-date{
+  font-family: var(--ff-sans); font-size: 12px; font-weight: 700;
+  text-transform: uppercase; font-variant-numeric: tabular-nums;
+  opacity: .65; margin-bottom: 6px;
+}
+.cx-row-type{
+  display: inline-block; align-self: flex-start;
+  font-family: var(--ff-sans); font-size: 11px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .05em;
+  border: 2px solid currentColor;
+  padding: 2px 8px; margin-bottom: 10px;
+}
+.cx-row-title{
+  margin: 0;
+  font-family: var(--ff-sans); font-weight: 700;
+  font-size: clamp(16px, 2vw, 30px);
+  line-height: .95; text-transform: uppercase;
+}
+.cx-row-title .ar{
+  font-family: var(--ff-ar); text-transform: none; line-height: 1.1;
+}
+.cx-row-time{
+  font-family: var(--ff-sans); font-size: 12px; font-weight: 600;
+  opacity: .6; margin-top: 8px; font-variant-numeric: tabular-nums;
+}
 
+/* Past-events toggle row */
+.cx-past-toggle{
+  height: 35vh;
+  display: flex; align-items: center; justify-content: center;
+  padding: 0 28px; text-align: center;
+  border-bottom: 2px solid currentColor;
+  cursor: pointer;
+  font-family: var(--ff-sans); font-size: 13px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .06em;
+  opacity: .55;
+  transition: opacity .12s, background .12s;
+  user-select: none;
+  box-sizing: border-box;
+}
+.cx-past-toggle:hover{ opacity: 1; background: rgba(255,255,255,.07); }
+
+/* Mobile ≤ 700px — no scroll-lock, natural stacking */
 @media (max-width: 700px){
   .cx-head{ flex-direction: column; gap: 8px; }
-  .cx-prog-row{ grid-template-columns: 60px 1fr; }
-  .cx-prog-type{ display: none; }
+  .cx-outer{ height: auto !important; }
+  .cx-sticky{
+    position: relative !important;
+    top: 0 !important;
+    height: auto !important;
+    flex-direction: column;
+  }
+  .cx-poster{
+    flex: 0 0 auto;
+    height: 60vw;
+    border-right: none;
+    border-bottom: 2px solid currentColor;
+  }
+  .cx-rail{
+    flex: 0 0 auto;
+    overflow: visible;
+  }
+  .cx-track{ transform: none !important; }
+  .cx-row, .cx-past-toggle{
+    height: auto; min-height: 80px;
+    padding: 18px 20px;
+  }
 }
 
 /* Mobile equivalent (see _gsOpenReaderMobile in index.html): below 700px
@@ -2785,14 +2893,21 @@ html[data-lang="ar"] .tl-row { text-align: right; }
 html[data-lang="ar"] .tl-month-head { text-align: right; }
 html[data-lang="ar"] .tl-tags { justify-content: flex-end; }
 
-/* Exhibition section */
+/* Exhibition section — Arabic / RTL overrides */
 html[data-lang="ar"] .cx-head { direction: rtl; }
 html[data-lang="ar"] .cx-title-head { text-align: right; }
-html[data-lang="ar"] .cx-card { text-align: right; }
-html[data-lang="ar"] .cx-row-top, html[data-lang="ar"] .cx-row-bottom { direction: rtl; }
-html[data-lang="ar"] .cx-programme { text-align: right; }
-html[data-lang="ar"] .cx-prog-row { direction: rtl; }
-html[data-lang="ar"] .cx-programme-head { text-align: right; }
+@media (min-width: 701px){
+  /* AR desktop: poster on right, rail on left */
+  html[data-lang="ar"] .cx-sticky { flex-direction: row-reverse; }
+  html[data-lang="ar"] .cx-poster {
+    border-right: none;
+    border-left: 2px solid currentColor;
+  }
+  html[data-lang="ar"] .cx-poster-band { text-align: right; direction: rtl; }
+  html[data-lang="ar"] .cx-poster-meta { flex-direction: row-reverse; }
+  html[data-lang="ar"] .cx-row { align-items: flex-end; direction: rtl; }
+  html[data-lang="ar"] .cx-past-toggle { direction: rtl; }
+}
 
 /* Footer */
 html[data-lang="ar"] .footer-col { text-align: right; }

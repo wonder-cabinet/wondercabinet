@@ -12,7 +12,7 @@
 <meta property="og:url" content="https://wondercabinet.space">
 <meta property="og:image" content="" id="og-image-meta">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="stylesheet" href="assets/app.css?v=56">
+<link rel="stylesheet" href="assets/app.css?v=57">
 </head>
 <body data-view="list">
 
@@ -755,13 +755,10 @@ function renderEventRow(e, day, isFirst){
 }
 
 /* ============================================================
-   CURRENT EXHIBITIONS
-   Long-running shows whose date range covers today. They live in
-   their own full-bleed band (they're neither "this week" nor
-   Programme material), and each card opens the same in-grid reader
-   as the timeline rows — vertical expansion, in place. Once an
-   exhibition closes, it drops out of here and flows into the past
-   archive on its own.
+   CURRENT EXHIBITIONS — WS3 redesign
+   Poster + rail split-screen per exhibition.
+   Left 50vw: cover poster (sticky, opens in-grid reader).
+   Right 50vw: programme event rail, scroll-locked (translateY).
    ============================================================ */
 function renderCurrentExhibitions(){
   const sec = document.getElementById("cx-section");
@@ -780,43 +777,197 @@ function renderCurrentExhibitions(){
     `<span class="en-only">${String(cur.length).padStart(2,"0")} on view</span>` +
     `<span class="ar-only ar" dir="rtl">${arNum(cur.length)} معروض</span>`;
 
+  const STICKY_TOP = 54;
+
+  function cxRow(pe, isPast){
+    const dateStr = pe.day ? `${parseInt(pe.day,10)} ${(MONTH_NAME_EN[pe.month]||'').slice(0,3)}` : '';
+    const dateArStr = pe.day ? `${arNum(parseInt(pe.day,10))} ${MONTH_NAME_AR[pe.month]||''}` : '';
+    return `<a class="cx-row${isPast ? ' is-past' : ''}" href="event.html?id=${encodeURIComponent(pe.id)}" data-ev="${pe.id}">
+      ${dateStr ? `<div class="cx-row-date"><span class="en-only">${dateStr}</span><span class="ar-only ar" dir="rtl">${dateArStr}</span></div>` : ''}
+      ${pe.type ? `<div class="cx-row-type">${pe.type}</div>` : ''}
+      <h4 class="cx-row-title">
+        <span class="en-only">${pe.title}</span>
+        <span class="ar-only ar" dir="rtl">${pe.titleAr||pe.title}</span>
+      </h4>
+      ${pe.start ? `<div class="cx-row-time">${pe.start}</div>` : ''}
+    </a>`;
+  }
+
   list.innerHTML = cur.map(e => {
-    const range = `${parseInt(e.day,10)} ${MONTH_NAME_EN[e.month].slice(0,3)} — ${parseInt(e.endDay,10)} ${MONTH_NAME_EN[e.endMonth].slice(0,3)}`;
-    const rangeAr = `${arNum(parseInt(e.day,10))} ${MONTH_NAME_AR[e.month]} — ${arNum(parseInt(e.endDay,10))} ${MONTH_NAME_AR[e.endMonth]}`;
-    const progRows = (e.programmeEvents && e.programmeEvents.length)
-      ? `<div class="cx-programme">
-          <div class="cx-programme-head">
-            <span class="en-only">Programme</span>
-            <span class="ar-only ar" dir="rtl">البرنامج</span>
-          </div>
-          ${e.programmeEvents.map(pe => `
-            <a class="cx-prog-row" data-ev="${pe.id}" href="event.html?id=${pe.id}">
-              <span class="cx-prog-date">${parseInt(pe.day,10)} ${MONTH_NAME_EN[pe.month]?.slice(0,3)||''}</span>
-              <span class="cx-prog-type">${pe.type}</span>
-              <span class="cx-prog-name">
-                <span class="en-only">${pe.title}</span>
-                <span class="ar-only ar" dir="rtl">${pe.titleAr||pe.title}</span>
+    const range = `${parseInt(e.day,10)} ${(MONTH_NAME_EN[e.month]||'').slice(0,3)} — ${parseInt(e.endDay||e.day,10)} ${(MONTH_NAME_EN[e.endMonth||e.month]||'').slice(0,3)}`;
+    const rangeAr = `${arNum(parseInt(e.day,10))} ${MONTH_NAME_AR[e.month]||''} — ${arNum(parseInt(e.endDay||e.day,10))} ${MONTH_NAME_AR[e.endMonth||e.month]||''}`;
+
+    const allPe = e.programmeEvents || [];
+    const upcoming = allPe.filter(pe => {
+      if (!pe.day || !pe.month) return true;
+      const d = new Date(pe.year||e.year, MONTH_ORDER.indexOf(pe.month), parseInt(pe.day,10));
+      return d >= today;
+    }).sort((a,b) => {
+      const da = new Date(a.year||e.year, MONTH_ORDER.indexOf(a.month||'Jan'), parseInt(a.day||1,10));
+      const db = new Date(b.year||e.year, MONTH_ORDER.indexOf(b.month||'Jan'), parseInt(b.day||1,10));
+      return da - db;
+    });
+    const past = allPe.filter(pe => {
+      if (!pe.day || !pe.month) return false;
+      const d = new Date(pe.year||e.year, MONTH_ORDER.indexOf(pe.month), parseInt(pe.day,10));
+      return d < today;
+    }).sort((a,b) => {
+      const da = new Date(a.year||e.year, MONTH_ORDER.indexOf(a.month||'Jan'), parseInt(a.day||1,10));
+      const db = new Date(b.year||e.year, MONTH_ORDER.indexOf(b.month||'Jan'), parseInt(b.day||1,10));
+      return db - da; // newest first
+    });
+
+    const hasPast = past.length > 0;
+    const autoExpand = upcoming.length === 0;
+    const pastHidden = !autoExpand;
+
+    return `<div class="cx-outer" id="cx-outer-${e.id}">
+      <div class="cx-sticky">
+        <div class="cx-poster" id="cx-poster-${e.id}" data-ev="${e.id}">
+          ${e.cover ? `<img class="cx-poster-img" src="${e.cover}" alt="" loading="lazy">` : ''}
+          <div class="cx-poster-band">
+            <div class="cx-poster-meta">
+              <span class="cx-poster-range">
+                <span class="en-only">${range}</span>
+                <span class="ar-only ar" dir="rtl">${rangeAr}</span>
               </span>
-            </a>`).join("")}
-        </div>`
-      : "";
-    return `
-    <a class="cx-card" href="event.html?id=${e.id}" data-ev="${e.id}">
-      <div class="cx-row-top">
-        <span class="cx-range"><span class="en-only">${range}</span><span class="ar-only ar" dir="rtl">${rangeAr}</span></span>
-        <span class="cx-tag"><span class="en-only">On view now</span><span class="ar-only ar" dir="rtl">معروض الآن</span></span>
+              <span class="cx-poster-tag">
+                <span class="en-only">On view now</span>
+                <span class="ar-only ar" dir="rtl">معروض الآن</span>
+              </span>
+            </div>
+            <h3 class="cx-poster-title">
+              <span class="en-only">${e.title}</span>
+              <span class="ar-only ar" dir="rtl">${e.titleAr||e.title}</span>
+            </h3>
+          </div>
+        </div>
+        <div class="cx-rail" id="cx-rail-${e.id}">
+          <div class="cx-track" id="cx-track-${e.id}">
+            ${upcoming.map(pe => cxRow(pe, false)).join('')}
+            ${hasPast ? `<div class="cx-past-toggle" id="cx-ptoggle-${e.id}">
+              <span class="en-only">Past events (${past.length}) ${autoExpand ? '↑' : '↓'}</span>
+              <span class="ar-only ar" dir="rtl">الفعاليات السابقة (${arNum(past.length)}) ${autoExpand ? '↑' : '↓'}</span>
+            </div>
+            <div id="cx-past-rows-${e.id}"${pastHidden ? ' hidden' : ''}>
+              ${past.map(pe => cxRow(pe, true)).join('')}
+            </div>` : ''}
+          </div>
+        </div>
       </div>
-      <h3 class="cx-name">
-        <span class="en-only">${e.title}</span>
-        <span class="ar-only ar" dir="rtl">${e.titleAr || e.title}</span>
-      </h3>
-      <div class="cx-row-bottom">
-        ${e.location ? `<span class="cx-venue">${e.location}</span>` : "<span></span>"}
-        <span class="cx-cta"><span class="en-only">Enter →</span><span class="ar-only ar">← دخول</span></span>
-      </div>
-    </a>
-    ${progRows}`
-  }).join("");
+    </div>`;
+  }).join('');
+
+  // Set up scroll machinery + interactions for each exhibition unit
+  cur.forEach(e => {
+    const outer = document.getElementById('cx-outer-' + e.id);
+    const track = document.getElementById('cx-track-' + e.id);
+    const posterEl = document.getElementById('cx-poster-' + e.id);
+    if (!outer || !track) return;
+
+    let currentProgress = 0;
+    let catchUpRAF = null, catchUpWatchdog = null, catchUpGen = 0;
+    let progressInitialized = false;
+    const SNAP_THRESHOLD = 180, CATCHUP_MS = 260;
+    const easeInOutQuad = t => t < .5 ? 2*t*t : 1 - Math.pow(-2*t+2,2)/2;
+
+    function setup(){
+      if (document.body.classList.contains('gs-reader-open')) return;
+      if (window.innerWidth <= 700){
+        outer.style.height = '';
+        outer.dataset.railRunway = '0';
+        return;
+      }
+      const viewH = window.innerHeight - STICKY_TOP;
+      const totalRailH = track.scrollHeight;
+      const railRunway = Math.max(0, totalRailH - viewH);
+      outer.style.height = (viewH + railRunway) + 'px';
+      outer.dataset.railRunway = railRunway;
+    }
+
+    function applyTrack(p){
+      if (window.innerWidth <= 700) return;
+      track.style.transform = 'translateY(-' + p + 'px)';
+    }
+
+    function onScroll(){
+      if (document.body.classList.contains('gs-reader-open')) return;
+      if (window.innerWidth <= 700) return;
+      const railRunway = parseFloat(outer.dataset.railRunway || 0);
+      const top = outer.getBoundingClientRect().top;
+      const target = Math.min(Math.max(STICKY_TOP - top, 0), railRunway);
+
+      if (catchUpRAF) cancelAnimationFrame(catchUpRAF);
+      if (catchUpWatchdog) clearTimeout(catchUpWatchdog);
+
+      if (!progressInitialized || Math.abs(target - currentProgress) <= SNAP_THRESHOLD){
+        progressInitialized = true;
+        currentProgress = target;
+        applyTrack(currentProgress);
+        return;
+      }
+
+      const from = currentProgress;
+      const t0 = performance.now();
+      const myGen = ++catchUpGen;
+      (function step(now){
+        const t = Math.min(1, (now - t0) / CATCHUP_MS);
+        currentProgress = from + (target - from) * easeInOutQuad(t);
+        applyTrack(currentProgress);
+        catchUpRAF = t < 1 ? requestAnimationFrame(step) : null;
+      })(t0);
+      catchUpWatchdog = setTimeout(function(){
+        if (myGen !== catchUpGen) return;
+        if (catchUpRAF) cancelAnimationFrame(catchUpRAF);
+        currentProgress = target;
+        applyTrack(currentProgress);
+      }, CATCHUP_MS + 150);
+    }
+
+    // Past toggle
+    const ptoggle = document.getElementById('cx-ptoggle-' + e.id);
+    const pastRows = document.getElementById('cx-past-rows-' + e.id);
+    if (ptoggle && pastRows){
+      let pastOpen = !pastRows.hidden;
+      ptoggle.addEventListener('click', function(){
+        pastOpen = !pastOpen;
+        pastRows.hidden = !pastOpen;
+        const n = pastRows.querySelectorAll('.cx-row').length;
+        ptoggle.innerHTML = pastOpen
+          ? `<span class="en-only">Past events (${n}) ↑</span><span class="ar-only ar" dir="rtl">الفعاليات السابقة (${arNum(n)}) ↑</span>`
+          : `<span class="en-only">Past events (${n}) ↓</span><span class="ar-only ar" dir="rtl">الفعاليات السابقة (${arNum(n)}) ↓</span>`;
+        setTimeout(function(){ setup(); onScroll(); }, 20);
+      });
+    }
+
+    // Poster click → in-grid reader (desktop) or mobile reader
+    if (posterEl){
+      posterEl.addEventListener('click', function(ev){
+        if (ev.metaKey || ev.ctrlKey || ev.shiftKey){
+          window.open('event.html?id=' + encodeURIComponent(e.id), '_blank');
+          return;
+        }
+        if (document.body.classList.contains('gs-reader-open') && !posterEl.querySelector('.gs-card-frame')){
+          _gsHardReset();
+        }
+        if (window.innerWidth <= 700){
+          _gsOpenReaderMobile(posterEl);
+        } else {
+          _cxOpenReader(posterEl);
+        }
+      });
+    }
+
+    // Row clicks are plain <a> navigations — stop propagation to poster parent
+    Array.prototype.forEach.call(track.querySelectorAll('a.cx-row'), function(row){
+      row.addEventListener('click', function(ev){ ev.stopPropagation(); });
+    });
+
+    setup();
+    window.addEventListener('resize', function(){ setup(); onScroll(); });
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+  });
 }
 
 /* ============================================================
@@ -980,6 +1131,159 @@ function _gsHardReset(){
   _gsReaderOpen = false;
   window.dispatchEvent(new Event("resize"));
 }
+/* ---------- CX POSTER IN-GRID READER ----------
+   Clicking the exhibition poster grows it rightward over the rail,
+   same wheel-driven/reversible expansion as _gsOpenReader but
+   the axis is poster flex-basis (rightward) instead of track translateX. */
+function _cxOpenReader(posterEl){
+  if (_gsReaderOpen) return;
+  _gsReaderOpen = true;
+
+  const startW = posterEl.getBoundingClientRect().width;
+  const targetW = window.innerWidth;
+
+  const _lockScrollY = window.scrollY;
+  document.body.style.position = 'fixed';
+  document.body.style.top = '-' + _lockScrollY + 'px';
+  document.body.style.left = '0';
+  document.body.style.right = '0';
+  document.body.classList.add('gs-reader-open');
+
+  posterEl.classList.add('gs-card-open');
+  const frame = document.createElement('iframe');
+  frame.className = 'gs-card-frame';
+  frame.title = 'Exhibition';
+  frame.src = 'event.html?id=' + encodeURIComponent(posterEl.dataset.ev) + '&embed=1';
+  frame.style.pointerEvents = 'none';
+  posterEl.appendChild(frame);
+
+  const ease = function(t){ return 1 - Math.pow(1 - t, 3); };
+  const lerp = function(a, b, t){ return a + (b - a) * t; };
+  const CLICK_T = 0.18;
+  const EXPAND_PX = 320;
+  const CLOSE_PX = 320;
+  let scrollT = 0;
+  let rawY = 0;
+  let closeRawY = 0;
+  let closeDir = 0;
+
+  function apply(t){
+    posterEl.style.flexBasis = lerp(startW, targetW, t) + 'px';
+  }
+  function animateOnce(){
+    posterEl.classList.add('cx-poster-anim');
+    setTimeout(function(){ posterEl.classList.remove('cx-poster-anim'); }, 500);
+  }
+  animateOnce();
+  void posterEl.offsetWidth;
+  apply(CLICK_T);
+
+  let closed = false;
+
+  function onWheel(ev){
+    ev.preventDefault();
+    try { onWheelInner(ev); }
+    catch(err){
+      console.warn('[WC] cx reader wheel error', err);
+      closed = true;
+      window.removeEventListener('message', onMsg);
+      window.removeEventListener('keydown', onKey);
+      window.removeEventListener('wheel', onWheel);
+      posterEl.removeEventListener('click', onClick, true);
+      _gsHardReset();
+      _gsReaderClosedAt = Date.now();
+    }
+  }
+  function onWheelInner(ev){
+    if (scrollT < 1){
+      rawY = Math.min(EXPAND_PX, Math.max(-CLOSE_PX, rawY + ev.deltaY));
+      scrollT = rawY >= 0
+        ? CLICK_T + (1 - CLICK_T) * ease(rawY / EXPAND_PX)
+        : CLICK_T * (1 - ease(-rawY / CLOSE_PX));
+      apply(scrollT);
+      if (rawY <= -CLOSE_PX){ collapse(true); return; }
+      return;
+    }
+    const doc = frame.contentDocument, win = frame.contentWindow;
+    if (!doc || !win) return;
+    if (closeDir !== 0){
+      closeRawY = Math.min(CLOSE_PX, Math.max(0, closeRawY + closeDir * ev.deltaY));
+      apply(1 - ease(closeRawY / CLOSE_PX));
+      if (closeRawY <= 0){ closeDir = 0; return; }
+      if (closeRawY >= CLOSE_PX){ collapse(true); return; }
+      return;
+    }
+    const max = doc.documentElement.scrollHeight - win.innerHeight;
+    const atTop = win.scrollY <= 1;
+    const atBottom = win.scrollY >= max - 2;
+    if (ev.deltaY > 0 && atBottom){
+      closeDir = 1;
+      closeRawY = Math.min(CLOSE_PX, ev.deltaY);
+      apply(1 - ease(closeRawY / CLOSE_PX));
+    } else if (ev.deltaY < 0 && atTop){
+      closeDir = -1;
+      closeRawY = Math.min(CLOSE_PX, -ev.deltaY);
+      apply(1 - ease(closeRawY / CLOSE_PX));
+    } else {
+      win.scrollBy(0, ev.deltaY);
+    }
+  }
+
+  function onClick(ev){
+    const rect = frame.getBoundingClientRect();
+    const x = ev.clientX - rect.left, y = ev.clientY - rect.top;
+    if (x < 0 || y < 0 || x > rect.width || y > rect.height) return;
+    const doc = frame.contentDocument;
+    if (!doc) return;
+    const inner = doc.elementFromPoint(x, y);
+    const clickable = inner && inner.closest('a,button');
+    if (!clickable) return;
+    ev.preventDefault(); ev.stopPropagation();
+    const href = clickable.getAttribute && clickable.getAttribute('href');
+    if (href && href.indexOf('event.html?id=') === 0 && href.indexOf('embed=1') === -1 && !clickable.target){
+      frame.contentWindow.location.replace(href + '&embed=1');
+      return;
+    }
+    clickable.click();
+  }
+
+  function onMsg(ev){
+    const d = ev.data || {};
+    if (d.type === 'wc-close' || d.type === 'wc-collapse') collapse();
+  }
+  function onKey(ev){ if (ev.key === 'Escape') collapse(); }
+
+  function collapse(instant){
+    if (closed) return;
+    closed = true;
+    if (!instant){ animateOnce(); apply(0); }
+    setTimeout(function(){
+      frame.remove();
+      posterEl.classList.remove('gs-card-open');
+      posterEl.style.flexBasis = '';
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.left = '';
+      document.body.style.right = '';
+      document.body.classList.remove('gs-reader-open');
+      window.scrollTo(0, _lockScrollY);
+      window.removeEventListener('message', onMsg);
+      window.removeEventListener('keydown', onKey);
+      window.removeEventListener('wheel', onWheel);
+      posterEl.removeEventListener('click', onClick, true);
+      _gsReaderOpen = false;
+      _gsReaderClosedAt = Date.now();
+      window.dispatchEvent(new Event('resize'));
+      window.dispatchEvent(new Event('scroll'));
+    }, instant ? 0 : 520);
+  }
+
+  window.addEventListener('message', onMsg);
+  window.addEventListener('keydown', onKey);
+  window.addEventListener('wheel', onWheel, { passive: false });
+  posterEl.addEventListener('click', onClick, true);
+}
+
 function _gsOpenReader(cardEl){
   if (_gsReaderOpen) return;
   _gsReaderOpen = true;
@@ -1930,6 +2234,7 @@ async function _boot(){
             type: pe.eventType || '',
             day: ps ? String(ps.getDate()).padStart(2,'0') : '',
             month: ps ? MABBR[ps.getMonth()] : '',
+            year: ps ? ps.getFullYear() : new Date().getFullYear(),
             start: ps && (ps.getHours()||ps.getMinutes()) ? ps.toTimeString().slice(0,5) : '',
           };
         }),
