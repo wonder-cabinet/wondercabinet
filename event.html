@@ -11,7 +11,7 @@
 <meta property="og:description" content="A space for art production and cultural development in Bethlehem, Palestine." id="og-desc-meta">
 <meta property="og:image" content="" id="og-image-meta">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="stylesheet" href="assets/app.css?v=57" />
+<link rel="stylesheet" href="assets/app.css?v=58" />
 <style>
   /* This page uses the exact same .ep-* / .event-panel template as every
      other entry point on the site (the homepage hero cards, the Programme
@@ -243,7 +243,9 @@
       writeupAr: doc.writeup?.ar || '',
       cover:    _sanityImg(doc.cover),
       content:  doc.content || [],
-      relatedArtists: (doc.relatedArtists||[]).map(a => ({ name: _loc(a.name), slug: a.slug || '' })).filter(a => a.name),
+      relatedArtists: (doc.relatedArtists||[]).map(a => ({
+        name: a.name?.en || a.name?.ar || '', nameAr: a.name?.ar || '', slug: a.slug || '',
+      })).filter(a => a.name),
       relatedProject: doc.relatedProject ? { title: _loc(doc.relatedProject.title), slug: doc.relatedProject.slug?.current || '' } : null,
       programmeEvents: (doc.programmeEvents || []).map(pe => {
         const ps = _iso(pe.startDateTime);
@@ -472,7 +474,12 @@ ${audioBar}
       ${ev.relatedArtists && ev.relatedArtists.length ? `<div class="ep-fact">
         <span class="ef-key"><span class="en-only">Artists</span><span class="ar-only ar">فنانون</span></span>
         <span class="ef-leader"></span>
-        <span class="ef-val">${ev.relatedArtists.map(a=>a.name).join(', ')}</span>
+        <span class="ef-val">${ev.relatedArtists.map(a => {
+          const inner = `<span class="en-only">${a.name}</span><span class="ar-only ar">${a.nameAr || a.name}</span>`;
+          return a.slug
+            ? `<a class="ep-artist-link" href="artist.html?id=${encodeURIComponent(a.slug)}"${EMBED ? ' target="_top"' : ''}>${inner}</a>`
+            : inner;
+        }).join(', ')}</span>
       </div>` : ""}
       ${ev.relatedProject ? `<div class="ep-fact">
         <span class="ef-key"><span class="en-only">Part of</span><span class="ar-only ar">جزء من</span></span>

@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en" data-lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>All Artists – The Wonder Cabinet – مجلس العجب</title>
+<meta name="description" content="Artists working with The Wonder Cabinet in Bethlehem, Palestine.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="The Wonder Cabinet">
+<meta property="og:title" content="All Artists – The Wonder Cabinet">
+<meta property="og:description" content="Artists working with The Wonder Cabinet in Bethlehem, Palestine.">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="assets/app.css?v=58" />
+<style>
+  body{ background: var(--night); color: var(--paper); min-height: 100vh; }
+  .ev-lang-toggle{
+    position: fixed; top: 20px; left: 24px; z-index: 50;
+    display: inline-flex; gap: 16px; border: none; background: none;
+  }
+  .ev-lang-toggle button{
+    border: none !important; background: none !important;
+    color: var(--paper) !important; opacity: .5;
+    font-family: var(--ff-sans); font-size: 12px; letter-spacing: 0; font-weight: 700;
+    padding: 0;
+  }
+  .ev-lang-toggle button[aria-pressed="true"]{ opacity: 1; }
+  .art-close{
+    all: unset; cursor: pointer;
+    position: fixed; top: 18px; right: 24px; z-index: 50;
+    color: var(--paper); font-size: 24px; font-weight: 700; line-height: 1;
+    opacity: .6; transition: opacity .15s;
+  }
+  .art-close:hover{ opacity: 1; }
+  html[data-lang="ar"] .art-close{ right: auto; left: 24px; }
+  .artists-page-wrap{ max-width: 1320px; margin: 0 auto; padding: 96px 24px 96px; }
+  .artists-page-label{
+    font-family: var(--ff-sans); font-size: 12px; letter-spacing: 0;
+    text-transform: uppercase; font-weight: 700; opacity: .85;
+    text-align: center; margin: 0 0 32px;
+  }
+  .artists-empty{
+    font-family: var(--ff-sans); font-size: 14px; opacity: .6; text-align: center;
+  }
+</style>
+</head>
+<body>
+
+<div class="ev-lang-toggle lang-toggle" role="group" aria-label="Language">
+  <button data-lang-btn="en" aria-pressed="true">EN</button>
+  <button data-lang-btn="ar" aria-pressed="false">AR</button>
+</div>
+<a class="art-close" href="index.html#gs-artists-section" aria-label="Back">✕</a>
+
+<main class="artists-page-wrap">
+  <div class="artists-page-label">
+    <span class="en-only">All artists</span>
+    <span class="ar-only ar" dir="rtl">جميع الفنانين</span>
+  </div>
+  <div class="gs-artist-list" id="artistsList"></div>
+</main>
+
+<script>
+(async function(){
+  const SANITY_PROJECT = 'xdtj605l', SANITY_DATASET = 'production';
+  const BASE = `https://${SANITY_PROJECT}.api.sanity.io/v2024-01-01/data/query/${SANITY_DATASET}?query=`;
+  async function groq(query){ const res = await fetch(BASE + encodeURIComponent(query)); const json = await res.json(); return json.result; }
+
+  const listEl = document.getElementById('artistsList');
+  try {
+    const docs = await groq(`*[_type == "artist"] | order(name.en asc) { name, "slug": slug.current }`);
+    const artists = (docs || []).map(d => ({
+      name: d.name?.en || d.name?.ar || '',
+      nameAr: d.name?.ar || '',
+      slug: d.slug || '',
+    })).filter(a => a.name);
+
+    if (artists.length){
+      listEl.innerHTML = artists.map(a => {
+        const inner = `<span class="en-only">${a.name}</span><span class="ar-only ar" dir="rtl">${a.nameAr || a.name}</span>`;
+        return a.slug
+          ? `<a class="gs-artist-name" href="artist.html?id=${encodeURIComponent(a.slug)}">${inner}</a>`
+          : `<span class="gs-artist-name" style="cursor:default;">${inner}</span>`;
+      }).join('');
+    } else {
+      listEl.innerHTML = `<p class="artists-empty"><span class="en-only">No artists yet.</span><span class="ar-only ar" dir="rtl">لا يوجد فنانون بعد.</span></p>`;
+    }
+  } catch (err) {
+    console.warn('[WC] artists index fetch failed', err);
+    listEl.innerHTML = `<p class="artists-empty">Couldn't load artists.</p>`;
+  }
+
+  // Language toggle
+  document.querySelectorAll('[data-lang-btn]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('[data-lang-btn]').forEach(b => b.setAttribute('aria-pressed', 'false'));
+      btn.setAttribute('aria-pressed', 'true');
+      document.documentElement.setAttribute('data-lang', btn.dataset.langBtn);
+      try { localStorage.setItem('twc-lang', btn.dataset.langBtn); } catch (e) {}
+    });
+  });
+  try {
+    const saved = localStorage.getItem('twc-lang');
+    if (saved) {
+      document.documentElement.setAttribute('data-lang', saved);
+      document.querySelectorAll('[data-lang-btn]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.langBtn === saved)));
+    }
+  } catch (e) {}
+})();
+</script>
+</body>
+</html>

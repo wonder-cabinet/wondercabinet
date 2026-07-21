@@ -2925,3 +2925,92 @@ html[data-lang="ar"] .ep-prog-row { direction: rtl; }
 html[data-lang="ar"] .ep-nav { direction: rtl; }
 html[data-lang="ar"] .ep-nav-prev { order: 2; }
 html[data-lang="ar"] .ep-nav-next { order: 1; }
+
+/* =========================================================
+   ARTISTS — WS1 homepage giant type + WS2 artist pages
+   ========================================================= */
+
+/* Inline artist-name link inside event-page fact rows (ep-facts) */
+.ep-artist-link{ color: inherit; text-decoration: underline; text-underline-offset: 3px; transition: opacity .12s; }
+.ep-artist-link:hover{ opacity: .65; }
+
+/* Stacked giant type — shared by the homepage "Artists this week" section
+   and the artists.html all-artists index. Pure type, no cards, no rules. */
+.gs-artist-list{
+  display: flex; flex-direction: column; align-items: center;
+  text-align: center; gap: 0;
+}
+.gs-artist-name{
+  display: block; width: 100%;
+  font-family: var(--ff-sans); font-weight: 700; text-transform: uppercase;
+  font-size: clamp(40px, 8.5vw, 168px); line-height: .94; letter-spacing: 0;
+  color: var(--paper); text-decoration: none;
+  padding: .06em 0; overflow-wrap: break-word;
+  transition: color .15s;
+}
+.gs-artist-name:hover, .gs-artist-name:focus-visible{ color: var(--highlight); }
+.gs-artist-name .ar{ font-family: var(--ff-ar); font-weight: 700; text-transform: none; }
+.gs-artist-all{
+  display: inline-block; margin-top: 28px;
+  font-family: var(--ff-sans); font-size: 12px; letter-spacing: 0;
+  text-transform: uppercase; font-weight: 700;
+  color: var(--paper); opacity: .65; text-decoration: none;
+  transition: opacity .15s;
+}
+.gs-artist-all:hover{ opacity: 1; }
+
+/* Arabic renders visually larger at these sizes — trim the clamp a touch
+   so it doesn't overflow/wrap worse than the Latin type. */
+html[data-lang="ar"] .gs-artist-name{ font-size: clamp(34px, 7vw, 136px); }
+
+@media (max-width: 700px){
+  .gs-artist-name{ font-size: clamp(30px, 10vw, 64px); }
+  html[data-lang="ar"] .gs-artist-name{ font-size: clamp(26px, 8.5vw, 54px); }
+  .gs-artist-all{ margin-top: 20px; }
+}
+
+/* Artist detail page (artist.html) — header: name/meta + flat photo.
+   EN: photo right-aligned (DOM order text→photo, row direction).
+   AR: photo left-aligned (row-reverse mirrors the same DOM order). */
+.art-header{
+  display: flex; align-items: flex-start; gap: clamp(24px, 4vw, 56px);
+  flex-wrap: wrap; padding-bottom: 8px;
+}
+.art-header-text{ flex: 1 1 320px; min-width: 260px; display: flex; flex-direction: column; gap: 10px; }
+.art-meta-line{
+  font-family: var(--ff-sans); font-size: 14px; font-weight: 500;
+  opacity: .65; margin: 0;
+}
+.art-meta-line .ar{ font-family: var(--ff-ar); font-size: 16px; }
+.art-photo-wrap{ flex: 0 0 auto; width: min(340px, 42vw); }
+.art-photo-wrap img{
+  display: block; width: 100%; height: auto;
+  object-fit: cover; border-radius: 0;
+}
+html[data-lang="ar"] .art-header{ flex-direction: row-reverse; text-align: right; }
+html[data-lang="ar"] .art-header-text{ align-items: flex-end; }
+@media (max-width: 700px){
+  .art-header{ flex-direction: column !important; }
+  .art-header-text{ order: 2; }
+  .art-photo-wrap{ order: 1; width: 100%; }
+  html[data-lang="ar"] .art-header-text{ align-items: flex-start; }
+}
+
+/* Past-events toggle on the artist page — same click-to-expand idea as the
+   exhibition rail's .cx-past-toggle, sized for a natural-height row list
+   instead of the 35vh rail rows. */
+.art-past-toggle{
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 0; margin-top: 4px;
+  border-top: 1px solid currentColor;
+  cursor: pointer; user-select: none;
+  font-family: var(--ff-sans); font-size: 12px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .05em; opacity: .6;
+  transition: opacity .12s;
+}
+.art-past-toggle:hover{ opacity: 1; }
+.art-past-arrow{ display: inline-block; transition: transform .2s; }
+.art-past-toggle[aria-expanded="true"] .art-past-arrow{ transform: rotate(180deg); }
+.art-past-list[hidden]{ display: none; }
+
+html[data-lang="ar"] .art-past-toggle{ direction: rtl; }

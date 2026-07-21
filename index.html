@@ -12,7 +12,7 @@
 <meta property="og:url" content="https://wondercabinet.space">
 <meta property="og:image" content="" id="og-image-meta">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="stylesheet" href="assets/app.css?v=57">
+<link rel="stylesheet" href="assets/app.css?v=58">
 </head>
 <body data-view="list">
 
@@ -89,7 +89,7 @@
 
   <section class="gs-vsection gs-dark" id="gs-artists-section" hidden>
     <h2><span class="en-only">Artists this week</span><span class="ar-only ar" dir="rtl">فنانو هذا الأسبوع</span></h2>
-    <div class="gs-marquee-wrap"><div class="gs-marquee" id="gs-marquee-artists" style="justify-content:flex-end;"></div></div>
+    <div class="gs-artist-list" id="gs-artist-list"></div>
   </section>
 
 </section>
@@ -2091,23 +2091,29 @@ function renderFeatured(){
       </div>`).join("");
   }
 
-  // Artists in this week — marquee. Links intentionally disabled until
-  // dedicated artist pages exist.
+  // Artists this week — pure typography, festival-poster style. Each name
+  // links to its own artist page; "All artists" links to the full index.
   const artistsSection = document.getElementById("gs-artists-section");
-  const marqueeArtists = document.getElementById("gs-marquee-artists");
+  const artistList = document.getElementById("gs-artist-list");
   if (ARTISTS.length){
     artistsSection.hidden = false;
-    marqueeArtists.innerHTML = ARTISTS.map(a => {
-      const inner = `<h3 class="gs-m-title">${a.name}</h3><span class="gs-m-sub">${a.discipline || ""}</span>`;
-      return `<div class="gs-m-card gs-m-card-static">${inner}</div>`;
-    }).join("");
+    artistList.innerHTML = ARTISTS.map(a => {
+      const inner = `<span class="en-only">${a.name}</span><span class="ar-only ar" dir="rtl">${a.nameAr || a.name}</span>`;
+      return a.slug
+        ? `<a class="gs-artist-name" href="artist.html?id=${encodeURIComponent(a.slug)}">${inner}</a>`
+        : `<span class="gs-artist-name" style="cursor:default;">${inner}</span>`;
+    }).join("") + `<a class="gs-artist-all" href="artists.html">
+      <span class="en-only">All artists →</span>
+      <span class="ar-only ar" dir="rtl">← جميع الفنانين</span>
+    </a>`;
+  } else {
+    artistsSection.hidden = true;
   }
 
-  // Scroll-linked (not autonomous) parallax for the two marquees, opposite directions
+  // Scroll-linked (not autonomous) parallax for the projects marquee
   function parallax(){
     const y = window.scrollY;
     if (marqueeProjects) marqueeProjects.style.transform = `translateX(${(-(y * 0.05) % 200)}px)`;
-    if (marqueeArtists)  marqueeArtists.style.transform  = `translateX(${((y * 0.05) % 200)}px)`;
   }
   window.addEventListener("scroll", parallax, { passive: true });
 }
@@ -2164,7 +2170,7 @@ async function _boot(){
       return { key:`${n.toLowerCase()}-${y}`, name:n, year:y };
     }
     const q = encodeURIComponent(`{
-      "events": *[_type == "event"] | order(startDateTime desc) { ..., location->{ name }, relatedArtists[]->{name, "slug": slug.current, discipline, photo}, relatedProject->{title, slug}, programmeEvents[]->{_id, "slug": slug.current, title, eventType, startDateTime} },
+      "events": *[_type == "event"] | order(startDateTime desc) { ..., location->{ name }, relatedArtists[]->{name, "slug": slug.current}, relatedProject->{title, slug}, programmeEvents[]->{_id, "slug": slug.current, title, eventType, startDateTime} },
       "projects": *[_type == "project"] | order(year desc) { title, "slug": slug.current, description, year, coverImage },
       "residencies": *[_type == "residency"] | order(year desc) { title, "slug": slug.current, description, year, coverImage },
       "settings": *[_type == "siteSettings"][0]{ monthlyThemeTitle, monthlyThemeDescription, ogImage, address, hours, mapsUrl }
@@ -2221,8 +2227,9 @@ async function _boot(){
         cover:    _sanityImg(doc.cover),
         content:  doc.content || [],
         relatedArtists: (doc.relatedArtists||[]).map(a => ({
-          name: _loc(a.name), slug: a.slug || '',
-          discipline: (a.discipline||[]).join(', '), photo: _sanityImg(a.photo),
+          name: a.name?.en || a.name?.ar || '',
+          nameAr: a.name?.ar || '',
+          slug: a.slug || '',
         })).filter(a => a.name),
         relatedProject: doc.relatedProject ? { title: _loc(doc.relatedProject.title), slug: doc.relatedProject.slug?.current || '' } : null,
         programmeEvents: (doc.programmeEvents || []).map(pe => {
