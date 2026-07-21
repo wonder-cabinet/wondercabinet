@@ -12,7 +12,7 @@
 <meta property="og:url" content="https://wondercabinet.space">
 <meta property="og:image" content="" id="og-image-meta">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="stylesheet" href="assets/app.css?v=65">
+<link rel="stylesheet" href="assets/app.css?v=66">
 </head>
 <body data-view="list">
 
@@ -1885,16 +1885,19 @@ function _gsOpenReaderMobile(cardEl){
   const targetH = Math.max(window.innerHeight - 78, 480);
 
   cardEl.classList.add("gs-card-open", "gs-card-open-m");
-  // Timeline rows and exhibition cards reuse this whole path on narrow
-  // viewports — they just need their own "host an absolute frame, hide my
-  // own content" class since the gs-card one is scoped to card children.
-  if (cardEl.matches(".tl-row, .cx-card, .cx-prog-row, .cx-row")) cardEl.classList.add("tl-row-open");
+  // Timeline rows, exhibition cards and artist names reuse this whole path
+  // on narrow viewports — they just need their own "host an absolute frame,
+  // hide my own content" class since the gs-card one is scoped to card
+  // children.
+  if (cardEl.matches(".tl-row, .cx-card, .cx-prog-row, .cx-row, .gs-lineup-name")) cardEl.classList.add("tl-row-open");
   cardEl.style.height = startH + "px";
 
   const frame = document.createElement("iframe");
   frame.className = "gs-card-frame";
-  frame.title = "Event";
-  frame.src = `event.html?id=${encodeURIComponent(cardEl.dataset.ev)}&embed=1`;
+  frame.title = cardEl.dataset.artist ? "Artist" : "Event";
+  frame.src = cardEl.dataset.artist
+    ? `artist.html?id=${encodeURIComponent(cardEl.dataset.artist)}&embed=1`
+    : `event.html?id=${encodeURIComponent(cardEl.dataset.ev)}&embed=1`;
   cardEl.appendChild(frame);
 
   // Force a reflow so the starting height + transition are live before the
@@ -2138,6 +2141,191 @@ function _tlOpenReader(rowEl){
     window.addEventListener("keydown", onKey);
     window.addEventListener("wheel", onWheel, { passive: false });
     rowEl.addEventListener("click", onClick, true);
+  }
+}
+
+/* ---------- ARTIST NAME IN-GRID READER ----------
+   "Artists this week" names host the same reader as the Programme
+   timeline rows — a near-verbatim copy of _tlOpenReader, since a
+   .gs-lineup-name link is, like a .tl-row, just a normal block-level
+   element sitting in ordinary page flow (no horizontal/vertical rail to
+   coordinate with). Only the iframe src template differs (artist.html
+   instead of event.html, keyed off data-artist instead of data-ev) — the
+   grow-in-place math only ever reads the element's own
+   getBoundingClientRect(), so it opens exactly where the giant stacked
+   name sits regardless of its width or font size. */
+function _artistOpenReader(nameEl){
+  if (_gsReaderOpen) return;
+  _gsReaderOpen = true;
+
+  const TOP = 56; // reading position: just below the fixed topbar
+
+  begin();
+
+  function begin(){
+    const r0 = nameEl.getBoundingClientRect();
+    const startH = r0.height;
+    const targetH = window.innerHeight - TOP;
+    const rise = r0.top - TOP;
+
+    const _lockScrollY = window.scrollY;
+    document.body.style.position = "fixed";
+    document.body.style.top = `-${_lockScrollY}px`;
+    document.body.style.left = "0";
+    document.body.style.right = "0";
+    document.body.classList.add("gs-reader-open");
+
+    nameEl.classList.add("tl-row-open");
+    const frame = document.createElement("iframe");
+    frame.className = "gs-card-frame";
+    frame.title = "Artist";
+    frame.src = `artist.html?id=${encodeURIComponent(nameEl.dataset.artist)}&embed=1`;
+    frame.style.pointerEvents = "none";
+    nameEl.appendChild(frame);
+
+    const ease = t => 1 - Math.pow(1 - t, 3);
+    const lerp = (a, b, t) => a + (b - a) * t;
+    const CLICK_T = 0.18;
+    const EXPAND_PX = 320;
+    const CLOSE_PX = 320;
+    let scrollT = 0;
+    let rawY = 0;
+    let closeRawY = 0;
+    let closeDir = 0;
+
+    function apply(t){
+      nameEl.style.height = lerp(startH, targetH, t) + "px";
+      nameEl.style.transform = `translateY(${(-rise * t).toFixed(2)}px)`;
+    }
+
+    let visT = 0;
+    let targetT = 0;
+    let closing = false;
+    const CHASE = 0.22;
+    const MIN_STEP = 0.004;
+    const anim = setInterval(() => {
+      if (closed) return;
+      const d = targetT - visT;
+      if (Math.abs(d) < 0.006){
+        if (visT !== targetT){ visT = targetT; apply(visT); }
+        if (closing) finish();
+        return;
+      }
+      visT += Math.sign(d) * Math.min(Math.abs(d), Math.max(Math.abs(d) * CHASE, MIN_STEP));
+      apply(visT);
+    }, 16);
+
+    function requestClose(){
+      closing = true;
+      targetT = 0;
+    }
+    targetT = CLICK_T;
+
+    function onWheel(e){
+      e.preventDefault();
+      try{ onWheelInner(e); }
+      catch(err){
+        console.warn("[WC] artist reader wheel error, resetting", err);
+        closed = true;
+        clearInterval(anim);
+        window.removeEventListener("message", onMsg);
+        window.removeEventListener("keydown", onKey);
+        window.removeEventListener("wheel", onWheel);
+        nameEl.removeEventListener("click", onClick, true);
+        _gsHardReset();
+        _gsReaderClosedAt = Date.now();
+      }
+    }
+    function onWheelInner(e){
+      const dy = _wcWheelDeltaY(e);
+      if (closing) return;
+      if (scrollT < 1){
+        rawY = Math.min(EXPAND_PX, Math.max(-CLOSE_PX, rawY + dy));
+        scrollT = rawY >= 0
+          ? CLICK_T + (1 - CLICK_T) * ease(rawY / EXPAND_PX)
+          : CLICK_T * (1 - ease(-rawY / CLOSE_PX));
+        targetT = scrollT;
+        if (rawY <= -CLOSE_PX) requestClose();
+        return;
+      }
+      const doc = frame.contentDocument, win = frame.contentWindow;
+      if (!doc || !win) return;
+      if (closeDir !== 0){
+        closeRawY = Math.min(CLOSE_PX, Math.max(0, closeRawY + closeDir * dy));
+        targetT = 1 - ease(closeRawY / CLOSE_PX);
+        if (closeRawY <= 0){ closeDir = 0; return; }
+        if (closeRawY >= CLOSE_PX) requestClose();
+        return;
+      }
+      const max = doc.documentElement.scrollHeight - win.innerHeight;
+      const atTop = win.scrollY <= 1;
+      const atBottom = win.scrollY >= max - 2;
+      if (dy > 0 && atBottom){
+        closeDir = 1;
+        closeRawY = Math.min(CLOSE_PX, dy);
+        targetT = 1 - ease(closeRawY / CLOSE_PX);
+      } else if (dy < 0 && atTop){
+        closeDir = -1;
+        closeRawY = Math.min(CLOSE_PX, -dy);
+        targetT = 1 - ease(closeRawY / CLOSE_PX);
+      } else {
+        win.scrollBy(0, dy);
+      }
+    }
+
+    function onClick(e){
+      const rect = frame.getBoundingClientRect();
+      const x = e.clientX - rect.left, y = e.clientY - rect.top;
+      if (x < 0 || y < 0 || x > rect.width || y > rect.height) return;
+      const doc = frame.contentDocument;
+      if (!doc) return;
+      const inner = doc.elementFromPoint(x, y);
+      const clickable = inner && inner.closest("a,button");
+      if (!clickable) return;
+      e.preventDefault();
+      e.stopPropagation();
+      const href = clickable.getAttribute && clickable.getAttribute("href");
+      if (href && href.indexOf("event.html?id=") === 0 && href.indexOf("embed=1") === -1 && !clickable.target){
+        frame.contentWindow.location.replace(href + "&embed=1");
+        return;
+      }
+      clickable.click();
+    }
+
+    function onMsg(e){
+      const d = e.data || {};
+      if (d.type === "wc-close" || d.type === "wc-collapse") requestClose();
+    }
+    function onKey(e){ if (e.key === "Escape") requestClose(); }
+
+    let closed = false;
+    function finish(){
+      if (closed) return;
+      closed = true;
+      clearInterval(anim);
+      frame.remove();
+      nameEl.classList.remove("tl-row-open", "tl-anim");
+      nameEl.style.height = "";
+      nameEl.style.transform = "";
+      document.body.style.position = "";
+      document.body.style.top = "";
+      document.body.style.left = "";
+      document.body.style.right = "";
+      document.body.classList.remove("gs-reader-open");
+      window.scrollTo(0, _lockScrollY);
+      window.removeEventListener("message", onMsg);
+      window.removeEventListener("keydown", onKey);
+      window.removeEventListener("wheel", onWheel);
+      nameEl.removeEventListener("click", onClick, true);
+      _gsReaderOpen = false;
+      _gsReaderClosedAt = Date.now();
+      window.dispatchEvent(new Event("resize"));
+    }
+
+    window.addEventListener("message", onMsg);
+    window.addEventListener("keydown", onKey);
+    window.addEventListener("wheel", onWheel, { passive: false });
+    nameEl.addEventListener("click", onClick, true);
   }
 }
 
@@ -2414,12 +2602,33 @@ function renderFeatured(){
     artistList.innerHTML = ARTISTS.map(a => {
       const inner = `<span class="en-only">${a.name}</span><span class="ar-only ar" dir="rtl">${a.nameAr || a.name}</span>`;
       return a.slug
-        ? `<a class="gs-lineup-name" href="artist.html?id=${encodeURIComponent(a.slug)}">${inner}</a>`
+        ? `<a class="gs-lineup-name" href="artist.html?id=${encodeURIComponent(a.slug)}" data-artist="${a.slug}">${inner}</a>`
         : `<span class="gs-lineup-name" style="cursor:default;">${inner}</span>`;
     }).join("") + `<a class="gs-lineup-all" href="artists.html">
       <span class="en-only">All artists →</span>
       <span class="ar-only ar" dir="rtl">← جميع الفنانين</span>
     </a>`;
+
+    // Artist names open the same in-grid reader as the Programme timeline
+    // rows (_artistOpenReader mirrors _tlOpenReader) — the clicked name
+    // itself grows in place. Middle/Cmd/Ctrl/Shift-click still navigates
+    // normally (new tab / real, shareable URL). Names without a slug never
+    // got a real <a> above, so nothing to wire here for those.
+    Array.prototype.forEach.call(artistList.querySelectorAll('a.gs-lineup-name[data-artist]'), function(nameEl){
+      nameEl.addEventListener('click', function(ev){
+        ev.stopPropagation();
+        if (ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.button === 1) return;
+        ev.preventDefault();
+        if (document.body.classList.contains('gs-reader-open') && !nameEl.querySelector('.gs-card-frame')){
+          _gsHardReset();
+        }
+        if (window.innerWidth <= 700){
+          _gsOpenReaderMobile(nameEl);
+        } else {
+          _artistOpenReader(nameEl);
+        }
+      });
+    });
   } else {
     artistsSection.hidden = true;
   }
