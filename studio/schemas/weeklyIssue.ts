@@ -43,10 +43,17 @@ export const weeklyIssue = defineType({
     }),
     defineField({
       name: 'events',
-      title: 'Events in this issue (optional override)',
-      description: 'Leave empty to automatically include everything scheduled within the week range above. Only set this to hand-pick a different set (e.g. to exclude something, or to group events that don\'t neatly fit a Mon–Sun week).',
+      title: 'Events in this issue',
+      description: 'Auto-filled once with everything scheduled that week. Remove any you don\'t want shown — the sync script won\'t add them back. You can also add events by hand (e.g. something that doesn\'t neatly fit a Mon–Sun week).',
       type: 'array',
       of: [{type: 'reference', to: [{type: 'event'}]}],
+    }),
+    defineField({
+      name: 'eventsAutoAssigned',
+      title: 'Events auto-assigned',
+      type: 'boolean',
+      hidden: true,
+      initialValue: false,
     }),
   ],
   orderings: [

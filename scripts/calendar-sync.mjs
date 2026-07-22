@@ -660,9 +660,16 @@ async function fetchExistingEvents() {
   );
 }
 
-async function fetchExistingIssueIds() {
-  const ids = await sanityQuery('*[_type=="weeklyIssue"]._id');
-  return new Set(ids || []);
+async function fetchExistingIssues() {
+  // eventsAutoAssigned (a hidden schema field, not the events array itself)
+  // is the sentinel for "have we ever auto-filled this doc's events list."
+  // Using a dedicated flag instead of "is events empty?" means an editor can
+  // remove events down to zero on purpose without the next sync run
+  // silently re-populating it — see main()'s weekly-issue pass.
+  const docs = await sanityQuery('*[_type=="weeklyIssue"]{_id, eventsAutoAssigned}');
+  const byId = new Map();
+  for (const d of docs || []) byId.set(d._id, !!d.eventsAutoAssigned);
+  return byId;
 }
 
 async function fetchIcsText() {
@@ -860,22 +867,46 @@ async function main() {
   // --- weekly-issue auto-creation pass ---
   // Ensure this week's and next week's `weeklyIssue` doc shell exists so an
   // editor always has somewhere in Studio to type the theme title/description
-  // ahead of (or during) the week — see studio/schemas/weeklyIssue.ts.
-  // createIfNotExists means re-runs never clobber a theme an editor already
-  // entered, or an events override they've hand-picked.
-  const existingIssueIds = await fetchExistingIssueIds();
+  // ahead of (or during) the week — see studio/schemas/weeklyIssue.ts. The
+  // `events` reference array is auto-filled once (with everything scheduled
+  // that week, by start date) so an editor sees a ready-made, editable list
+  // in Studio and can just delete the ones they want excluded — rather than
+  // hand-picking a whole week's events from scratch. `eventsAutoAssigned`
+  // marks that the one-time fill has happened; later runs never touch
+  // `events` again once that's set, so removals (even down to zero) stick.
+  const existingIssues = await fetchExistingIssues(); // Map<issueId, eventsAutoAssigned>
   const thisWeek = getHebronWeekBounds(now);
   const nextWeek = getHebronWeekBounds(new Date(thisWeek.mondayDate.getTime() + 7 * 86400000));
   for (const { weekStart, weekEnd } of [thisWeek, nextWeek]) {
     const issueId = `weekly-issue-${weekStart}`;
-    if (existingIssueIds.has(issueId)) {
-      actions.push({ action: "OK", id: issueId, title: "(weekly issue)", date: weekStart, notes: "already exists" });
+    const alreadyExists = existingIssues.has(issueId);
+    const alreadyAutoAssigned = existingIssues.get(issueId) === true;
+
+    if (alreadyExists && alreadyAutoAssigned) {
+      actions.push({ action: "OK", id: issueId, title: "(weekly issue)", date: weekStart, notes: "already exists; events list already auto-assigned (editor-curated from here)" });
       continue;
     }
-    mutations.push({
-      createIfNotExists: { _id: issueId, _type: "weeklyIssue", weekStart, weekEnd },
-    });
-    actions.push({ action: "CREATE", id: issueId, title: "(weekly issue)", date: weekStart, notes: `week ${weekStart} → ${weekEnd}; theme left blank for editor` });
+
+    // Events whose start date (Hebron wall-clock, same convention as
+    // calendarDate() elsewhere in this file) falls within this Mon–Sun week.
+    const weekEventIds = existingDocs
+      .filter((d) => d.startDateTime && calendarDate(d.startDateTime) >= weekStart && calendarDate(d.startDateTime) <= weekEnd)
+      .map((d) => d._id);
+    const eventsField = weekEventIds.map((id) => ({ _type: "reference", _ref: id, _key: id }));
+
+    if (!alreadyExists) {
+      mutations.push({
+        createIfNotExists: { _id: issueId, _type: "weeklyIssue", weekStart, weekEnd, events: eventsField, eventsAutoAssigned: true },
+      });
+      actions.push({ action: "CREATE", id: issueId, title: "(weekly issue)", date: weekStart, notes: `week ${weekStart} → ${weekEnd}; theme left blank for editor; auto-assigned ${weekEventIds.length} event(s)` });
+    } else {
+      // Doc exists (e.g. created before this feature shipped) but never had
+      // its events auto-filled — patch it in now, once.
+      mutations.push({
+        patch: { id: issueId, set: { events: eventsField, eventsAutoAssigned: true } },
+      });
+      actions.push({ action: "PATCH", id: issueId, title: "(weekly issue)", date: weekStart, notes: `backfilled events list with ${weekEventIds.length} event(s) (one-time auto-assign)` });
+    }
   }
 
   printTable(actions);
