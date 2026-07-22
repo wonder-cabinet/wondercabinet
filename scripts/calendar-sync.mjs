@@ -955,7 +955,22 @@ function printTable(actions) {
   }
 }
 
-main().catch((err) => {
-  console.error(err);
-  process.exit(1);
-});
+// CLI entry point. Guarded so this file can *also* be imported as a module
+// (see api/calendar-webhook.mjs, which calls `main()` directly on each
+// real-time push notification) without auto-running on import.
+const isDirectRun = (() => {
+  try {
+    return import.meta.url === `file://${process.argv[1]}`;
+  } catch {
+    return false;
+  }
+})();
+
+if (isDirectRun) {
+  main().catch((err) => {
+    console.error(err);
+    process.exit(1);
+  });
+}
+
+export { main };

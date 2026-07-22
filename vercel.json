@@ -2,5 +2,8 @@
   "buildCommand": "",
   "outputDirectory": ".",
   "cleanUrls": true,
-  "trailingSlash": false
+  "trailingSlash": false,
+  "crons": [
+    { "path": "/api/renew-watch", "schedule": "0 3 * * *" }
+  ]
 }
