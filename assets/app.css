@@ -2237,6 +2237,12 @@ body.gs-reader-open{ overflow: hidden; }
 .ep-free{ cursor: default; opacity: .6; background: transparent; color: currentColor; padding: 0; }
 .ep-free:hover{ opacity: .6; }
 
+/* Registration closed — event ended, but keep the CTA on the page (not
+   removed) so it's clear registration existed and is simply no longer open. */
+.ep-register-disabled{ cursor: default; opacity: .45; pointer-events: none; }
+.ep-register-disabled:hover{ opacity: .45; }
+.ep-register-header.ep-register-disabled{ background: transparent; border: 1px solid currentColor; color: inherit; }
+
 /* ---- FULLSCREEN (Opening / featured events) ---- */
 .event-fullscreen{
   position: fixed; inset: 0; z-index: 210;
