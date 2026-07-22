@@ -791,20 +791,6 @@ function renderCurrentExhibitions(){
 
   const STICKY_TOP = 54;
 
-  function cxRow(pe, isPast){
-    const dateStr = pe.day ? `${parseInt(pe.day,10)} ${(MONTH_NAME_EN[pe.month]||'').slice(0,3)}` : '';
-    const dateArStr = pe.day ? `${arNum(parseInt(pe.day,10))} ${MONTH_NAME_AR[pe.month]||''}` : '';
-    return `<a class="cx-row${isPast ? ' is-past' : ''}" href="event.html?id=${encodeURIComponent(pe.id)}" data-ev="${pe.id}">
-      ${dateStr ? `<div class="cx-row-date"><span class="en-only">${dateStr}</span><span class="ar-only ar" dir="rtl">${dateArStr}</span></div>` : ''}
-      ${pe.type ? `<div class="cx-row-type">${pe.type}</div>` : ''}
-      <h4 class="cx-row-title">
-        <span class="en-only">${pe.title}</span>
-        <span class="ar-only ar" dir="rtl">${pe.titleAr||pe.title}</span>
-      </h4>
-      ${pe.start ? `<div class="cx-row-time">${pe.start}</div>` : ''}
-    </a>`;
-  }
-
   list.innerHTML = cur.map(e => {
     const range = `${parseInt(e.day,10)} ${(MONTH_NAME_EN[e.month]||'').slice(0,3)} — ${parseInt(e.endDay||e.day,10)} ${(MONTH_NAME_EN[e.endMonth||e.month]||'').slice(0,3)}`;
     const rangeAr = `${arNum(parseInt(e.day,10))} ${MONTH_NAME_AR[e.month]||''} — ${arNum(parseInt(e.endDay||e.day,10))} ${MONTH_NAME_AR[e.endMonth||e.month]||''}`;
@@ -1121,6 +1107,37 @@ function _gsEventCard(ev){
 function _gsEmptyCard(en, ar){
   return `<div class="gs-card gs-card-empty">
     <p class="gs-c-desc"><span class="en-only">${en}</span><span class="ar-only ar" dir="rtl">${ar}</span></p>
+  </div>`;
+}
+
+// Compact list-row style shared by the exhibitions programme rail
+// (renderCurrentExhibitions) and the "Also happening this week" list card
+// (renderWeekMode) — hoisted to module scope so both can use the exact same
+// markup/CSS (.cx-row) rather than keeping two copies in sync.
+function cxRow(pe, isPast){
+  const dateStr = pe.day ? `${parseInt(pe.day,10)} ${(MONTH_NAME_EN[pe.month]||'').slice(0,3)}` : '';
+  const dateArStr = pe.day ? `${arNum(parseInt(pe.day,10))} ${MONTH_NAME_AR[pe.month]||''}` : '';
+  return `<a class="cx-row${isPast ? ' is-past' : ''}" href="event.html?id=${encodeURIComponent(pe.id)}" data-ev="${pe.id}">
+    ${dateStr ? `<div class="cx-row-date"><span class="en-only">${dateStr}</span><span class="ar-only ar" dir="rtl">${dateArStr}</span></div>` : ''}
+    ${pe.type ? `<div class="cx-row-type">${pe.type}</div>` : ''}
+    <h4 class="cx-row-title">
+      <span class="en-only">${pe.title}</span>
+      <span class="ar-only ar" dir="rtl">${pe.titleAr||pe.title}</span>
+    </h4>
+    ${pe.start ? `<div class="cx-row-time">${pe.start}</div>` : ''}
+  </a>`;
+}
+
+// Wraps a list of events (already resolved from ALL, or programmeEvents-
+// shaped objects) as a single compact card matching the exhibitions rail's
+// look — used for "Also happening this week" (renderWeekMode) so lower-
+// priority events don't compete for space with the highlighted gs-cards.
+function _gsListCard(items, headingEn, headingAr){
+  return `<div class="gs-card gs-card-list">
+    <div class="gs-card-list-inner">
+      <h4 class="gs-list-heading"><span class="en-only">${headingEn}</span><span class="ar-only ar" dir="rtl">${headingAr}</span></h4>
+      <div class="gs-list-rows">${items.map(it => cxRow(it, false)).join('')}</div>
+    </div>
   </div>`;
 }
 
@@ -2509,9 +2526,21 @@ function renderFeatured(){
     }
     link.innerHTML = `<span class="en-only">View full week →</span><span class="ar-only ar" dir="rtl">← عرض الأسبوع كاملاً</span>`;
     link.href = "#programme";
-    track.innerHTML = evs.length
+    // "Also happening this week" — lower-priority events an editor has
+    // moved into weeklyIssue.secondaryEvents in Studio. Rendered as one
+    // compact list card (reusing the exhibitions rail's row style) appended
+    // after the highlighted gs-cards, rather than getting a full card each.
+    const secondaryIds = (issue && issue.secondaryEventIds) || [];
+    const secondaryEvs = secondaryIds.length
+      ? ALL.filter(ev => secondaryIds.includes(ev.id)).sort((a,b) => eventTimestamp(a) - eventTimestamp(b))
+      : [];
+    const mainHtml = evs.length
       ? evs.map(_gsEventCard).join("")
       : _gsEmptyCard("Nothing scheduled this week — check the full programme.", "لا توجد فعاليات هذا الأسبوع — راجع البرنامج كاملاً.");
+    const secondaryHtml = secondaryEvs.length
+      ? _gsListCard(secondaryEvs, "Also happening this week", "يحدث أيضاً هذا الأسبوع")
+      : "";
+    track.innerHTML = mainHtml + secondaryHtml;
   }
 
   function renderProjectMode(){
@@ -2735,7 +2764,7 @@ async function _boot(){
       "projects": *[_type == "project"] | order(year desc) { title, "slug": slug.current, description, year, coverImage },
       "residencies": *[_type == "residency"] | order(year desc) { title, "slug": slug.current, description, year, coverImage },
       "settings": *[_type == "siteSettings"][0]{ ogImage, address, hours, mapsUrl },
-      "issues": *[_type == "weeklyIssue"] | order(weekStart desc){ title, description, weekStart, weekEnd, "eventIds": events[]->slug.current, eventsAutoAssigned }
+      "issues": *[_type == "weeklyIssue"] | order(weekStart desc){ title, description, weekStart, weekEnd, "eventIds": events[]->slug.current, "secondaryEventIds": secondaryEvents[]->slug.current, eventsAutoAssigned }
     }`);
     const res = await fetch(`https://xdtj605l.api.sanity.io/v2024-01-01/data/query/production?query=${q}`);
     const { result } = await res.json();
@@ -2851,6 +2880,9 @@ async function _boot(){
       // absent (doc predates the sync ever running for that week), fall
       // back to plain date-range matching in _gsWeekEvents().
       eventIds: doc.eventsAutoAssigned && Array.isArray(doc.eventIds) ? doc.eventIds : null,
+      // Editor-curated, always optional — de-emphasized events for "Also
+      // happening this week" (see renderWeekMode()). Never auto-populated.
+      secondaryEventIds: Array.isArray(doc.secondaryEventIds) ? doc.secondaryEventIds : [],
     }));
     SETTINGS = settingsDoc ? {
       address:      settingsDoc.address?.en || '',
