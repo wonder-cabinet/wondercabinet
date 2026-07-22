@@ -43,8 +43,15 @@ export const weeklyIssue = defineType({
     }),
     defineField({
       name: 'events',
-      title: 'Events in this issue',
-      description: 'Auto-filled once with everything scheduled that week. Remove any you don\'t want shown — the sync script won\'t add them back. You can also add events by hand (e.g. something that doesn\'t neatly fit a Mon–Sun week).',
+      title: 'Highlighted events',
+      description: 'Auto-filled once with everything scheduled that week, shown as the big highlighted cards on the homepage. Remove any you don\'t want shown — the sync script won\'t add them back. To de-emphasize an event instead of hiding it, move it to "Also happening this week" below rather than deleting it here. You can also add events by hand (e.g. something that doesn\'t neatly fit a Mon–Sun week).',
+      type: 'array',
+      of: [{type: 'reference', to: [{type: 'event'}]}],
+    }),
+    defineField({
+      name: 'secondaryEvents',
+      title: 'Also happening this week',
+      description: 'Lower-priority events for the same week — shown in a single compact list card at the end of the "This week" row instead of a full highlighted card. Move an event here from "Highlighted events" above to de-emphasize it without removing it from the week entirely.',
       type: 'array',
       of: [{type: 'reference', to: [{type: 'event'}]}],
     }),

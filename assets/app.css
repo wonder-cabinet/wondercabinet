@@ -1732,6 +1732,20 @@ html[data-lang="ar"] .ar-only{ direction: rtl; }
 .gs-c-desc{ font-family: var(--ff-sans); font-size: 15px; line-height: 1.5; max-width: 38ch; opacity: .85; margin: 0; }
 .gs-c-cta{ font-family: var(--ff-sans); font-size: 11px; letter-spacing: 0; text-transform: uppercase; font-weight: 700; }
 
+/* "Also happening this week" — a single compact list card at the end of the
+   This Week rail, reusing .cx-row (the exhibitions programme rail's row
+   style) instead of a full highlighted gs-card per event. Not a link itself
+   (unlike .gs-card) since it holds its own <a> rows. */
+.gs-card-list{ text-decoration: none; color: inherit; cursor: default; }
+.gs-card-list-inner{ display: flex; flex-direction: column; height: 100%; overflow: hidden; }
+.gs-list-heading{
+  font-family: var(--ff-sans); font-size: 12px; letter-spacing: 0; text-transform: uppercase;
+  font-weight: 700; opacity: .65; margin: 0; padding: 28px 28px 0;
+  flex: 0 0 auto;
+}
+.gs-list-rows{ flex: 1 1 auto; overflow-y: auto; }
+html[data-lang="ar"] .gs-list-heading{ text-align: right; }
+
 /* Featured projects / Residencies / Artists in this week */
 .gs-vsection{ padding: 36px 24px; border-top: 2px solid var(--ink); }
 .gs-vsection h2{ font-family: var(--ff-sans); font-size: 12px; letter-spacing: 0; text-transform: uppercase; font-weight: 700; opacity: 1; margin: 0 0 24px; }
