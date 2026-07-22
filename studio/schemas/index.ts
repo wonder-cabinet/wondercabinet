@@ -20,6 +20,7 @@ import {project} from './project'
 import {residency} from './residency'
 import {artwork} from './artwork'
 import {siteSettings} from './siteSettings'
+import {weeklyIssue} from './weeklyIssue'
 
 export const schemaTypes = [
   // Objects
@@ -44,4 +45,5 @@ export const schemaTypes = [
   residency,
   artwork,
   siteSettings,
+  weeklyIssue,
 ]

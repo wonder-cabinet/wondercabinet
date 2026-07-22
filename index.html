@@ -2474,16 +2474,31 @@ function renderFeatured(){
     range.innerHTML = `<span class="en-only">${start.getDate()}—${end.getDate()} ${MONTH_NAME_EN[MABBR_G[end.getMonth()]]}</span><span class="ar-only ar" dir="rtl">${arNum(start.getDate())}—${arNum(end.getDate())} ${MONTH_NAME_AR[MABBR_G[end.getMonth()]]}</span>`;
     count.innerHTML = `<span class="en-only">${evs.length} ${evs.length === 1 ? "event" : "events"}</span><span class="ar-only ar" dir="rtl">${arNum(evs.length)} فعاليات</span>`;
     const themeEl = document.getElementById("gs-theme");
-    if (SETTINGS && (SETTINGS.themeDesc || SETTINGS.themeTitle)){
+    // Match this week's range (Mon–Sun, already computed above as start/end)
+    // against the archived weeklyIssue docs. Build the YYYY-MM-DD strings
+    // from LOCAL date parts, not toISOString() — start/end are local
+    // midnight (see getMonday), and toISOString() converts to UTC first,
+    // which would silently roll the date back a day for any timezone
+    // ahead of UTC (Bethlehem is UTC+3) — local midnight becomes 21:00 the
+    // previous day in UTC.
+    const _toISODate = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    const _startISO = _toISODate(start);
+    const _endISO = _toISODate(end);
+    const issue = (window.ISSUES || []).find(i =>
+      i.weekStart && i.weekEnd && i.weekStart <= _endISO && i.weekEnd >= _startISO
+    );
+    if (issue && (issue.desc || issue.title)){
       themeEl.hidden = false;
-      document.getElementById("gs-theme-quote").innerHTML = SETTINGS.themeDesc
-        ? `<span class="en-only">${SETTINGS.themeDesc}</span><span class="ar-only ar" dir="rtl">${SETTINGS.themeDescAr || SETTINGS.themeDesc}</span>`
+      document.getElementById("gs-theme-quote").innerHTML = issue.desc
+        ? `<span class="en-only">${issue.desc}</span><span class="ar-only ar" dir="rtl">${issue.descAr || issue.desc}</span>`
         : "";
-      const titleEn = SETTINGS.themeTitle || "";
-      const titleAr = SETTINGS.themeTitleAr || titleEn;
+      const titleEn = issue.title || "";
+      const titleAr = issue.titleAr || titleEn;
       document.getElementById("gs-theme-desc").innerHTML = titleEn
         ? `<span class="en-only">Explore <mark class="gs-theme-highlight">${titleEn}</mark> through the Wonder Cabinet program this week.</span><span class="ar-only ar" dir="rtl">استكشف <mark class="gs-theme-highlight">${titleAr}</mark> من خلال برنامج وندر كابينت هذا الأسبوع.</span>`
         : "";
+    } else {
+      themeEl.hidden = true;
     }
     link.innerHTML = `<span class="en-only">View full week →</span><span class="ar-only ar" dir="rtl">← عرض الأسبوع كاملاً</span>`;
     link.href = "#programme";
@@ -2712,7 +2727,8 @@ async function _boot(){
       "events": *[_type == "event"] | order(startDateTime desc) { ..., location->{ name }, relatedArtists[]->{name, "slug": slug.current}, relatedProject->{title, slug}, programmeEvents[]->{_id, "slug": slug.current, title, eventType, startDateTime}, "coverPalette": cover.asset->metadata.palette },
       "projects": *[_type == "project"] | order(year desc) { title, "slug": slug.current, description, year, coverImage },
       "residencies": *[_type == "residency"] | order(year desc) { title, "slug": slug.current, description, year, coverImage },
-      "settings": *[_type == "siteSettings"][0]{ monthlyThemeTitle, monthlyThemeDescription, ogImage, address, hours, mapsUrl }
+      "settings": *[_type == "siteSettings"][0]{ ogImage, address, hours, mapsUrl },
+      "issues": *[_type == "weeklyIssue"] | order(weekStart desc){ title, description, weekStart, weekEnd }
     }`);
     const res = await fetch(`https://xdtj605l.api.sanity.io/v2024-01-01/data/query/production?query=${q}`);
     const { result } = await res.json();
@@ -2807,11 +2823,21 @@ async function _boot(){
       title: _loc(r.title), slug: r.slug || '', desc: _loc(r.description), year: r.year || 0, cover: _sanityImg(r.coverImage),
     }));
     const settingsDoc = result && result.settings;
+    // Weekly theme now lives in its own archived "issue" per week (see
+    // studio/schemas/weeklyIssue.ts) instead of a single mutable field on
+    // siteSettings — so past themes stay on record instead of being
+    // overwritten. ISSUES is matched against the current week in
+    // renderWeekMode() below, since that's where "this week"'s Mon–Sun
+    // range is already computed.
+    window.ISSUES = ((result && result.issues) || []).map(doc => ({
+      title:   doc.title?.en || '',
+      titleAr: doc.title?.ar || '',
+      desc:    doc.description?.en || '',
+      descAr:  doc.description?.ar || '',
+      weekStart: doc.weekStart || '',
+      weekEnd:   doc.weekEnd || '',
+    }));
     SETTINGS = settingsDoc ? {
-      themeTitle:   settingsDoc.monthlyThemeTitle?.en || '',
-      themeTitleAr: settingsDoc.monthlyThemeTitle?.ar || '',
-      themeDesc:    settingsDoc.monthlyThemeDescription?.en || '',
-      themeDescAr:  settingsDoc.monthlyThemeDescription?.ar || '',
       address:      settingsDoc.address?.en || '',
       addressAr:    settingsDoc.address?.ar || '',
       hours:        settingsDoc.hours?.en || '',

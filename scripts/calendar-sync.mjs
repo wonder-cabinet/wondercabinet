@@ -128,6 +128,25 @@ function isoToUtcDate(iso) {
   return new Date(iso);
 }
 
+// Monday–Sunday bounds (as plain YYYY-MM-DD calendar-date strings, Asia/Hebron
+// wall-clock) of the week containing `now`. Used to auto-create this week's
+// (and next week's) `weeklyIssue` doc — see main()'s weekly-issue pass below.
+// Deliberately mirrors the "local calendar date, not UTC" reasoning used
+// throughout this file (utcToHebronIso, calendarDate) and on the site itself
+// (index.html's getMonday): computing the week boundary from a UTC instant
+// directly would risk rolling the date back/forward a day around midnight.
+function getHebronWeekBounds(now) {
+  const hebronIso = utcToHebronIso(now);
+  const [y, mo, da] = hebronIso.slice(0, 10).split("-").map(Number);
+  const d = new Date(Date.UTC(y, mo - 1, da)); // midnight UTC standing in for that Hebron calendar date
+  const dow = d.getUTCDay(); // 0=Sun..6=Sat
+  const diffToMonday = dow === 0 ? 6 : dow - 1;
+  const monday = new Date(d.getTime() - diffToMonday * 86400000);
+  const fmt = (x) => `${x.getUTCFullYear()}-${String(x.getUTCMonth() + 1).padStart(2, "0")}-${String(x.getUTCDate()).padStart(2, "0")}`;
+  const sunday = new Date(monday.getTime() + 6 * 86400000);
+  return { weekStart: fmt(monday), weekEnd: fmt(sunday), mondayDate: monday };
+}
+
 // ---------------------------------------------------------------------------
 // ICS parsing
 // ---------------------------------------------------------------------------
@@ -641,6 +660,11 @@ async function fetchExistingEvents() {
   );
 }
 
+async function fetchExistingIssueIds() {
+  const ids = await sanityQuery('*[_type=="weeklyIssue"]._id');
+  return new Set(ids || []);
+}
+
 async function fetchIcsText() {
   if (ICS_FILE) {
     const fs = await import("node:fs");
@@ -831,6 +855,27 @@ async function main() {
       date: doc.startDateTime.slice(0, 10),
       notes: `googleCalendarEventId "${doc.googleCalendarEventId}" no longer found in the feed — event may have been deleted/cancelled on the calendar. NOT auto-deleting.`,
     });
+  }
+
+  // --- weekly-issue auto-creation pass ---
+  // Ensure this week's and next week's `weeklyIssue` doc shell exists so an
+  // editor always has somewhere in Studio to type the theme title/description
+  // ahead of (or during) the week — see studio/schemas/weeklyIssue.ts.
+  // createIfNotExists means re-runs never clobber a theme an editor already
+  // entered, or an events override they've hand-picked.
+  const existingIssueIds = await fetchExistingIssueIds();
+  const thisWeek = getHebronWeekBounds(now);
+  const nextWeek = getHebronWeekBounds(new Date(thisWeek.mondayDate.getTime() + 7 * 86400000));
+  for (const { weekStart, weekEnd } of [thisWeek, nextWeek]) {
+    const issueId = `weekly-issue-${weekStart}`;
+    if (existingIssueIds.has(issueId)) {
+      actions.push({ action: "OK", id: issueId, title: "(weekly issue)", date: weekStart, notes: "already exists" });
+      continue;
+    }
+    mutations.push({
+      createIfNotExists: { _id: issueId, _type: "weeklyIssue", weekStart, weekEnd },
+    });
+    actions.push({ action: "CREATE", id: issueId, title: "(weekly issue)", date: weekStart, notes: `week ${weekStart} → ${weekEnd}; theme left blank for editor` });
   }
 
   printTable(actions);
