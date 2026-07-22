@@ -460,13 +460,14 @@ ${audioBar}
   <div class="ep-content">
     ${contentBlocks && contentBlocks.length
       ? `<div class="ep-content-blocks">${_renderBlocks(contentBlocks)}</div>`
-      : (bodyEn || bodyAr ? `
+      : ""}
+    ${(bodyEn || bodyAr) ? `
     <div class="ep-text">
       ${bodyEn ? `<div class="en-only">${bodyEn}</div>` : ""}
       ${writeupEn ? `<div class="en-only">${writeupEn}</div>` : ""}
       ${bodyAr ? `<div class="ar-only ar" dir="rtl">${bodyAr}</div>` : ""}
       ${writeupAr ? `<div class="ar-only ar" dir="rtl">${writeupAr}</div>` : ""}
-    </div>` : "")}
+    </div>` : ""}
     ${(ev.subtitle && ev.content && ev.content.length) ? `<p class="ep-subtitle en-only">${ev.subtitle}</p>` : ""}
     <div class="ep-facts">
       <div class="ep-fact">

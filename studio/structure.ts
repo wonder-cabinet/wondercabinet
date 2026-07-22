@@ -95,6 +95,16 @@ export const structure = (S: StructureBuilder) =>
             .filter('_type == "location"')
         ),
 
+      S.listItem()
+        .title('Weekly Issues')
+        .schemaType('weeklyIssue')
+        .child(
+          S.documentList()
+            .title('Weekly Issues')
+            .filter('_type == "weeklyIssue"')
+            .defaultOrdering([{field: 'weekStart', direction: 'desc'}])
+        ),
+
       S.divider(),
 
       // ── SETTINGS (singleton) ─────────────────────────
