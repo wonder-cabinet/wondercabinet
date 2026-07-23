@@ -161,7 +161,7 @@ let archiveState = "idle"; // idle -> loaded, set once the Archive link is click
 const MONTH_ORDER = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 const MONTH_NAME_EN = { Jan:"January", Feb:"February", Mar:"March", Apr:"April", May:"May", Jun:"June", Jul:"July", Aug:"August", Sep:"September", Oct:"October", Nov:"November", Dec:"December" };
 const MONTH_NAME_AR = { Jan:"يناير", Feb:"فبراير", Mar:"مارس", Apr:"أبريل", May:"مايو", Jun:"يونيو", Jul:"يوليو", Aug:"أغسطس", Sep:"سبتمبر", Oct:"أكتوبر", Nov:"نوفمبر", Dec:"ديسمبر" };
-const TYPE_AR = { Class:"صف", Film:"فيلم", Performance:"عرض", Radio:"إذاعة", Reading:"قراءة", Workshop:"ورشة", Opening:"افتتاح", Bar:"بار", Exhibition:"معرض" };
+const TYPE_AR = { Class:"صف", Film:"فيلم", Performance:"عرض", Radio:"إذاعة", Reading:"قراءة", Workshop:"ورشة", "Open Studio":"استوديو مفتوح", Opening:"افتتاح", Bar:"بار", Exhibition:"معرض" };
 const VENUE_AR = { "Ground floor":"الطابق الأرضي","Screening room":"غرفة العرض","Main hall":"القاعة الرئيسية","Library":"المكتبة","Studio":"الستوديو","Workshop":"الورشة","Whole building":"كامل المبنى","Bar open":"البار مفتوح" };
 const SEASON_NAME_AR = { Autumn:"خريف", Winter:"شتاء", Spring:"ربيع", Summer:"صيف" };
 
@@ -269,9 +269,9 @@ function renderThisWeek(){
    Shared between the future Programme bar and the past-archive bar:
    same markup, same interaction, different backing list + STATE key.
    ============================================================ */
-const FILTER_TYPES = ["", "Performance", "Film", "Class", "Workshop", "Radio", "Reading", "Opening", "Bar", "Exhibition"];
-const FILTER_LABEL_EN = { "":"All", Performance:"Performance", Film:"Film", Class:"Class", Workshop:"Workshop", Radio:"Radio", Reading:"Reading", Opening:"Opening", Bar:"Bar", Exhibition:"Exhibition" };
-const FILTER_LABEL_AR = { "":"الكل", Performance:"عرض", Film:"فيلم", Class:"صف", Workshop:"ورشة", Radio:"إذاعة", Reading:"قراءة", Opening:"افتتاح", Bar:"بار", Exhibition:"معرض" };
+const FILTER_TYPES = ["", "Performance", "Film", "Class", "Workshop", "Open Studio", "Radio", "Reading", "Opening", "Bar", "Exhibition"];
+const FILTER_LABEL_EN = { "":"All", Performance:"Performance", Film:"Film", Class:"Class", Workshop:"Workshop", "Open Studio":"Open Studio", Radio:"Radio", Reading:"Reading", Opening:"Opening", Bar:"Bar", Exhibition:"Exhibition" };
+const FILTER_LABEL_AR = { "":"الكل", Performance:"عرض", Film:"فيلم", Class:"صف", Workshop:"ورشة", "Open Studio":"استوديو مفتوح", Radio:"إذاعة", Reading:"قراءة", Opening:"افتتاح", Bar:"بار", Exhibition:"معرض" };
 
 function renderFilterBar(containerId, getList, stateKey, onChange){
   const container = document.getElementById(containerId);

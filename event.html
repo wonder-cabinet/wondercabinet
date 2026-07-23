@@ -113,13 +113,14 @@
   const DWFULL = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
   const MFULL  = ["January","February","March","April","May","June","July","August","September","October","November","December"];
   const MONTH_NAME_AR = { Jan:"يناير", Feb:"فبراير", Mar:"مارس", Apr:"أبريل", May:"مايو", Jun:"يونيو", Jul:"يوليو", Aug:"أغسطس", Sep:"سبتمبر", Oct:"أكتوبر", Nov:"نوفمبر", Dec:"ديسمبر" };
-  const TYPE_AR = { Class:"صف", Film:"فيلم", Performance:"عرض", Radio:"إذاعة", Reading:"قراءة", Workshop:"ورشة", Opening:"افتتاح", Bar:"بار", Exhibition:"معرض" };
+  const TYPE_AR = { Class:"صف", Film:"فيلم", Performance:"عرض", Radio:"إذاعة", Reading:"قراءة", Workshop:"ورشة", "Open Studio":"استوديو مفتوح", Opening:"افتتاح", Bar:"بار", Exhibition:"معرض" };
 
   const TYPE_COLORS = {
     Performance: { bg: "#cc6698", ink: "#0a0a16" },
     Film:        { bg: "#ffe600", ink: "#0a0a16" },
     Class:       { bg: "#c8a0f0", ink: "#0a0a16" },
     Workshop:    { bg: "#ff5a00", ink: "#f6f3ea" },
+    "Open Studio": { bg: "#ff5a00", ink: "#f6f3ea" },
     Radio:       { bg: "#00d26a", ink: "#0a0a16" },
     Reading:     { bg: "#ffd6c2", ink: "#0a0a16" },
     Opening:     { bg: "#0a0a16", ink: "#f6f3ea" },
@@ -128,7 +129,8 @@
   };
   const COLOR_THEME_OVERRIDES = {
     performance: TYPE_COLORS.Performance, film: TYPE_COLORS.Film, class: TYPE_COLORS.Class,
-    workshop: TYPE_COLORS.Workshop, radio: TYPE_COLORS.Radio, reading: TYPE_COLORS.Reading,
+    workshop: TYPE_COLORS.Workshop, "open studio": TYPE_COLORS["Open Studio"],
+    radio: TYPE_COLORS.Radio, reading: TYPE_COLORS.Reading,
     opening: TYPE_COLORS.Opening, bar: TYPE_COLORS.Bar,
     exhibition: TYPE_COLORS.Exhibition,
     paper: { bg: "#FCFFE5", ink: "#0a0a16" },
