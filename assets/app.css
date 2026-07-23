@@ -1732,7 +1732,7 @@ html[data-lang="ar"] .ar-only{ direction: rtl; }
 .gs-card-video .gs-c-title,
 .gs-card-video .gs-c-desc,
 .gs-card-video .gs-c-cta{ color: #f6f3ea; }
-.gs-c-meta{ font-family: var(--ff-sans); font-size: 22px; letter-spacing: 0; text-transform: uppercase; font-weight: 700; opacity: .65; }
+.gs-c-meta{ font-family: var(--ff-sans); font-size: 22px; letter-spacing: 0; text-transform: uppercase; font-weight: 700; opacity: 1; }
 .gs-c-today-label{
   font-family: var(--ff-sans); font-size: 13px; font-weight: 700;
   letter-spacing: .06em; text-transform: uppercase;
@@ -1755,7 +1755,7 @@ html[data-lang="ar"] .gs-c-today-label{ left: auto; right: 0; }
 .gs-card-list-inner{ display: flex; flex-direction: column; height: 100%; overflow: hidden; }
 .gs-list-heading{
   font-family: var(--ff-sans); font-size: 12px; letter-spacing: 0; text-transform: uppercase;
-  font-weight: 700; opacity: .65; margin: 0; padding: 28px 28px 0;
+  font-weight: 700; opacity: 1; margin: 0; padding: 28px 28px 0;
   flex: 0 0 auto;
 }
 .gs-list-rows{ flex: 1 1 auto; overflow-y: auto; }
@@ -1993,10 +1993,15 @@ body.gs-reader-open{ overflow: hidden; }
 }
 .cx-row.is-past{ opacity: .55; }
 .cx-row.is-past:hover{ opacity: 1; }
+/* Today's row in a compact list (Also happening this week / exhibitions
+   rail) — same "fully bordered" highlight as .gs-card-today, scaled down
+   for the row's shallower height. box-sizing:border-box on .cx-row keeps
+   this from changing the row's total height. */
+.cx-row-today{ border: 4px solid currentColor; }
 .cx-row-date{
   font-family: var(--ff-sans); font-size: 16px; font-weight: 700;
   text-transform: uppercase; font-variant-numeric: tabular-nums;
-  opacity: .65; margin-bottom: 6px;
+  opacity: 1; margin-bottom: 6px;
 }
 .cx-row-type{
   display: inline-block; align-self: flex-start;
@@ -2016,7 +2021,7 @@ body.gs-reader-open{ overflow: hidden; }
 }
 .cx-row-time{
   font-family: var(--ff-sans); font-size: 16px; font-weight: 600;
-  opacity: .6; margin-top: 8px; font-variant-numeric: tabular-nums;
+  opacity: 1; margin-top: 8px; font-variant-numeric: tabular-nums;
 }
 
 /* Past-events toggle row */
