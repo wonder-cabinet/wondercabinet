@@ -1732,7 +1732,15 @@ html[data-lang="ar"] .ar-only{ direction: rtl; }
 .gs-card-video .gs-c-title,
 .gs-card-video .gs-c-desc,
 .gs-card-video .gs-c-cta{ color: #f6f3ea; }
-.gs-c-meta{ font-family: var(--ff-sans); font-size: 11px; letter-spacing: 0; text-transform: uppercase; font-weight: 700; opacity: .65; }
+.gs-c-meta{ font-family: var(--ff-sans); font-size: 22px; letter-spacing: 0; text-transform: uppercase; font-weight: 700; opacity: .65; }
+.gs-c-today-label{
+  font-family: var(--ff-sans); font-size: 12px; font-weight: 700;
+  letter-spacing: .06em; text-transform: uppercase;
+  color: var(--ink); background: var(--highlight);
+  display: inline-block; padding: 3px 10px; border-radius: 3px;
+  margin-bottom: 8px;
+}
+.gs-c-today-label .ar{ font-family: var(--ff-ar); letter-spacing: 0; }
 .gs-c-title{ font-family: var(--ff-sans); font-weight: 700; font-size: clamp(28px, 3vw, 44px); line-height: .98; letter-spacing: 0; text-transform: uppercase; margin: 0; }
 .gs-c-title .ar{ font-family: var(--ff-ar); font-style: italic; letter-spacing: 0; text-transform: none; line-height: 1.1; }
 .gs-c-desc{ font-family: var(--ff-sans); font-size: 15px; line-height: 1.5; max-width: 38ch; opacity: .85; margin: 0; }
@@ -2156,6 +2164,40 @@ body.gs-reader-open{ overflow: hidden; }
 .ep-prog-type{ font-family: var(--ff-sans); font-size: 11px; font-weight: 700; text-transform: uppercase; opacity: .55; }
 .ep-prog-name{ font-family: var(--ff-sans); font-size: 15px; font-weight: 600; }
 .ep-prog-arrow{ font-size: 16px; opacity: .5; text-align: right; }
+
+/* Related artists — end of the event page. Names link to the artist's own
+   page; bios are shown open (not collapsed/click-to-expand) directly
+   under each name. */
+.ep-related-artists{
+  border-top: 2px solid currentColor;
+  margin: 0;
+  padding: var(--pad);
+  display: flex; flex-direction: column; gap: 32px;
+}
+.ep-related-artists-head{
+  font-family: var(--ff-sans); font-size: 11px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .08em;
+  opacity: .6;
+}
+.ep-related-artist{ display: flex; flex-direction: column; gap: 10px; }
+.ep-related-artist-name{
+  display: inline-block; width: fit-content;
+  font-family: var(--ff-sans); font-size: clamp(20px, 3vw, 28px); font-weight: 700;
+  color: inherit; text-decoration: none;
+  transition: opacity .12s;
+}
+a.ep-related-artist-name:hover{ opacity: .65; }
+.ep-related-artist-name .ar{ font-family: var(--ff-ar); font-weight: 700; }
+.ep-related-artist-bio p{
+  font-family: var(--ff-sans); font-size: 16px; line-height: 1.5;
+  margin: 0 0 .8em; max-width: 58ch; opacity: .8; font-weight: 400;
+  color: inherit;
+}
+.ep-related-artist-bio p:last-child{ margin-bottom: 0; }
+.ep-related-artist-bio .ar p{
+  font-family: var(--ff-ar); direction: rtl; text-align: right;
+  font-size: 17px; line-height: 1.6;
+}
 
 .ep-title{
   margin: 0; font-family: var(--ff-sans); font-weight: 700;
@@ -2964,6 +3006,8 @@ html[data-lang="ar"] .ep-title { text-align: right; }
 html[data-lang="ar"] .ep-register-header { direction: rtl; }
 html[data-lang="ar"] .ep-programme { text-align: right; }
 html[data-lang="ar"] .ep-prog-row { direction: rtl; }
+html[data-lang="ar"] .ep-related-artists { text-align: right; }
+html[data-lang="ar"] .ep-related-artist { align-items: flex-end; }
 html[data-lang="ar"] .ep-nav { direction: rtl; }
 html[data-lang="ar"] .ep-nav-prev { order: 2; }
 html[data-lang="ar"] .ep-nav-next { order: 1; }
