@@ -2461,7 +2461,12 @@ function renderFeatured(){
     sticky.style.setProperty("--gs-fg", "var(--ink)");
     kicker.innerHTML = `<span class="en-only">This week</span><span class="ar-only ar" dir="rtl">هذا الأسبوع</span>`;
     range.innerHTML = `<span class="en-only">${start.getDate()}—${end.getDate()} ${MONTH_NAME_EN[MABBR_G[end.getMonth()]]}</span><span class="ar-only ar" dir="rtl">${arNum(start.getDate())}—${arNum(end.getDate())} ${MONTH_NAME_AR[MABBR_G[end.getMonth()]]}</span>`;
-    count.innerHTML = `<span class="en-only">${evs.length} ${evs.length === 1 ? "event" : "events"}</span><span class="ar-only ar" dir="rtl">${arNum(evs.length)} فعاليات</span>`;
+    // Count must include secondary ("Also happening this week") events too,
+    // not just the highlighted gs-cards — otherwise the header undercounts
+    // (e.g. shows "4 events" when a 5th is sitting in the list card).
+    const secondaryIdsForCount = (issue && issue.secondaryEventIds) || [];
+    const totalEventCount = evs.length + secondaryIdsForCount.length;
+    count.innerHTML = `<span class="en-only">${totalEventCount} ${totalEventCount === 1 ? "event" : "events"}</span><span class="ar-only ar" dir="rtl">${arNum(totalEventCount)} فعاليات</span>`;
     const themeEl = document.getElementById("gs-theme");
     if (issue && (issue.desc || issue.title)){
       themeEl.hidden = false;
