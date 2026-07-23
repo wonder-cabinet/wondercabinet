@@ -1734,12 +1734,13 @@ html[data-lang="ar"] .ar-only{ direction: rtl; }
 .gs-card-video .gs-c-cta{ color: #f6f3ea; }
 .gs-c-meta{ font-family: var(--ff-sans); font-size: 22px; letter-spacing: 0; text-transform: uppercase; font-weight: 700; opacity: .65; }
 .gs-c-today-label{
-  font-family: var(--ff-sans); font-size: 12px; font-weight: 700;
+  font-family: var(--ff-sans); font-size: 13px; font-weight: 700;
   letter-spacing: .06em; text-transform: uppercase;
-  color: var(--ink); background: var(--highlight);
-  display: inline-block; padding: 3px 10px; border-radius: 3px;
-  margin-bottom: 8px;
+  color: var(--gs-bg); background: var(--gs-fg);
+  position: absolute; top: 0; left: 0; z-index: 3;
+  padding: 8px 16px; border-radius: 0;
 }
+html[data-lang="ar"] .gs-c-today-label{ left: auto; right: 0; }
 .gs-c-today-label .ar{ font-family: var(--ff-ar); letter-spacing: 0; }
 .gs-c-title{ font-family: var(--ff-sans); font-weight: 700; font-size: clamp(28px, 3vw, 44px); line-height: .98; letter-spacing: 0; text-transform: uppercase; margin: 0; }
 .gs-c-title .ar{ font-family: var(--ff-ar); font-style: italic; letter-spacing: 0; text-transform: none; line-height: 1.1; }
