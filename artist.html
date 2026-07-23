@@ -114,9 +114,9 @@
     <div class="foot-col">
       <div class="foot-col-head">Follow</div>
       <div class="foot-col-body">
-        <a href="https://www.instagram.com/wonder.cabinet/" target="_blank" rel="noopener">Instagram</a>
-        <a href="https://www.facebook.com/wondercabinetbethlehem" target="_blank" rel="noopener">Facebook</a>
-        <a href="https://chat.whatsapp.com/I8ETsHie2Ye87kURhWnZY1" target="_blank" rel="noopener">WhatsApp</a>
+        <a id="footer-instagram" href="https://www.instagram.com/wonder.cabinet/" target="_blank" rel="noopener">Instagram</a>
+        <a id="footer-facebook" href="https://www.facebook.com/wondercabinetbethlehem" target="_blank" rel="noopener">Facebook</a>
+        <a id="footer-whatsapp" href="https://chat.whatsapp.com/I8ETsHie2Ye87kURhWnZY1" target="_blank" rel="noopener">WhatsApp</a>
         <button class="foot-newsletter-btn">Subscribe to Newsletter</button>
       </div>
     </div>
@@ -293,7 +293,7 @@
   try {
     const [docs, settingsDoc] = await Promise.all([
       groq(`*[_type == "artist"] | order(name.en asc) { name, "slug": slug.current, bio, photo, discipline, currentLocation, website, instagram, links, "events": *[_type == "event" && references(^._id)] | order(startDateTime desc) { _id, title, "slug": slug.current, eventType, startDateTime, endDateTime } }`),
-      groq(`*[_type == "siteSettings"][0]{ address, hours, mapsUrl }`),
+      groq(`*[_type == "siteSettings"][0]{ address, hours, mapsUrl, socialLinks }`),
     ]);
     artists = (docs || []).map(docToArtist);
     artist = artists.find(a => a.slug === id);
@@ -308,6 +308,16 @@
         `<span class="en-only">${settingsDoc.hours.en}</span>` +
         (settingsDoc.hours.ar ? `<span class="ar-only ar" dir="rtl">${settingsDoc.hours.ar}</span>` : '');
       if (fMaps && settingsDoc.mapsUrl) { fMaps.href = settingsDoc.mapsUrl; }
+      // "Follow" column links — previously hardcoded, never reflected
+      // Sanity edits since socialLinks was never fetched on the frontend.
+      const socialByLabel = {};
+      (settingsDoc.socialLinks || []).forEach(l => { if (l?.label && l?.url) socialByLabel[l.label.trim().toLowerCase()] = l.url; });
+      const fIg = document.getElementById('footer-instagram');
+      const fFb = document.getElementById('footer-facebook');
+      const fWa = document.getElementById('footer-whatsapp');
+      if (fIg && socialByLabel['instagram']) fIg.href = socialByLabel['instagram'];
+      if (fFb && socialByLabel['facebook']) fFb.href = socialByLabel['facebook'];
+      if (fWa && socialByLabel['whatsapp']) fWa.href = socialByLabel['whatsapp'];
     }
   } catch (err) { console.warn('[WC] artist fetch failed', err); }
 
