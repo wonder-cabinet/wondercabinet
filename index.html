@@ -1033,7 +1033,9 @@ function _gsCardVideo(ev){
 function _gsEventCard(ev){
   const typeAr = TYPE_AR[ev.type] || ev.type;
   const videoSrc = _gsCardVideo(ev);
-  return `<a class="gs-card${videoSrc ? " gs-card-video" : ""}" href="event.html?id=${ev.id}" data-ev="${ev.id}">
+  const _today = new Date(); _today.setHours(0,0,0,0);
+  const isToday = eventDateOnly(ev).getTime() === _today.getTime();
+  return `<a class="gs-card${videoSrc ? " gs-card-video" : ""}${isToday ? " gs-card-today" : ""}" href="event.html?id=${ev.id}" data-ev="${ev.id}">
     ${videoSrc ? `<video class="gs-card-bg-video" autoplay muted loop playsinline src="${videoSrc}"></video><div class="gs-card-scrim"></div>` : ""}
     <div class="gs-card-inner">
       <div class="gs-c-meta">
