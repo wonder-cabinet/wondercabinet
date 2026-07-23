@@ -2556,6 +2556,28 @@ function renderFeatured(){
   // Event cards open the in-grid reader instead of navigating; cmd/ctrl
   // click (and the reader's own ↗ button) still reach the real URL.
   track.addEventListener("click", (e) => {
+    // Rows inside the "Also happening this week" list card (secondary
+    // events) previously had no handler at all here — a.cx-row isn't
+    // a.gs-card, so the click fell through to a plain navigation instead
+    // of opening in place like every other event on this rail. Reusing
+    // _gsOpenReader itself (rather than building a separate mechanism) means
+    // the list card expands exactly the same way a normal gs-card does —
+    // same animation, same "same as all other events" behavior the user
+    // asked for — just pointed at whichever row was actually clicked.
+    const listRow = e.target.closest("a.cx-row[data-ev]");
+    if (listRow) {
+      if (e.metaKey || e.ctrlKey || e.shiftKey) return;
+      e.preventDefault();
+      const listCard = listRow.closest(".gs-card-list");
+      if (!listCard) return;
+      if (document.body.classList.contains("gs-reader-open") && !document.querySelector(".gs-card-frame")){
+        _gsHardReset();
+      }
+      listCard.dataset.ev = listRow.dataset.ev;
+      if (window.innerWidth <= 700) _gsOpenReaderMobile(listCard);
+      else _gsOpenReader(listCard);
+      return;
+    }
     const card = e.target.closest("a.gs-card[data-ev]");
     if (!card || e.metaKey || e.ctrlKey || e.shiftKey) return;
     e.preventDefault();
