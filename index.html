@@ -1038,6 +1038,7 @@ function _gsEventCard(ev){
   return `<a class="gs-card${videoSrc ? " gs-card-video" : ""}${isToday ? " gs-card-today" : ""}" href="event.html?id=${ev.id}" data-ev="${ev.id}">
     ${videoSrc ? `<video class="gs-card-bg-video" autoplay muted loop playsinline src="${videoSrc}"></video><div class="gs-card-scrim"></div>` : ""}
     <div class="gs-card-inner">
+      ${isToday ? `<div class="gs-c-today-label"><span class="en-only">Today</span><span class="ar-only ar" dir="rtl">اليوم</span></div>` : ""}
       <div class="gs-c-meta">
         <span class="en-only">${ev.type}${ev.dow ? " · " + ev.dow + " " + parseInt(ev.day,10) + " " + ev.month : ""}${ev.start ? " · " + ev.start : ""}</span>
         <span class="ar-only ar" dir="rtl">${typeAr}${ev.dowAr ? " · " + ev.dowAr : ""}${ev.start ? " · " + ev.start : ""}</span>

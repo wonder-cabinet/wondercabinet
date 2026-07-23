@@ -1732,7 +1732,15 @@ html[data-lang="ar"] .ar-only{ direction: rtl; }
 .gs-card-video .gs-c-title,
 .gs-card-video .gs-c-desc,
 .gs-card-video .gs-c-cta{ color: #f6f3ea; }
-.gs-c-meta{ font-family: var(--ff-sans); font-size: 11px; letter-spacing: 0; text-transform: uppercase; font-weight: 700; opacity: .65; }
+.gs-c-meta{ font-family: var(--ff-sans); font-size: 22px; letter-spacing: 0; text-transform: uppercase; font-weight: 700; opacity: .65; }
+.gs-c-today-label{
+  font-family: var(--ff-sans); font-size: 12px; font-weight: 700;
+  letter-spacing: .06em; text-transform: uppercase;
+  color: var(--ink); background: var(--highlight);
+  display: inline-block; padding: 3px 10px; border-radius: 3px;
+  margin-bottom: 8px;
+}
+.gs-c-today-label .ar{ font-family: var(--ff-ar); letter-spacing: 0; }
 .gs-c-title{ font-family: var(--ff-sans); font-weight: 700; font-size: clamp(28px, 3vw, 44px); line-height: .98; letter-spacing: 0; text-transform: uppercase; margin: 0; }
 .gs-c-title .ar{ font-family: var(--ff-ar); font-style: italic; letter-spacing: 0; text-transform: none; line-height: 1.1; }
 .gs-c-desc{ font-family: var(--ff-sans); font-size: 15px; line-height: 1.5; max-width: 38ch; opacity: .85; margin: 0; }
