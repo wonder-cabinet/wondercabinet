@@ -125,58 +125,8 @@
 
 <!-- THE TIMELINE — one continuous flow, grouped by season, sticky shrinking month heads -->
 <section class="timeline" id="timeline"></section>
-<footer class="foot" id="visit">
-  <div class="foot-cols">
-
-    <!-- Col 1 — Identity -->
-    <div class="foot-col">
-      <div class="foot-col-head">The Wonder Cabinet</div>
-      <div class="foot-col-body">
-        <p id="footer-address">Karkafeh Street<br>Bethlehem, Palestine<br>(Next to Arij)</p>
-        <p id="footer-hours">Every day<br>9:00 – 23:00</p>
-        <a id="footer-maps" href="https://goo.gl/maps/9BhxnnrTfYZZVoMU9" target="_blank" rel="noopener">Google Maps →</a>
-      </div>
-    </div>
-
-    <!-- Col 2 — Programme -->
-    <div class="foot-col">
-      <div class="foot-col-head">Programme</div>
-      <div class="foot-col-body">
-        <a href="#programme">Events</a>
-        <a href="#">Archive</a>
-        <a href="#">Contribute</a>
-        <a href="#">About</a>
-      </div>
-    </div>
-
-    <!-- Col 3 — Social -->
-    <div class="foot-col">
-      <div class="foot-col-head">Follow</div>
-      <div class="foot-col-body">
-        <a id="footer-instagram" href="https://www.instagram.com/wonder.cabinet/" target="_blank" rel="noopener">Instagram</a>
-        <a id="footer-facebook" href="https://www.facebook.com/wondercabinetbethlehem" target="_blank" rel="noopener">Facebook</a>
-        <a id="footer-whatsapp" href="https://chat.whatsapp.com/I8ETsHie2Ye87kURhWnZY1" target="_blank" rel="noopener">WhatsApp</a>
-        <button class="foot-newsletter-btn">Subscribe to Newsletter</button>
-      </div>
-    </div>
-
-    <!-- Col 4 — Contact -->
-    <div class="foot-col">
-      <div class="foot-col-head">Contact</div>
-      <div class="foot-col-body">
-        <a href="mailto:office@wondercabinet.space">office@wondercabinet.space</a>
-        <a href="https://radioalhara.net" target="_blank" rel="noopener">Radio Alhara</a>
-        <a href="#">Local Industries</a>
-        <a href="https://www.aauanastas.com" target="_blank" rel="noopener">AAU Anastas</a>
-      </div>
-    </div>
-
-  </div>
-  <div class="foot-base">
-    <span>© The Wonder Cabinet · Bethlehem, Palestine</span>
-    <span><a href="#">مجلس العجب</a></span>
-  </div>
-</footer>
+<footer class="foot" id="visit"></footer>
+<script src="assets/footer.js"></script>
 
 <script>
 /* ============================================================
@@ -203,7 +153,6 @@ let ALL = [];
 let SEASONS = [];
 let PROJECTS = [];
 let RESIDENCIES = [];
-let SETTINGS = null;
 let ARTISTS = [];
 let PAST_EVENTS = []; // everything strictly before this week; populated by renderPastArchive()
 let archiveState = "idle"; // idle -> loaded, set once the Archive link is clicked and the archive is inserted
@@ -2763,7 +2712,7 @@ async function _boot(){
       "events": *[_type == "event"] | order(startDateTime desc) { ..., location->{ name }, relatedArtists[]->{name, "slug": slug.current}, relatedProject->{title, slug}, programmeEvents[]->{_id, "slug": slug.current, title, eventType, startDateTime}, "coverPalette": cover.asset->metadata.palette },
       "projects": *[_type == "project"] | order(year desc) { title, "slug": slug.current, description, year, coverImage },
       "residencies": *[_type == "residency"] | order(year desc) { title, "slug": slug.current, description, year, coverImage },
-      "settings": *[_type == "siteSettings"][0]{ ogImage, address, hours, mapsUrl, socialLinks },
+      "settings": *[_type == "siteSettings"][0]{ ogImage },
       "issues": *[_type == "weeklyIssue"] | order(weekStart desc){ title, description, weekStart, weekEnd, "eventIds": events[]->slug.current, "secondaryEventIds": secondaryEvents[]->slug.current, eventsAutoAssigned }
     }`);
     const res = await fetch(`https://xdtj605l.api.sanity.io/v2024-01-01/data/query/production?query=${q}`);
@@ -2884,39 +2833,9 @@ async function _boot(){
       // happening this week" (see renderWeekMode()). Never auto-populated.
       secondaryEventIds: Array.isArray(doc.secondaryEventIds) ? doc.secondaryEventIds : [],
     }));
-    SETTINGS = settingsDoc ? {
-      address:      settingsDoc.address?.en || '',
-      addressAr:    settingsDoc.address?.ar || '',
-      hours:        settingsDoc.hours?.en || '',
-      hoursAr:      settingsDoc.hours?.ar || '',
-      mapsUrl:      settingsDoc.mapsUrl || '',
-      socialLinks:  Array.isArray(settingsDoc.socialLinks) ? settingsDoc.socialLinks : [],
-    } : null;
-    // Inject footer address/hours/maps from siteSettings
-    if (SETTINGS) {
-      const fAddr = document.getElementById('footer-address');
-      const fHours = document.getElementById('footer-hours');
-      const fMaps = document.getElementById('footer-maps');
-      if (fAddr && SETTINGS.address) fAddr.innerHTML =
-        `<span class="en-only">${SETTINGS.address.replace(/\n/g,'<br>')}</span>` +
-        (SETTINGS.addressAr ? `<span class="ar-only ar" dir="rtl">${SETTINGS.addressAr.replace(/\n/g,'<br>')}</span>` : '');
-      if (fHours && SETTINGS.hours) fHours.innerHTML =
-        `<span class="en-only">${SETTINGS.hours}</span>` +
-        (SETTINGS.hoursAr ? `<span class="ar-only ar" dir="rtl">${SETTINGS.hoursAr}</span>` : '');
-      if (fMaps && SETTINGS.mapsUrl) { fMaps.href = SETTINGS.mapsUrl; fMaps.hidden = false; }
-      // "Follow" column — Instagram/Facebook/WhatsApp were previously
-      // hardcoded and never reflected edits made in Sanity's Site Settings
-      // (socialLinks was fetched nowhere on the frontend). Match by label
-      // so editors can update these from Studio going forward.
-      const socialByLabel = {};
-      SETTINGS.socialLinks.forEach(l => { if (l?.label && l?.url) socialByLabel[l.label.trim().toLowerCase()] = l.url; });
-      const fIg = document.getElementById('footer-instagram');
-      const fFb = document.getElementById('footer-facebook');
-      const fWa = document.getElementById('footer-whatsapp');
-      if (fIg && socialByLabel['instagram']) fIg.href = socialByLabel['instagram'];
-      if (fFb && socialByLabel['facebook']) fFb.href = socialByLabel['facebook'];
-      if (fWa && socialByLabel['whatsapp']) fWa.href = socialByLabel['whatsapp'];
-    }
+    // Footer (address/hours/maps/social) is owned entirely by assets/footer.js
+    // now, which does its own siteSettings fetch — see that file. Nothing to
+    // do here for it.
     // Inject OG image from siteSettings (best effort — helps browsers, not crawlers)
     if (settingsDoc && settingsDoc.ogImage) {
       const ogUrl = _sanityImg(settingsDoc.ogImage);
