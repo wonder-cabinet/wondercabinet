@@ -1067,9 +1067,11 @@ function _gsEmptyCard(en, ar){
 // (renderWeekMode) — hoisted to module scope so both can use the exact same
 // markup/CSS (.cx-row) rather than keeping two copies in sync.
 function cxRow(pe, isPast){
-  const dateStr = pe.day ? `${parseInt(pe.day,10)} ${(MONTH_NAME_EN[pe.month]||'').slice(0,3)}` : '';
-  const dateArStr = pe.day ? `${arNum(parseInt(pe.day,10))} ${MONTH_NAME_AR[pe.month]||''}` : '';
-  return `<a class="cx-row${isPast ? ' is-past' : ''}" href="event.html?id=${encodeURIComponent(pe.id)}" data-ev="${pe.id}">
+  const dateStr = pe.day ? `${pe.dow ? pe.dow + " " : ""}${parseInt(pe.day,10)} ${(MONTH_NAME_EN[pe.month]||'').slice(0,3)}` : '';
+  const dateArStr = pe.day ? `${pe.dowAr ? pe.dowAr + " " : ""}${arNum(parseInt(pe.day,10))} ${MONTH_NAME_AR[pe.month]||''}` : '';
+  const _today = new Date(); _today.setHours(0,0,0,0);
+  const isToday = !isPast && eventDateOnly(pe).getTime() === _today.getTime();
+  return `<a class="cx-row${isPast ? ' is-past' : ''}${isToday ? ' cx-row-today' : ''}" href="event.html?id=${encodeURIComponent(pe.id)}" data-ev="${pe.id}">
     ${dateStr ? `<div class="cx-row-date"><span class="en-only">${dateStr}</span><span class="ar-only ar" dir="rtl">${dateArStr}</span></div>` : ''}
     ${pe.type ? `<div class="cx-row-type">${pe.type}</div>` : ''}
     <h4 class="cx-row-title">
