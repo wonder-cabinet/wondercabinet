@@ -92,49 +92,8 @@
   <div class="event-panel is-page" id="arRoot" style="background:var(--paper);color:var(--night);"></div>
 </main>
 
-<footer class="foot" id="visit">
-  <div class="foot-cols">
-    <div class="foot-col">
-      <div class="foot-col-head">The Wonder Cabinet</div>
-      <div class="foot-col-body">
-        <p id="footer-address">Karkafeh Street<br>Bethlehem, Palestine<br>(Next to Arij)</p>
-        <p id="footer-hours">Every day<br>9:00 – 23:00</p>
-        <a id="footer-maps" href="https://goo.gl/maps/9BhxnnrTfYZZVoMU9" target="_blank" rel="noopener">Google Maps →</a>
-      </div>
-    </div>
-    <div class="foot-col">
-      <div class="foot-col-head">Programme</div>
-      <div class="foot-col-body">
-        <a href="index.html#programme">Events</a>
-        <a href="index.html">Archive</a>
-        <a href="index.html">Contribute</a>
-        <a href="index.html">About</a>
-      </div>
-    </div>
-    <div class="foot-col">
-      <div class="foot-col-head">Follow</div>
-      <div class="foot-col-body">
-        <a href="https://www.instagram.com/wonder.cabinet/" target="_blank" rel="noopener">Instagram</a>
-        <a href="https://www.facebook.com/wondercabinetbethlehem" target="_blank" rel="noopener">Facebook</a>
-        <a href="https://chat.whatsapp.com/I8ETsHie2Ye87kURhWnZY1" target="_blank" rel="noopener">WhatsApp</a>
-        <button class="foot-newsletter-btn">Subscribe to Newsletter</button>
-      </div>
-    </div>
-    <div class="foot-col">
-      <div class="foot-col-head">Contact</div>
-      <div class="foot-col-body">
-        <a href="mailto:office@wondercabinet.space">office@wondercabinet.space</a>
-        <a href="https://radioalhara.net" target="_blank" rel="noopener">Radio Alhara</a>
-        <a href="index.html">Local Industries</a>
-        <a href="https://www.aauanastas.com" target="_blank" rel="noopener">AAU Anastas</a>
-      </div>
-    </div>
-  </div>
-  <div class="foot-base">
-    <span>© The Wonder Cabinet · Bethlehem, Palestine</span>
-    <span><a href="index.html">مجلس العجب</a></span>
-  </div>
-</footer>
+<footer class="foot" id="visit"></footer>
+<script src="assets/footer.js"></script>
 
 <script>
 (async function(){
@@ -291,24 +250,11 @@
 
   let artist, artists = [];
   try {
-    const [docs, settingsDoc] = await Promise.all([
-      groq(`*[_type == "artist"] | order(name.en asc) { name, "slug": slug.current, bio, photo, discipline, currentLocation, website, instagram, links, "events": *[_type == "event" && references(^._id)] | order(startDateTime desc) { _id, title, "slug": slug.current, eventType, startDateTime, endDateTime } }`),
-      groq(`*[_type == "siteSettings"][0]{ address, hours, mapsUrl }`),
-    ]);
+    // Footer (address/hours/maps/social) is owned by assets/footer.js now,
+    // which does its own siteSettings fetch — nothing to do here for it.
+    const docs = await groq(`*[_type == "artist"] | order(name.en asc) { name, "slug": slug.current, bio, photo, discipline, currentLocation, website, instagram, links, "events": *[_type == "event" && references(^._id)] | order(startDateTime desc) { _id, title, "slug": slug.current, eventType, startDateTime, endDateTime } }`);
     artists = (docs || []).map(docToArtist);
     artist = artists.find(a => a.slug === id);
-    if (settingsDoc) {
-      const fAddr = document.getElementById('footer-address');
-      const fHours = document.getElementById('footer-hours');
-      const fMaps = document.getElementById('footer-maps');
-      if (fAddr && settingsDoc.address?.en) fAddr.innerHTML =
-        `<span class="en-only">${settingsDoc.address.en.replace(/\n/g, '<br>')}</span>` +
-        (settingsDoc.address.ar ? `<span class="ar-only ar" dir="rtl">${settingsDoc.address.ar.replace(/\n/g, '<br>')}</span>` : '');
-      if (fHours && settingsDoc.hours?.en) fHours.innerHTML =
-        `<span class="en-only">${settingsDoc.hours.en}</span>` +
-        (settingsDoc.hours.ar ? `<span class="ar-only ar" dir="rtl">${settingsDoc.hours.ar}</span>` : '');
-      if (fMaps && settingsDoc.mapsUrl) { fMaps.href = settingsDoc.mapsUrl; }
-    }
   } catch (err) { console.warn('[WC] artist fetch failed', err); }
 
   const root = document.getElementById('arRoot');
