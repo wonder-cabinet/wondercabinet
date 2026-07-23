@@ -228,6 +228,8 @@
       content:  doc.content || [],
       relatedArtists: (doc.relatedArtists||[]).map(a => ({
         name: a.name?.en || a.name?.ar || '', nameAr: a.name?.ar || '', slug: a.slug || '',
+        bio:   a.bio?.en ? a.bio.en.split(/\n\n+/).map(p => p.trim()).filter(Boolean) : [],
+        bioAr: a.bio?.ar ? a.bio.ar.split(/\n\n+/).map(p => p.trim()).filter(Boolean) : [],
       })).filter(a => a.name),
       relatedProject: doc.relatedProject ? { title: _loc(doc.relatedProject.title), slug: doc.relatedProject.slug?.current || '' } : null,
       programmeEvents: (doc.programmeEvents || []).map(pe => {
@@ -499,6 +501,27 @@ ${audioBar}
         <span class="ep-prog-arrow">→</span>
       </a>`).join("")}
   </div>` : ""}
+  ${(ev.relatedArtists && ev.relatedArtists.length) ? `
+  <div class="ep-related-artists">
+    <div class="ep-related-artists-head">
+      <span class="en-only">Related Artists</span>
+      <span class="ar-only ar" dir="rtl">فنانون ذوو صلة</span>
+    </div>
+    ${ev.relatedArtists.map(a => {
+      const nameInner = `<span class="en-only">${a.name}</span><span class="ar-only ar" dir="rtl">${a.nameAr || a.name}</span>`;
+      const nameHtml = a.slug
+        ? `<a class="ep-related-artist-name" href="artist.html?id=${encodeURIComponent(a.slug)}"${EMBED ? ' target="_top"' : ''}>${nameInner}</a>`
+        : `<div class="ep-related-artist-name">${nameInner}</div>`;
+      const hasBio = (a.bio && a.bio.length) || (a.bioAr && a.bioAr.length);
+      return `<div class="ep-related-artist">
+        ${nameHtml}
+        ${hasBio ? `<div class="ep-related-artist-bio">
+          ${a.bio && a.bio.length ? `<div class="en-only">${a.bio.map(p => `<p>${p}</p>`).join('')}</div>` : ''}
+          ${a.bioAr && a.bioAr.length ? `<div class="ar-only ar" dir="rtl">${a.bioAr.map(p => `<p>${p}</p>`).join('')}</div>` : ''}
+        </div>` : ''}
+      </div>`;
+    }).join("")}
+  </div>` : ""}
   ${navBar}
 </div>`;
   }
@@ -515,7 +538,7 @@ ${audioBar}
   try {
     // Footer (address/hours/maps/social) is owned by assets/footer.js now,
     // which does its own siteSettings fetch — nothing to do here for it.
-    const docs = await groq(`*[_type == "event"] | order(startDateTime desc) { ..., location->{ name }, relatedArtists[]->{name, "slug": slug.current}, relatedProject->{title, slug}, programmeEvents[]->{_id, "slug": slug.current, title, eventType, startDateTime}, "coverPalette": cover.asset->metadata.palette }`);
+    const docs = await groq(`*[_type == "event"] | order(startDateTime desc) { ..., location->{ name }, relatedArtists[]->{name, "slug": slug.current, bio}, relatedProject->{title, slug}, programmeEvents[]->{_id, "slug": slug.current, title, eventType, startDateTime}, "coverPalette": cover.asset->metadata.palette }`);
     all = (docs || []).map(docToEv);
     ev = all.find(e => e.id === id);
   } catch(err) { console.warn('[WC] event fetch failed', err); }
