@@ -1718,7 +1718,7 @@ html[data-lang="ar"] .ar-only{ direction: rtl; }
    reads as the headline for the day without needing separate copy. */
 .gs-card-today{
   flex: 0 0 min(624px, 100vw); /* 520px default, 20% wider */
-  border-right-width: 10px;
+  border: 10px solid var(--gs-fg);
 }
 .gs-card-inner{
   position: relative; z-index: 2; height: 100%;
@@ -1787,7 +1787,7 @@ html[data-lang="ar"] .gs-list-heading{ text-align: right; }
   .gs-rail{ border-right: 0; border-bottom: 2px solid var(--gs-fg); }
   .gs-track{ flex-direction: column; transform: none !important; height: auto; }
   .gs-card{ flex: none; height: auto; border-right: 0; border-bottom: 2px solid var(--gs-fg); }
-  .gs-card-today{ flex: none; border-right: 0; border-bottom-width: 10px; }
+  .gs-card-today{ flex: none; border: 10px solid var(--gs-fg); }
   .gs-res-grid{ grid-template-columns: 1fr; }
   .gs-res-item{ border-right: 0; border-bottom: 2px solid currentColor; }
   .gs-res-item:last-child{ border-bottom: 0; }
