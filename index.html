@@ -161,7 +161,7 @@ let archiveState = "idle"; // idle -> loaded, set once the Archive link is click
 const MONTH_ORDER = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 const MONTH_NAME_EN = { Jan:"January", Feb:"February", Mar:"March", Apr:"April", May:"May", Jun:"June", Jul:"July", Aug:"August", Sep:"September", Oct:"October", Nov:"November", Dec:"December" };
 const MONTH_NAME_AR = { Jan:"يناير", Feb:"فبراير", Mar:"مارس", Apr:"أبريل", May:"مايو", Jun:"يونيو", Jul:"يوليو", Aug:"أغسطس", Sep:"سبتمبر", Oct:"أكتوبر", Nov:"نوفمبر", Dec:"ديسمبر" };
-const TYPE_AR = { Class:"صف", Film:"فيلم", Performance:"عرض", Radio:"إذاعة", Reading:"قراءة", Workshop:"ورشة", Opening:"افتتاح", Bar:"بار", Exhibition:"معرض" };
+const TYPE_AR = { Class:"صف", Film:"فيلم", Performance:"عرض", Radio:"إذاعة", Reading:"قراءة", Workshop:"ورشة", "Open Studio":"استوديو مفتوح", Opening:"افتتاح", Bar:"بار", Exhibition:"معرض" };
 const VENUE_AR = { "Ground floor":"الطابق الأرضي","Screening room":"غرفة العرض","Main hall":"القاعة الرئيسية","Library":"المكتبة","Studio":"الستوديو","Workshop":"الورشة","Whole building":"كامل المبنى","Bar open":"البار مفتوح" };
 const SEASON_NAME_AR = { Autumn:"خريف", Winter:"شتاء", Spring:"ربيع", Summer:"صيف" };
 
@@ -269,9 +269,9 @@ function renderThisWeek(){
    Shared between the future Programme bar and the past-archive bar:
    same markup, same interaction, different backing list + STATE key.
    ============================================================ */
-const FILTER_TYPES = ["", "Performance", "Film", "Class", "Workshop", "Radio", "Reading", "Opening", "Bar", "Exhibition"];
-const FILTER_LABEL_EN = { "":"All", Performance:"Performance", Film:"Film", Class:"Class", Workshop:"Workshop", Radio:"Radio", Reading:"Reading", Opening:"Opening", Bar:"Bar", Exhibition:"Exhibition" };
-const FILTER_LABEL_AR = { "":"الكل", Performance:"عرض", Film:"فيلم", Class:"صف", Workshop:"ورشة", Radio:"إذاعة", Reading:"قراءة", Opening:"افتتاح", Bar:"بار", Exhibition:"معرض" };
+const FILTER_TYPES = ["", "Performance", "Film", "Class", "Workshop", "Open Studio", "Radio", "Reading", "Opening", "Bar", "Exhibition"];
+const FILTER_LABEL_EN = { "":"All", Performance:"Performance", Film:"Film", Class:"Class", Workshop:"Workshop", "Open Studio":"Open Studio", Radio:"Radio", Reading:"Reading", Opening:"Opening", Bar:"Bar", Exhibition:"Exhibition" };
+const FILTER_LABEL_AR = { "":"الكل", Performance:"عرض", Film:"فيلم", Class:"صف", Workshop:"ورشة", "Open Studio":"استوديو مفتوح", Radio:"إذاعة", Reading:"قراءة", Opening:"افتتاح", Bar:"بار", Exhibition:"معرض" };
 
 function renderFilterBar(containerId, getList, stateKey, onChange){
   const container = document.getElementById(containerId);
@@ -1036,9 +1036,9 @@ function _gsEventCard(ev){
   const _today = new Date(); _today.setHours(0,0,0,0);
   const isToday = eventDateOnly(ev).getTime() === _today.getTime();
   return `<a class="gs-card${videoSrc ? " gs-card-video" : ""}${isToday ? " gs-card-today" : ""}" href="event.html?id=${ev.id}" data-ev="${ev.id}">
+    ${isToday ? `<div class="gs-c-today-label"><span class="en-only">Today</span><span class="ar-only ar" dir="rtl">اليوم</span></div>` : ""}
     ${videoSrc ? `<video class="gs-card-bg-video" autoplay muted loop playsinline src="${videoSrc}"></video><div class="gs-card-scrim"></div>` : ""}
     <div class="gs-card-inner">
-      ${isToday ? `<div class="gs-c-today-label"><span class="en-only">Today</span><span class="ar-only ar" dir="rtl">اليوم</span></div>` : ""}
       <div class="gs-c-meta">
         <span class="en-only">${ev.type}${ev.dow ? " · " + ev.dow + " " + parseInt(ev.day,10) + " " + ev.month : ""}${ev.start ? " · " + ev.start : ""}</span>
         <span class="ar-only ar" dir="rtl">${typeAr}${ev.dowAr ? " · " + ev.dowAr : ""}${ev.start ? " · " + ev.start : ""}</span>
@@ -2461,7 +2461,12 @@ function renderFeatured(){
     sticky.style.setProperty("--gs-fg", "var(--ink)");
     kicker.innerHTML = `<span class="en-only">This week</span><span class="ar-only ar" dir="rtl">هذا الأسبوع</span>`;
     range.innerHTML = `<span class="en-only">${start.getDate()}—${end.getDate()} ${MONTH_NAME_EN[MABBR_G[end.getMonth()]]}</span><span class="ar-only ar" dir="rtl">${arNum(start.getDate())}—${arNum(end.getDate())} ${MONTH_NAME_AR[MABBR_G[end.getMonth()]]}</span>`;
-    count.innerHTML = `<span class="en-only">${evs.length} ${evs.length === 1 ? "event" : "events"}</span><span class="ar-only ar" dir="rtl">${arNum(evs.length)} فعاليات</span>`;
+    // Count must include secondary ("Also happening this week") events too,
+    // not just the highlighted gs-cards — otherwise the header undercounts
+    // (e.g. shows "4 events" when a 5th is sitting in the list card).
+    const secondaryIdsForCount = (issue && issue.secondaryEventIds) || [];
+    const totalEventCount = evs.length + secondaryIdsForCount.length;
+    count.innerHTML = `<span class="en-only">${totalEventCount} ${totalEventCount === 1 ? "event" : "events"}</span><span class="ar-only ar" dir="rtl">${arNum(totalEventCount)} فعاليات</span>`;
     const themeEl = document.getElementById("gs-theme");
     if (issue && (issue.desc || issue.title)){
       themeEl.hidden = false;
