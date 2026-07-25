@@ -3069,7 +3069,7 @@ span.gs-lineup-name{ cursor: default; }
    paper-colored rows — the giant stacked names sit on the dark section's
    own background instead, so the reader should read as seamless there:
    no border. */
-.gs-lineup-name.tl-row-open{ border-top: none; }
+.gs-lineup-name.tl-row-open{ display: block; width: 100%; border-top: none; }
 .gs-lineup-name .ar{ font-family: var(--ff-ar); font-weight: 700; text-transform: none; }
 .gs-lineup-all{
   display: block; margin-top: 28px;
