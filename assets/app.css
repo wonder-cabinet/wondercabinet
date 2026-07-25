@@ -3044,23 +3044,25 @@ html[data-lang="ar"] .ep-nav-next { order: 1; }
 }
 #gs-artists-section h2{
   text-align: center;
-  font-size: clamp(40px, 8.5vw, 168px);
+  font-size: clamp(26px, 4.8vw, 92px);
   line-height: .94;
   color: var(--ink);
   margin: 0 0 .06em;
 }
-html[data-lang="ar"] #gs-artists-section h2{ font-size: clamp(34px, 7vw, 136px); }
+html[data-lang="ar"] #gs-artists-section h2{ font-size: clamp(22px, 4vw, 78px); }
 @media (max-width: 700px){
-  #gs-artists-section h2{ font-size: clamp(30px, 10vw, 64px); }
-  html[data-lang="ar"] #gs-artists-section h2{ font-size: clamp(26px, 8.5vw, 54px); }
+  #gs-artists-section h2{ font-size: clamp(18px, 6.5vw, 36px); }
+  html[data-lang="ar"] #gs-artists-section h2{ font-size: clamp(16px, 5.5vw, 30px); }
 }
 .gs-lineup-name{
   display: inline-block;
   text-decoration: none;
   color: inherit;
+  cursor: pointer;
   overflow-wrap: break-word;
   transition: color .15s;
 }
+span.gs-lineup-name{ cursor: default; }
 .gs-lineup-name:hover, .gs-lineup-name:focus-visible{ color: var(--highlight); }
 /* In-grid reader (_artistOpenReader in index.html) reuses .tl-row-open,
    which draws a border-top to mark the split on the Programme timeline's

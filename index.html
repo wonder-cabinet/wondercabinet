@@ -2635,7 +2635,7 @@ function renderFeatured(){
       const inner = `<span class="en-only">${a.name}</span><span class="ar-only ar" dir="rtl">${a.nameAr || a.name}</span>`;
       return a.slug
         ? `<a class="gs-lineup-name" href="artist.html?id=${encodeURIComponent(a.slug)}" data-artist="${a.slug}">${inner}</a>`
-        : `<span class="gs-lineup-name" style="cursor:default;">${inner}</span>`;
+        : `<span class="gs-lineup-name">${inner}</span>`;
     }).join(", \u00A0") + `<a class="gs-lineup-all" href="artists.html">
       <span class="en-only">All artists →</span>
       <span class="ar-only ar" dir="rtl">← جميع الفنانين</span>

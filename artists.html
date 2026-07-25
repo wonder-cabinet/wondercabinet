@@ -10,29 +10,10 @@
 <meta property="og:title" content="All Artists – The Wonder Cabinet">
 <meta property="og:description" content="Artists working with The Wonder Cabinet in Bethlehem, Palestine.">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="stylesheet" href="assets/app.css?v=66" />
+<link rel="stylesheet" href="assets/app.css?v=69" />
 <style>
   body{ background: var(--night); color: var(--paper); min-height: 100vh; }
-  .ev-lang-toggle{
-    position: fixed; top: 20px; left: 24px; z-index: 50;
-    display: inline-flex; gap: 16px; border: none; background: none;
-  }
-  .ev-lang-toggle button{
-    border: none !important; background: none !important;
-    color: var(--paper) !important; opacity: .5;
-    font-family: var(--ff-sans); font-size: 12px; letter-spacing: 0; font-weight: 700;
-    padding: 0;
-  }
-  .ev-lang-toggle button[aria-pressed="true"]{ opacity: 1; }
-  .art-close{
-    all: unset; cursor: pointer;
-    position: fixed; top: 18px; right: 24px; z-index: 50;
-    color: var(--paper); font-size: 24px; font-weight: 700; line-height: 1;
-    opacity: .6; transition: opacity .15s;
-  }
-  .art-close:hover{ opacity: 1; }
-  html[data-lang="ar"] .art-close{ right: auto; left: 24px; }
-  .artists-page-wrap{ max-width: 1320px; margin: 0 auto; padding: 96px 24px 96px; }
+  .artists-page-wrap{ max-width: 1320px; margin: 0 auto; padding: 48px 24px 96px; }
   .artists-page-label{
     font-family: var(--ff-sans); font-size: 12px; letter-spacing: 0;
     text-transform: uppercase; font-weight: 700; opacity: .85;
@@ -45,11 +26,22 @@
 </head>
 <body>
 
-<div class="ev-lang-toggle lang-toggle" role="group" aria-label="Language">
-  <button data-lang-btn="en" aria-pressed="true">EN</button>
-  <button data-lang-btn="ar" aria-pressed="false">AR</button>
-</div>
-<a class="art-close" href="index.html#gs-artists-section" aria-label="Back">✕</a>
+<header class="topbar">
+  <div class="topbar-inner">
+    <a class="tpb-logo" href="index.html">
+      <span class="logo" role="img" aria-label="The Wonder Cabinet"></span>
+    </a>
+    <nav class="tpb-nav">
+      <a href="index.html#programme"><span class="en-only">Programme</span><span class="ar-only ar">البرنامج</span></a>
+      <a href="index.html"><span class="en-only">Archive</span><span class="ar-only ar">الأرشيف</span></a>
+      <div class="lang-toggle" role="group" aria-label="Language">
+        <button data-lang-btn="en" aria-pressed="true">EN</button>
+        <button data-lang-btn="ar" aria-pressed="false">AR</button>
+      </div>
+      <a href="index.html#gs-artists-section" aria-label="Close"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M4 4l10 10M14 4L4 14"/></svg></a>
+    </nav>
+  </div>
+</header>
 
 <main class="artists-page-wrap">
   <div class="artists-page-label">
@@ -79,8 +71,8 @@
         const inner = `<span class="en-only">${a.name}</span><span class="ar-only ar" dir="rtl">${a.nameAr || a.name}</span>`;
         return a.slug
           ? `<a class="gs-lineup-name" href="artist.html?id=${encodeURIComponent(a.slug)}">${inner}</a>`
-          : `<span class="gs-lineup-name" style="cursor:default;">${inner}</span>`;
-      }).join('');
+          : `<span class="gs-lineup-name">${inner}</span>`;
+      }).join(', \u00A0');
     } else {
       listEl.innerHTML = `<p class="artists-empty"><span class="en-only">No artists yet.</span><span class="ar-only ar" dir="rtl">لا يوجد فنانون بعد.</span></p>`;
     }
