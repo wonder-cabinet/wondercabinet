@@ -30,18 +30,11 @@
        to the actual page viewport instead. */
     overflow: visible;
   }
-  .ev-lang-toggle{
-    position: fixed; top: 20px; left: 24px; z-index: 50;
-    display: inline-flex; gap: 16px; border: none; background: none;
-  }
-  .ev-lang-toggle button{
-    border: none !important; background: none !important;
-    color: var(--ink) !important; opacity: .5;
-    font-family: var(--ff-sans); font-size: 12px; letter-spacing: 0; font-weight: 700;
-    padding: 0;
-  }
-  .ev-lang-toggle button[aria-pressed="true"]{ opacity: 1; }
-  .event-page-wrap{ padding-top: clamp(24px, 4vw, 48px); min-height: 60vh; }
+  .event-page-wrap{ padding-top: clamp(16px, 3vw, 32px); min-height: 60vh; }
+  /* Standalone page gets the site's real topbar (logo, Programme, Archive,
+     language, close) instead of a bare floating language toggle — this
+     page should feel like a page of the site, not an isolated popup. */
+  html.embed .topbar{ display: none !important; }
 
   /* ---- EMBED MODE (?embed=1) ----
      The same page, hosted inside the homepage grid's expanding reader
@@ -51,7 +44,6 @@
      (the same one the grid card uses as its background) sits at the top
      of the flow so it scrolls away as you read. */
   html.embed{ overscroll-behavior: none; }
-  html.embed .ev-lang-toggle{ display: none; }
   html.embed .more{ display: none !important; }
   html.embed .foot{ display: none !important; }
   html.embed .event-page-wrap{ padding-top: 0; min-height: 0; }
@@ -92,10 +84,22 @@
 </head>
 <body>
 
-<div class="ev-lang-toggle lang-toggle" role="group" aria-label="Language">
-  <button data-lang-btn="en" aria-pressed="true">EN</button>
-  <button data-lang-btn="ar" aria-pressed="false">AR</button>
-</div>
+<header class="topbar">
+  <div class="topbar-inner">
+    <a class="tpb-logo" href="index.html">
+      <span class="logo" role="img" aria-label="The Wonder Cabinet"></span>
+    </a>
+    <nav class="tpb-nav">
+      <a href="index.html#programme"><span class="en-only">Programme</span><span class="ar-only ar">البرنامج</span></a>
+      <a href="index.html"><span class="en-only">Archive</span><span class="ar-only ar">الأرشيف</span></a>
+      <div class="lang-toggle" role="group" aria-label="Language">
+        <button data-lang-btn="en" aria-pressed="true">EN</button>
+        <button data-lang-btn="ar" aria-pressed="false">AR</button>
+      </div>
+      <a id="epClose" href="index.html" aria-label="Close"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M4 4l10 10M14 4L4 14"/></svg></a>
+    </nav>
+  </div>
+</header>
 
 <main class="event-page-wrap">
   <div class="event-panel is-page" id="epRoot" style="background:var(--paper);color:var(--night);"></div>
@@ -391,6 +395,9 @@
     const popBtn = EMBED
       ? `<a class="ep-pop" href="event.html?id=${encodeURIComponent(ev.id)}" target="_top" aria-label="Open as its own page"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3H3v12h12v-4M10 3h5v5M14 4l-7 7"/></svg></a>`
       : "";
+    const closeBtn = EMBED
+      ? `<a class="ep-close" id="epClose" href="index.html" aria-label="Back"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4l10 10M14 4L4 14"/></svg></a>`
+      : "";
 
     return `
 ${audioBar}
@@ -420,7 +427,7 @@ ${audioBar}
       <span class="ep-type-tag ar-only ar">${typeArLabel}</span>
       <div class="ep-header-icons">
         ${popBtn}
-        <a class="ep-close" id="epClose" href="index.html" aria-label="Back"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4l10 10M14 4L4 14"/></svg></a>
+        ${closeBtn}
       </div>
     </div>
   </div>
@@ -586,10 +593,8 @@ ${audioBar}
     if (!EMBED) {
       history.pushState({id: targetEv.id}, '', `event.html?id=${encodeURIComponent(targetEv.id)}`);
     }
-    if (EMBED) {
-      document.documentElement.style.setProperty('--bg', tc.bg);
-      document.body.style.background = tc.bg;
-    }
+    document.documentElement.style.setProperty('--bg', tc.bg);
+    document.body.style.background = tc.bg;
   }
 
   // Document-level delegation — survives every innerHTML swap
