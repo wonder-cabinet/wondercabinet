@@ -12,7 +12,7 @@
 <meta property="og:url" content="https://wondercabinet.space">
 <meta property="og:image" content="" id="og-image-meta">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="stylesheet" href="assets/app.css?v=67">
+<link rel="stylesheet" href="assets/app.css?v=68">
 </head>
 <body data-view="list">
 
@@ -2636,7 +2636,7 @@ function renderFeatured(){
       return a.slug
         ? `<a class="gs-lineup-name" href="artist.html?id=${encodeURIComponent(a.slug)}" data-artist="${a.slug}">${inner}</a>`
         : `<span class="gs-lineup-name" style="cursor:default;">${inner}</span>`;
-    }).join("") + `<a class="gs-lineup-all" href="artists.html">
+    }).join(", \u00A0") + `<a class="gs-lineup-all" href="artists.html">
       <span class="en-only">All artists →</span>
       <span class="ar-only ar" dir="rtl">← جميع الفنانين</span>
     </a>`;
