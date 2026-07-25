@@ -6,14 +6,14 @@
 @import url("https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400;1,700&display=swap");
 
 :root{
-  /* ---- Signature palette (green page + blue ink) ---- */
-  --bg:        #00d26a;   /* electric wondercabinet green */
+  /* ---- Signature palette (cream page + blue ink) ---- */
+  --bg:        #f6f3ea;   /* warm wondercabinet paper */
   --bg-alt:    #f6f3ea;   /* warm paper for sections that need relief */
   --ink:       #1d24ff;   /* royal wondercabinet blue */
   --ink-soft:  #4850ff;
   --ink-mute:  #6b71ff;
   --paper:     #f6f3ea;
-  --card:      #00d26a;
+  --card:      #f6f3ea;
   --night:     #0a0a16;
   --highlight: #ffe65c;   /* yellow accent (weekend poster) */
   --orange:    #ff3b1d;   /* snake-orange accent */
@@ -3122,8 +3122,9 @@ html[data-lang="ar"] .art-header-text{ align-items: flex-end; }
    instead of the 35vh rail rows. */
 .art-past-toggle{
   display: flex; align-items: center; justify-content: space-between;
-  padding: 14px 0; margin-top: 4px;
-  border-top: 1px solid currentColor;
+  width: 100%; padding: 14px 0; margin-top: 4px;
+  background: none; border: none; border-top: 1px solid currentColor;
+  color: inherit; text-align: inherit;
   cursor: pointer; user-select: none;
   font-family: var(--ff-sans); font-size: 12px; font-weight: 700;
   text-transform: uppercase; letter-spacing: .05em; opacity: .6;

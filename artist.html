@@ -11,7 +11,7 @@
 <meta property="og:description" content="A space for art production and cultural development in Bethlehem, Palestine." id="og-desc-meta">
 <meta property="og:image" content="" id="og-image-meta">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="stylesheet" href="assets/app.css?v=66" />
+<link rel="stylesheet" href="assets/app.css?v=71" />
 <style>
   /* Same reader-mode template shell as event.html, in-flow instead of a
      slide-in panel — see event.html for the canonical version of this
@@ -210,13 +210,13 @@
         ? a.upcoming.map(eventRowHtml).join('')
         : `<p class="art-meta-line"><span class="en-only">No upcoming events.</span><span class="ar-only ar" dir="rtl">لا توجد فعاليات قادمة حالياً.</span></p>`}
       ${a.past.length ? `
-      <div class="art-past-toggle" id="artPastToggle" aria-expanded="false">
+      <button type="button" class="art-past-toggle" id="artPastToggle" aria-expanded="false">
         <span>
           <span class="en-only">Past events (${a.past.length})</span>
           <span class="ar-only ar" dir="rtl">الفعاليات السابقة (${arNum(a.past.length)})</span>
           <span class="art-past-arrow">↓</span>
         </span>
-      </div>
+      </button>
       <div class="art-past-list" id="artPastList" hidden>${a.past.map(eventRowHtml).join('')}</div>` : ''}
     </div>` : '';
 
