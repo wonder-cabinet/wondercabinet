@@ -594,6 +594,7 @@ ${audioBar}
       history.pushState({id: targetEv.id}, '', `event.html?id=${encodeURIComponent(targetEv.id)}`);
     }
     document.documentElement.style.setProperty('--bg', tc.bg);
+    document.documentElement.style.setProperty('--ink', tc.ink);
     document.body.style.background = tc.bg;
   }
 
@@ -623,6 +624,7 @@ ${audioBar}
     // (mountEvent already sets it, but set it here too before first paint.)
     const tc = _colorFor(ev, { bg: "#1d24ff", ink: "#f6f3ea" });
     document.documentElement.style.setProperty('--bg', tc.bg);
+    document.documentElement.style.setProperty('--ink', tc.ink);
     document.body.style.background = tc.bg;
 
     // Report scroll position to the parent — it maps the first stretch of
