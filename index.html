@@ -12,7 +12,7 @@
 <meta property="og:url" content="https://wondercabinet.space">
 <meta property="og:image" content="" id="og-image-meta">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="stylesheet" href="assets/app.css?v=70">
+<link rel="stylesheet" href="assets/app.css?v=71">
 </head>
 <body data-view="list">
 
@@ -902,7 +902,20 @@ function renderCurrentExhibitions(){
         ptoggle.innerHTML = pastOpen
           ? `<span class="en-only">Past events (${n}) ↑</span><span class="ar-only ar" dir="rtl">الفعاليات السابقة (${arNum(n)}) ↑</span>`
           : `<span class="en-only">Past events (${n}) ↓</span><span class="ar-only ar" dir="rtl">الفعاليات السابقة (${arNum(n)}) ↓</span>`;
-        setTimeout(function(){ setup(); onScroll(); }, 20);
+        // Toggling changes track.scrollHeight, which setup() uses to
+        // recompute railRunway — but the page itself hasn't scrolled, so
+        // re-deriving the track position from onScroll()'s live geometry
+        // right after this can land on a stale/inconsistent value and
+        // visibly jump the rail to an unrelated position (looking like the
+        // content just vanished). Hold the same relative position instead.
+        const keepProgress = currentProgress;
+        setTimeout(function(){
+          setup();
+          const railRunway = parseFloat(outer.dataset.railRunway || 0);
+          currentProgress = Math.min(keepProgress, railRunway);
+          progressInitialized = true;
+          applyTrack(currentProgress);
+        }, 20);
       });
     }
 
