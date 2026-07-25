@@ -3037,8 +3037,10 @@ html[data-lang="ar"] .ep-nav-next { order: 1; }
 /* Stacked giant type — shared by the homepage "Artists this week" section
    and the artists.html all-artists index. Pure type, no cards, no rules. */
 .gs-lineup-list{
-  display: flex; flex-direction: column; align-items: center;
-  text-align: center; gap: 0;
+  text-align: center;
+  font-family: var(--ff-sans); font-weight: 700; text-transform: uppercase;
+  font-size: clamp(26px, 4.8vw, 92px); line-height: 1.15; letter-spacing: 0;
+  color: var(--paper);
 }
 #gs-artists-section h2{
   text-align: center;
@@ -3053,11 +3055,10 @@ html[data-lang="ar"] #gs-artists-section h2{ font-size: clamp(34px, 7vw, 136px);
   html[data-lang="ar"] #gs-artists-section h2{ font-size: clamp(26px, 8.5vw, 54px); }
 }
 .gs-lineup-name{
-  display: block; width: 100%;
-  font-family: var(--ff-sans); font-weight: 700; text-transform: uppercase;
-  font-size: clamp(40px, 8.5vw, 168px); line-height: .94; letter-spacing: 0;
-  color: var(--paper); text-decoration: none;
-  padding: .06em 0; overflow-wrap: break-word;
+  display: inline-block;
+  text-decoration: none;
+  color: inherit;
+  overflow-wrap: break-word;
   transition: color .15s;
 }
 .gs-lineup-name:hover, .gs-lineup-name:focus-visible{ color: var(--highlight); }
@@ -3069,7 +3070,7 @@ html[data-lang="ar"] #gs-artists-section h2{ font-size: clamp(34px, 7vw, 136px);
 .gs-lineup-name.tl-row-open{ border-top: none; }
 .gs-lineup-name .ar{ font-family: var(--ff-ar); font-weight: 700; text-transform: none; }
 .gs-lineup-all{
-  display: inline-block; margin-top: 28px;
+  display: block; margin-top: 28px;
   font-family: var(--ff-sans); font-size: 12px; letter-spacing: 0;
   text-transform: uppercase; font-weight: 700;
   color: var(--paper); opacity: .65; text-decoration: none;
@@ -3079,11 +3080,11 @@ html[data-lang="ar"] #gs-artists-section h2{ font-size: clamp(34px, 7vw, 136px);
 
 /* Arabic renders visually larger at these sizes — trim the clamp a touch
    so it doesn't overflow/wrap worse than the Latin type. */
-html[data-lang="ar"] .gs-lineup-name{ font-size: clamp(34px, 7vw, 136px); }
+html[data-lang="ar"] .gs-lineup-list{ font-size: clamp(22px, 4vw, 78px); }
 
 @media (max-width: 700px){
-  .gs-lineup-name{ font-size: clamp(30px, 10vw, 64px); }
-  html[data-lang="ar"] .gs-lineup-name{ font-size: clamp(26px, 8.5vw, 54px); }
+  .gs-lineup-list{ font-size: clamp(18px, 6.5vw, 36px); }
+  html[data-lang="ar"] .gs-lineup-list{ font-size: clamp(16px, 5.5vw, 30px); }
   .gs-lineup-all{ margin-top: 20px; }
 }
 
