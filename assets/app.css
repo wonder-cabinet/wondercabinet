@@ -1966,7 +1966,12 @@ body.gs-reader-open{ overflow: hidden; }
   will-change: transform;
 }
 
-/* Programme event rows */
+/* Programme event rows — background/color read the --cx-accent/--cx-ink
+   custom properties (which inherit down from the section by default, same
+   flat color for every row) but can be overridden per-row via inline style
+   when the row's own event has its own poster palette (see the Upcoming
+   exhibitions list rows in renderCurrentExhibitions), so each exhibition's
+   row can show its own poster's colors instead of the section-wide one. */
 .cx-row{
   display: flex;
   flex-direction: column;
@@ -1975,7 +1980,8 @@ body.gs-reader-open{ overflow: hidden; }
   padding: 0 28px;
   border-bottom: 2px solid currentColor;
   text-decoration: none;
-  color: inherit;
+  background: var(--cx-accent, transparent);
+  color: var(--cx-ink, inherit);
   transition: background .12s;
   box-sizing: border-box;
   position: relative; overflow: hidden;
