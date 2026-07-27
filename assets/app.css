@@ -1867,6 +1867,12 @@ body.gs-reader-open{ overflow: hidden; }
   padding: clamp(28px, 4vw, 52px) var(--pad) clamp(20px, 3vw, 36px);
   border-bottom: 2px solid currentColor;
 }
+/* The class rule above sets its own `display`, which — because author
+   styles always win over the UA stylesheet regardless of specificity —
+   silently defeats the plain [hidden] attribute JS sets when there's no
+   current exhibition to show a head for. Without this, hidden=true still
+   renders as a visible empty flex bar. */
+.cx-head[hidden]{ display: none; }
 .cx-title-head{
   margin: 0;
   font-family: var(--ff-sans); font-weight: 700;
