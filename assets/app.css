@@ -2142,6 +2142,7 @@ body.gs-reader-open{ overflow: hidden; }
 .ep-meta .dt-range{ font-size: clamp(38px, 6vw, 86px); font-weight: 700; line-height: 1.1; }
 .ep-type-tag{ letter-spacing: 0; font-weight: 400; font-size: 40px; }
 .ep-time{ font-variant-numeric: tabular-nums; }
+.ep-duration{ opacity: .65; font-weight: 400; }
 
 /* Exhibition programme — on event page */
 .ep-programme{

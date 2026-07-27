@@ -203,6 +203,7 @@
       dayOrdinal: s ? _ordinal(s.getDate()) : '',
       start:    hasTime ? s.toTimeString().slice(0,5) : '',
       end:      doc.endDateTime && (+doc.endDateTime.slice(11,13)||+doc.endDateTime.slice(14,16)) ? e.toTimeString().slice(0,5) : '',
+      filmDuration: doc.filmDuration || null,
       // Multi-day (exhibitions and other long-running things): keep the
       // closing DATE so the header can show a range instead of times.
       endDate:  (e && (e.getFullYear() !== s.getFullYear() || e.getMonth() !== s.getMonth() || e.getDate() !== s.getDate()))
@@ -403,7 +404,7 @@ ${audioBar}
       ` : `
       <span class="en-only">${ev.dowFull ? `${ev.dowFull}<br>${ev.monthFull} ${ev.dayOrdinal}, ${ev.year}` : _overlayDate(ev)}</span>
       <span class="ar-only ar">${ev.dowAr ? `${ev.dowAr}<br>` : ""}${ev.day} ${MONTH_NAME_AR[ev.month]} ${arNum(ev.year)}</span>
-      <span class="ep-time">${ev.start}${ev.end ? " — " + ev.end : ""}</span>
+      <span class="ep-time">${ev.start}${ev.end ? " — " + ev.end : ""}${ev.filmDuration ? ` <span class="ep-duration">(${ev.filmDuration} min)</span>` : ""}</span>
       `}
     </div>
     ${ev.register

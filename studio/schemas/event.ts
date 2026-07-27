@@ -69,6 +69,13 @@ export const event = defineType({
     defineField({name: 'startDateTime', title: 'Start', type: 'datetime'}),
     defineField({name: 'endDateTime', title: 'End', type: 'datetime'}),
     defineField({
+      name: 'filmDuration',
+      title: 'Duration (minutes)',
+      description: 'Runtime of the film, in minutes. Shown on the event page next to the screening time.',
+      type: 'number',
+      hidden: ({document}) => (document as any)?.eventType !== 'Film',
+    }),
+    defineField({
       name: 'location',
       title: 'Location',
       type: 'reference',
