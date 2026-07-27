@@ -833,60 +833,97 @@ function renderCurrentExhibitions(){
     </div>`;
   }).join('');
 
-  // Plain list, used whenever there's nothing currently on view (the most
-  // recent past exhibition, tagged accordingly) and always for anything
-  // still to come. One consistent row style + heading — "Upcoming
-  // exhibitions" — rather than mixing separate collapsed/expanded past-
-  // exhibition treatments with a differently-labelled upcoming list.
-  const listItems = [];
-  if (!showingCurrent && past.length) listItems.push({ ev: past[0], isPast: true });
-  upcoming.forEach(e => listItems.push({ ev: e, isPast: false }));
+  // Past fallback (only when nothing's currently on view) keeps the full
+  // row — date, tags, title, time — opened by a click, same as everywhere
+  // else. Upcoming exhibitions get a slim trigger instead of a full
+  // preview row: there's no "cover" to show since scrolling to it opens
+  // the real inline page (title + date included) automatically.
+  const pastRowHtml = (!showingCurrent && past.length) ? cxRow(past[0], true, 'Past') : '';
+  const upcomingRowHtml = upcoming.map(e => `<a class="cx-row cx-upcoming-trigger" href="event.html?id=${encodeURIComponent(e.id)}" data-ev="${e.id}">
+    <div class="cx-row-tags">
+      ${e.type ? `<div class="cx-row-type">${e.type}</div>` : ''}
+      <div class="cx-row-type cx-row-status">Upcoming</div>
+    </div>
+  </a>`).join('');
 
-  const upcomingHtml = listItems.length ? `<div class="cx-upcoming">
+  const upcomingHtml = (pastRowHtml || upcomingRowHtml) ? `<div class="cx-upcoming">
     <h3 class="cx-upcoming-head"><span class="en-only">Upcoming exhibitions</span><span class="ar-only ar" dir="rtl">معارض قادمة</span></h3>
-    <div class="cx-upcoming-rows">${listItems.map(it => cxRow(it.ev, it.isPast, it.isPast ? 'Past' : 'Upcoming')).join('')}</div>
+    <div class="cx-upcoming-rows">${pastRowHtml}${upcomingRowHtml}</div>
   </div>` : '';
 
   list.innerHTML = mainUnitsHtml + upcomingHtml;
 
-  // Rows in this plain list open the in-grid reader in place, same as
-  // every other event on the site — they live in normal vertical flow
-  // (not a scroll-locked rail), so _tlOpenReader (the same function the
-  // Programme timeline rows use) is the right fit: the clicked row just
-  // grows downward in place, no scroll-lock poster/rail transition.
-  // Scoped to just this list so it can't ever double-fire alongside the
-  // exhibition rail's own cx-row handler or the "Also happening this
-  // week" list's handler, which both target cx-row elements inside their
-  // own separate containers.
-  if (listItems.length){
-    const upcomingRows = list.querySelector('.cx-upcoming-rows');
-    if (upcomingRows){
-      const listById = {};
-      listItems.forEach(function(it){ listById[it.ev.id] = it.ev; });
-      Array.prototype.forEach.call(upcomingRows.querySelectorAll('a.cx-row'), function(row){
-        // Each row takes its own poster's palette (Sanity's precomputed
-        // image palette) rather than a section-wide theme, so a newly
-        // added poster shows its own colors right away.
-        const rowEv = listById[row.dataset.ev];
-        if (rowEv && rowEv.coverPalette){
-          row.style.setProperty('--cx-accent', rowEv.coverPalette.bg);
-          row.style.setProperty('--cx-ink', rowEv.coverPalette.ink);
+  // Both row kinds open the in-grid reader in place, same as every other
+  // event on the site — normal vertical flow (not a scroll-locked rail),
+  // so _tlOpenReader (the same function the Programme timeline rows use)
+  // is the right fit. Scoped to just this list so it can't ever
+  // double-fire alongside the exhibition rail's own cx-row handler or the
+  // "Also happening this week" list's handler.
+  const upcomingRowsEl = list.querySelector('.cx-upcoming-rows');
+  if (upcomingRowsEl){
+    const byId = {};
+    if (!showingCurrent && past.length) byId[past[0].id] = past[0];
+    upcoming.forEach(function(e){ byId[e.id] = e; });
+
+    // Single guarded opener shared by both the click handler and the
+    // upcoming rows' scroll auto-trigger, so a row can never be asked to
+    // open twice (e.g. a click landing right as the scroll trigger fires).
+    function openRow(row){
+      if (row.dataset.cxOpened) return;
+      row.dataset.cxOpened = '1';
+      if (document.body.classList.contains('gs-reader-open') && !row.querySelector('.gs-card-frame')){
+        _gsHardReset();
+      }
+      if (window.innerWidth <= 700){
+        _gsOpenReaderMobile(row);
+      } else {
+        _tlOpenReader(row);
+      }
+    }
+
+    Array.prototype.forEach.call(upcomingRowsEl.querySelectorAll('a.cx-row'), function(row){
+      // Each row takes its own poster's palette (Sanity's precomputed
+      // image palette) rather than a section-wide theme, so a newly
+      // added poster shows its own colors right away.
+      const rowEv = byId[row.dataset.ev];
+      if (rowEv && rowEv.coverPalette){
+        row.style.setProperty('--cx-accent', rowEv.coverPalette.bg);
+        row.style.setProperty('--cx-ink', rowEv.coverPalette.ink);
+      }
+      row.addEventListener('click', function(ev){
+        ev.stopPropagation();
+        if (ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.button === 1) return;
+        ev.preventDefault();
+        openRow(row);
+      });
+    });
+
+    // Upcoming rows only (not the past fallback): scrolling down to the
+    // row auto-opens it — no click needed — locking the page exactly like
+    // the current-exhibition poster+rail does, so the visitor reads
+    // through the inline page and it collapses back as they keep
+    // scrolling. Guarded so it only ever fires once per row and only on a
+    // downward scroll actually reaching the row (never on page load, and
+    // never retriggered once used).
+    const TRIGGER_LINE = 56;
+    let lastY = window.scrollY;
+    function checkAutoOpen(){
+      const scrollingDown = window.scrollY > lastY;
+      lastY = window.scrollY;
+      if (!scrollingDown || _gsReaderOpen) return;
+      Array.prototype.forEach.call(upcomingRowsEl.querySelectorAll('a.cx-upcoming-trigger'), function(row){
+        if (row.dataset.cxOpened) return;
+        const rect = row.getBoundingClientRect();
+        // Generous tolerance on the far side so a fast fling that jumps
+        // the row's slim 72px anchor straight past the trigger line in a
+        // single scroll event still catches it, not just a slow scroll
+        // that happens to land exactly on the line.
+        if (rect.top <= TRIGGER_LINE && rect.top > -window.innerHeight){
+          openRow(row);
         }
-        row.addEventListener('click', function(ev){
-          ev.stopPropagation();
-          if (ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.button === 1) return;
-          ev.preventDefault();
-          if (document.body.classList.contains('gs-reader-open') && !row.querySelector('.gs-card-frame')){
-            _gsHardReset();
-          }
-          if (window.innerWidth <= 700){
-            _gsOpenReaderMobile(row);
-          } else {
-            _tlOpenReader(row);
-          }
-        });
       });
     }
+    window.addEventListener('scroll', checkAutoOpen, { passive: true });
   }
 
   // Set up scroll machinery + interactions for one exhibition unit. Called
