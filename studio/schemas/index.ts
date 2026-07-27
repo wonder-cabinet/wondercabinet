@@ -21,6 +21,7 @@ import {residency} from './residency'
 import {artwork} from './artwork'
 import {siteSettings} from './siteSettings'
 import {weeklyIssue} from './weeklyIssue'
+import {socialPost} from './socialPost'
 
 export const schemaTypes = [
   // Objects
@@ -46,4 +47,5 @@ export const schemaTypes = [
   artwork,
   siteSettings,
   weeklyIssue,
+  socialPost,
 ]

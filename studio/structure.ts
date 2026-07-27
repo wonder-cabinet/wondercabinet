@@ -105,6 +105,16 @@ export const structure = (S: StructureBuilder) =>
             .defaultOrdering([{field: 'weekStart', direction: 'desc'}])
         ),
 
+      S.listItem()
+        .title('Social Posts')
+        .schemaType('socialPost')
+        .child(
+          S.documentList()
+            .title('Social Posts')
+            .filter('_type == "socialPost"')
+            .defaultOrdering([{field: 'generatedAt', direction: 'desc'}])
+        ),
+
       S.divider(),
 
       // ── SETTINGS (singleton) ─────────────────────────
