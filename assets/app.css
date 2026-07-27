@@ -2060,14 +2060,24 @@ body.gs-reader-open{ overflow: hidden; }
 .cx-past-toggle:hover{ opacity: 1; background: rgba(255,255,255,.07); }
 
 /* Upcoming exhibitions — compact list, always visible when any Exhibition-
-   type event has a future start date. Plain links (no in-grid reader) —
-   this is a secondary/teaser list, not the section's main hero unit. */
+   type event has a future start date. */
 .cx-upcoming{ border-top: 2px solid currentColor; }
 .cx-upcoming-head{
   margin: 0; padding: 26px 28px 0;
   font-family: var(--ff-sans); font-size: 12px; font-weight: 700;
   text-transform: uppercase; letter-spacing: 0; opacity: .75;
 }
+/* Slim trigger row for an upcoming exhibition — no title/date "cover" to
+   read here, since scrolling down to it auto-opens the real inline page
+   (see the scroll auto-trigger in renderCurrentExhibitions), which shows
+   its own title and date immediately. Just tall enough to hold the tags
+   and act as the anchor the reader grows out of. */
+.cx-upcoming-trigger{
+  height: auto;
+  min-height: 72px;
+  justify-content: center;
+}
+.cx-upcoming-trigger .cx-row-tags{ margin-bottom: 0; }
 
 /* Mobile ≤ 700px — no scroll-lock, natural stacking */
 @media (max-width: 700px){
