@@ -99,7 +99,7 @@
      Each card opens the same in-grid reader as the timeline rows. -->
 <section class="cx" id="cx-section" hidden>
   <div class="cx-head">
-    <h2 class="cx-title-head">
+    <h2 class="cx-title-head" id="cx-title-head">
       <span class="en-only">Current <em>exhibitions</em></span>
       <span class="ar-only ar" dir="rtl">معارض <em>حالية</em></span>
     </h2>
@@ -713,23 +713,45 @@ function renderCurrentExhibitions(){
   const sec = document.getElementById("cx-section");
   const list = document.getElementById("cx-list");
   const count = document.getElementById("cx-count");
+  const titleEl = document.getElementById("cx-title-head");
   if (!sec || !list) return;
   const today = new Date(); today.setHours(0,0,0,0);
-  const cur = ALL.filter(e =>
-    e.type === "Exhibition" &&
+  const allExhibitions = ALL.filter(e => e.type === "Exhibition");
+  const cur = allExhibitions.filter(e =>
     eventDateOnly(e) <= today && today <= eventEndDateOnly(e)
   ).sort((a,b) => eventTimestamp(a) - eventTimestamp(b));
+  const upcoming = allExhibitions.filter(e => eventDateOnly(e) > today)
+    .sort((a,b) => eventTimestamp(a) - eventTimestamp(b));
+  // Most recent first — only ever show the single latest past exhibition
+  // (as a collapsed teaser), not the whole archive.
+  const past = allExhibitions.filter(e => eventEndDateOnly(e) < today)
+    .sort((a,b) => eventTimestamp(b) - eventTimestamp(a));
 
-  if (!cur.length){ sec.hidden = true; return; }
+  if (!cur.length && !upcoming.length && !past.length){ sec.hidden = true; return; }
   sec.hidden = false;
-  if (count) count.innerHTML =
-    `<span class="en-only">${String(cur.length).padStart(2,"0")} on view</span>` +
-    `<span class="ar-only ar" dir="rtl">${arNum(cur.length)} معروض</span>`;
 
-  // Theme the whole section band (header + border) off the first current
-  // exhibition's poster palette, same source as each unit's own accent —
-  // falls back to the static brand blue when no palette data exists.
-  const headTheme = cur[0] && cur[0].coverPalette;
+  // The one exhibition that gets the full poster+rail treatment: every
+  // current exhibition if there's at least one, otherwise just the most
+  // recent past one (shown collapsed — see cx-collapsed-bar below). Never
+  // both at once, and never more than one past exhibition at a time.
+  const showingCurrent = cur.length > 0;
+  const mainUnits = showingCurrent ? cur : (past.length ? [past[0]] : []);
+
+  if (titleEl){
+    titleEl.innerHTML = showingCurrent
+      ? `<span class="en-only">Current <em>exhibitions</em></span><span class="ar-only ar" dir="rtl">معارض <em>حالية</em></span>`
+      : mainUnits.length
+        ? `<span class="en-only">Past <em>exhibition</em></span><span class="ar-only ar" dir="rtl">معرض <em>سابق</em></span>`
+        : `<span class="en-only">Upcoming <em>exhibitions</em></span><span class="ar-only ar" dir="rtl">معارض <em>قادمة</em></span>`;
+  }
+  if (count) count.innerHTML = showingCurrent
+    ? `<span class="en-only">${String(cur.length).padStart(2,"0")} on view</span><span class="ar-only ar" dir="rtl">${arNum(cur.length)} معروض</span>`
+    : "";
+
+  // Theme the whole section band (header + border) off the featured unit's
+  // poster palette, same source as each unit's own accent — falls back to
+  // the static brand blue when no palette data exists.
+  const headTheme = mainUnits[0] && mainUnits[0].coverPalette;
   if (headTheme){
     sec.style.setProperty('--cx-accent', headTheme.bg);
     sec.style.setProperty('--cx-ink', headTheme.ink);
@@ -740,7 +762,8 @@ function renderCurrentExhibitions(){
 
   const STICKY_TOP = 54;
 
-  list.innerHTML = cur.map(e => {
+  const mainUnitsHtml = mainUnits.map(e => {
+    const collapsed = !showingCurrent; // only true for the single past-exhibition fallback
     const range = `${parseInt(e.day,10)} ${(MONTH_NAME_EN[e.month]||'').slice(0,3)} — ${parseInt(e.endDay||e.day,10)} ${(MONTH_NAME_EN[e.endMonth||e.month]||'').slice(0,3)}`;
     const rangeAr = `${arNum(parseInt(e.day,10))} ${MONTH_NAME_AR[e.month]||''} — ${arNum(parseInt(e.endDay||e.day,10))} ${MONTH_NAME_AR[e.endMonth||e.month]||''}`;
 
@@ -768,7 +791,22 @@ function renderCurrentExhibitions(){
     const autoExpand = upcoming.length === 0;
     const pastHidden = !autoExpand;
 
+    const collapsedBar = collapsed ? `<div class="cx-collapsed-bar" id="cx-collapsed-${e.id}" role="button" tabindex="0">
+      <span class="cx-collapsed-tag"><span class="en-only">Past exhibition</span><span class="ar-only ar" dir="rtl">معرض سابق</span></span>
+      <h3 class="cx-collapsed-title">
+        <span class="en-only">${e.title}</span>
+        <span class="ar-only ar" dir="rtl">${e.titleAr||e.title}</span>
+      </h3>
+      <span class="cx-collapsed-range">
+        <span class="en-only">${range}</span>
+        <span class="ar-only ar" dir="rtl">${rangeAr}</span>
+      </span>
+      <span class="cx-collapsed-plus" aria-hidden="true">+</span>
+    </div>` : '';
+
     return `<div class="cx-outer" id="cx-outer-${e.id}">
+      ${collapsedBar}
+      <div class="cx-full-wrap" id="cx-full-${e.id}"${collapsed ? ' hidden' : ''}>
       <div class="cx-sticky">
         <div class="cx-poster" id="cx-poster-${e.id}" data-ev="${e.id}">
           ${e.cover ? `<img class="cx-poster-img" src="${e.cover}" alt="" loading="lazy">` : ''}
@@ -779,8 +817,9 @@ function renderCurrentExhibitions(){
                 <span class="ar-only ar" dir="rtl">${rangeAr}</span>
               </span>
               <span class="cx-poster-tag">
-                <span class="en-only">On view now</span>
-                <span class="ar-only ar" dir="rtl">معروض الآن</span>
+                ${collapsed
+                  ? `<span class="en-only">Past exhibition</span><span class="ar-only ar" dir="rtl">معرض سابق</span>`
+                  : `<span class="en-only">On view now</span><span class="ar-only ar" dir="rtl">معروض الآن</span>`}
               </span>
             </div>
             <h3 class="cx-poster-title">
@@ -802,11 +841,23 @@ function renderCurrentExhibitions(){
           </div>
         </div>
       </div>
+      </div>
     </div>`;
   }).join('');
 
-  // Set up scroll machinery + interactions for each exhibition unit
-  cur.forEach(e => {
+  const upcomingHtml = upcoming.length ? `<div class="cx-upcoming">
+    <h3 class="cx-upcoming-head"><span class="en-only">Upcoming exhibitions</span><span class="ar-only ar" dir="rtl">معارض قادمة</span></h3>
+    <div class="cx-upcoming-rows">${upcoming.map(e => cxRow(e, false)).join('')}</div>
+  </div>` : '';
+
+  list.innerHTML = mainUnitsHtml + upcomingHtml;
+
+  // Set up scroll machinery + interactions for one exhibition unit. Called
+  // immediately for every currently-on-view exhibition; called lazily (on
+  // first click of the collapsed bar) for the single past-exhibition
+  // fallback — its layout can't be measured correctly while cx-full-wrap
+  // is hidden, so setup() has to run only once the unit is actually visible.
+  function initExhibitionUnit(e){
     const outer = document.getElementById('cx-outer-' + e.id);
     const track = document.getElementById('cx-track-' + e.id);
     const posterEl = document.getElementById('cx-poster-' + e.id);
@@ -950,7 +1001,32 @@ function renderCurrentExhibitions(){
     window.addEventListener('resize', function(){ setup(); onScroll(); });
     window.addEventListener('scroll', onScroll, { passive: true });
     onScroll();
-  });
+  }
+
+  if (showingCurrent){
+    cur.forEach(initExhibitionUnit);
+  } else if (mainUnits.length){
+    // Collapsed past-exhibition fallback: don't run the scroll-lock setup
+    // until the editor actually asks to see it — the bar is just a plain
+    // summary until clicked.
+    const pastEx = mainUnits[0];
+    const bar = document.getElementById('cx-collapsed-' + pastEx.id);
+    const wrap = document.getElementById('cx-full-' + pastEx.id);
+    if (bar && wrap){
+      let expanded = false;
+      const expand = () => {
+        if (expanded) return;
+        expanded = true;
+        wrap.hidden = false;
+        bar.classList.add('cx-collapsed-bar-open');
+        initExhibitionUnit(pastEx);
+      };
+      bar.addEventListener('click', expand);
+      bar.addEventListener('keydown', (ev) => {
+        if (ev.key === 'Enter' || ev.key === ' '){ ev.preventDefault(); expand(); }
+      });
+    }
+  }
 }
 
 /* ============================================================

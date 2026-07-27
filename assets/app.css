@@ -2041,6 +2041,52 @@ body.gs-reader-open{ overflow: hidden; }
 }
 .cx-past-toggle:hover{ opacity: 1; background: rgba(255,255,255,.07); }
 
+/* Collapsed summary bar — shown instead of the full poster+rail unit when
+   there's no exhibition currently on view, so the most recent past one is
+   still reachable without permanently occupying the full scroll-lock
+   height. Click swaps it for the real unit (see initExhibitionUnit in
+   index.html) rather than navigating away. */
+.cx-collapsed-bar{
+  display: flex; align-items: center; gap: 20px;
+  padding: 22px 28px;
+  cursor: pointer;
+  border-bottom: 2px solid currentColor;
+  transition: background .12s;
+}
+.cx-collapsed-bar:hover{ background: rgba(255,255,255,.07); }
+.cx-collapsed-tag{
+  font-family: var(--ff-sans); font-size: 11px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .05em;
+  border: 2px solid currentColor; padding: 3px 10px; flex-shrink: 0;
+  white-space: nowrap;
+}
+.cx-collapsed-title{
+  margin: 0; flex: 1 1 auto; min-width: 0;
+  font-family: var(--ff-sans); font-weight: 700;
+  font-size: clamp(18px, 2.2vw, 28px); text-transform: uppercase; line-height: 1.05;
+}
+.cx-collapsed-title .ar{ font-family: var(--ff-ar); text-transform: none; }
+.cx-collapsed-range{
+  font-family: var(--ff-sans); font-size: 13px; font-variant-numeric: tabular-nums;
+  opacity: .75; white-space: nowrap; flex-shrink: 0;
+}
+.cx-collapsed-plus{
+  font-family: var(--ff-sans); font-size: 26px; font-weight: 700; flex-shrink: 0; line-height: 1;
+  display: inline-block; transition: transform .15s;
+}
+.cx-collapsed-bar-open .cx-collapsed-plus{ transform: rotate(45deg); }
+.cx-collapsed-bar-open{ cursor: default; }
+
+/* Upcoming exhibitions — compact list, always visible when any Exhibition-
+   type event has a future start date. Plain links (no in-grid reader) —
+   this is a secondary/teaser list, not the section's main hero unit. */
+.cx-upcoming{ border-top: 2px solid currentColor; }
+.cx-upcoming-head{
+  margin: 0; padding: 26px 28px 0;
+  font-family: var(--ff-sans); font-size: 12px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0; opacity: .75;
+}
+
 /* Mobile ≤ 700px — no scroll-lock, natural stacking */
 @media (max-width: 700px){
   .cx-head{ flex-direction: column; gap: 8px; }
@@ -2995,6 +3041,8 @@ html[data-lang="ar"] .tl-tags { justify-content: flex-end; }
 /* Exhibition section — Arabic / RTL overrides */
 html[data-lang="ar"] .cx-head { direction: rtl; }
 html[data-lang="ar"] .cx-title-head { text-align: right; }
+html[data-lang="ar"] .cx-collapsed-bar { direction: rtl; }
+html[data-lang="ar"] .cx-upcoming-head { text-align: right; }
 @media (min-width: 701px){
   /* AR desktop: poster on right, rail on left */
   html[data-lang="ar"] .cx-sticky { flex-direction: row-reverse; }
