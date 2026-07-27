@@ -2068,11 +2068,6 @@ body.gs-reader-open{ overflow: hidden; }
 /* Upcoming exhibitions — compact list, always visible when any Exhibition-
    type event has a future start date. */
 .cx-upcoming{ border-top: 2px solid currentColor; }
-.cx-upcoming-head{
-  margin: 0; padding: 26px 28px 0;
-  font-family: var(--ff-sans); font-size: 12px; font-weight: 700;
-  text-transform: uppercase; letter-spacing: 0; opacity: .75;
-}
 /* .cx-upcoming-trigger carries no styling of its own — it's a plain full
    .cx-row (date/tags/title/time all visible, same as the past row) that
    just additionally auto-opens when scrolled to (see the scroll
@@ -3032,7 +3027,6 @@ html[data-lang="ar"] .tl-tags { justify-content: flex-end; }
 /* Exhibition section — Arabic / RTL overrides */
 html[data-lang="ar"] .cx-head { direction: rtl; }
 html[data-lang="ar"] .cx-title-head { text-align: right; }
-html[data-lang="ar"] .cx-upcoming-head { text-align: right; }
 @media (min-width: 701px){
   /* AR desktop: poster on right, rail on left */
   html[data-lang="ar"] .cx-sticky { flex-direction: row-reverse; }

@@ -848,7 +848,6 @@ function renderCurrentExhibitions(){
   const upcomingRowHtml = upcoming.map(e => cxRow(e, false, 'Upcoming').replace('class="cx-row', 'class="cx-row cx-upcoming-trigger')).join('');
 
   const upcomingHtml = (pastRowHtml || upcomingRowHtml) ? `<div class="cx-upcoming">
-    <h3 class="cx-upcoming-head"><span class="en-only">Upcoming exhibitions</span><span class="ar-only ar" dir="rtl">معارض قادمة</span></h3>
     <div class="cx-upcoming-rows">${pastRowHtml}${upcomingRowHtml}</div>
   </div>` : '';
 
