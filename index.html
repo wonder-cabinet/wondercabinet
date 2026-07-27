@@ -742,10 +742,16 @@ function renderCurrentExhibitions(){
 
   // The head (title + count) only makes sense while a current exhibition
   // is actually showing — otherwise hide it outright rather than leaving
-  // an empty bar with just its border still drawn.
+  // an empty bar with just its border still drawn. titleEl is always
+  // explicitly written (never left holding its static "Current
+  // exhibitions" markup from the page's initial HTML) so there's no way
+  // for stale text to show through if headEl's hidden state and this
+  // ever got out of sync.
   if (headEl) headEl.hidden = !showingCurrent;
-  if (titleEl && showingCurrent){
-    titleEl.innerHTML = `<span class="en-only">Current <em>exhibitions</em></span><span class="ar-only ar" dir="rtl">معارض <em>حالية</em></span>`;
+  if (titleEl){
+    titleEl.innerHTML = showingCurrent
+      ? `<span class="en-only">Current <em>exhibitions</em></span><span class="ar-only ar" dir="rtl">معارض <em>حالية</em></span>`
+      : '';
   }
   if (count) count.innerHTML = showingCurrent
     ? `<span class="en-only">${String(cur.length).padStart(2,"0")} on view</span><span class="ar-only ar" dir="rtl">${arNum(cur.length)} معروض</span>`
