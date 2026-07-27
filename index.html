@@ -12,7 +12,7 @@
 <meta property="og:url" content="https://wondercabinet.space">
 <meta property="og:image" content="" id="og-image-meta">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="stylesheet" href="assets/app.css?v=71">
+<link rel="stylesheet" href="assets/app.css?v=72">
 </head>
 <body data-view="list">
 
@@ -774,8 +774,8 @@ function renderCurrentExhibitions(){
   const STICKY_TOP = 54;
 
   const mainUnitsHtml = mainUnits.map(e => {
-    const range = `${parseInt(e.day,10)} ${(MONTH_NAME_EN[e.month]||'').slice(0,3)} — ${parseInt(e.endDay||e.day,10)} ${(MONTH_NAME_EN[e.endMonth||e.month]||'').slice(0,3)}`;
-    const rangeAr = `${arNum(parseInt(e.day,10))} ${MONTH_NAME_AR[e.month]||''} — ${arNum(parseInt(e.endDay||e.day,10))} ${MONTH_NAME_AR[e.endMonth||e.month]||''}`;
+    const range = `${MONTH_NAME_EN[e.month]||''} ${_ordinal(parseInt(e.day,10))} — ${MONTH_NAME_EN[e.endMonth||e.month]||''} ${_ordinal(parseInt(e.endDay||e.day,10))}, ${e.endYear||e.year}`;
+    const rangeAr = `${arNum(parseInt(e.day,10))} ${MONTH_NAME_AR[e.month]||''} — ${arNum(parseInt(e.endDay||e.day,10))} ${MONTH_NAME_AR[e.endMonth||e.month]||''} ${arNum(e.endYear||e.year)}`;
 
     const allPe = e.programmeEvents || [];
     const upcoming = allPe.filter(pe => {

@@ -1945,15 +1945,20 @@ body.gs-reader-open{ overflow: hidden; }
   padding: 18px 28px 22px;
 }
 .cx-poster-meta{
-  display: flex; align-items: center; justify-content: space-between; gap: 12px;
-  font-family: var(--ff-sans); font-size: 11px; font-weight: 700;
-  text-transform: uppercase; letter-spacing: .05em;
+  display: flex; align-items: flex-end; justify-content: space-between; gap: 12px;
+  flex-wrap: wrap;
+  font-family: var(--ff-sans); font-weight: 700;
   margin-bottom: 10px;
 }
-.cx-poster-range{ font-variant-numeric: lining-nums tabular-nums; font-size: 14px; }
+.cx-poster-range{
+  font-variant-numeric: lining-nums tabular-nums;
+  font-size: clamp(16px, 2vw, 28px); line-height: 1.15;
+  text-transform: uppercase; letter-spacing: 0;
+}
 .cx-poster-tag{
   border: 2px solid currentColor; padding: 3px 10px;
   white-space: nowrap; flex-shrink: 0;
+  font-size: 11px; text-transform: uppercase; letter-spacing: .05em;
 }
 .cx-poster-title{
   margin: 0;
@@ -2183,9 +2188,9 @@ body.gs-reader-open{ overflow: hidden; }
 .ep-header-icons{
   display: flex; align-items: center; gap: 10px; flex-shrink: 0;
 }
-.ep-meta .dt-block{ display: flex; flex-direction: column; gap: 2px; line-height: 1.4; font-size: 40px; }
+.ep-meta .dt-block{ display: flex; flex-direction: column; gap: 2px; line-height: 1.4; font-size: 40px; text-transform: uppercase; }
 .ep-meta .dt-range{ font-size: clamp(38px, 6vw, 86px); font-weight: 700; line-height: 1.1; }
-.ep-type-tag{ letter-spacing: 0; font-weight: 400; font-size: 40px; }
+.ep-type-tag{ letter-spacing: 0; font-weight: 400; font-size: 40px; text-transform: uppercase; }
 .ep-time{ font-variant-numeric: tabular-nums; }
 .ep-duration{ opacity: .65; font-weight: 400; }
 
@@ -2255,7 +2260,7 @@ a.ep-related-artist-name:hover{ opacity: .65; }
 .ep-title{
   margin: 0; font-family: var(--ff-sans); font-weight: 700;
   font-size: var(--wc-title-size); line-height: 1.1;
-  letter-spacing: 0; text-transform: none; text-wrap: balance;
+  letter-spacing: 0; text-transform: uppercase; text-wrap: balance;
 }
 .ep-title .ar{ font-family: var(--ff-ar); letter-spacing: 0; text-transform: none; line-height: 1.2; }
 .ep-subtitle{
