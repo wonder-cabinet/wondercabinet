@@ -2172,12 +2172,12 @@ body.gs-reader-open{ overflow: hidden; }
   overflow: hidden;
 }
 @keyframes epTitleSlideDown{
-  from{ transform: translateY(-60%); opacity: 0; }
-  to{ transform: translateY(0); opacity: 1; }
+  from{ transform: translateY(-60%); }
+  to{ transform: translateY(0); }
 }
 @keyframes epDateSlideUp{
-  from{ transform: translateY(60%); opacity: 0; }
-  to{ transform: translateY(0); opacity: 1; }
+  from{ transform: translateY(60%); }
+  to{ transform: translateY(0); }
 }
 .ep-title{ animation: epTitleSlideDown .5s cubic-bezier(.2,.8,.2,1) both; }
 .ep-meta .dt-block{ animation: epDateSlideUp .5s cubic-bezier(.2,.8,.2,1) both; }
