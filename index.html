@@ -840,12 +840,11 @@ function renderCurrentExhibitions(){
   }).join('');
 
   // Both the past fallback and upcoming rows show their date/tags/title —
-  // never a blank placeholder — and both open by a click. Upcoming rows
-  // additionally auto-open when scrolled to (see checkAutoOpen below);
-  // the visible title/date is there the whole time either way, it's just
-  // that reaching the row also opens the full inline page automatically.
+  // never a blank placeholder — and both open the same way: a click.
+  // (Scroll-to-auto-open was tried and reverted — see the note further
+  // down where it used to be wired up.)
   const pastRowHtml = (!showingCurrent && past.length) ? cxRow(past[0], true, 'Past') : '';
-  const upcomingRowHtml = upcoming.map(e => cxRow(e, false, 'Upcoming').replace('class="cx-row', 'class="cx-row cx-upcoming-trigger')).join('');
+  const upcomingRowHtml = upcoming.map(e => cxRow(e, false, 'Upcoming')).join('');
 
   const upcomingHtml = (pastRowHtml || upcomingRowHtml) ? `<div class="cx-upcoming">
     <div class="cx-upcoming-rows">${pastRowHtml}${upcomingRowHtml}</div>
@@ -910,32 +909,16 @@ function renderCurrentExhibitions(){
       });
     });
 
-    // Upcoming rows only (not the past fallback): scrolling down to the
-    // row auto-opens it — no click needed — locking the page exactly like
-    // the current-exhibition poster+rail does, so the visitor reads
-    // through the inline page and it collapses back as they keep
-    // scrolling. Guarded so it only ever fires once per row and only on a
-    // downward scroll actually reaching the row (never on page load, and
-    // never retriggered once used).
-    const TRIGGER_LINE = 56;
-    let lastY = window.scrollY;
-    function checkAutoOpen(){
-      const scrollingDown = window.scrollY > lastY;
-      lastY = window.scrollY;
-      if (!scrollingDown || _gsReaderOpen) return;
-      Array.prototype.forEach.call(upcomingRowsEl.querySelectorAll('a.cx-upcoming-trigger'), function(row){
-        if (row.dataset.cxOpened) return;
-        const rect = row.getBoundingClientRect();
-        // Generous tolerance on the far side so a fast fling that jumps
-        // the row's slim 72px anchor straight past the trigger line in a
-        // single scroll event still catches it, not just a slow scroll
-        // that happens to land exactly on the line.
-        if (rect.top <= TRIGGER_LINE && rect.top > -window.innerHeight){
-          openRow(row);
-        }
-      });
-    }
-    window.addEventListener('scroll', checkAutoOpen, { passive: true });
+    // Scroll-to-auto-open was tried here and reverted: closing the reader
+    // restores the page to the exact scroll position it had when opened
+    // (see _tlOpenReader/_gsOpenReaderMobile's own close behavior), which
+    // — combined with clearing the open-guard on close so the row can be
+    // reopened by a later click — meant the row was still sitting right
+    // at the trigger line the instant it finished closing, so it reopened
+    // itself immediately: an open/close loop the user could never scroll
+    // past. Click-to-open (below) doesn't have this problem since it only
+    // ever fires from a deliberate user action, never from scroll
+    // position, so it can't retrigger itself.
   }
 
   // Set up scroll machinery + interactions for one exhibition unit. Called
