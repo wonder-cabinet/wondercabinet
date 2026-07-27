@@ -1,0 +1,86 @@
+From 7cf0450252366464ae14c05959ceadb70ca29306 Mon Sep 17 00:00:00 2001
+From: Ibrahim <ibrahimowais@gmail.com>
+Date: Sat, 25 Jul 2026 07:53:45 +0000
+Subject: [PATCH] Event page: shrink date/type header text on mobile, unify
+ close icon with pop-out icon style
+
+---
+ assets/app.css | 17 ++++++++++++-----
+ event.html     |  4 ++--
+ index.html     |  2 +-
+ 3 files changed, 15 insertions(+), 8 deletions(-)
+
+diff --git a/assets/app.css b/assets/app.css
+index 9224d12..c0bd099 100644
+--- a/assets/app.css
++++ b/assets/app.css
+@@ -2120,12 +2120,13 @@ body.gs-reader-open{ overflow: hidden; }
+ }
+ .ep-close{
+   all: unset; cursor: pointer;
+-  color: white;
+-  font-size: 28px; font-weight: 700;
+-  opacity: 1; transition: opacity .15s;
+-  line-height: 1;
++  display: grid; place-items: center;
++  color: currentColor;
++  width: 28px; height: 28px;
++  opacity: .75; transition: opacity .15s;
+ }
+-.ep-close:hover{ opacity: .7; }
++.ep-close svg{ display: block; width: 18px; height: 18px; }
++.ep-close:hover{ opacity: 1; }
+ 
+ .ep-meta{
+   font-family: var(--ff-sans); font-weight: 400;
+@@ -2453,6 +2454,12 @@ a.ep-related-artist-name:hover{ opacity: .65; }
+   .event-panel{ width: 100%; }
+   .efs-hero{ grid-template-columns: 1fr; }
+   .efs-title{ font-size: clamp(32px,8vw,52px); }
++  /* Date + event-type header was taking up most of the screen on mobile,
++     leaving almost no room to actually read the body copy. Bring it down
++     closer to the title's scale instead of towering over it. */
++  .ep-meta .dt-block{ font-size: 22px; }
++  .ep-meta .dt-range{ font-size: clamp(22px, 7vw, 34px); }
++  .ep-type-tag{ font-size: 18px; }
+ }
+ 
+ /* =========================================================
+diff --git a/event.html b/event.html
+index 1c9b9cc..f43b72b 100644
+--- a/event.html
++++ b/event.html
+@@ -11,7 +11,7 @@
+ <meta property="og:description" content="A space for art production and cultural development in Bethlehem, Palestine." id="og-desc-meta">
+ <meta property="og:image" content="" id="og-image-meta">
+ <meta name="twitter:card" content="summary_large_image">
+-<link rel="stylesheet" href="assets/app.css?v=66" />
++<link rel="stylesheet" href="assets/app.css?v=67" />
+ <style>
+   /* This page uses the exact same .ep-* / .event-panel template as every
+      other entry point on the site (the homepage hero cards, the Programme
+@@ -420,7 +420,7 @@ ${audioBar}
+       <span class="ep-type-tag ar-only ar">${typeArLabel}</span>
+       <div class="ep-header-icons">
+         ${popBtn}
+-        <a class="ep-close" id="epClose" href="index.html" aria-label="Back">✕</a>
++        <a class="ep-close" id="epClose" href="index.html" aria-label="Back"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4l10 10M14 4L4 14"/></svg></a>
+       </div>
+     </div>
+   </div>
+diff --git a/index.html b/index.html
+index 1a34758..9fd0bfd 100644
+--- a/index.html
++++ b/index.html
+@@ -12,7 +12,7 @@
+ <meta property="og:url" content="https://wondercabinet.space">
+ <meta property="og:image" content="" id="og-image-meta">
+ <meta name="twitter:card" content="summary_large_image">
+-<link rel="stylesheet" href="assets/app.css?v=66">
++<link rel="stylesheet" href="assets/app.css?v=67">
+ </head>
+ <body data-view="list">
+ 
+-- 
+2.43.0
+
