@@ -2068,10 +2068,6 @@ body.gs-reader-open{ overflow: hidden; }
 /* Upcoming exhibitions — compact list, always visible when any Exhibition-
    type event has a future start date. */
 .cx-upcoming{ border-top: 2px solid currentColor; }
-/* .cx-upcoming-trigger carries no styling of its own — it's a plain full
-   .cx-row (date/tags/title/time all visible, same as the past row) that
-   just additionally auto-opens when scrolled to (see the scroll
-   auto-trigger in renderCurrentExhibitions). */
 
 /* Mobile ≤ 700px — no scroll-lock, natural stacking */
 @media (max-width: 700px){
