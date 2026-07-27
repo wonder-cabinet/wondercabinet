@@ -839,18 +839,13 @@ function renderCurrentExhibitions(){
     </div>`;
   }).join('');
 
-  // Past fallback (only when nothing's currently on view) keeps the full
-  // row — date, tags, title, time — opened by a click, same as everywhere
-  // else. Upcoming exhibitions get a slim trigger instead of a full
-  // preview row: there's no "cover" to show since scrolling to it opens
-  // the real inline page (title + date included) automatically.
+  // Both the past fallback and upcoming rows show their date/tags/title —
+  // never a blank placeholder — and both open by a click. Upcoming rows
+  // additionally auto-open when scrolled to (see checkAutoOpen below);
+  // the visible title/date is there the whole time either way, it's just
+  // that reaching the row also opens the full inline page automatically.
   const pastRowHtml = (!showingCurrent && past.length) ? cxRow(past[0], true, 'Past') : '';
-  const upcomingRowHtml = upcoming.map(e => `<a class="cx-row cx-upcoming-trigger" href="event.html?id=${encodeURIComponent(e.id)}" data-ev="${e.id}">
-    <div class="cx-row-tags">
-      ${e.type ? `<div class="cx-row-type">${e.type}</div>` : ''}
-      <div class="cx-row-type cx-row-status">Upcoming</div>
-    </div>
-  </a>`).join('');
+  const upcomingRowHtml = upcoming.map(e => cxRow(e, false, 'Upcoming').replace('class="cx-row', 'class="cx-row cx-upcoming-trigger')).join('');
 
   const upcomingHtml = (pastRowHtml || upcomingRowHtml) ? `<div class="cx-upcoming">
     <h3 class="cx-upcoming-head"><span class="en-only">Upcoming exhibitions</span><span class="ar-only ar" dir="rtl">معارض قادمة</span></h3>

@@ -2073,17 +2073,10 @@ body.gs-reader-open{ overflow: hidden; }
   font-family: var(--ff-sans); font-size: 12px; font-weight: 700;
   text-transform: uppercase; letter-spacing: 0; opacity: .75;
 }
-/* Slim trigger row for an upcoming exhibition — no title/date "cover" to
-   read here, since scrolling down to it auto-opens the real inline page
-   (see the scroll auto-trigger in renderCurrentExhibitions), which shows
-   its own title and date immediately. Just tall enough to hold the tags
-   and act as the anchor the reader grows out of. */
-.cx-upcoming-trigger{
-  height: auto;
-  min-height: 72px;
-  justify-content: center;
-}
-.cx-upcoming-trigger .cx-row-tags{ margin-bottom: 0; }
+/* .cx-upcoming-trigger carries no styling of its own — it's a plain full
+   .cx-row (date/tags/title/time all visible, same as the past row) that
+   just additionally auto-opens when scrolled to (see the scroll
+   auto-trigger in renderCurrentExhibitions). */
 
 /* Mobile ≤ 700px — no scroll-lock, natural stacking */
 @media (max-width: 700px){
