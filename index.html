@@ -867,10 +867,22 @@ function renderCurrentExhibitions(){
 
     // Single guarded opener shared by both the click handler and the
     // upcoming rows' scroll auto-trigger, so a row can never be asked to
-    // open twice (e.g. a click landing right as the scroll trigger fires).
+    // open twice at once (e.g. a click landing right as the scroll
+    // trigger fires). The guard is only for the moment it's open — a
+    // MutationObserver clears it the instant the reader's iframe is torn
+    // down (see _tlOpenReader/_gsOpenReaderMobile's own close/finish()),
+    // so closing and clicking (or scrolling to) the row again reopens it,
+    // rather than being permanently spent after the first open.
     function openRow(row){
       if (row.dataset.cxOpened) return;
       row.dataset.cxOpened = '1';
+      const obs = new MutationObserver(function(){
+        if (!row.querySelector('.gs-card-frame')){
+          delete row.dataset.cxOpened;
+          obs.disconnect();
+        }
+      });
+      obs.observe(row, { childList: true });
       if (document.body.classList.contains('gs-reader-open') && !row.querySelector('.gs-card-frame')){
         _gsHardReset();
       }
