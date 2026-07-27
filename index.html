@@ -730,19 +730,19 @@ function renderCurrentExhibitions(){
   if (!cur.length && !upcoming.length && !past.length){ sec.hidden = true; return; }
   sec.hidden = false;
 
-  // The one exhibition that gets the full poster+rail treatment: every
-  // current exhibition if there's at least one, otherwise just the most
-  // recent past one (shown collapsed — see cx-collapsed-bar below). Never
-  // both at once, and never more than one past exhibition at a time.
+  // The full poster+rail scroll-lock treatment is reserved for exhibitions
+  // that are actually on view right now. Anything else (a past exhibition
+  // with nothing currently on view, or exhibitions still to come) renders
+  // as a single plain list further down — same simple in-grid reader as
+  // every other event on the site, no scroll-lock, no separate collapsed/
+  // expanded states to keep in sync.
   const showingCurrent = cur.length > 0;
-  const mainUnits = showingCurrent ? cur : (past.length ? [past[0]] : []);
+  const mainUnits = showingCurrent ? cur : [];
 
   if (titleEl){
     titleEl.innerHTML = showingCurrent
       ? `<span class="en-only">Current <em>exhibitions</em></span><span class="ar-only ar" dir="rtl">معارض <em>حالية</em></span>`
-      : mainUnits.length
-        ? `<span class="en-only">Past <em>exhibition</em></span><span class="ar-only ar" dir="rtl">معرض <em>سابق</em></span>`
-        : `<span class="en-only">Upcoming <em>exhibitions</em></span><span class="ar-only ar" dir="rtl">معارض <em>قادمة</em></span>`;
+      : '';
   }
   if (count) count.innerHTML = showingCurrent
     ? `<span class="en-only">${String(cur.length).padStart(2,"0")} on view</span><span class="ar-only ar" dir="rtl">${arNum(cur.length)} معروض</span>`
@@ -750,7 +750,9 @@ function renderCurrentExhibitions(){
 
   // Theme the whole section band (header + border) off the featured unit's
   // poster palette, same source as each unit's own accent — falls back to
-  // the static brand blue when no palette data exists.
+  // the static brand blue when no palette data exists. Only applies while
+  // a poster+rail unit is actually showing; the plain list below themes
+  // each of its own rows individually instead.
   const headTheme = mainUnits[0] && mainUnits[0].coverPalette;
   if (headTheme){
     sec.style.setProperty('--cx-accent', headTheme.bg);
@@ -763,7 +765,6 @@ function renderCurrentExhibitions(){
   const STICKY_TOP = 54;
 
   const mainUnitsHtml = mainUnits.map(e => {
-    const collapsed = !showingCurrent; // only true for the single past-exhibition fallback
     const range = `${parseInt(e.day,10)} ${(MONTH_NAME_EN[e.month]||'').slice(0,3)} — ${parseInt(e.endDay||e.day,10)} ${(MONTH_NAME_EN[e.endMonth||e.month]||'').slice(0,3)}`;
     const rangeAr = `${arNum(parseInt(e.day,10))} ${MONTH_NAME_AR[e.month]||''} — ${arNum(parseInt(e.endDay||e.day,10))} ${MONTH_NAME_AR[e.endMonth||e.month]||''}`;
 
@@ -791,22 +792,8 @@ function renderCurrentExhibitions(){
     const autoExpand = upcoming.length === 0;
     const pastHidden = !autoExpand;
 
-    const collapsedBar = collapsed ? `<div class="cx-collapsed-bar" id="cx-collapsed-${e.id}" role="button" tabindex="0">
-      <span class="cx-collapsed-tag"><span class="en-only">Past exhibition</span><span class="ar-only ar" dir="rtl">معرض سابق</span></span>
-      <h3 class="cx-collapsed-title">
-        <span class="en-only">${e.title}</span>
-        <span class="ar-only ar" dir="rtl">${e.titleAr||e.title}</span>
-      </h3>
-      <span class="cx-collapsed-range">
-        <span class="en-only">${range}</span>
-        <span class="ar-only ar" dir="rtl">${rangeAr}</span>
-      </span>
-      <span class="cx-collapsed-plus" aria-hidden="true">+</span>
-    </div>` : '';
-
     return `<div class="cx-outer" id="cx-outer-${e.id}">
-      ${collapsedBar}
-      <div class="cx-full-wrap" id="cx-full-${e.id}"${collapsed ? ' hidden' : ''}>
+      <div class="cx-full-wrap" id="cx-full-${e.id}">
       <div class="cx-sticky">
         <div class="cx-poster" id="cx-poster-${e.id}" data-ev="${e.id}">
           ${e.cover ? `<img class="cx-poster-img" src="${e.cover}" alt="" loading="lazy">` : ''}
@@ -817,9 +804,7 @@ function renderCurrentExhibitions(){
                 <span class="ar-only ar" dir="rtl">${rangeAr}</span>
               </span>
               <span class="cx-poster-tag">
-                ${collapsed
-                  ? `<span class="en-only">Past exhibition</span><span class="ar-only ar" dir="rtl">معرض سابق</span>`
-                  : `<span class="en-only">On view now</span><span class="ar-only ar" dir="rtl">معروض الآن</span>`}
+                <span class="en-only">On view now</span><span class="ar-only ar" dir="rtl">معروض الآن</span>
               </span>
             </div>
             <h3 class="cx-poster-title">
@@ -845,32 +830,41 @@ function renderCurrentExhibitions(){
     </div>`;
   }).join('');
 
-  const upcomingHtml = upcoming.length ? `<div class="cx-upcoming">
+  // Plain list, used whenever there's nothing currently on view (the most
+  // recent past exhibition, tagged accordingly) and always for anything
+  // still to come. One consistent row style + heading — "Upcoming
+  // exhibitions" — rather than mixing separate collapsed/expanded past-
+  // exhibition treatments with a differently-labelled upcoming list.
+  const listItems = [];
+  if (!showingCurrent && past.length) listItems.push({ ev: past[0], isPast: true });
+  upcoming.forEach(e => listItems.push({ ev: e, isPast: false }));
+
+  const upcomingHtml = listItems.length ? `<div class="cx-upcoming">
     <h3 class="cx-upcoming-head"><span class="en-only">Upcoming exhibitions</span><span class="ar-only ar" dir="rtl">معارض قادمة</span></h3>
-    <div class="cx-upcoming-rows">${upcoming.map(e => cxRow(e, false)).join('')}</div>
+    <div class="cx-upcoming-rows">${listItems.map(it => cxRow(it.ev, it.isPast, it.isPast ? 'Past exhibition' : 'Upcoming')).join('')}</div>
   </div>` : '';
 
   list.innerHTML = mainUnitsHtml + upcomingHtml;
 
-  // Upcoming-exhibition rows open the in-grid reader in place, same as
-  // every other event on the site — these live in a plain vertical list
+  // Rows in this plain list open the in-grid reader in place, same as
+  // every other event on the site — they live in normal vertical flow
   // (not a scroll-locked rail), so _tlOpenReader (the same function the
-  // Programme timeline rows use) is the right fit: the clicked row grows
-  // downward in place. Scoped to just this list so it can't ever
-  // double-fire alongside the exhibition rail's own cx-row handler or the
-  // "Also happening this week" list's handler, which both target cx-row
-  // elements inside their own separate containers.
-  if (upcoming.length){
+  // Programme timeline rows use) is the right fit: the clicked row just
+  // grows downward in place, no scroll-lock poster/rail transition.
+  // Scoped to just this list so it can't ever double-fire alongside the
+  // exhibition rail's own cx-row handler or the "Also happening this
+  // week" list's handler, which both target cx-row elements inside their
+  // own separate containers.
+  if (listItems.length){
     const upcomingRows = list.querySelector('.cx-upcoming-rows');
     if (upcomingRows){
-      const upcomingById = {};
-      upcoming.forEach(function(e){ upcomingById[e.id] = e; });
+      const listById = {};
+      listItems.forEach(function(it){ listById[it.ev.id] = it.ev; });
       Array.prototype.forEach.call(upcomingRows.querySelectorAll('a.cx-row'), function(row){
-        // Each upcoming exhibition's row takes its own poster's palette
-        // (Sanity's precomputed image palette, same source the featured
-        // unit uses) rather than the section-wide theme, so a newly added
-        // poster shows its own colors right away.
-        const rowEv = upcomingById[row.dataset.ev];
+        // Each row takes its own poster's palette (Sanity's precomputed
+        // image palette) rather than a section-wide theme, so a newly
+        // added poster shows its own colors right away.
+        const rowEv = listById[row.dataset.ev];
         if (rowEv && rowEv.coverPalette){
           row.style.setProperty('--cx-accent', rowEv.coverPalette.bg);
           row.style.setProperty('--cx-ink', rowEv.coverPalette.ink);
@@ -1058,27 +1052,6 @@ function renderCurrentExhibitions(){
 
   if (showingCurrent){
     cur.forEach(initExhibitionUnit);
-  } else if (mainUnits.length){
-    // Collapsed past-exhibition fallback: don't run the scroll-lock setup
-    // until the editor actually asks to see it — the bar is just a plain
-    // summary until clicked.
-    const pastEx = mainUnits[0];
-    const bar = document.getElementById('cx-collapsed-' + pastEx.id);
-    const wrap = document.getElementById('cx-full-' + pastEx.id);
-    if (bar && wrap){
-      let expanded = false;
-      const expand = () => {
-        if (expanded) return;
-        expanded = true;
-        wrap.hidden = false;
-        bar.classList.add('cx-collapsed-bar-open');
-        initExhibitionUnit(pastEx);
-      };
-      bar.addEventListener('click', expand);
-      bar.addEventListener('keydown', (ev) => {
-        if (ev.key === 'Enter' || ev.key === ' '){ ev.preventDefault(); expand(); }
-      });
-    }
   }
 }
 
@@ -1195,14 +1168,20 @@ function _gsEmptyCard(en, ar){
 // (renderCurrentExhibitions) and the "Also happening this week" list card
 // (renderWeekMode) — hoisted to module scope so both can use the exact same
 // markup/CSS (.cx-row) rather than keeping two copies in sync.
-function cxRow(pe, isPast){
+function cxRow(pe, isPast, statusTag){
   const dateStr = pe.day ? `${pe.dow ? pe.dow + " " : ""}${parseInt(pe.day,10)} ${(MONTH_NAME_EN[pe.month]||'').slice(0,3)}` : '';
   const dateArStr = pe.day ? `${pe.dowAr ? pe.dowAr + " " : ""}${arNum(parseInt(pe.day,10))} ${MONTH_NAME_AR[pe.month]||''}` : '';
   const _today = new Date(); _today.setHours(0,0,0,0);
   const isToday = !isPast && eventDateOnly(pe).getTime() === _today.getTime();
+  // statusTag adds a second small badge (e.g. "Upcoming"/"Past exhibition")
+  // alongside the row's own type tag, rather than replacing it — the type
+  // ("Exhibition") stays visible either way.
+  const tags = [];
+  if (pe.type) tags.push(`<div class="cx-row-type">${pe.type}</div>`);
+  if (statusTag) tags.push(`<div class="cx-row-type cx-row-status">${statusTag}</div>`);
   return `<a class="cx-row${isPast ? ' is-past' : ''}${isToday ? ' cx-row-today' : ''}" href="event.html?id=${encodeURIComponent(pe.id)}" data-ev="${pe.id}">
     ${dateStr ? `<div class="cx-row-date"><span class="en-only">${dateStr}</span><span class="ar-only ar" dir="rtl">${dateArStr}</span></div>` : ''}
-    ${pe.type ? `<div class="cx-row-type">${pe.type}</div>` : ''}
+    ${tags.length ? `<div class="cx-row-tags">${tags.join('')}</div>` : ''}
     <h4 class="cx-row-title">
       <span class="en-only">${pe.title}</span>
       <span class="ar-only ar" dir="rtl">${pe.titleAr||pe.title}</span>
