@@ -42,6 +42,7 @@ export const event = defineType({
     defineField({
       name: 'eventType',
       title: 'Type',
+      description: 'Pick from the list, or just type a new one — anything you type here becomes a usable type immediately, no developer needed. New types show up in the homepage filter bar automatically, but won\'t have a custom color until one is added in code (they\'ll use a default color until then).',
       type: 'string',
       options: {
         list: [
@@ -53,8 +54,9 @@ export const event = defineType({
           {title: 'Reading', value: 'Reading'},
           {title: 'Opening', value: 'Opening'},
           {title: 'Bar', value: 'Bar'},
+          {title: 'Open Studio', value: 'Open Studio'},
+          {title: 'Exhibition', value: 'Exhibition'},
         ],
-        layout: 'dropdown',
         allowCustomValue: true,
       },
     }),

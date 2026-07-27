@@ -8,6 +8,8 @@ const EVENT_TYPES = [
   {value: 'Radio',       label: 'Radio'},
   {value: 'Reading',     label: 'Readings'},
   {value: 'Opening',     label: 'Openings'},
+  {value: 'Open Studio', label: 'Open Studios'},
+  {value: 'Exhibition',  label: 'Exhibitions'},
 ]
 
 export const structure = (S: StructureBuilder) =>
