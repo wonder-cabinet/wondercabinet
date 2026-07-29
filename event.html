@@ -623,7 +623,12 @@ ${audioBar}
   if (EMBED) {
     // Fill the whole frame with the event's theme color (no page margins).
     // (mountEvent already sets it, but set it here too before first paint.)
-    const tc = _colorFor(ev, { bg: "#1d24ff", ink: "#f6f3ea" });
+    // Prefer the exhibition's own poster palette over the static type
+    // fallback — mountEvent() already resolved this once; re-deriving it
+    // here with plain _colorFor() (which ignores coverPalette) was
+    // clobbering the correct poster green with the generic Exhibition
+    // blue (#1d24ff) right after paint.
+    const tc = (ev.type === 'Exhibition' && ev.coverPalette) ? ev.coverPalette : _colorFor(ev, { bg: "#1d24ff", ink: "#f6f3ea" });
     document.documentElement.style.setProperty('--bg', tc.bg);
     document.documentElement.style.setProperty('--ink', tc.ink);
     document.body.style.background = tc.bg;
