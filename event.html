@@ -563,22 +563,18 @@ ${audioBar}
   // Mount an event into the page — called on first load and on programme-row clicks.
   function mountEvent(targetEv) {
     const tc = _colorFor(targetEv, { bg: "#1d24ff", ink: "#f6f3ea" });
-    root.style.background = tc.bg;
-    root.style.color = tc.ink;
-    root.innerHTML = buildEventPanel(targetEv, all);
     // Theme the reader from Sanity's precomputed image palette, matching
     // the same accent used elsewhere on the site (e.g. the Current
     // Exhibitions unit). Falls back to the static type color when no
-    // palette exists (old assets, SVGs).
-    if (targetEv.type === 'Exhibition' && targetEv.coverPalette) {
-      const theme = targetEv.coverPalette;
-      root.style.background = theme.bg;
-      root.style.color = theme.ink;
-      if (EMBED) {
-        document.documentElement.style.setProperty('--bg', theme.bg);
-        document.body.style.background = theme.bg;
-      }
-    }
+    // palette exists (old assets, SVGs). Resolved once, up front, so
+    // every place below that paints the theme (root, --bg/--ink vars,
+    // body background) agrees — previously the palette color was set
+    // here and then unconditionally overwritten back to the flat
+    // Exhibition-type blue a few lines down.
+    const useTheme = (targetEv.type === 'Exhibition' && targetEv.coverPalette) ? targetEv.coverPalette : tc;
+    root.style.background = useTheme.bg;
+    root.style.color = useTheme.ink;
+    root.innerHTML = buildEventPanel(targetEv, all);
     _initPanelAudio(root);
     window.scrollTo(0, 0);
     // Update title + OG
@@ -594,9 +590,9 @@ ${audioBar}
     if (!EMBED) {
       history.pushState({id: targetEv.id}, '', `event.html?id=${encodeURIComponent(targetEv.id)}`);
     }
-    document.documentElement.style.setProperty('--bg', tc.bg);
-    document.documentElement.style.setProperty('--ink', tc.ink);
-    document.body.style.background = tc.bg;
+    document.documentElement.style.setProperty('--bg', useTheme.bg);
+    document.documentElement.style.setProperty('--ink', useTheme.ink);
+    document.body.style.background = useTheme.bg;
   }
 
   // Document-level delegation — survives every innerHTML swap
