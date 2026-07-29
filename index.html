@@ -65,6 +65,7 @@
         <div class="gs-count" id="gs-count"></div>
         <div class="gs-hint"><span class="en-only">Scroll ↓ to move →</span><span class="ar-only ar" dir="rtl">مرر للأسفل للتنقل →</span></div>
         <a class="gs-link" href="#programme" id="gs-link"></a>
+        <a class="gs-link gs-archive-link" href="#" id="gs-archive-link" hidden><span class="en-only">View past months →</span><span class="ar-only ar" dir="rtl">← عرض الأشهر الماضية</span></a>
       </div>
       <div class="gs-track" id="gs-track"></div>
     </div>
@@ -2626,8 +2627,19 @@ function renderFeatured(){
     } else {
       themeEl.hidden = true;
     }
-    link.innerHTML = `<span class="en-only">View full week →</span><span class="ar-only ar" dir="rtl">← عرض الأسبوع كاملاً</span>`;
+    link.innerHTML = `<span class="en-only">View full month →</span><span class="ar-only ar" dir="rtl">← عرض الشهر كاملاً</span>`;
     link.href = "#programme";
+    const archiveLink = document.getElementById("gs-archive-link");
+    if (archiveLink){
+      archiveLink.hidden = !PAST_EVENTS.length;
+      if (!archiveLink.dataset.wired){
+        archiveLink.dataset.wired = "1";
+        archiveLink.addEventListener("click", (e) => {
+          e.preventDefault();
+          if (PAST_EVENTS.length) revealPastArchive();
+        });
+      }
+    }
     // "Also happening this week" — lower-priority events an editor has
     // moved into weeklyIssue.secondaryEvents in Studio. Rendered as one
     // compact list card (reusing the exhibitions rail's row style) appended
@@ -2658,6 +2670,8 @@ function renderFeatured(){
       : `<span class="en-only">${p.year || ""}</span>`;
     link.innerHTML = `<span class="en-only">View project →</span><span class="ar-only ar" dir="rtl">← عرض المشروع</span>`;
     link.href = PROJECT_PAGES[p.slug] || "#gscroll";
+    const archiveLinkP = document.getElementById("gs-archive-link");
+    if (archiveLinkP) archiveLinkP.hidden = true;
     track.innerHTML = evs.length
       ? evs.map(_gsEventCard).join("")
       : _gsEmptyCard(p.desc || "More on this project soon.", "قريباً المزيد حول هذا المشروع.");
@@ -2673,6 +2687,8 @@ function renderFeatured(){
     count.innerHTML = `<span class="en-only">${r.year || ""}</span>`;
     link.innerHTML = `<span class="en-only">View residency →</span><span class="ar-only ar" dir="rtl">← عرض الإقامة</span>`;
     link.href = "#residencies";
+    const archiveLinkR = document.getElementById("gs-archive-link");
+    if (archiveLinkR) archiveLinkR.hidden = true;
     track.innerHTML = _gsEmptyCard(r.desc || "More on this residency soon.", "قريباً المزيد حول هذه الإقامة.");
   }
 
