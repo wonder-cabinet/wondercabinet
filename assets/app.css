@@ -2017,8 +2017,12 @@ body.gs-reader-open{ overflow: hidden; }
    carry their own poster-palette accent (see Upcoming exhibitions in
    renderCurrentExhibitions) would otherwise have that solid color wiped
    out on hover, exposing the ambient section color behind and leaving
-   the row's own text unreadable against it. */
-.cx-row:hover{
+   the row's own text unreadable against it.
+   Excluded once the row is open (.tl-row-open / .cx-row-open): the
+   cursor usually stays put right where it clicked, so without this the
+   inverted hover colors kept showing behind/around the fading-in
+   reader iframe instead of the row's real poster colors. */
+.cx-row:hover:not(.tl-row-open):not(.cx-row-open){
   background: var(--cx-ink, var(--ink));
   color: var(--cx-accent, var(--bg));
 }
