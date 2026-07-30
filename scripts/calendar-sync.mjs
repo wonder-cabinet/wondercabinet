@@ -23,9 +23,17 @@
 //  - New events: createIfNotExists with all parsed fields (published, no
 //    draft) + googleCalendarEventId.
 //  - Existing (matched via googleCalendarEventId — not a fresh adoption this
-//    run): patch startDateTime / endDateTime / title.en if they differ from
-//    the calendar. Never touch subtitle/body/images/ar-title/etc — those may
-//    be hand-polished in the Studio.
+//    run): patch startDateTime / endDateTime / title.en / title.ar / body.en /
+//    body.ar if they differ from the calendar. Never touch subtitle/images/
+//    relatedArtists ordering/etc — those may be hand-polished in the Studio.
+//  - Artist detection: inside the DESCRIPTION block, an <u>underlined name</u>
+//    is treated as "this event's artist" — text before it is the event's own
+//    description, text after it is that artist's bio. The name is fuzzy-
+//    matched (same normalization as title adoption) against existing `artist`
+//    docs; a match gets linked (relatedArtists, append-only — never removes
+//    an existing link), no match creates a new artist doc (name + bio) and
+//    links that instead. Only ever adds artists, never edits an existing
+//    artist's bio once created (that's the Studio's job from then on).
 //  - Docs that have a googleCalendarEventId, a future startDateTime, and
 //    whose UID no longer appears *anywhere* in the raw feed (even in a
 //    skipped/all-day/cancelled event) get a warning logged. Never deleted.
@@ -460,7 +468,9 @@ function findMarkers(text) {
   return found;
 }
 
-function sliceBetween(text, markers, fromName, toNames) {
+// Raw (HTML-still-intact) slice between two markers — needed for the artist
+// extraction below, which has to see the literal <u> tag before it's stripped.
+function sliceBetweenRaw(text, markers, fromName, toNames) {
   const fromIdx = markers.findIndex((mk) => mk.name === fromName);
   if (fromIdx === -1) return "";
   const from = markers[fromIdx];
@@ -471,8 +481,31 @@ function sliceBetween(text, markers, fromName, toNames) {
       break;
     }
   }
-  const raw = to ? text.slice(from.end, to.index) : text.slice(from.end);
-  return stripHtmlToText(raw);
+  return to ? text.slice(from.end, to.index) : text.slice(from.end);
+}
+
+function sliceBetween(text, markers, fromName, toNames) {
+  return stripHtmlToText(sliceBetweenRaw(text, markers, fromName, toNames));
+}
+
+// ---------------------------------------------------------------------------
+// Artist extraction — the artist's name is written as underlined text
+// (<u>Name</u>) inside the DESCRIPTION block, with their bio as the text
+// immediately following it. Everything before the underlined name is the
+// event's own description; everything after it is the artist's bio.
+// If no underlined text is found, the whole block is just the description
+// and no artist is detected (existing behavior, unchanged).
+// ---------------------------------------------------------------------------
+function extractArtistFromBlock(rawBlockHtml) {
+  const m = rawBlockHtml.match(/<u>([\s\S]*?)<\/u>/i);
+  if (!m) return { body: stripHtmlToText(rawBlockHtml), artistName: "", artistBio: "" };
+  const before = rawBlockHtml.slice(0, m.index);
+  const after = rawBlockHtml.slice(m.index + m[0].length);
+  return {
+    body: stripHtmlToText(before),
+    artistName: stripHtmlToText(m[1]),
+    artistBio: stripHtmlToText(after),
+  };
 }
 
 function parseStructuredDescription(rawDescription) {
@@ -485,23 +518,26 @@ function parseStructuredDescription(rawDescription) {
 
   const enTitle = sliceBetween(rawDescription, markers, "TITLE", ["SUBTITLE", "DESCRIPTION", "ARABIC"]);
   const enSubtitle = sliceBetween(rawDescription, markers, "SUBTITLE", ["DESCRIPTION", "ARABIC"]);
-  const enBody = sliceBetween(rawDescription, markers, "DESCRIPTION", ["ARABIC"]);
+  const enDescRaw = sliceBetweenRaw(rawDescription, markers, "DESCRIPTION", ["ARABIC"]);
+  const enArtist = extractArtistFromBlock(enDescRaw);
 
   // Arabic section: everything after the ARABIC marker gets its own
   // TITLE/SUBTITLE/DESCRIPTION triplet (second occurrence of each name).
   const arabicIdx = markers.findIndex((mk) => /^ARABIC$/i.test(mk.name));
-  let arTitle = "", arSubtitle = "", arBody = "";
+  let arTitle = "", arSubtitle = "";
+  let arArtist = { body: "", artistName: "", artistBio: "" };
   if (arabicIdx !== -1) {
     const afterArabic = markers.slice(arabicIdx + 1);
     const arMarkersRebased = afterArabic; // indices are still absolute into rawDescription
     arTitle = sliceBetween(rawDescription, [markers[arabicIdx], ...arMarkersRebased], "TITLE", ["SUBTITLE", "DESCRIPTION", "END PUBLIC INFO"]);
     arSubtitle = sliceBetween(rawDescription, [markers[arabicIdx], ...arMarkersRebased], "SUBTITLE", ["DESCRIPTION", "END PUBLIC INFO"]);
-    arBody = sliceBetween(rawDescription, [markers[arabicIdx], ...arMarkersRebased], "DESCRIPTION", ["END PUBLIC INFO"]);
+    const arDescRaw = sliceBetweenRaw(rawDescription, [markers[arabicIdx], ...arMarkersRebased], "DESCRIPTION", ["END PUBLIC INFO"]);
+    arArtist = extractArtistFromBlock(arDescRaw);
   }
 
   return {
-    en: { title: enTitle, subtitle: enSubtitle, body: enBody },
-    ar: { title: arTitle, subtitle: arSubtitle, body: arBody },
+    en: { title: enTitle, subtitle: enSubtitle, body: enArtist.body, artistName: enArtist.artistName, artistBio: enArtist.artistBio },
+    ar: { title: arTitle, subtitle: arSubtitle, body: arArtist.body, artistName: arArtist.artistName, artistBio: arArtist.artistBio },
   };
 }
 
@@ -526,9 +562,11 @@ function parseFreeform(summary, rawDescription) {
     if (arabicRatio(p) > 0.5) arParas.push(p);
     else enParas.push(p);
   }
+  // No underlined-name convention to look for outside the structured
+  // template — artist detection only ever runs on structured descriptions.
   return {
-    en: { title: summary, subtitle: "", body: enParas.join("\n\n") },
-    ar: { title: "", subtitle: "", body: arParas.join("\n\n") },
+    en: { title: summary, subtitle: "", body: enParas.join("\n\n"), artistName: "", artistBio: "" },
+    ar: { title: "", subtitle: "", body: arParas.join("\n\n"), artistName: "", artistBio: "" },
   };
 }
 
@@ -657,8 +695,47 @@ async function fetchExistingEvents() {
     return JSON.parse(fs.readFileSync(SANITY_SNAPSHOT, "utf8"));
   }
   return sanityQuery(
-    '*[_type=="event"]{_id,title,slug,startDateTime,endDateTime,googleCalendarEventId,eventType,recurring}'
+    '*[_type=="event"]{_id,title,slug,startDateTime,endDateTime,googleCalendarEventId,eventType,recurring,body,"relatedArtistRefs":relatedArtists[]._ref}'
   );
+}
+
+// Every artist doc's _id + English name, used to fuzzy-match a name parsed
+// off the calendar against an existing artist before creating a new one.
+async function fetchExistingArtists() {
+  if (SANITY_SNAPSHOT) return []; // dry-run/local test path — no artist linking without live data
+  const docs = await sanityQuery('*[_type=="artist"]{_id, "nameEn": name.en}');
+  return (docs || []).map((d) => ({ _id: d._id, nameEn: d.nameEn || "" }));
+}
+
+function randomKey() {
+  return Math.random().toString(36).slice(2, 10);
+}
+
+// Resolve a parsed artist name to a Sanity reference — reusing an existing
+// artist (fuzzy match, same normalization as event-title adoption) if one
+// exists, otherwise queuing a createIfNotExists for a new artist doc with
+// the bio text that followed their underlined name. `existingArtists` and
+// `mutations` are mutated in place so the same artist mentioned in two
+// events later in this same run is only ever created once.
+function resolveArtistRef(nameEn, bioEn, nameAr, bioAr, existingArtists, mutations, actions) {
+  if (!nameEn) return null;
+  const match = existingArtists.find((a) => titlesLikelyMatch(a.nameEn, nameEn));
+  if (match) return { id: match._id, created: false };
+
+  const id = `artist-${slugify(nameEn) || "unnamed"}`;
+  const doc = {
+    _id: id,
+    _type: "artist",
+    name: { _type: "localeString", en: nameEn, ar: nameAr || undefined },
+    slug: { _type: "slug", current: slugify(nameEn) || id },
+    bio: bioEn || bioAr ? { _type: "localeText", en: bioEn || undefined, ar: bioAr || undefined } : undefined,
+  };
+  for (const k of Object.keys(doc)) if (doc[k] === undefined) delete doc[k];
+
+  mutations.push({ createIfNotExists: doc });
+  existingArtists.push({ _id: id, nameEn });
+  actions.push({ action: "CREATE-ARTIST", id, title: nameEn, date: "-", notes: "auto-detected from underlined name in calendar description" });
+  return { id, created: true };
 }
 
 async function fetchExistingIssues() {
@@ -711,6 +788,7 @@ async function main() {
   }
 
   const existingDocs = await fetchExistingEvents();
+  const existingArtists = await fetchExistingArtists();
   const byGcalId = new Map();
   const adoptionCandidates = [];
   for (const doc of existingDocs) {
@@ -774,8 +852,20 @@ async function main() {
       usedFallback = true;
     }
     const enTitle = (parsed.en.title || ev.summary || "").trim();
+    const arTitle = (parsed.ar.title || "").trim();
+    const enBody = (parsed.en.body || "").trim();
+    const arBody = (parsed.ar.body || "").trim();
+    const artistNameEn = (parsed.en.artistName || "").trim();
+    const artistBioEn = (parsed.en.artistBio || "").trim();
+    const artistNameAr = (parsed.ar.artistName || "").trim();
+    const artistBioAr = (parsed.ar.artistBio || "").trim();
     const registerUrl = extractRegisterUrl(ev.description);
     const eventType = inferEventType(enTitle);
+
+    // Resolve (link existing, or create) the artist mentioned via an
+    // underlined name in the description, if any. Shared by both the
+    // patch and create branches below.
+    const artistRef = resolveArtistRef(artistNameEn, artistBioEn, artistNameAr, artistBioAr, existingArtists, mutations, actions);
 
     // --- matching: (1) gcal id, (2) adoption by date + title similarity ---
     let doc = byGcalId.get(gcalId);
@@ -798,20 +888,35 @@ async function main() {
       if (doc.startDateTime !== startIso) patch.startDateTime = startIso;
       if (endIso && doc.endDateTime !== endIso) patch.endDateTime = endIso;
       if (adopted) patch.googleCalendarEventId = gcalId;
-      // Keep the English title in sync with the calendar too (dot-path set
-      // so we only ever touch title.en — never clobber a hand-added Arabic
-      // title that isn't present in the calendar description). Everything
-      // else (body, images, subtitle, etc.) stays hands-off, since those
-      // are routinely hand-polished in the Studio after creation.
-      // Skip this on the same run a doc is freshly adopted: adoption matches
+      // Keep title, and the event's own description (not the artist's bio —
+      // that lives on the artist doc), in sync with the calendar. Dot-path
+      // sets so we only ever touch these exact fields — subtitle, images,
+      // etc. stay hands-off, since those are routinely hand-polished in the
+      // Studio after creation.
+      // Skip title on the same run a doc is freshly adopted: adoption matches
       // by *similar*, not identical, title on purpose (that's the whole
       // point of the fuzzy match), so the existing title is very likely a
       // deliberately hand-edited version of the raw calendar summary —
       // overwriting it the moment we link the doc would fight the editor.
       if (!adopted && enTitle && doc.title?.en !== enTitle) patch["title.en"] = enTitle;
+      if (!adopted && arTitle && doc.title?.ar !== arTitle) patch["title.ar"] = arTitle;
+      if (enBody && doc.body?.en !== enBody) patch["body.en"] = enBody;
+      if (arBody && doc.body?.ar !== arBody) patch["body.ar"] = arBody;
 
-      if (Object.keys(patch).length) {
-        mutations.push({ patch: { id: doc._id, set: patch } });
+      // Newly-detected artist: append-only (never remove/replace whatever's
+      // already linked), and only if this exact artist isn't linked yet —
+      // keeps repeated runs idempotent instead of piling up duplicate refs.
+      const needsArtistLink = artistRef && !(doc.relatedArtistRefs || []).includes(artistRef.id);
+
+      if (Object.keys(patch).length || needsArtistLink) {
+        const patchBody = { id: doc._id };
+        if (Object.keys(patch).length) patchBody.set = patch;
+        if (needsArtistLink) {
+          patchBody.setIfMissing = { relatedArtists: [] };
+          patchBody.insert = { after: "relatedArtists[-1]", items: [{ _type: "reference", _ref: artistRef.id, _key: randomKey() }] };
+        }
+        mutations.push({ patch: patchBody });
+        const changedFields = [...Object.keys(patch), ...(needsArtistLink ? ["relatedArtists"] : [])];
         actions.push({
           action: adopted ? "ADOPT+PATCH" : "PATCH",
           id: doc._id,
@@ -819,7 +924,7 @@ async function main() {
           date: startIso.slice(0, 10),
           notes: adopted
             ? `matched existing doc by date+title, set googleCalendarEventId=${gcalId}${patch.startDateTime ? "; dates updated" : ""}`
-            : `changed → ${Object.keys(patch).join(", ")}`,
+            : `changed → ${changedFields.join(", ")}`,
         });
       } else {
         actions.push({ action: "OK", id: doc._id, title: enTitle, date: startIso.slice(0, 10), notes: "matched, no changes needed" });
@@ -842,9 +947,10 @@ async function main() {
       endDateTime: endIso || undefined,
       recurring: isRecurring || undefined,
       registerUrl: registerUrl || undefined,
-      body: parsed.en.body || parsed.ar.body
-        ? { _type: "localeText", en: parsed.en.body || undefined, ar: parsed.ar.body || undefined }
+      body: enBody || arBody
+        ? { _type: "localeText", en: enBody || undefined, ar: arBody || undefined }
         : undefined,
+      relatedArtists: artistRef ? [{ _type: "reference", _ref: artistRef.id, _key: randomKey() }] : undefined,
       googleCalendarEventId: gcalId,
     };
     // Strip undefined keys (createIfNotExists payload should be clean).
