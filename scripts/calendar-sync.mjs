@@ -22,9 +22,10 @@
 //    googleCalendarEventId onto that doc instead of creating a duplicate.
 //  - New events: createIfNotExists with all parsed fields (published, no
 //    draft) + googleCalendarEventId.
-//  - Existing (matched via id or adoption): ONLY patch startDateTime /
-//    endDateTime if they differ. Never touch title/body/images/etc — those
-//    may be hand-polished in the Studio.
+//  - Existing (matched via googleCalendarEventId — not a fresh adoption this
+//    run): patch startDateTime / endDateTime / title.en if they differ from
+//    the calendar. Never touch subtitle/body/images/ar-title/etc — those may
+//    be hand-polished in the Studio.
 //  - Docs that have a googleCalendarEventId, a future startDateTime, and
 //    whose UID no longer appears *anywhere* in the raw feed (even in a
 //    skipped/all-day/cancelled event) get a warning logged. Never deleted.
@@ -797,6 +798,17 @@ async function main() {
       if (doc.startDateTime !== startIso) patch.startDateTime = startIso;
       if (endIso && doc.endDateTime !== endIso) patch.endDateTime = endIso;
       if (adopted) patch.googleCalendarEventId = gcalId;
+      // Keep the English title in sync with the calendar too (dot-path set
+      // so we only ever touch title.en — never clobber a hand-added Arabic
+      // title that isn't present in the calendar description). Everything
+      // else (body, images, subtitle, etc.) stays hands-off, since those
+      // are routinely hand-polished in the Studio after creation.
+      // Skip this on the same run a doc is freshly adopted: adoption matches
+      // by *similar*, not identical, title on purpose (that's the whole
+      // point of the fuzzy match), so the existing title is very likely a
+      // deliberately hand-edited version of the raw calendar summary —
+      // overwriting it the moment we link the doc would fight the editor.
+      if (!adopted && enTitle && doc.title?.en !== enTitle) patch["title.en"] = enTitle;
 
       if (Object.keys(patch).length) {
         mutations.push({ patch: { id: doc._id, set: patch } });
@@ -807,7 +819,7 @@ async function main() {
           date: startIso.slice(0, 10),
           notes: adopted
             ? `matched existing doc by date+title, set googleCalendarEventId=${gcalId}${patch.startDateTime ? "; dates updated" : ""}`
-            : `dates changed → ${Object.keys(patch).join(", ")}`,
+            : `changed → ${Object.keys(patch).join(", ")}`,
         });
       } else {
         actions.push({ action: "OK", id: doc._id, title: enTitle, date: startIso.slice(0, 10), notes: "matched, no changes needed" });

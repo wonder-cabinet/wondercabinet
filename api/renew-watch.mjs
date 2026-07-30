@@ -1,6 +1,15 @@
 // Periodic renewal of the Google Calendar push notification channel before
 // it expires (Calendar API watch channels are time-limited — typically on
-// the order of a week). Runs daily via the `crons` entry in vercel.json.
+// the order of a week).
+//
+// STATUS: inactive. This was meant to run daily via a `crons` entry in
+// vercel.json, but Vercel cron invocations cost money on this plan, and the
+// team decided to sync via the GitHub Actions hourly poll instead (see
+// scripts/calendar-sync.mjs + .github/workflows/calendar-sync.yml). The
+// vercel.json cron entry has been removed. This file (and setup-watch.mjs /
+// calendar-webhook.mjs) is left in place in case real-time sync is wanted
+// again later, but nothing currently calls it — no watch channel is
+// registered, so there's nothing to renew even if it were invoked manually.
 //
 // Best-effort stops the old channel, then registers a fresh one via
 // registerWatch() (shared with /api/setup-watch), updating the
