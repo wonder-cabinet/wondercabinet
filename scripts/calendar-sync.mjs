@@ -553,6 +553,24 @@ function arabicRatio(str) {
   return arabic.length / letters.length;
 }
 
+// SUMMARY on a free-form (non-structured-template) event is often typed as
+// "English title  Arabic title" in one line, no separator — split it on the
+// EN/AR script boundary instead of dumping the whole thing into title.en
+// with title.ar left empty. Handles the common EN-then-AR order; falls back
+// to AR-then-EN if the string starts with an Arabic character.
+function splitTitleByScript(summary) {
+  const s = (summary || "").trim();
+  if (!s) return { en: "", ar: "" };
+  const idx = s.search(/[؀-ۿ]/);
+  if (idx === -1) return { en: s, ar: "" };
+  if (idx === 0) {
+    const latinIdx = s.search(/[A-Za-z]/);
+    if (latinIdx > 0) return { en: s.slice(latinIdx).trim(), ar: s.slice(0, latinIdx).trim() };
+    return { en: "", ar: s };
+  }
+  return { en: s.slice(0, idx).trim(), ar: s.slice(idx).trim() };
+}
+
 function parseFreeform(summary, rawDescription) {
   const plain = stripHtmlToText(rawDescription);
   const paragraphs = splitParagraphs(plain);
@@ -562,11 +580,12 @@ function parseFreeform(summary, rawDescription) {
     if (arabicRatio(p) > 0.5) arParas.push(p);
     else enParas.push(p);
   }
+  const titleSplit = splitTitleByScript(summary);
   // No underlined-name convention to look for outside the structured
   // template — artist detection only ever runs on structured descriptions.
   return {
-    en: { title: summary, subtitle: "", body: enParas.join("\n\n"), artistName: "", artistBio: "" },
-    ar: { title: "", subtitle: "", body: arParas.join("\n\n"), artistName: "", artistBio: "" },
+    en: { title: titleSplit.en, subtitle: "", body: enParas.join("\n\n"), artistName: "", artistBio: "" },
+    ar: { title: titleSplit.ar, subtitle: "", body: arParas.join("\n\n"), artistName: "", artistBio: "" },
   };
 }
 
