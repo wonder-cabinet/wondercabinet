@@ -12,7 +12,7 @@
 <meta property="og:url" content="https://wondercabinet.space">
 <meta property="og:image" content="" id="og-image-meta">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="stylesheet" href="assets/app.css?v=78">
+<link rel="stylesheet" href="assets/app.css?v=79">
 </head>
 <body data-view="list">
 
@@ -2708,7 +2708,14 @@ function renderFeatured(){
 
   renderWeekMode();
   setup();
-  window.addEventListener("resize", setup);
+  // Must also re-run onScroll() here, not just setup() — setup() alone
+  // recomputes maxScroll/height but never reapplies track's transform, so
+  // after a resize (e.g. Windows Firefox's classic scrollbar appearing/
+  // disappearing as outer's JS-computed height crosses the viewport-height
+  // threshold) the rail is left showing a stale position until the next
+  // scroll tick. Matches the identical pattern already used in
+  // renderCurrentExhibitions' resize listener above.
+  window.addEventListener("resize", function(){ setup(); onScroll(); });
   window.addEventListener("scroll", onScroll, { passive: true });
   onScroll();
 

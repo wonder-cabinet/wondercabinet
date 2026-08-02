@@ -1687,7 +1687,19 @@ html[data-lang="ar"] .ar-only{ direction: rtl; }
    Replaces the old opposing dual-column featured-split.
    Everything here is driven only by native scroll position.
    ========================================================= */
-.gs-outer{ position: relative; }
+.gs-outer{
+  position: relative;
+  /* Firefox's scroll-anchoring tries to keep some element "in place" when
+     page content shifts above/around the viewport. outer.style.height is
+     recomputed by JS on every resize (renderFeatured's setup()) based on
+     track.scrollWidth, and on Windows Firefox in particular this has been
+     reported to fight with the anchoring heuristic and leave the page
+     scroll-locked (can't scroll past/through this section, sometimes the
+     whole page). Opting this container out of anchoring removes that
+     interaction entirely; it doesn't need anchoring since its scroll
+     position is fully JS-driven (onScroll()) anyway. */
+  overflow-anchor: none;
+}
 .gs-sticky{
   --gs-bg: var(--paper); --gs-fg: var(--ink);
   /* Docks just below the site topbar (54px, sticky itself with a higher
@@ -1912,6 +1924,11 @@ body.gs-reader-open{ overflow: hidden; }
 /* Per-exhibition scroll unit */
 .cx-outer{
   /* height computed by JS: (100vh - 54) + railRunway */
+  /* Same Firefox scroll-anchoring defensive fix as .gs-outer above — this
+     container's height is also recomputed by JS on resize, and its scroll
+     position is likewise fully JS-driven, so anchoring can only cause
+     conflicts, never help. */
+  overflow-anchor: none;
 }
 
 /* Sticky frame — holds poster + rail side by side */
