@@ -695,7 +695,7 @@ async function fetchExistingEvents() {
     return JSON.parse(fs.readFileSync(SANITY_SNAPSHOT, "utf8"));
   }
   return sanityQuery(
-    '*[_type=="event"]{_id,title,slug,startDateTime,endDateTime,googleCalendarEventId,eventType,recurring,body,"relatedArtistRefs":relatedArtists[]._ref}'
+    '*[_type=="event"]{_id,title,slug,startDateTime,endDateTime,googleCalendarEventId,eventType,recurring,body,"relatedArtistRefs":relatedArtists[]._ref,calendarSyncTitleEn,calendarSyncTitleAr,calendarSyncBodyEn,calendarSyncBodyAr}'
   );
 }
 
@@ -888,20 +888,45 @@ async function main() {
       if (doc.startDateTime !== startIso) patch.startDateTime = startIso;
       if (endIso && doc.endDateTime !== endIso) patch.endDateTime = endIso;
       if (adopted) patch.googleCalendarEventId = gcalId;
-      // Keep title, and the event's own description (not the artist's bio —
-      // that lives on the artist doc), in sync with the calendar. Dot-path
-      // sets so we only ever touch these exact fields — subtitle, images,
-      // etc. stay hands-off, since those are routinely hand-polished in the
-      // Studio after creation.
-      // Skip title on the same run a doc is freshly adopted: adoption matches
-      // by *similar*, not identical, title on purpose (that's the whole
-      // point of the fuzzy match), so the existing title is very likely a
-      // deliberately hand-edited version of the raw calendar summary —
-      // overwriting it the moment we link the doc would fight the editor.
-      if (!adopted && enTitle && doc.title?.en !== enTitle) patch["title.en"] = enTitle;
-      if (!adopted && arTitle && doc.title?.ar !== arTitle) patch["title.ar"] = arTitle;
-      if (enBody && doc.body?.en !== enBody) patch["body.en"] = enBody;
-      if (arBody && doc.body?.ar !== arBody) patch["body.ar"] = arBody;
+
+      // Keep title / description in sync with the calendar — but only ever
+      // apply a change to a field an editor hasn't touched since the last
+      // sync. calendarSyncTitleEn/Ar/BodyEn/Ar (hidden) hold the calendar
+      // value as of the last run; if the Studio field still matches that
+      // baseline, nothing's been hand-edited and it's safe to advance it.
+      // If it doesn't match, an editor changed it in Studio since — leave
+      // it alone (this is the fix for a real incident: a hand-edited title
+      // sitting in Studio got silently reverted back to the calendar's
+      // version on the next hourly run, because there was no way to tell
+      // "calendar changed" apart from "editor changed it independently").
+      // The baseline itself always advances to the calendar's current value
+      // regardless, so a legacy doc (no baseline yet) starts being tracked
+      // from its current Studio value — never retroactively overwritten —
+      // and a hand-edit doesn't get flagged as "different" forever.
+      // Skipped entirely on a fresh adoption this run: adoption matches by
+      // *similar*, not identical, title on purpose, so the existing title
+      // is almost certainly a deliberately hand-edited version already.
+      function syncField(currentValue, calendarValue, baselineField, setPath) {
+        if (!calendarValue) return;
+        const hasBaseline = doc[baselineField] != null;
+        // No baseline yet (a doc from before this feature existed) — treat
+        // as "unknown editing history", NOT "untouched". The alternative
+        // (defaulting baseline to currentValue, which trivially always
+        // equals itself) would mean the very first run after this ships
+        // treats every legacy doc as safe to overwrite, which is exactly
+        // backwards: it's the one case where we have zero information
+        // about whether Studio has since diverged from the calendar.
+        const baseline = hasBaseline ? doc[baselineField] : currentValue;
+        const untouchedSinceLastSync = hasBaseline && currentValue === baseline;
+        if (untouchedSinceLastSync && currentValue !== calendarValue) patch[setPath] = calendarValue;
+        if (baseline !== calendarValue) patch[baselineField] = calendarValue;
+      }
+      if (!adopted) {
+        syncField(doc.title?.en, enTitle, "calendarSyncTitleEn", "title.en");
+        syncField(doc.title?.ar, arTitle, "calendarSyncTitleAr", "title.ar");
+        syncField(doc.body?.en, enBody, "calendarSyncBodyEn", "body.en");
+        syncField(doc.body?.ar, arBody, "calendarSyncBodyAr", "body.ar");
+      }
 
       // Newly-detected artist: append-only (never remove/replace whatever's
       // already linked), and only if this exact artist isn't linked yet —
@@ -952,6 +977,12 @@ async function main() {
         : undefined,
       relatedArtists: artistRef ? [{ _type: "reference", _ref: artistRef.id, _key: randomKey() }] : undefined,
       googleCalendarEventId: gcalId,
+      // Baseline for future runs' hand-edit detection (see the patch branch
+      // above) — what the calendar said at creation time.
+      calendarSyncTitleEn: enTitle || undefined,
+      calendarSyncTitleAr: arTitle || undefined,
+      calendarSyncBodyEn: enBody || undefined,
+      calendarSyncBodyAr: arBody || undefined,
     };
     // Strip undefined keys (createIfNotExists payload should be clean).
     for (const k of Object.keys(doc2)) if (doc2[k] === undefined) delete doc2[k];

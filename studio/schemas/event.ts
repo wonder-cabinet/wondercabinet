@@ -132,6 +132,16 @@ export const event = defineType({
     }),
     defineField({name: 'googleCalendarEventId', title: 'Google Calendar event ID', type: 'string', hidden: true}),
     defineField({name: 'notionId', title: 'Notion ID', type: 'string', hidden: true}),
+    // Internal bookkeeping for scripts/calendar-sync.mjs — the calendar
+    // title/description text as of the last sync run, NOT the current
+    // Studio value. Lets the sync tell "the calendar changed" apart from
+    // "an editor hand-edited this in Studio" (both look like "differs from
+    // the calendar" otherwise) so a hand edit never gets silently reverted
+    // on the next hourly run. Never edit these by hand.
+    defineField({name: 'calendarSyncTitleEn', title: 'Calendar sync: last title (EN)', type: 'string', hidden: true}),
+    defineField({name: 'calendarSyncTitleAr', title: 'Calendar sync: last title (AR)', type: 'string', hidden: true}),
+    defineField({name: 'calendarSyncBodyEn', title: 'Calendar sync: last body (EN)', type: 'text', hidden: true}),
+    defineField({name: 'calendarSyncBodyAr', title: 'Calendar sync: last body (AR)', type: 'text', hidden: true}),
   ],
   orderings: [
     {name: 'startDateDesc', title: 'Date (newest first)', by: [{field: 'startDateTime', direction: 'desc'}]},
