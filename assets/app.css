@@ -1872,7 +1872,14 @@ body.gs-reader-open{ overflow: hidden; }
    Right 50vw: programme event rail, scroll-locked (translateY).
    Flat style — no gradients, no border-radius, 2px rules. */
 .cx{
-  background: var(--cx-accent, #1d24ff); color: var(--cx-ink, #f6f3ea);
+  /* Fallback was #1d24ff (brand blue) — every row inside now themes itself
+     from its own poster palette via inline --cx-accent/--cx-ink (see
+     renderCurrentExhibitions in index.html), so this section-level value
+     should never actually show through in practice. It's now a neutral
+     transparent instead of blue purely as a defensive measure, so that if
+     a row is ever rendered a beat before its own inline style is applied,
+     nothing flashes an unrelated brand color behind poster-themed content. */
+  background: var(--cx-accent, transparent); color: var(--cx-ink, inherit);
   border-top: 2px solid var(--ink);
   border-bottom: 2px solid var(--ink);
 }
