@@ -12,7 +12,7 @@
 <meta property="og:url" content="https://wondercabinet.space">
 <meta property="og:image" content="" id="og-image-meta">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="stylesheet" href="assets/app.css?v=79">
+<link rel="stylesheet" href="assets/app.css?v=80">
 </head>
 <body data-view="list">
 
@@ -1162,6 +1162,66 @@ function _gsWeekEvents(start){
   }).sort((a,b) => eventTimestamp(a) - eventTimestamp(b));
 }
 
+// Live-stream play button — shown on any event's hero card (and, in
+// event.html, the reader) that has a streamUrl set in Sanity, regardless of
+// eventType (that field isn't reliably tagged "Radio" across existing
+// events — see the Sanity schema comment on streamSource). A single shared
+// <audio> element plays across re-renders (mode switches, weekly refetch),
+// keyed by URL rather than by button identity, so whichever card currently
+// matches the playing URL shows the "playing" state and everything else
+// doesn't — including cards recreated after a re-render.
+const STREAM_SOURCE_LABELS = {
+  "alhara-1": "Radio alHara Ch.1",
+  "alhara-2": "Radio alHara Ch.2",
+  "nts-1": "NTS Ch.1",
+  "nts-2": "NTS Ch.2",
+};
+function _wcStreamLabel(v){ return STREAM_SOURCE_LABELS[v] || ""; }
+const _wcStreamAudio = new Audio();
+_wcStreamAudio.preload = "none";
+let _wcStreamUrl = "";
+function _wcSyncStreamButtons(){
+  document.querySelectorAll(".gs-c-play").forEach(btn => {
+    const playing = !_wcStreamAudio.paused && btn.dataset.stream === _wcStreamUrl;
+    btn.classList.toggle("is-playing", playing);
+    btn.setAttribute("aria-pressed", playing ? "true" : "false");
+  });
+}
+function _wcToggleStream(url){
+  if (!url) return;
+  if (_wcStreamUrl === url && !_wcStreamAudio.paused){
+    _wcStreamAudio.pause();
+  } else {
+    _wcStreamUrl = url;
+    _wcStreamAudio.src = url;
+    // Live streams can hiccup on first connect (CORS preflight, slow
+    // relay) — swallow the rejection so a transient failure doesn't throw
+    // an unhandled promise error; the button just silently stays "off".
+    _wcStreamAudio.play().catch(() => {});
+  }
+}
+_wcStreamAudio.addEventListener("play", _wcSyncStreamButtons);
+_wcStreamAudio.addEventListener("pause", _wcSyncStreamButtons);
+_wcStreamAudio.addEventListener("error", () => { _wcStreamUrl = ""; _wcSyncStreamButtons(); });
+document.addEventListener("click", (e) => {
+  const btn = e.target.closest(".gs-c-play");
+  if (!btn) return;
+  e.preventDefault(); e.stopPropagation();
+  _wcToggleStream(btn.dataset.stream);
+});
+
+function _gsPlayButton(ev){
+  if (!ev.streamUrl) return "";
+  const label = _wcStreamLabel(ev.streamSource);
+  const suffixEn = label ? " · " + label : "";
+  const suffixAr = label ? " · " + label : "";
+  return `<button type="button" class="gs-c-play" data-stream="${ev.streamUrl}" aria-label="Play live stream" aria-pressed="false">
+    <svg class="gs-c-play-icon-play" viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M8 5v14l11-7z"/></svg>
+    <svg class="gs-c-play-icon-pause" viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+    <span class="gs-c-play-label"><span class="en-only">Listen live${suffixEn}</span><span class="ar-only ar" dir="rtl">استمع مباشرة${suffixAr}</span></span>
+  </button>`;
+}
+
 function _gsCardVideo(ev){
   const b = (ev.content || []).find(c => (c._type || c.type) === "contentVideo");
   if (!b) return "";
@@ -1176,6 +1236,7 @@ function _gsEventCard(ev){
   return `<a class="gs-card${videoSrc ? " gs-card-video" : ""}${isToday ? " gs-card-today" : ""}" href="event.html?id=${ev.id}" data-ev="${ev.id}">
     ${isToday ? `<div class="gs-c-today-label"><span class="en-only">Today</span><span class="ar-only ar" dir="rtl">اليوم</span></div>` : ""}
     ${videoSrc ? `<video class="gs-card-bg-video" autoplay muted loop playsinline src="${videoSrc}"></video><div class="gs-card-scrim"></div>` : ""}
+    ${_gsPlayButton(ev)}
     <div class="gs-card-inner">
       <div class="gs-c-meta">
         <span class="en-only">${ev.type}${ev.dow ? " · " + ev.dow + " " + parseInt(ev.day,10) + " " + ev.month : ""}${ev.start ? " · " + ev.start : ""}</span>
@@ -2954,6 +3015,8 @@ async function _boot(){
         status:   doc.status || 'upcoming',
         featured: !!doc.featured,
         register: doc.registerUrl || '',
+        streamSource: doc.streamSource || '',
+        streamUrl:    doc.streamUrl || '',
         shortDesc: doc.shortDescription?.en || '',
         shortDescAr: doc.shortDescription?.ar || '',
         short:    doc.shortDescription?.en || '',

@@ -93,6 +93,29 @@ export const event = defineType({
       options: {list: ['upcoming', 'past'], layout: 'radio'},
     }),
     defineField({name: 'registerUrl', title: 'Registration URL', type: 'url'}),
+    defineField({
+      name: 'streamSource',
+      title: 'Live stream source',
+      description:
+        'For radio episodes and listening sessions that stream live from an external station. Just a label for the Play button (e.g. "Listen live — NTS Ch.1") — pick a preset, or "Other" for a one-off/different station. Not tied to the event Type field, since not every radio/listening-session event is reliably tagged that way.',
+      type: 'string',
+      options: {
+        list: [
+          {title: 'Radio alHara — Channel 1', value: 'alhara-1'},
+          {title: 'Radio alHara — Channel 2', value: 'alhara-2'},
+          {title: 'NTS — Channel 1', value: 'nts-1'},
+          {title: 'NTS — Channel 2', value: 'nts-2'},
+          {title: 'Other', value: 'other'},
+        ],
+      },
+    }),
+    defineField({
+      name: 'streamUrl',
+      title: 'Live stream URL',
+      description:
+        'Direct audio stream link (an Icecast/Shoutcast/relay .mp3 or .aac URL, not a station\'s homepage or embed-player page). This is what the homepage/event Play button actually connects to — leave blank and no Play button shows.',
+      type: 'url',
+    }),
     defineField({name: 'shortDescription', title: 'Short description', type: 'localeText'}),
     defineField({name: 'body', title: 'Body', type: 'localeText'}),
     defineField({

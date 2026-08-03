@@ -11,7 +11,7 @@
 <meta property="og:description" content="A space for art production and cultural development in Bethlehem, Palestine." id="og-desc-meta">
 <meta property="og:image" content="" id="og-image-meta">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="stylesheet" href="assets/app.css?v=76" />
+<link rel="stylesheet" href="assets/app.css?v=80" />
 <style>
   /* This page uses the exact same .ep-* / .event-panel template as every
      other entry point on the site (the homepage hero cards, the Programme
@@ -218,6 +218,8 @@
       status:   doc.status || 'upcoming',
       featured: !!doc.featured,
       register: doc.registerUrl || '',
+      streamSource: doc.streamSource || '',
+      streamUrl:    doc.streamUrl || '',
       isPast:   s ? s < new Date() : (doc.status === 'past'),
       // Registration should stay open (clickable) for the event's full
       // duration, not just until it starts — only disable it once the
@@ -300,6 +302,28 @@
     return { prev: idx < all.length - 1 ? all[idx + 1] : null, next: idx > 0 ? all[idx - 1] : null };
   }
 
+  // Same channel labels as the homepage hero card (index.html's
+  // STREAM_SOURCE_LABELS) — kept as a separate copy since this page has no
+  // shared JS module with index.html, just the two Sanity option values in
+  // sync via the schema.
+  const STREAM_SOURCE_LABELS = {
+    "alhara-1": "Radio alHara Ch.1",
+    "alhara-2": "Radio alHara Ch.2",
+    "nts-1": "NTS Ch.1",
+    "nts-2": "NTS Ch.2",
+  };
+
+  function _initLiveStream(root){
+    const audio = root.querySelector(".epl-audio");
+    if (!audio) return;
+    const btn = root.querySelector(".epl-play"),
+          iconPlay = root.querySelector(".epl-icon-play"),
+          iconPause = root.querySelector(".epl-icon-pause");
+    btn.addEventListener("click", () => audio.paused ? audio.play().catch(() => {}) : audio.pause());
+    audio.addEventListener("play",  () => { iconPlay.style.display = "none"; iconPause.style.display = ""; });
+    audio.addEventListener("pause", () => { iconPlay.style.display = "";     iconPause.style.display = "none"; });
+  }
+
   function _initPanelAudio(root){
     const audio = root.querySelector(".epa-audio");
     if (!audio) return;
@@ -359,6 +383,25 @@
   <div class="epa-time"><span class="epa-current">0:00</span> / <span class="epa-total">${audioSrcBlock.durationMin ? audioSrcBlock.durationMin+":00" : "--:--"}</span></div>
 </div>` : "";
 
+    // Live stream bar — a radio episode/listening session with a Sanity
+    // streamUrl set. No seek bar/duration (it's a live feed, not a fixed
+    // recording) — just play/pause and a "live" indicator, unlike the
+    // contentAudio bar above.
+    const streamSourceLabel = STREAM_SOURCE_LABELS[ev.streamSource] || "";
+    const liveStreamBar = ev.streamUrl ? `
+<div class="ep-live-bar">
+  <audio class="epl-audio" src="${ev.streamUrl}" preload="none"></audio>
+  <button class="epl-play" aria-label="Play live stream">
+    <svg class="epl-icon-play"  viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M8 5v14l11-7z"/></svg>
+    <svg class="epl-icon-pause" viewBox="0 0 24 24" fill="currentColor" width="20" height="20" style="display:none"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+  </button>
+  <div class="epl-label">
+    <span class="epl-live-dot"></span>
+    <span class="en-only">Listen live${streamSourceLabel ? " — " + streamSourceLabel : ""}</span>
+    <span class="ar-only ar" dir="rtl">استمع مباشرة${streamSourceLabel ? " — " + streamSourceLabel : ""}</span>
+  </div>
+</div>` : "";
+
     const { prev, next } = _findAdjacentEvents(all, ev.id);
     // Adjacent-event links must stay in embed mode when we're already
     // embedded (in-grid reader, desktop or mobile) — otherwise following
@@ -401,6 +444,7 @@
       : "";
 
     return `
+${liveStreamBar}
 ${audioBar}
 <div class="ep-header">
   <div class="ep-meta">
@@ -576,6 +620,7 @@ ${audioBar}
     root.style.color = useTheme.ink;
     root.innerHTML = buildEventPanel(targetEv, all);
     _initPanelAudio(root);
+    _initLiveStream(root);
     window.scrollTo(0, 0);
     // Update title + OG
     const titleStr = targetEv.titleAr ? `${targetEv.title} · ${targetEv.titleAr}` : targetEv.title;

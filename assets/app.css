@@ -1761,6 +1761,25 @@ html[data-lang="ar"] .ar-only{ direction: rtl; }
 }
 html[data-lang="ar"] .gs-c-today-label{ left: auto; right: 0; }
 .gs-c-today-label .ar{ font-family: var(--ff-ar); letter-spacing: 0; }
+
+/* Live-stream play button — radio episodes/listening sessions with a
+   streamUrl set in Sanity. Sits opposite the "Today" label so both can be
+   present at once without overlapping. */
+.gs-c-play{
+  position: absolute; top: 16px; right: 16px; z-index: 3;
+  display: flex; align-items: center; gap: 8px;
+  padding: 9px 16px; border: none; border-radius: 999px; cursor: pointer;
+  background: rgba(10,10,22,.78); color: #f6f3ea;
+  font-family: var(--ff-sans); font-size: 11px; font-weight: 700;
+  letter-spacing: .04em; text-transform: uppercase;
+  transition: background .2s ease;
+}
+html[data-lang="ar"] .gs-c-play{ right: auto; left: 16px; }
+.gs-c-play:hover{ background: rgba(10,10,22,.92); }
+.gs-c-play .gs-c-play-icon-pause{ display: none; }
+.gs-c-play.is-playing .gs-c-play-icon-play{ display: none; }
+.gs-c-play.is-playing .gs-c-play-icon-pause{ display: block; }
+.gs-c-play .ar{ font-family: var(--ff-ar); text-transform: none; letter-spacing: 0; }
 .gs-c-title{ font-family: var(--ff-sans); font-weight: 700; font-size: var(--wc-title-size); line-height: .98; letter-spacing: 0; text-transform: uppercase; margin: 0; }
 .gs-c-title .ar{ font-family: var(--ff-ar); font-style: italic; letter-spacing: 0; text-transform: none; line-height: 1.1; }
 .gs-c-desc{ font-family: var(--ff-sans); font-size: 15px; line-height: 1.5; max-width: 38ch; opacity: .85; margin: 0; }
@@ -2516,6 +2535,39 @@ a.ep-related-artist-name:hover{ opacity: .65; }
 .epa-time{
   font-family: var(--ff-sans); font-size: 11px; font-variant-numeric: tabular-nums;
   letter-spacing: 0; white-space: nowrap; opacity: .7; flex-shrink: 0;
+}
+
+/* ---- Live stream bar — same slot/style as the audio bar above, but for a
+   live radio/listening-session feed: no seek bar or duration, just
+   play/pause plus a pulsing "live" dot. ---- */
+.ep-live-bar{
+  position: sticky; top: 0; z-index: 10; flex-shrink: 0;
+  background: var(--night); color: var(--paper);
+  display: flex; align-items: center; gap: 14px;
+  padding: 13px 18px;
+  border-bottom: 2px solid rgba(246,243,234,.18);
+}
+.epl-play{
+  all: unset; cursor: pointer; flex-shrink: 0;
+  width: 38px; height: 38px;
+  display: grid; place-items: center;
+  border: 2px solid var(--paper); border-radius: 50%;
+  transition: background .12s, color .12s;
+}
+.epl-play:hover{ background: var(--paper); color: var(--night); }
+.epl-label{
+  font-family: var(--ff-sans); font-size: 11px; letter-spacing: .02em;
+  text-transform: uppercase; font-weight: 700;
+  display: flex; align-items: center; gap: 8px;
+}
+.epl-label .ar{ font-family: var(--ff-ar); text-transform: none; letter-spacing: 0; }
+.epl-live-dot{
+  width: 8px; height: 8px; border-radius: 50%; background: #ff3b30;
+  flex-shrink: 0; animation: epl-pulse 1.6s ease-in-out infinite;
+}
+@keyframes epl-pulse{
+  0%, 100% { opacity: 1; }
+  50% { opacity: .35; }
 }
 
 /* ---- Prev / Next navigation bar at bottom of panel ---- */
