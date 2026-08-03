@@ -942,7 +942,17 @@ function renderCurrentExhibitions(){
     let currentProgress = 0;
     let catchUpRAF = null, catchUpWatchdog = null, catchUpGen = 0;
     let progressInitialized = false;
-    const SNAP_THRESHOLD = 180, CATCHUP_MS = 260;
+    // Raised from 180/260 — at that threshold, an ordinary fast scroll
+    // gesture (trackpad flick, momentum) right at the entry/exit edge of
+    // the pinned scroll-jack region routinely exceeded 180px in one native
+    // scroll tick, forcing the 260ms eased catch-up animation to run even
+    // for a perfectly normal scroll. That reads as "scroll got stuck for a
+    // second" — the transform really was still catching up, just too
+    // often and too slowly. A higher threshold means only genuinely huge
+    // jumps (closing a reader mid-fling, etc) still get smoothed; anything
+    // else snaps instantly like the rest of the page. The catch-up itself
+    // is now quicker too, in case it does trigger.
+    const SNAP_THRESHOLD = 420, CATCHUP_MS = 160;
     const easeInOutQuad = t => t < .5 ? 2*t*t : 1 - Math.pow(-2*t+2,2)/2;
 
     function setup(){
@@ -2579,8 +2589,18 @@ function renderFeatured(){
   let progressInitialized = false; // first onScroll() call always snaps, never animates —
                                     // a browser-restored mid-scroll position on load/refresh
                                     // shouldn't play a catch-up animation on first paint.
-  const SNAP_THRESHOLD = 180; // px
-  const CATCHUP_MS = 260;
+  // Raised from 180/260 — same fix as the exhibitions rail's identical
+  // mechanism above: at 180px, an ordinary fast scroll gesture right at
+  // the entry/exit edge of this pinned "This Week" region routinely
+  // exceeded the threshold in one native scroll tick, forcing the 260ms
+  // eased catch-up to run for what was really just a normal scroll. Felt
+  // like the rail got stuck for a second, then caught up on its own —
+  // reported 2026-08-03, mostly noticeable at the start/end of the rail.
+  // A higher threshold means only a genuinely huge jump still gets
+  // smoothed; everything else snaps instantly. Catch-up itself is quicker
+  // too, in case it does trigger.
+  const SNAP_THRESHOLD = 420; // px
+  const CATCHUP_MS = 160;
   const easeInOutQuad = t => t < 0.5 ? 2*t*t : 1 - Math.pow(-2*t + 2, 2) / 2;
 
   function applyProgress(p, isRtl){
