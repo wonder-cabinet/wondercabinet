@@ -884,7 +884,22 @@ async function main() {
     // Resolve (link existing, or create) the artist mentioned via an
     // underlined name in the description, if any. Shared by both the
     // patch and create branches below.
-    const artistRef = resolveArtistRef(artistNameEn, artistBioEn, artistNameAr, artistBioAr, existingArtists, mutations, actions);
+    //
+    // Skip for Class/Workshop events: these are recurring instructor-led
+    // sessions (yoga, tatreez, etc.) where an underlined name in the
+    // description is the instructor being emphasised within the event's
+    // OWN description, not a distinct "featured artist" bio the way it is
+    // for a Performance/Exhibition/Film. Without this guard, an instructor
+    // like "Eilda Zaghmout" (yoga) gets auto-created as an "artist" and
+    // shown in the homepage's "Artists this week" section every time the
+    // hourly sync re-parses the recurring event — which is exactly the bug
+    // reported 2026-08-03 (fixed by removing her artist doc + the 6
+    // relatedArtists links by hand in Sanity; this guard stops it from
+    // recurring on the next sync run).
+    const skipArtistDetection = eventType === "Class" || eventType === "Workshop";
+    const artistRef = skipArtistDetection
+      ? null
+      : resolveArtistRef(artistNameEn, artistBioEn, artistNameAr, artistBioAr, existingArtists, mutations, actions);
 
     // --- matching: (1) gcal id, (2) adoption by date + title similarity ---
     let doc = byGcalId.get(gcalId);
