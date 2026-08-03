@@ -1739,6 +1739,17 @@ html[data-lang="ar"] .ar-only{ direction: rtl; }
   flex: 0 0 min(624px, 100vw); /* 520px default, 20% wider */
   border: 10px solid var(--gs-fg);
 }
+/* An event whose own time is already over (checked against its actual end/
+   start time, not just its date) stays in the rail rather than being
+   removed — per feedback, elapsed events should visually recede, not
+   disappear — so it just gets a much narrower card. Declared after
+   .gs-card-today so it still wins (narrower, not wider) on a today's event
+   whose time has already passed. */
+.gs-card-elapsed{
+  flex: 0 0 min(240px, 50vw);
+  opacity: .55;
+}
+.gs-card-elapsed:hover{ opacity: .85; }
 .gs-card-inner{
   position: relative; z-index: 2; height: 100%;
   padding: 56px 40px; display: flex; flex-direction: column; justify-content: center; gap: 14px;
