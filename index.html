@@ -12,7 +12,7 @@
 <meta property="og:url" content="https://wondercabinet.space">
 <meta property="og:image" content="" id="og-image-meta">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="stylesheet" href="assets/app.css?v=86">
+<link rel="stylesheet" href="assets/app.css?v=87">
 </head>
 <body data-view="list">
 
@@ -1895,6 +1895,7 @@ function _gsOpenReader(cardEl){
                            // (negative = shrinking from the nudge back toward closed)
   let closeRawY = 0;      // virtual scroll position once past an edge during reading, 0..CLOSE_PX
   let closeDir = 0;       // 0 = reading normally; +1 closing via the bottom edge, -1 via the top
+  let readingStarted = false; // flips true on the first reading-phase scroll tick — see .gs-card-reading
 
   function apply(t){
     cardEl.style.flexBasis = lerp(startW, targetW, t) + "px";
@@ -1952,6 +1953,17 @@ function _gsOpenReader(cardEl){
     // into the iframe.
     const doc = frame.contentDocument, win = frame.contentWindow;
     if (!doc || !win) return;
+
+    // The card keeps its own closed-state look (video/scrim, compact meta +
+    // title) all the way through full expansion — see the CSS comment above
+    // .gs-card-reading in app.css. Only now, the first time a scroll tick
+    // actually reaches the reading phase, does the handoff to the iframe's
+    // real header/background begin, so the crossfade lines up with the
+    // person starting to read rather than with the click/expand itself.
+    if (!readingStarted){
+      readingStarted = true;
+      cardEl.classList.add("gs-card-reading");
+    }
 
     if (closeDir !== 0){
       // Already past an edge and shrinking back — same continuous, fully
@@ -2037,7 +2049,7 @@ function _gsOpenReader(cardEl){
     }
     setTimeout(() => {
       frame.remove();
-      cardEl.classList.remove("gs-card-open");
+      cardEl.classList.remove("gs-card-open", "gs-card-reading");
       cardEl.style.flexBasis = "";
       track.style.transform = `translateX(${baseX}px)`;
       document.body.style.position = "";
@@ -2102,7 +2114,11 @@ function _gsOpenReaderMobile(cardEl){
   const startH = cardEl.getBoundingClientRect().height;
   const targetH = Math.max(window.innerHeight - 78, 480);
 
-  cardEl.classList.add("gs-card-open", "gs-card-open-m");
+  // Mobile keeps the old instant crossfade (no separate "reading" trigger
+  // to defer to — touch-scrolling reaches the iframe natively here, see
+  // the file note above this function), so gs-card-reading is added right
+  // away alongside gs-card-open rather than waiting for a scroll tick.
+  cardEl.classList.add("gs-card-open", "gs-card-open-m", "gs-card-reading");
   // Timeline rows, exhibition cards and artist names reuse this whole path
   // on narrow viewports — they just need their own "host an absolute frame,
   // hide my own content" class since the gs-card one is scoped to card
@@ -2138,7 +2154,7 @@ function _gsOpenReaderMobile(cardEl){
     cardEl.style.height = startH + "px";
     setTimeout(() => {
       frame.remove();
-      cardEl.classList.remove("gs-card-open", "gs-card-open-m", "tl-row-open");
+      cardEl.classList.remove("gs-card-open", "gs-card-open-m", "gs-card-reading", "tl-row-open");
       cardEl.style.height = "";
       document.body.classList.remove("gs-reader-open");
       window.removeEventListener("message", onMsg);

@@ -1860,24 +1860,46 @@ html[data-lang="ar"] .gs-list-heading{ text-align: right; }
    hosts event.html?embed=1 in an iframe filling its box. Clicking nudges
    the borders open; the inner page's scroll drives the rest of the
    expansion (flex-basis + track shift), until the block spans from the
-   rail to the right edge. Neighboring cards simply get pushed aside. */
+   rail to the right edge. Neighboring cards simply get pushed aside.
+
+   Two-stage handoff (see _gsOpenReader in index.html):
+   .gs-card-open is added immediately on click and only drives the width
+   expansion — the card's own background video/scrim and its day/date/
+   time + title stay exactly as they looked closed, all the way through
+   full expansion, so opening never reads as swapping to a different
+   design mid-motion. Only .gs-c-desc/.gs-c-cta (not part of the reader's
+   own header) fade immediately, since there's nothing for them to hand
+   off to.
+   .gs-card-reading is added later, from JS, the first time an actual
+   scroll tick is forwarded into the iframe (i.e. the person has started
+   reading, not just opened the card) — that's when the real crossfade
+   happens: video/scrim/meta/title fade out as the iframe's own matching
+   header + background + (for video events) its own hero video fade in
+   underneath, with the meta/title growing slightly as they go so it
+   reads as one heading morphing into the bigger one, not a hard cut. */
 .gs-card-inner,
 .gs-card-bg-video,
 .gs-card-scrim,
-.gs-card-list-inner{ transition: opacity .3s ease; }
-.gs-card-open .gs-card-inner,
-.gs-card-open .gs-card-bg-video,
-.gs-card-open .gs-card-scrim,
-.gs-card-open .gs-card-list-inner{ opacity: 0; pointer-events: none; }
+.gs-card-list-inner{ transition: opacity .4s ease; }
+.gs-card-open .gs-c-desc,
+.gs-card-open .gs-c-cta{ transition: opacity .25s ease; opacity: 0; pointer-events: none; }
+.gs-card-reading .gs-card-bg-video,
+.gs-card-reading .gs-card-scrim,
+.gs-card-reading .gs-card-inner,
+.gs-card-reading .gs-card-list-inner{ opacity: 0; pointer-events: none; }
+.gs-c-meta,
+.gs-c-title{ transition: font-size .4s ease; }
+.gs-card-reading .gs-c-meta{ font-size: 28px; }
+.gs-card-reading .gs-c-title{ font-size: calc(var(--wc-title-size) * 1.06); }
 .gs-card-frame{
   position: absolute; inset: 0;
   width: 100%; height: 100%;
   border: 0; display: block;
   z-index: 5;
   opacity: 0;
-  transition: opacity .3s ease;
+  transition: opacity .4s ease;
 }
-.gs-card-open .gs-card-frame{ opacity: 1; }
+.gs-card-reading .gs-card-frame{ opacity: 1; }
 .gs-anim{
   transition:
     flex-basis .45s cubic-bezier(.2,.8,.2,1),
