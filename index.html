@@ -2686,8 +2686,22 @@ function renderFeatured(){
     // from raw date matching. Falls back to plain date-range matching if no
     // issue doc exists yet for this week (e.g. sync hasn't run since the
     // week started).
+    //
+    // Still cross-checked against the event's actual current date, though
+    // (eventDateOnly(ev) >= start && <= end) — calendar-sync.mjs's weekly-
+    // issue events list is filled in ONCE and deliberately never touched
+    // again (so hand-removals stick), but a RECURRING event is a single
+    // reused Sanity doc whose startDateTime calendar-sync keeps advancing
+    // to its next real-world occurrence on every sync run. If that
+    // occurrence rolls past this week (e.g. a monthly slot jumping from
+    // this week to three weeks out), the id stays in this week's already-
+    // locked list forever, and the event kept showing up here — sorted to
+    // the far end, since its now-distant timestamp is the latest in the
+    // list. This filter drops anything whose real date has quietly moved
+    // on, without weakening actual editor removals (a removal just means
+    // absence from eventIds, which this doesn't touch).
     const evs = issue && Array.isArray(issue.eventIds)
-      ? ALL.filter(ev => issue.eventIds.includes(ev.id)).sort((a,b) => eventTimestamp(a) - eventTimestamp(b))
+      ? ALL.filter(ev => issue.eventIds.includes(ev.id) && eventDateOnly(ev) >= start && eventDateOnly(ev) <= end).sort((a,b) => eventTimestamp(a) - eventTimestamp(b))
       : _gsWeekEvents(start);
     sticky.style.setProperty("--gs-bg", "var(--paper)");
     sticky.style.setProperty("--gs-fg", "var(--ink)");
