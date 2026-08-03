@@ -117,6 +117,16 @@ export const structure = (S: StructureBuilder) =>
             .defaultOrdering([{field: 'generatedAt', direction: 'desc'}])
         ),
 
+      S.listItem()
+        .title('Stream Channels')
+        .schemaType('streamChannel')
+        .child(
+          S.documentList()
+            .title('Stream Channels')
+            .filter('_type == "streamChannel"')
+            .defaultOrdering([{field: 'name', direction: 'asc'}])
+        ),
+
       S.divider(),
 
       // ── SETTINGS (singleton) ─────────────────────────

@@ -22,6 +22,7 @@ import {artwork} from './artwork'
 import {siteSettings} from './siteSettings'
 import {weeklyIssue} from './weeklyIssue'
 import {socialPost} from './socialPost'
+import {streamChannel} from './streamChannel'
 
 export const schemaTypes = [
   // Objects
@@ -48,4 +49,5 @@ export const schemaTypes = [
   siteSettings,
   weeklyIssue,
   socialPost,
+  streamChannel,
 ]

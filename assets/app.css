@@ -1763,19 +1763,19 @@ html[data-lang="ar"] .gs-c-today-label{ left: auto; right: 0; }
 .gs-c-today-label .ar{ font-family: var(--ff-ar); letter-spacing: 0; }
 
 /* Live-stream play button — radio episodes/listening sessions with a
-   streamUrl set in Sanity. Sits opposite the "Today" label so both can be
-   present at once without overlapping. */
+   streamUrl set in Sanity. Flush to the corner, square, same treatment as
+   .gs-c-today-label above (just the opposite corner, so both can be
+   present on the same card without overlapping). */
 .gs-c-play{
-  position: absolute; top: 16px; right: 16px; z-index: 3;
+  all: unset; cursor: pointer;
+  position: absolute; top: 0; right: 0; z-index: 3;
   display: flex; align-items: center; gap: 8px;
-  padding: 9px 16px; border: none; border-radius: 999px; cursor: pointer;
-  background: rgba(10,10,22,.78); color: #f6f3ea;
-  font-family: var(--ff-sans); font-size: 11px; font-weight: 700;
-  letter-spacing: .04em; text-transform: uppercase;
-  transition: background .2s ease;
+  padding: 8px 16px; border-radius: 0;
+  background: var(--gs-fg); color: var(--gs-bg);
+  font-family: var(--ff-sans); font-size: 13px; font-weight: 700;
+  letter-spacing: .06em; text-transform: uppercase;
 }
-html[data-lang="ar"] .gs-c-play{ right: auto; left: 16px; }
-.gs-c-play:hover{ background: rgba(10,10,22,.92); }
+html[data-lang="ar"] .gs-c-play{ right: auto; left: 0; }
 .gs-c-play .gs-c-play-icon-pause{ display: none; }
 .gs-c-play.is-playing .gs-c-play-icon-play{ display: none; }
 .gs-c-play.is-playing .gs-c-play-icon-pause{ display: block; }

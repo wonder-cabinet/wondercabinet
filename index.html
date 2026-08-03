@@ -12,7 +12,7 @@
 <meta property="og:url" content="https://wondercabinet.space">
 <meta property="og:image" content="" id="og-image-meta">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="stylesheet" href="assets/app.css?v=80">
+<link rel="stylesheet" href="assets/app.css?v=81">
 </head>
 <body data-view="list">
 
@@ -1163,20 +1163,15 @@ function _gsWeekEvents(start){
 }
 
 // Live-stream play button — shown on any event's hero card (and, in
-// event.html, the reader) that has a streamUrl set in Sanity, regardless of
-// eventType (that field isn't reliably tagged "Radio" across existing
-// events — see the Sanity schema comment on streamSource). A single shared
-// <audio> element plays across re-renders (mode switches, weekly refetch),
-// keyed by URL rather than by button identity, so whichever card currently
-// matches the playing URL shows the "playing" state and everything else
-// doesn't — including cards recreated after a re-render.
-const STREAM_SOURCE_LABELS = {
-  "alhara-1": "Radio alHara Ch.1",
-  "alhara-2": "Radio alHara Ch.2",
-  "nts-1": "NTS Ch.1",
-  "nts-2": "NTS Ch.2",
-};
-function _wcStreamLabel(v){ return STREAM_SOURCE_LABELS[v] || ""; }
+// event.html, the reader) that has a streamChannel set in Sanity, regardless
+// of eventType (that field isn't reliably tagged "Radio" across existing
+// events — see the Sanity schema comment on it). streamChannel is a
+// reference to a separate "Stream Channel" doc (name + URL), so producers
+// can add a station or fix a URL in Studio without a code deploy. A single
+// shared <audio> element plays across re-renders (mode switches, weekly
+// refetch), keyed by URL rather than by button identity, so whichever card
+// currently matches the playing URL shows the "playing" state and
+// everything else doesn't — including cards recreated after a re-render.
 const _wcStreamAudio = new Audio();
 _wcStreamAudio.preload = "none";
 let _wcStreamUrl = "";
@@ -1211,14 +1206,14 @@ document.addEventListener("click", (e) => {
 });
 
 function _gsPlayButton(ev){
-  if (!ev.streamUrl) return "";
-  const label = _wcStreamLabel(ev.streamSource);
-  const suffixEn = label ? " · " + label : "";
-  const suffixAr = label ? " · " + label : "";
-  return `<button type="button" class="gs-c-play" data-stream="${ev.streamUrl}" aria-label="Play live stream" aria-pressed="false">
+  const url = ev.streamChannel && ev.streamChannel.url;
+  if (!url) return "";
+  const label = ev.streamChannel.name || "";
+  const suffix = label ? " · " + label : "";
+  return `<button type="button" class="gs-c-play" data-stream="${url}" aria-label="Play live stream" aria-pressed="false">
     <svg class="gs-c-play-icon-play" viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M8 5v14l11-7z"/></svg>
     <svg class="gs-c-play-icon-pause" viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
-    <span class="gs-c-play-label"><span class="en-only">Listen live${suffixEn}</span><span class="ar-only ar" dir="rtl">استمع مباشرة${suffixAr}</span></span>
+    <span class="gs-c-play-label"><span class="en-only">Listen live${suffix}</span><span class="ar-only ar" dir="rtl">استمع مباشرة${suffix}</span></span>
   </button>`;
 }
 
@@ -2968,7 +2963,7 @@ async function _boot(){
       return { key:`${n.toLowerCase()}-${y}`, name:n, year:y };
     }
     const q = encodeURIComponent(`{
-      "events": *[_type == "event"] | order(startDateTime desc) { ..., location->{ name }, relatedArtists[]->{name, "slug": slug.current}, relatedProject->{title, slug}, programmeEvents[]->{_id, "slug": slug.current, title, eventType, startDateTime}, "coverPalette": cover.asset->metadata.palette },
+      "events": *[_type == "event"] | order(startDateTime desc) { ..., location->{ name }, relatedArtists[]->{name, "slug": slug.current}, relatedProject->{title, slug}, programmeEvents[]->{_id, "slug": slug.current, title, eventType, startDateTime}, "coverPalette": cover.asset->metadata.palette, streamChannel->{name, streamUrl} },
       "projects": *[_type == "project"] | order(year desc) { title, "slug": slug.current, description, year, coverImage },
       "residencies": *[_type == "residency"] | order(year desc) { title, "slug": slug.current, description, year, coverImage },
       "settings": *[_type == "siteSettings"][0]{ ogImage },
@@ -3015,8 +3010,12 @@ async function _boot(){
         status:   doc.status || 'upcoming',
         featured: !!doc.featured,
         register: doc.registerUrl || '',
-        streamSource: doc.streamSource || '',
-        streamUrl:    doc.streamUrl || '',
+        // streamChannel is a reference to a "Stream Channel" doc (its own
+        // editable content type — see studio/schemas/streamChannel.ts) so
+        // producers can add a new station or fix a channel's URL in Studio
+        // without a code deploy. null when no channel is set (no Play
+        // button shows).
+        streamChannel: doc.streamChannel ? { name: doc.streamChannel.name || '', url: doc.streamChannel.streamUrl || '' } : null,
         shortDesc: doc.shortDescription?.en || '',
         shortDescAr: doc.shortDescription?.ar || '',
         short:    doc.shortDescription?.en || '',
