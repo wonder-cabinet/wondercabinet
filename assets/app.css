@@ -2091,14 +2091,18 @@ body.gs-reader-open{ overflow: hidden; }
    for the row's shallower height. box-sizing:border-box on .cx-row keeps
    this from changing the row's total height. */
 .cx-row-today{ border: 4px solid currentColor; }
+/* Date/type/time match .gs-c-meta (the day/date/time line on the main
+   hero cards) at 22px, so a row like this reads at the same size as the
+   highlighted cards rather than noticeably smaller next to its own huge
+   title. */
 .cx-row-date{
-  font-family: var(--ff-sans); font-size: 16px; font-weight: 700;
+  font-family: var(--ff-sans); font-size: 22px; font-weight: 700;
   text-transform: uppercase; font-variant-numeric: tabular-nums;
   opacity: 1; margin-bottom: 6px;
 }
 .cx-row-type{
   display: inline-block; align-self: flex-start;
-  font-family: var(--ff-sans); font-size: 11px; font-weight: 700;
+  font-family: var(--ff-sans); font-size: 22px; font-weight: 700;
   text-transform: uppercase; letter-spacing: .05em;
   border: 2px solid currentColor;
   padding: 2px 8px; margin-bottom: 10px;
@@ -2119,7 +2123,7 @@ body.gs-reader-open{ overflow: hidden; }
   font-family: var(--ff-ar); text-transform: none; line-height: 1.1;
 }
 .cx-row-time{
-  font-family: var(--ff-sans); font-size: 16px; font-weight: 600;
+  font-family: var(--ff-sans); font-size: 22px; font-weight: 600;
   opacity: 1; margin-top: 8px; font-variant-numeric: tabular-nums;
 }
 
