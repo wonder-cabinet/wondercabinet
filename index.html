@@ -1174,6 +1174,13 @@ function _gsWeekEvents(start){
 // everything else doesn't — including cards recreated after a re-render.
 const _wcStreamAudio = new Audio();
 _wcStreamAudio.preload = "none";
+// Exposed on window so event.html, when opened as this page's own in-grid
+// reader (a same-origin iframe), can share this exact <audio> element
+// instead of spinning up its own — otherwise playing from a hero card and
+// then opening that same event's reader left two independent players out
+// of sync (sound already playing from the card's audio, but the reader's
+// own button had never heard about it and still showed "play").
+window._wcStreamAudio = _wcStreamAudio;
 let _wcStreamUrl = "";
 function _wcSyncStreamButtons(){
   document.querySelectorAll(".gs-c-play").forEach(btn => {
@@ -1198,6 +1205,7 @@ function _wcToggleStream(url){
 _wcStreamAudio.addEventListener("play", _wcSyncStreamButtons);
 _wcStreamAudio.addEventListener("pause", _wcSyncStreamButtons);
 _wcStreamAudio.addEventListener("error", () => { _wcStreamUrl = ""; _wcSyncStreamButtons(); });
+window._wcToggleStream = _wcToggleStream;
 document.addEventListener("click", (e) => {
   const btn = e.target.closest(".gs-c-play");
   if (!btn) return;

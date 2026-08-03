@@ -302,14 +302,40 @@
   }
 
   function _initLiveStream(root){
-    const audio = root.querySelector(".epl-audio");
-    if (!audio) return;
-    const btn = root.querySelector(".epl-play"),
-          iconPlay = root.querySelector(".epl-icon-play"),
-          iconPause = root.querySelector(".epl-icon-pause");
-    btn.addEventListener("click", () => audio.paused ? audio.play().catch(() => {}) : audio.pause());
-    audio.addEventListener("play",  () => { iconPlay.style.display = "none"; iconPause.style.display = ""; });
-    audio.addEventListener("pause", () => { iconPlay.style.display = "";     iconPause.style.display = "none"; });
+    const btn = root.querySelector(".epl-play");
+    if (!btn) return;
+    const iconPlay = root.querySelector(".epl-icon-play"),
+          iconPause = root.querySelector(".epl-icon-pause"),
+          audio = root.querySelector(".epl-audio"),
+          url = audio ? audio.getAttribute("src") : "";
+
+    // When opened as the homepage's own in-grid reader (a same-origin
+    // iframe), share the exact <audio> element the hero cards' Play
+    // buttons use instead of this bar's own local one — see the comment
+    // on window._wcStreamAudio in index.html for why: without this, a
+    // stream already playing from a card showed "play" (not "pause") the
+    // moment you opened that same event's reader, since the reader had no
+    // idea the parent page was already playing it.
+    let parentAudio = null;
+    if (EMBED) {
+      try { parentAudio = window.parent && window.parent !== window ? window.parent._wcStreamAudio : null; } catch(_){ parentAudio = null; }
+    }
+
+    if (parentAudio && url) {
+      const sync = () => {
+        const playing = !parentAudio.paused && parentAudio.src === url;
+        iconPlay.style.display = playing ? "none" : "";
+        iconPause.style.display = playing ? "" : "none";
+      };
+      btn.addEventListener("click", () => window.parent._wcToggleStream(url));
+      parentAudio.addEventListener("play", sync);
+      parentAudio.addEventListener("pause", sync);
+      sync();
+    } else if (audio) {
+      btn.addEventListener("click", () => audio.paused ? audio.play().catch(() => {}) : audio.pause());
+      audio.addEventListener("play",  () => { iconPlay.style.display = "none"; iconPause.style.display = ""; });
+      audio.addEventListener("pause", () => { iconPlay.style.display = "";     iconPause.style.display = "none"; });
+    }
   }
 
   function _initPanelAudio(root){
