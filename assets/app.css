@@ -2091,28 +2091,27 @@ body.gs-reader-open{ overflow: hidden; }
    for the row's shallower height. box-sizing:border-box on .cx-row keeps
    this from changing the row's total height. */
 .cx-row-today{ border: 4px solid currentColor; }
-/* Date/type/time match .gs-c-meta (the day/date/time line on the main
-   hero cards) at 22px, so a row like this reads at the same size as the
-   highlighted cards rather than noticeably smaller next to its own huge
-   title. */
-.cx-row-date{
+/* Single "type · date · time" line — matches .gs-c-meta (the meta line on
+   the main hero cards) at 22px, both in size and in being one combined
+   line rather than a date above the title and a time below it. margin-top
+   gives it breathing room off the row's own top edge, which otherwise
+   this text sat flush against once a wrapped multi-line title pushed the
+   vertically-centered content close to the row's edges. */
+.cx-row-meta{
   font-family: var(--ff-sans); font-size: 22px; font-weight: 700;
   text-transform: uppercase; font-variant-numeric: tabular-nums;
-  opacity: 1; margin-bottom: 6px;
+  opacity: 1; margin-top: 20px; margin-bottom: 10px;
 }
-.cx-row-type{
+/* Status badge ("Upcoming" / "Past exhibition" / "Current") — its own
+   small bordered tag, separate from the plain meta line above since it's
+   a status flag rather than a date/time/type fact. */
+.cx-row-status{
   display: inline-block; align-self: flex-start;
-  font-family: var(--ff-sans); font-size: 22px; font-weight: 700;
-  text-transform: uppercase; letter-spacing: .05em;
+  font-family: var(--ff-sans); font-size: 11px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .05em; opacity: .7;
   border: 2px solid currentColor;
   padding: 2px 8px; margin-bottom: 10px;
 }
-/* Wrapper for a row that carries both its type tag ("Exhibition") and a
-   status badge ("Upcoming" / "Past exhibition") side by side, instead of
-   one replacing the other. */
-.cx-row-tags{ display: flex; gap: 8px; align-self: flex-start; margin-bottom: 10px; }
-.cx-row-tags .cx-row-type{ margin-bottom: 0; }
-.cx-row-status{ opacity: .7; }
 .cx-row-title{
   margin: 0;
   font-family: var(--ff-sans); font-weight: 700;
@@ -2121,10 +2120,6 @@ body.gs-reader-open{ overflow: hidden; }
 }
 .cx-row-title .ar{
   font-family: var(--ff-ar); text-transform: none; line-height: 1.1;
-}
-.cx-row-time{
-  font-family: var(--ff-sans); font-size: 22px; font-weight: 600;
-  opacity: 1; margin-top: 8px; font-variant-numeric: tabular-nums;
 }
 
 /* Past-events toggle row */
