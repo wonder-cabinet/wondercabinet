@@ -661,10 +661,18 @@ function renderEventRow(e, day, isFirst){
   const floorAr = VENUE_AR[floor] || floor;
   const typeAr = TYPE_AR[e.type] || e.type;
   const isPast = e.status === "past";
+  // Was hardcoded "↻ Weekly" for every recurring event regardless of its
+  // actual cadence — wrong for anything that doesn't recur weekly (e.g.
+  // the NTS x Wonder Cabinet radio show recurs every 4 weeks, not every
+  // Monday like the yoga class). Now reuses the same recurringLabel-or-
+  // fallback text as the date column below, so the badge always matches
+  // what the row itself says.
+  const recurTagText = e.recurringLabel || ('Every ' + e.dowFull);
+  const recurTagTextAr = e.recurringLabelAr || ('كل ' + (e.dowAr || e.dow));
   const tag = e.featured
     ? `<span class="tl-tag tl-featured"><span class="en-only">Featured</span><span class="ar-only ar">مميّز</span></span>`
     : e.recurring
-      ? `<span class="tl-tag tl-recurring"><span class="en-only">↻ Weekly</span><span class="ar-only ar">↻ أسبوعي</span></span>`
+      ? `<span class="tl-tag tl-recurring"><span class="en-only">↻ ${recurTagText}</span><span class="ar-only ar">↻ ${recurTagTextAr}</span></span>`
       : isPast
         ? `<span class="tl-tag tl-past"><span class="en-only">Past</span><span class="ar-only ar">سابق</span></span>`
         : (e.register
@@ -676,8 +684,8 @@ function renderEventRow(e, day, isFirst){
         ${isFirst && e.recurring ? `
           <span class="tl-recur-mark">↻</span>
           <span class="tl-dow">
-            <span class="en-only">${e.recurringLabel || 'Every ' + e.dow}</span>
-            <span class="ar-only ar" dir="rtl">${e.recurringLabelAr || 'أسبوعي'}</span>
+            <span class="en-only">${recurTagText}</span>
+            <span class="ar-only ar" dir="rtl">${recurTagTextAr}</span>
           </span>
         ` : isFirst ? `
           <span class="tl-day">${e.day}</span>
