@@ -1792,7 +1792,10 @@ html[data-lang="ar"] .gs-c-play{ right: auto; left: 0; }
 .gs-card-list{ text-decoration: none; color: inherit; cursor: default; }
 .gs-card-list-inner{ display: flex; flex-direction: column; height: 100%; overflow: hidden; }
 .gs-list-heading{
-  font-family: var(--ff-sans); font-size: 12px; letter-spacing: 0; text-transform: uppercase;
+  /* Matches .gs-c-meta (the day/date/time line on the main hero cards) so
+     "Also happening this week" reads at the same size as everything else
+     in the rail, not smaller. */
+  font-family: var(--ff-sans); font-size: 22px; letter-spacing: 0; text-transform: uppercase;
   font-weight: 700; opacity: 1; margin: 0; padding: 28px 28px 0;
   flex: 0 0 auto;
 }
