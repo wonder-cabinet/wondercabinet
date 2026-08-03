@@ -297,6 +297,22 @@ function addUtcDays(date, n) {
   return new Date(date.getTime() + n * 86400000);
 }
 
+// Midnight (00:00) Asia/Hebron, on the calendar date containing `now`,
+// expressed as a UTC Date. Used so a recurring master doesn't get advanced
+// away from "today's" occurrence just because its exact clock time has
+// already passed by the time a sync run executes — it should stay pointed at
+// today's occurrence (which the site then shows narrowed/dimmed via
+// _gsHasElapsed) for the rest of the calendar day, and only roll to the next
+// occurrence once that day is actually over. Without this, a same-day
+// occurrence whose time has elapsed is silently skipped with no trace left
+// anywhere (unlike one-off events, a recurring master is its own only record).
+function hebronDayFloorUtc(now) {
+  const hebronIso = utcToHebronIso(now);
+  const [y, mo, da] = hebronIso.slice(0, 10).split("-").map(Number);
+  const offMin = hebronOffsetMinutes(now);
+  return new Date(Date.UTC(y, mo - 1, da, 0, 0, 0) - offMin * 60000);
+}
+
 // Compute the next occurrence (as a UTC Date, same wall-clock time as the
 // master) at or after `now`, given the master's first occurrence `dtstartUtc`.
 function nextRecurrenceOccurrence(dtstartUtc, rrule, now) {
@@ -842,7 +858,7 @@ async function main() {
 
     if (ev.rrule) {
       isRecurring = true;
-      const nextUtc = nextRecurrenceOccurrence(ev.dtstart.utc, ev.rrule, now);
+      const nextUtc = nextRecurrenceOccurrence(ev.dtstart.utc, ev.rrule, hebronDayFloorUtc(now));
       if (!nextUtc) {
         actions.push({ action: "SKIP", id: "-", title: ev.summary, date: "-", notes: "recurring series has no future occurrence (past UNTIL/COUNT)" });
         continue;
