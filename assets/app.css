@@ -1791,10 +1791,18 @@ html[data-lang="ar"] .gs-c-play{ right: auto; left: 0; }
 .gs-c-play.is-playing .gs-c-play-icon-play{ display: none; }
 .gs-c-play.is-playing .gs-c-play-icon-pause{ display: block; }
 .gs-c-play .ar{ font-family: var(--ff-ar); text-transform: none; letter-spacing: 0; }
-.gs-c-title{ font-family: var(--ff-sans); font-weight: 700; font-size: var(--wc-title-size); line-height: .98; letter-spacing: 0; text-transform: uppercase; margin: 0; }
+.gs-c-title{ font-family: var(--ff-sans); font-weight: 700; font-size: var(--wc-title-size); line-height: .98; letter-spacing: 0; text-transform: uppercase; margin: 0; overflow-wrap: break-word; word-break: break-word; }
 .gs-c-title .ar{ font-family: var(--ff-ar); font-style: italic; letter-spacing: 0; text-transform: none; line-height: 1.1; }
-.gs-c-desc{ font-family: var(--ff-sans); font-size: 15px; line-height: 1.5; max-width: 38ch; opacity: .85; margin: 0; }
+.gs-c-desc{ font-family: var(--ff-sans); font-size: 15px; line-height: 1.5; max-width: 38ch; opacity: .85; margin: 0; overflow-wrap: break-word; word-break: break-word; }
 .gs-c-cta{ font-family: var(--ff-sans); font-size: 11px; letter-spacing: 0; text-transform: uppercase; font-weight: 700; }
+/* A narrow (elapsed) card's title/meta previously overflowed past its own
+   240px width into the neighboring card instead of wrapping inside it — the
+   break-word rules above fix that for every card, narrow or not.
+   Separately: once a Radio/Listening Session card's live stream is
+   actually playing, drop its short description — the card is already
+   doing its job (the person tuned in), so the intro copy is just clutter
+   competing with the play button for a small, often-narrowed box. */
+.gs-c-play.is-playing ~ .gs-card-inner .gs-c-desc{ display: none; }
 
 /* "Also happening this week" — a single compact list card at the end of the
    This Week rail, reusing .cx-row (the exhibitions programme rail's row
