@@ -1742,14 +1742,34 @@ html[data-lang="ar"] .ar-only{ direction: rtl; }
 /* An event whose own time is already over (checked against its actual end/
    start time, not just its date) stays in the rail rather than being
    removed — per feedback, elapsed events should visually recede, not
-   disappear — so it just gets a much narrower card. Declared after
-   .gs-card-today so it still wins (narrower, not wider) on a today's event
-   whose time has already passed. */
+   disappear — so it just gets a much narrower card, tagged "Took place"
+   (.gs-c-elapsed-label, top-right — the same corner the play button would
+   sit in, which is hidden once elapsed anyway) rather than just dimmed.
+   Declared after .gs-card-today so it still wins (narrower, not wider) on
+   a today's event whose time has already passed.
+   Scoped to THIS WEEK only: _gsHasElapsed/.gs-card-elapsed only ever gets
+   applied by _gsEventCard, which only renders the live "This Week" rail
+   (renderWeekMode) — a featured/archived past week is a different layout
+   entirely (Programme timeline rows, not .gs-card), so this never touches
+   it. If a past-week "featured" gs-card view gets built later, it should
+   NOT carry this class — past weeks keep their original layout as laid
+   out, full-size. */
 .gs-card-elapsed{
   flex: 0 0 min(240px, 50vw);
-  opacity: .55;
 }
-.gs-card-elapsed:hover{ opacity: .85; }
+.gs-card-elapsed .gs-c-meta,
+.gs-card-elapsed .gs-c-title{
+  font-size: 16px; line-height: 1.25;
+}
+.gs-c-elapsed-label{
+  font-family: var(--ff-sans); font-size: 13px; font-weight: 700;
+  letter-spacing: .06em; text-transform: uppercase;
+  color: var(--gs-bg); background: var(--gs-fg);
+  position: absolute; top: 0; right: 0; z-index: 3;
+  padding: 8px 16px; border-radius: 0;
+}
+html[data-lang="ar"] .gs-c-elapsed-label{ right: auto; left: 0; }
+.gs-c-elapsed-label .ar{ font-family: var(--ff-ar); letter-spacing: 0; }
 .gs-card-inner{
   position: relative; z-index: 2; height: 100%;
   padding: 56px 40px; display: flex; flex-direction: column; justify-content: center; gap: 14px;
