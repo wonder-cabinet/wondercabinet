@@ -1761,6 +1761,15 @@ html[data-lang="ar"] .ar-only{ direction: rtl; }
 .gs-card-elapsed .gs-c-title{
   font-size: 16px; line-height: 1.25;
 }
+/* Opening an elapsed card gets the exact same click→expand→read treatment
+   as any other card (see .gs-card-reading in the IN-GRID EVENT READER
+   section below) — the compact 16px size above is only the CLOSED/narrow
+   look. This compound selector (both classes on the same element) beats
+   the plain .gs-card-elapsed rule above regardless of source order, so
+   the title/meta reliably grow to the same full reading size every other
+   block reaches once you start scrolling, instead of staying stuck small. */
+.gs-card-elapsed.gs-card-reading .gs-c-meta{ font-size: 28px; }
+.gs-card-elapsed.gs-card-reading .gs-c-title{ font-size: calc(var(--wc-title-size) * 1.06); }
 .gs-c-elapsed-label{
   font-family: var(--ff-sans); font-size: 13px; font-weight: 700;
   letter-spacing: .06em; text-transform: uppercase;
