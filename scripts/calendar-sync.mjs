@@ -297,18 +297,26 @@ function addUtcDays(date, n) {
   return new Date(date.getTime() + n * 86400000);
 }
 
-// Midnight (00:00) Asia/Hebron, on the calendar date containing `now`,
+// Midnight (00:00) Asia/Hebron on the MONDAY of the week containing `now`,
 // expressed as a UTC Date. Used so a recurring master doesn't get advanced
-// away from "today's" occurrence just because its exact clock time has
-// already passed by the time a sync run executes — it should stay pointed at
-// today's occurrence (which the site then shows narrowed/dimmed via
-// _gsHasElapsed) for the rest of the calendar day, and only roll to the next
-// occurrence once that day is actually over. Without this, a same-day
-// occurrence whose time has elapsed is silently skipped with no trace left
-// anywhere (unlike one-off events, a recurring master is its own only record).
-function hebronDayFloorUtc(now) {
-  const hebronIso = utcToHebronIso(now);
-  const [y, mo, da] = hebronIso.slice(0, 10).split("-").map(Number);
+// away from an occurrence that already happened earlier THIS week just
+// because a sync run executes later in the same week — it should stay
+// pointed at that occurrence (which the site shows narrowed/dimmed via
+// _gsHasElapsed once its own time passes) all the way through Sunday night,
+// and only roll to the next occurrence once the week is actually over. This
+// matters because the homepage's "This Week" block is itself Monday–Sunday
+// (see getHebronWeekBounds / weeklyIssue), so the master's stored date needs
+// to stay inside that same window for as long as the block does, or the
+// event vanishes from its own week partway through — confirmed: NTS x
+// Wonder Cabinet aired Mon 3 Aug, then disappeared from the This Week rail
+// as soon as Tue 4 Aug's sync run advanced the master to its next (4-week-
+// later) occurrence. An earlier day-only floor fixed the same-day case but
+// not this. Without either, a same-day/same-week occurrence whose time has
+// elapsed is silently skipped with no trace left anywhere (unlike one-off
+// events, a recurring master is its own only record).
+function hebronWeekFloorUtc(now) {
+  const { mondayDate } = getHebronWeekBounds(now);
+  const y = mondayDate.getUTCFullYear(), mo = mondayDate.getUTCMonth() + 1, da = mondayDate.getUTCDate();
   const offMin = hebronOffsetMinutes(now);
   return new Date(Date.UTC(y, mo - 1, da, 0, 0, 0) - offMin * 60000);
 }
@@ -858,7 +866,7 @@ async function main() {
 
     if (ev.rrule) {
       isRecurring = true;
-      const nextUtc = nextRecurrenceOccurrence(ev.dtstart.utc, ev.rrule, hebronDayFloorUtc(now));
+      const nextUtc = nextRecurrenceOccurrence(ev.dtstart.utc, ev.rrule, hebronWeekFloorUtc(now));
       if (!nextUtc) {
         actions.push({ action: "SKIP", id: "-", title: ev.summary, date: "-", notes: "recurring series has no future occurrence (past UNTIL/COUNT)" });
         continue;
