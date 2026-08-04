@@ -1803,6 +1803,12 @@ html[data-lang="ar"] .gs-c-play{ right: auto; left: 0; }
    doing its job (the person tuned in), so the intro copy is just clutter
    competing with the play button for a small, often-narrowed box. */
 .gs-c-play.is-playing ~ .gs-card-inner .gs-c-desc{ display: none; }
+/* Once an event has fully elapsed (.gs-card-elapsed — see _gsHasElapsed),
+   the description has nothing left to invite anyone into, and a "Listen
+   live" button is actively wrong — the stream isn't live anymore. Both go
+   away entirely rather than just narrowing with everything else. */
+.gs-card-elapsed .gs-c-desc,
+.gs-card-elapsed .gs-c-play{ display: none; }
 
 /* "Also happening this week" — a single compact list card at the end of the
    This Week rail, reusing .cx-row (the exhibitions programme rail's row
