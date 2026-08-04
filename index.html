@@ -12,7 +12,7 @@
 <meta property="og:url" content="https://wondercabinet.space">
 <meta property="og:image" content="" id="og-image-meta">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="stylesheet" href="assets/app.css?v=91">
+<link rel="stylesheet" href="assets/app.css?v=92">
 </head>
 <body data-view="list">
 
@@ -1840,6 +1840,25 @@ function _gsOpenReader(cardEl){
     ? track.scrollWidth - (cardOffsetInTrack + startW) // card's right border lands on the rail
     : -cardOffsetInTrack;                              // card's left border lands on the rail
 
+  // Title/meta size grows IN STEP with the block's own width, driven by the
+  // exact same t as flexBasis below — not a separate discrete jump once
+  // reading starts. Matters most for an elapsed ("Took place") card, whose
+  // closed size is a small 16px: previously it sat fixed at 16px through the
+  // whole open-and-expand motion and only snapped bigger once you started
+  // reading, which read as stuck-then-jump rather than "growing with the
+  // block." Start is whatever's actually on screen right now (16px for
+  // elapsed, already-full-size for a normal card, so this is a no-op there);
+  // target mirrors .gs-card-reading's sizes (28px meta) and the
+  // clamp(32px, 4.4vw, 64px) behind --wc-title-size *1.06 for the title —
+  // computed in JS since a custom property holding a clamp() can't be read
+  // back as a resolved px number.
+  const metaEl = cardEl.querySelector(".gs-c-meta");
+  const titleEl = cardEl.querySelector(".gs-c-title");
+  const startMetaSize = metaEl ? parseFloat(getComputedStyle(metaEl).fontSize) : 0;
+  const startTitleSize = titleEl ? parseFloat(getComputedStyle(titleEl).fontSize) : 0;
+  const targetMetaSize = 28;
+  const targetTitleSize = Math.min(64, Math.max(32, window.innerWidth * 0.044)) * 1.06;
+
   // Freeze the background page. overflow:hidden alone is not reliable here
   // — some wheel/trackpad gestures still nudge window.scrollY through it,
   // and it also makes body/html the nearest "scroll container" for any
@@ -1901,6 +1920,8 @@ function _gsOpenReader(cardEl){
   function apply(t){
     cardEl.style.flexBasis = lerp(startW, targetW, t) + "px";
     track.style.transform = `translateX(${lerp(baseX, targetX, t)}px)`;
+    if (metaEl) metaEl.style.fontSize = lerp(startMetaSize, targetMetaSize, t) + "px";
+    if (titleEl) titleEl.style.fontSize = lerp(startTitleSize, targetTitleSize, t) + "px";
   }
   function animateOnce(){
     cardEl.classList.add("gs-anim");
@@ -2052,6 +2073,8 @@ function _gsOpenReader(cardEl){
       frame.remove();
       cardEl.classList.remove("gs-card-open", "gs-card-reading");
       cardEl.style.flexBasis = "";
+      if (metaEl) metaEl.style.fontSize = "";
+      if (titleEl) titleEl.style.fontSize = "";
       track.style.transform = `translateX(${baseX}px)`;
       document.body.style.position = "";
       document.body.style.top = "";
