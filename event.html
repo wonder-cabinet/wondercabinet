@@ -448,7 +448,7 @@
       const vb = contentBlocks.find(b => (b._type || '') === 'contentVideo');
       const vsrc = vb ? (_sanityFile(vb.videoFile) || '') : '';
       if (vsrc) {
-        heroVideoHtml = `<div class="ep-hero-video"><video autoplay muted loop playsinline src="${vsrc}"></video></div>`;
+        heroVideoHtml = `<div class="ep-hero-video"><video autoplay muted loop playsinline preload="auto" src="${vsrc}"></video></div>`;
         contentBlocks = contentBlocks.filter(b => b !== vb);
       }
     }

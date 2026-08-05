@@ -1276,7 +1276,7 @@ function _gsEventCard(ev){
   return `<a class="gs-card${videoSrc ? " gs-card-video" : ""}${isToday ? " gs-card-today" : ""}${elapsed ? " gs-card-elapsed" : ""}" href="event.html?id=${ev.id}" data-ev="${ev.id}">
     ${isToday ? `<div class="gs-c-today-label"><span class="en-only">Today</span><span class="ar-only ar" dir="rtl">اليوم</span></div>` : ""}
     ${elapsed ? `<div class="gs-c-elapsed-label"><span class="en-only">Took place</span><span class="ar-only ar" dir="rtl">حدثت بالفعل</span></div>` : ""}
-    ${videoSrc ? `<video class="gs-card-bg-video" autoplay muted loop playsinline src="${videoSrc}"></video><div class="gs-card-scrim"></div>` : ""}
+    ${videoSrc ? `<video class="gs-card-bg-video" autoplay muted loop playsinline preload="auto" src="${videoSrc}"></video><div class="gs-card-scrim"></div>` : ""}
     ${_gsPlayButton(ev)}
     <div class="gs-card-inner">
       <div class="gs-c-meta">
