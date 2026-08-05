@@ -12,7 +12,7 @@
 <meta property="og:url" content="https://wondercabinet.space">
 <meta property="og:image" content="" id="og-image-meta">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="stylesheet" href="assets/app.css?v=92">
+<link rel="stylesheet" href="assets/app.css?v=93">
 </head>
 <body data-view="list">
 
@@ -1320,7 +1320,16 @@ function cxRow(pe, isPast, statusTag){
   // statusTag ("Upcoming"/"Past"/"Current") stays its own small bordered
   // badge, separate from the meta line — it's a status flag, not a date/
   // time/type fact.
-  return `<a class="cx-row${isPast ? ' is-past' : ''}${isToday ? ' cx-row-today' : ''}" href="event.html?id=${encodeURIComponent(pe.id)}" data-ev="${pe.id}">
+  // Same background-video treatment as the main hero cards (_gsCardVideo),
+  // reused here so a row — e.g. in "Also happening this week" — shows its
+  // event's own uploaded video instead of staying flat-colored just
+  // because it landed in the lower-priority list rather than a highlighted
+  // gs-card. No-ops (empty string) for any item shape that doesn't carry a
+  // .content array (e.g. some programmeEvents-shaped callers), same as
+  // _gsCardVideo already handles for the hero cards.
+  const videoSrc = _gsCardVideo(pe);
+  return `<a class="cx-row${isPast ? ' is-past' : ''}${isToday ? ' cx-row-today' : ''}${videoSrc ? ' cx-row-video' : ''}" href="event.html?id=${encodeURIComponent(pe.id)}" data-ev="${pe.id}">
+    ${videoSrc ? `<video class="cx-row-bg-video" autoplay muted loop playsinline preload="auto" src="${videoSrc}"></video><div class="cx-row-scrim"></div>` : ''}
     ${metaEn ? `<div class="cx-row-meta"><span class="en-only">${metaEn}</span><span class="ar-only ar" dir="rtl">${metaAr}</span></div>` : ''}
     ${statusTag ? `<div class="cx-row-status">${statusTag}</div>` : ''}
     <h4 class="cx-row-title">

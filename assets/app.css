@@ -2167,6 +2167,20 @@ body.gs-reader-open{ overflow: hidden; }
    for the row's shallower height. box-sizing:border-box on .cx-row keeps
    this from changing the row's total height. */
 .cx-row-today{ border: 4px solid currentColor; }
+/* Background video on a row — same idea as .gs-card-bg-video/.gs-card-scrim
+   on the main hero cards, just fitted to a row's shallower box. .cx-row
+   already has position:relative;overflow:hidden (see above), so this only
+   needs the layering: video behind, scrim for legibility, then the text
+   pulled onto its own stacking level (position:relative + z-index) since
+   an absolutely positioned sibling paints above static in-flow content by
+   default regardless of z-index:auto. */
+.cx-row-bg-video{ position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; }
+.cx-row-scrim{ position: absolute; inset: 0; background: rgba(10,10,22,.55); z-index: 1; }
+.cx-row-meta, .cx-row-status, .cx-row-title{ position: relative; z-index: 2; }
+.cx-row-video .cx-row-meta,
+.cx-row-video .cx-row-status,
+.cx-row-video .cx-row-title{ color: #f6f3ea; }
+.cx-row-video .cx-row-status{ border-color: #f6f3ea; }
 /* Single "type · date · time" line — matches .gs-c-meta (the meta line on
    the main hero cards) at 22px, both in size and in being one combined
    line rather than a date above the title and a time below it. margin-top
