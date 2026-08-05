@@ -12,7 +12,7 @@
 <meta property="og:url" content="https://wondercabinet.space">
 <meta property="og:image" content="" id="og-image-meta">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="stylesheet" href="assets/app.css?v=93">
+<link rel="stylesheet" href="assets/app.css?v=94">
 </head>
 <body data-view="list">
 
@@ -1306,7 +1306,7 @@ function _gsEmptyCard(en, ar){
 // (renderCurrentExhibitions) and the "Also happening this week" list card
 // (renderWeekMode) — hoisted to module scope so both can use the exact same
 // markup/CSS (.cx-row) rather than keeping two copies in sync.
-function cxRow(pe, isPast, statusTag){
+function cxRow(pe, isPast, statusTag, suppressVideo){
   const dateStr = pe.day ? `${pe.dow ? pe.dow + " " : ""}${parseInt(pe.day,10)} ${(MONTH_NAME_EN[pe.month]||'').slice(0,3)}` : '';
   const dateArStr = pe.day ? `${pe.dowAr ? pe.dowAr + " " : ""}${arNum(parseInt(pe.day,10))} ${MONTH_NAME_AR[pe.month]||''}` : '';
   const _today = new Date(); _today.setHours(0,0,0,0);
@@ -1327,7 +1327,10 @@ function cxRow(pe, isPast, statusTag){
   // gs-card. No-ops (empty string) for any item shape that doesn't carry a
   // .content array (e.g. some programmeEvents-shaped callers), same as
   // _gsCardVideo already handles for the hero cards.
-  const videoSrc = _gsCardVideo(pe);
+  // suppressVideo: this item's video is instead being shown as the whole
+  // list card's shared background (see _gsListCard) — skip rendering it a
+  // second time inside its own row.
+  const videoSrc = suppressVideo ? "" : _gsCardVideo(pe);
   return `<a class="cx-row${isPast ? ' is-past' : ''}${isToday ? ' cx-row-today' : ''}${videoSrc ? ' cx-row-video' : ''}" href="event.html?id=${encodeURIComponent(pe.id)}" data-ev="${pe.id}">
     ${videoSrc ? `<video class="cx-row-bg-video" autoplay muted loop playsinline preload="auto" src="${videoSrc}"></video><div class="cx-row-scrim"></div>` : ''}
     ${metaEn ? `<div class="cx-row-meta"><span class="en-only">${metaEn}</span><span class="ar-only ar" dir="rtl">${metaAr}</span></div>` : ''}
@@ -1343,11 +1346,19 @@ function cxRow(pe, isPast, statusTag){
 // shaped objects) as a single compact card matching the exhibitions rail's
 // look — used for "Also happening this week" (renderWeekMode) so lower-
 // priority events don't compete for space with the highlighted gs-cards.
-function _gsListCard(items, headingEn, headingAr){
-  return `<div class="gs-card gs-card-list">
+//
+// bgVideoEv: an item from `items` whose video should fill the WHOLE card as
+// a shared background (rows sit on top of it, transparent) rather than each
+// staying confined to its own row. Resolved by the caller: automatic when
+// exactly one item has a video, or the editor's explicit pick (weeklyIssue's
+// secondaryFeaturedVideo) when two or more do — see renderWeekMode().
+function _gsListCard(items, headingEn, headingAr, bgVideoEv){
+  const bgVideoSrc = bgVideoEv ? _gsCardVideo(bgVideoEv) : "";
+  return `<div class="gs-card gs-card-list${bgVideoSrc ? ' gs-card-list-video' : ''}">
+    ${bgVideoSrc ? `<video class="gs-card-list-bg-video" autoplay muted loop playsinline preload="auto" src="${bgVideoSrc}"></video><div class="gs-card-list-scrim"></div>` : ''}
     <div class="gs-card-list-inner">
       <h4 class="gs-list-heading"><span class="en-only">${headingEn}</span><span class="ar-only ar" dir="rtl">${headingAr}</span></h4>
-      <div class="gs-list-rows">${items.map(it => cxRow(it, false)).join('')}</div>
+      <div class="gs-list-rows">${items.map(it => cxRow(it, false, null, !!(bgVideoEv && it.id === bgVideoEv.id))).join('')}</div>
     </div>
   </div>`;
 }
@@ -2824,11 +2835,24 @@ function renderFeatured(){
     const secondaryEvs = secondaryIds.length
       ? ALL.filter(ev => secondaryIds.includes(ev.id)).sort((a,b) => eventTimestamp(a) - eventTimestamp(b))
       : [];
+    // Which (if any) "Also happening this week" event's video fills the
+    // whole list card as a shared background, rather than staying confined
+    // to its own row. Automatic when exactly one candidate has a video —
+    // with two or more, it's ambiguous which one "wins" visually, so it
+    // takes an explicit editor pick (weeklyIssue.secondaryFeaturedVideo) to
+    // avoid an arbitrary/unpredictable choice; with none picked, every row
+    // just keeps showing its own video individually (unchanged from before).
+    const secondaryVideoCandidates = secondaryEvs.filter(ev => _gsCardVideo(ev));
+    const secondaryBgVideoEv = secondaryVideoCandidates.length === 1
+      ? secondaryVideoCandidates[0]
+      : (secondaryVideoCandidates.length >= 2 && issue && issue.secondaryFeaturedVideo)
+        ? secondaryVideoCandidates.find(ev => ev.id === issue.secondaryFeaturedVideo) || null
+        : null;
     const mainHtml = evs.length
       ? evs.map(_gsEventCard).join("")
       : _gsEmptyCard("Nothing scheduled this week — check the full programme.", "لا توجد فعاليات هذا الأسبوع — راجع البرنامج كاملاً.");
     const secondaryHtml = secondaryEvs.length
-      ? _gsListCard(secondaryEvs, "Also happening this week", "يحدث أيضاً هذا الأسبوع")
+      ? _gsListCard(secondaryEvs, "Also happening this week", "يحدث أيضاً هذا الأسبوع", secondaryBgVideoEv)
       : "";
     track.innerHTML = mainHtml + secondaryHtml;
   }
@@ -3087,7 +3111,7 @@ async function _boot(){
       "projects": *[_type == "project"] | order(year desc) { title, "slug": slug.current, description, year, coverImage },
       "residencies": *[_type == "residency"] | order(year desc) { title, "slug": slug.current, description, year, coverImage },
       "settings": *[_type == "siteSettings"][0]{ ogImage },
-      "issues": *[_type == "weeklyIssue"] | order(weekStart desc){ title, description, weekStart, weekEnd, "eventIds": events[]->slug.current, "secondaryEventIds": secondaryEvents[]->slug.current, eventsAutoAssigned }
+      "issues": *[_type == "weeklyIssue"] | order(weekStart desc){ title, description, weekStart, weekEnd, "eventIds": events[]->slug.current, "secondaryEventIds": secondaryEvents[]->slug.current, eventsAutoAssigned, "secondaryFeaturedVideo": secondaryFeaturedVideo->slug.current }
     }`);
     const res = await fetch(`https://xdtj605l.api.sanity.io/v2024-01-01/data/query/production?query=${q}`);
     const { result } = await res.json();
@@ -3212,6 +3236,11 @@ async function _boot(){
       // Editor-curated, always optional — de-emphasized events for "Also
       // happening this week" (see renderWeekMode()). Never auto-populated.
       secondaryEventIds: Array.isArray(doc.secondaryEventIds) ? doc.secondaryEventIds : [],
+      // Editor's pick for which "Also happening this week" event's video
+      // fills the whole list card as a shared background, when more than
+      // one of them has a video (with exactly one, it's used automatically
+      // — see renderWeekMode()). Optional, always defaults to unset.
+      secondaryFeaturedVideo: doc.secondaryFeaturedVideo || null,
     }));
     // Footer (address/hours/maps/social) is owned entirely by assets/footer.js
     // now, which does its own siteSettings fetch — see that file. Nothing to

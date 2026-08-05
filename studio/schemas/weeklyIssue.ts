@@ -56,6 +56,13 @@ export const weeklyIssue = defineType({
       of: [{type: 'reference', to: [{type: 'event'}]}],
     }),
     defineField({
+      name: 'secondaryFeaturedVideo',
+      title: 'Also-happening video background',
+      description: 'If more than one event in "Also happening this week" above has a video uploaded, pick which one\'s video should fill the whole list card as a shared background (the others just keep their plain rows). If only one of them has a video, it\'s used automatically and this field is ignored — only needed to break the tie when there are two or more.',
+      type: 'reference',
+      to: [{type: 'event'}],
+    }),
+    defineField({
       name: 'eventsAutoAssigned',
       title: 'Events auto-assigned',
       type: 'boolean',

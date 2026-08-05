@@ -1844,7 +1844,28 @@ html[data-lang="ar"] .gs-c-play{ right: auto; left: 0; }
    style) instead of a full highlighted gs-card per event. Not a link itself
    (unlike .gs-card) since it holds its own <a> rows. */
 .gs-card-list{ text-decoration: none; color: inherit; cursor: default; }
-.gs-card-list-inner{ display: flex; flex-direction: column; height: 100%; overflow: hidden; }
+/* Shared background video for the whole list card — same layering idea as
+   .gs-card-bg-video/.gs-card-scrim and .cx-row-bg-video/.cx-row-scrim, just
+   sized to the full column instead of one row. .gs-card (the base class)
+   already sets position:relative;overflow:hidden, so this only needs the
+   stacking: video behind everything, scrim for legibility, heading+rows
+   pulled onto their own layer above both (see the z-index bump on
+   .gs-card-list-inner below). Individual rows stay visually transparent
+   here (see cxRow's suppressVideo param in index.html) so this one video
+   reads as a single backdrop behind the whole list, not per-row tiles. */
+.gs-card-list-bg-video{ position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; }
+.gs-card-list-scrim{ position: absolute; inset: 0; background: rgba(10,10,22,.55); z-index: 1; }
+.gs-card-list-video .gs-list-heading,
+.gs-card-list-video .cx-row-meta,
+.gs-card-list-video .cx-row-status,
+.gs-card-list-video .cx-row-title{ color: #f6f3ea; }
+.gs-card-list-video .cx-row-status{ border-color: #f6f3ea; }
+/* "Also happening this week" rows specifically get taller than the base
+   .cx-row (used elsewhere, e.g. the exhibitions rail) — more breathing
+   room above/below the vertically-centered meta/title block, which reads
+   as space under the title since that's the last line in the stack. */
+.gs-card-list .cx-row{ height: 50vh; }
+.gs-card-list-inner{ display: flex; flex-direction: column; height: 100%; overflow: hidden; position: relative; z-index: 2; }
 .gs-list-heading{
   /* Matches .gs-c-meta (the day/date/time line on the main hero cards) so
      "Also happening this week" reads at the same size as everything else
@@ -2126,6 +2147,8 @@ body.gs-reader-open{ overflow: hidden; }
   justify-content: center;
   height: 35vh;
   padding: 0 28px;
+  /* --- see .gs-card-list .cx-row below for the taller "Also happening
+     this week" variant --- */
   border-bottom: 2px solid currentColor;
   text-decoration: none;
   background: var(--cx-accent, transparent);
