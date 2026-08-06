@@ -1307,16 +1307,38 @@ function _gsEmptyCard(en, ar){
 // (renderWeekMode) — hoisted to module scope so both can use the exact same
 // markup/CSS (.cx-row) rather than keeping two copies in sync.
 function cxRow(pe, isPast, statusTag, suppressVideo){
-  const dateStr = pe.day ? `${pe.dow ? pe.dow + " " : ""}${parseInt(pe.day,10)} ${(MONTH_NAME_EN[pe.month]||'').slice(0,3)}` : '';
-  const dateArStr = pe.day ? `${pe.dowAr ? pe.dowAr + " " : ""}${arNum(parseInt(pe.day,10))} ${MONTH_NAME_AR[pe.month]||''}` : '';
+  // Exhibitions run over a range, not a single day — when the end date is
+  // genuinely different from the start date, show "13–20 AUG" (or
+  // "28 AUG – 3 SEP" across a month boundary) instead of just the opening
+  // date + time, so it's clear when the show comes down, not just when it
+  // opens. Anything without a distinct end date (a single-day exhibition,
+  // or any non-exhibition row) keeps the original single-date+time format.
+  const isRange = pe.type === 'Exhibition' && pe.endDay &&
+    (parseInt(pe.endDay,10) !== parseInt(pe.day,10) || (pe.endMonth||pe.month) !== pe.month || (pe.endYear && pe.year && pe.endYear !== pe.year));
+  let dateStr, dateArStr;
+  if (isRange){
+    const sameMonth = (pe.endMonth||pe.month) === pe.month;
+    dateStr = sameMonth
+      ? `${parseInt(pe.day,10)}–${parseInt(pe.endDay,10)} ${(MONTH_NAME_EN[pe.month]||'').slice(0,3)}`
+      : `${parseInt(pe.day,10)} ${(MONTH_NAME_EN[pe.month]||'').slice(0,3)} – ${parseInt(pe.endDay,10)} ${(MONTH_NAME_EN[pe.endMonth]||'').slice(0,3)}`;
+    dateArStr = sameMonth
+      ? `${arNum(parseInt(pe.day,10))}–${arNum(parseInt(pe.endDay,10))} ${MONTH_NAME_AR[pe.month]||''}`
+      : `${arNum(parseInt(pe.day,10))} ${MONTH_NAME_AR[pe.month]||''} – ${arNum(parseInt(pe.endDay,10))} ${MONTH_NAME_AR[pe.endMonth]||''}`;
+  } else {
+    dateStr = pe.day ? `${pe.dow ? pe.dow + " " : ""}${parseInt(pe.day,10)} ${(MONTH_NAME_EN[pe.month]||'').slice(0,3)}` : '';
+    dateArStr = pe.day ? `${pe.dowAr ? pe.dowAr + " " : ""}${arNum(parseInt(pe.day,10))} ${MONTH_NAME_AR[pe.month]||''}` : '';
+  }
   const _today = new Date(); _today.setHours(0,0,0,0);
   const isToday = !isPast && eventDateOnly(pe).getTime() === _today.getTime();
   // Single combined "type · date · time" line, matching .gs-c-meta on the
   // main hero cards, instead of a date line above the title and a time
   // line below it — type/time aren't localized here either, same as
   // .gs-c-meta (only the date portion has an actual EN/AR difference).
-  const metaEn = [pe.type, dateStr, pe.start].filter(Boolean).join(" · ");
-  const metaAr = [pe.type, dateArStr, pe.start].filter(Boolean).join(" · ");
+  // A ranged exhibition date drops the trailing opening-time — "13–20 AUG
+  // · 18:00" would misleadingly read as if the whole exhibition were only
+  // open at 18:00, rather than 18:00 being just the opening reception.
+  const metaEn = isRange ? [pe.type, dateStr].filter(Boolean).join(" · ") : [pe.type, dateStr, pe.start].filter(Boolean).join(" · ");
+  const metaAr = isRange ? [pe.type, dateArStr].filter(Boolean).join(" · ") : [pe.type, dateArStr, pe.start].filter(Boolean).join(" · ");
   // statusTag ("Upcoming"/"Past"/"Current") stays its own small bordered
   // badge, separate from the meta line — it's a status flag, not a date/
   // time/type fact.
