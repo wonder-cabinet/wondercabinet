@@ -853,8 +853,11 @@ function renderCurrentExhibitions(){
   const pastRowHtml = (!showingCurrent && past.length) ? cxRow(past[0], true, 'Past') : '';
   const upcomingRowHtml = upcoming.map(e => cxRow(e, false, 'Upcoming')).join('');
 
+  // Soonest first: the nearest upcoming exhibition is the relevant one to
+  // lead with, not the past fallback (which only ever shows at all when
+  // there's no current exhibition to feature up top already).
   const upcomingHtml = (pastRowHtml || upcomingRowHtml) ? `<div class="cx-upcoming">
-    <div class="cx-upcoming-rows">${pastRowHtml}${upcomingRowHtml}</div>
+    <div class="cx-upcoming-rows">${upcomingRowHtml}${pastRowHtml}</div>
   </div>` : '';
 
   list.innerHTML = mainUnitsHtml + upcomingHtml;
