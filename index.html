@@ -12,7 +12,7 @@
 <meta property="og:url" content="https://wondercabinet.space">
 <meta property="og:image" content="" id="og-image-meta">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="stylesheet" href="assets/app.css?v=94">
+<link rel="stylesheet" href="assets/app.css?v=95">
 </head>
 <body data-view="list">
 
@@ -682,11 +682,9 @@ function renderEventRow(e, day, isFirst){
     <a class="tl-row${isPast ? ' is-past' : ''}${isFirst ? ' tl-first' : ''}" href="event.html?id=${e.id}" data-ev="${e.id}">
       <div class="tl-date">
         ${isFirst && e.recurring ? `
-          <span class="tl-recur-mark">↻</span>
-          <span class="tl-dow">
-            <span class="en-only">${recurTagText}</span>
-            <span class="ar-only ar" dir="rtl">${recurTagTextAr}</span>
-          </span>
+          <span class="tl-recur-mark" title="${recurTagText}">↻</span>
+          <span class="tl-day">${e.day}</span>
+          <span class="tl-dow"><span class="en-only">${e.dow}</span><span class="ar-only ar">${e.dowAr}</span></span>
         ` : isFirst ? `
           <span class="tl-day">${e.day}</span>
           <span class="tl-dow"><span class="en-only">${e.dow}</span><span class="ar-only ar">${e.dowAr}</span></span>

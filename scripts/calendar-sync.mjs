@@ -738,7 +738,7 @@ async function fetchExistingEvents() {
     return JSON.parse(fs.readFileSync(SANITY_SNAPSHOT, "utf8"));
   }
   return sanityQuery(
-    '*[_type=="event"]{_id,title,slug,startDateTime,endDateTime,googleCalendarEventId,eventType,recurring,body,"relatedArtistRefs":relatedArtists[]._ref,calendarSyncTitleEn,calendarSyncTitleAr,calendarSyncBodyEn,calendarSyncBodyAr}'
+    '*[_type=="event"]{_id,title,slug,startDateTime,endDateTime,googleCalendarEventId,eventType,recurring,recurringBaseTitle,body,"relatedArtistRefs":relatedArtists[]._ref,calendarSyncTitleEn,calendarSyncTitleAr,calendarSyncBodyEn,calendarSyncBodyAr}'
   );
 }
 
@@ -980,8 +980,30 @@ async function main() {
         if (baseline !== calendarValue) patch[baselineField] = calendarValue;
       }
       if (!adopted) {
-        syncField(doc.title?.en, enTitle, "calendarSyncTitleEn", "title.en");
-        syncField(doc.title?.ar, arTitle, "calendarSyncTitleAr", "title.ar");
+        // Recurring master rollover: when this run is advancing the master
+        // to a genuinely new occurrence (patch.startDateTime just got set
+        // above), reset the title back to the show's generic default —
+        // recurringBaseTitle, set once by the editor in Studio — instead of
+        // running the normal calendar-vs-baseline title sync. Otherwise a
+        // guest name added by hand for one episode (e.g. "NTS x Wonder
+        // Cabinet w/ Busher Kanj") sticks around forever: the calendar's own
+        // SUMMARY for this recurring series never actually changes week to
+        // week (editors add the guest name directly in Studio, not on the
+        // calendar), so the ordinary hand-edit-protection guard below would
+        // otherwise treat it as a deliberate edit and never revert it, even
+        // long after that guest's episode has aired (reported 2026-08-11).
+        // The editor can then hand-edit Title again for the next confirmed
+        // guest; that sticks until the following rollover.
+        const isRollover = doc.recurring && !!patch.startDateTime;
+        if (isRollover && doc.recurringBaseTitle && doc.recurringBaseTitle.en) {
+          if (doc.title?.en !== doc.recurringBaseTitle.en) patch["title.en"] = doc.recurringBaseTitle.en;
+          if (doc.recurringBaseTitle.ar && doc.title?.ar !== doc.recurringBaseTitle.ar) patch["title.ar"] = doc.recurringBaseTitle.ar;
+          patch.calendarSyncTitleEn = doc.recurringBaseTitle.en;
+          if (doc.recurringBaseTitle.ar) patch.calendarSyncTitleAr = doc.recurringBaseTitle.ar;
+        } else {
+          syncField(doc.title?.en, enTitle, "calendarSyncTitleEn", "title.en");
+          syncField(doc.title?.ar, arTitle, "calendarSyncTitleAr", "title.ar");
+        }
         syncField(doc.body?.en, enBody, "calendarSyncBodyEn", "body.en");
         syncField(doc.body?.ar, arBody, "calendarSyncBodyAr", "body.ar");
       }

@@ -87,6 +87,13 @@ export const event = defineType({
     defineField({name: 'recurring', title: 'Recurring', type: 'boolean', initialValue: false}),
     defineField({name: 'recurringLabel', title: 'Recurring label', type: 'localeString', description: 'e.g. "Every Tuesday"'}),
     defineField({
+      name: 'recurringBaseTitle',
+      title: 'Default title (recurring)',
+      description: 'Only used for recurring events. The show\'s generic name (e.g. "NTS x Wonder Cabinet"), with no specific guest/episode in it. Every time the calendar sync advances this event to its next occurrence, the Title field above is automatically reset back to this — so a guest name you added for one episode doesn\'t linger on the listing after that episode has aired. Set this once; then edit Title by hand for each upcoming episode\'s guest as it\'s confirmed.',
+      type: 'localeString',
+      hidden: ({document}) => !(document as any)?.recurring,
+    }),
+    defineField({
       name: 'status',
       title: 'Status',
       type: 'string',
