@@ -977,7 +977,23 @@ async function main() {
         const baseline = hasBaseline ? doc[baselineField] : currentValue;
         const untouchedSinceLastSync = hasBaseline && currentValue === baseline;
         if (untouchedSinceLastSync && currentValue !== calendarValue) patch[setPath] = calendarValue;
-        if (baseline !== calendarValue) patch[baselineField] = calendarValue;
+        // Persisted baseline: once actually tracked (hasBaseline), always
+        // advance to the calendar's current value, same as before. On the
+        // FIRST run (no baseline yet), persist the field's CURRENT value —
+        // not the calendar's — as the starting baseline, matching the
+        // comment above ("starts being tracked from its current Studio
+        // value"). The previous code persisted calendarValue here even on
+        // the first run, which silently mismatched forever on any doc
+        // whose Studio field was empty/different at that moment (e.g. body
+        // was null pre-sync, calendar had real text) — the baseline field
+        // ended up holding the calendar's text while the visible field
+        // stayed null, and since they could now never equal each other,
+        // every future run treated it as a permanent hand-edit and refused
+        // to ever apply the calendar's (or any later) update. Confirmed
+        // bug via "Live Show: ABUL3EES" (2026-08-13): body stuck null on
+        // the site despite calendarSyncBodyEn/Ar already holding real text.
+        const newBaseline = hasBaseline ? calendarValue : (baseline ?? null);
+        if (doc[baselineField] !== newBaseline) patch[baselineField] = newBaseline;
       }
       if (!adopted) {
         // Recurring master rollover: when this run is advancing the master
