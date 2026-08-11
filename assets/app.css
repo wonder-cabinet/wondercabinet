@@ -1757,10 +1757,22 @@ html[data-lang="ar"] .ar-only{ direction: rtl; }
 .gs-has-issue-bg .gs-card:not(.gs-card-video):not(.gs-card-img) .cx-row-meta,
 .gs-has-issue-bg .gs-card:not(.gs-card-video):not(.gs-card-img) .cx-row-title{ color: #f6f3ea; }
 .gs-has-issue-bg .gs-card:not(.gs-card-video):not(.gs-card-img) .cx-row-status{ color: #f6f3ea; border-color: #f6f3ea; }
-/* Poster-driven accent: swaps the site's --ink (and everything already
-   derived from it — borders, nav link color/hover, --gs-fg) for the cover
-   image's own dominant color, scoped to just the topbar and this rail so
-   the rest of the site keeps its normal royal blue. */
+/* Divider lines: same white as the light text over the shared image —
+   the normal royal-blue borders read poorly against a photo, and (unlike
+   the text, which needed switching per-card) every divider in this section
+   can just go white uniformly, card-with-its-own-image or not. */
+.gs-has-issue-bg,
+.gs-has-issue-bg .gs-rail,
+.gs-has-issue-bg .gs-card,
+.topbar.gs-has-issue-bg{
+  border-color: #f6f3ea;
+}
+/* Poster-driven accent: swaps the site's --ink (and everything else already
+   derived from it, like nav link color/hover) for the cover image's own
+   dominant color, scoped to just the topbar and this rail so the rest of
+   the site keeps its normal royal blue. Borders stay white (above), not
+   accent-colored — that read better in testing than a colored line against
+   a busy photo. */
 .gs-has-issue-theme{ --ink: var(--gs-issue-accent, var(--ink)); }
 .gs-kicker{ font-family: var(--ff-sans); font-size: 11px; letter-spacing: 0; text-transform: uppercase; font-weight: 700; opacity: 1; }
 .gs-range{ font-family: var(--ff-sans); font-size: clamp(28px, 2.8vw, 42px); font-weight: 700; line-height: 1; letter-spacing: 0; }
