@@ -12,7 +12,7 @@
 <meta property="og:url" content="https://wondercabinet.space">
 <meta property="og:image" content="" id="og-image-meta">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="stylesheet" href="assets/app.css?v=97">
+<link rel="stylesheet" href="assets/app.css?v=98">
 </head>
 <body data-view="list">
 
@@ -2827,12 +2827,38 @@ function renderFeatured(){
     // shown as a shared background behind the whole rail — the intro text
     // sidebar, and any hero card that doesn't already have its own video or
     // cover image. Cards that DO have their own video/img keep that,
-    // unaffected (see .gs-card-video/.gs-card-img in _gsEventCard).
+    // unaffected (see .gs-card-video/.gs-card-img in _gsEventCard). Also
+    // extended up into the topbar, using a viewport-fixed background
+    // (background-attachment:fixed, same image/size/position on both
+    // elements — see .gs-has-issue-bg in app.css) so the two independently
+    // sticky boxes read as one continuous backdrop instead of a hard seam.
+    // When the cover has a usable palette, the site's royal-blue accent
+    // (--ink, which every border/link color in this section already
+    // derives from) is swapped for the poster's own dominant color, scoped
+    // to just the topbar + this rail — same "theme off the artwork" idea
+    // already used for the exhibitions rail's --cx-accent.
+    const topbarEl = document.querySelector(".topbar");
     if (issue && issue.cover){
       sticky.style.setProperty("--gs-issue-bg", `url("${issue.cover}")`);
       sticky.classList.add("gs-has-issue-bg");
+      if (topbarEl){
+        topbarEl.style.setProperty("--gs-issue-bg", `url("${issue.cover}")`);
+        topbarEl.classList.add("gs-has-issue-bg");
+      }
+      if (issue.coverPalette){
+        sticky.style.setProperty("--gs-issue-accent", issue.coverPalette.bg);
+        sticky.classList.add("gs-has-issue-theme");
+        if (topbarEl){
+          topbarEl.style.setProperty("--gs-issue-accent", issue.coverPalette.bg);
+          topbarEl.classList.add("gs-has-issue-theme");
+        }
+      } else {
+        sticky.classList.remove("gs-has-issue-theme");
+        if (topbarEl) topbarEl.classList.remove("gs-has-issue-theme");
+      }
     } else {
-      sticky.classList.remove("gs-has-issue-bg");
+      sticky.classList.remove("gs-has-issue-bg", "gs-has-issue-theme");
+      if (topbarEl) topbarEl.classList.remove("gs-has-issue-bg", "gs-has-issue-theme");
     }
     kicker.innerHTML = `<span class="en-only">This week</span><span class="ar-only ar" dir="rtl">هذا الأسبوع</span>`;
     range.innerHTML = `<span class="en-only">${start.getDate()}—${end.getDate()} ${MONTH_NAME_EN[MABBR_G[end.getMonth()]]}</span><span class="ar-only ar" dir="rtl">${arNum(start.getDate())}—${arNum(end.getDate())} ${MONTH_NAME_AR[MABBR_G[end.getMonth()]]}</span>`;
@@ -3153,7 +3179,7 @@ async function _boot(){
       "projects": *[_type == "project"] | order(year desc) { title, "slug": slug.current, description, year, coverImage },
       "residencies": *[_type == "residency"] | order(year desc) { title, "slug": slug.current, description, year, coverImage },
       "settings": *[_type == "siteSettings"][0]{ ogImage },
-      "issues": *[_type == "weeklyIssue"] | order(weekStart desc){ title, description, weekStart, weekEnd, cover, "eventIds": events[]->slug.current, "secondaryEventIds": secondaryEvents[]->slug.current, eventsAutoAssigned, "secondaryFeaturedVideo": secondaryFeaturedVideo->slug.current }
+      "issues": *[_type == "weeklyIssue"] | order(weekStart desc){ title, description, weekStart, weekEnd, cover, "coverPalette": cover.asset->metadata.palette, "eventIds": events[]->slug.current, "secondaryEventIds": secondaryEvents[]->slug.current, eventsAutoAssigned, "secondaryFeaturedVideo": secondaryFeaturedVideo->slug.current }
     }`);
     const res = await fetch(`https://xdtj605l.api.sanity.io/v2024-01-01/data/query/production?query=${q}`);
     const { result } = await res.json();
@@ -3272,6 +3298,7 @@ async function _boot(){
       // ambient theme image (see renderWeekMode()), not just the future
       // archive flip-through view it was originally meant for.
       cover: _sanityImg(doc.cover),
+      coverPalette: _pickPalette(doc.coverPalette),
       // Present (as an array, possibly empty) once calendar-sync.mjs has
       // auto-assigned this issue's events at least once — see
       // studio/schemas/weeklyIssue.ts and the weekly-issue pass in

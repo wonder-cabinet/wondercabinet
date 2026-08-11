@@ -1727,6 +1727,20 @@ html[data-lang="ar"] .ar-only{ direction: rtl; }
   background-size: cover;
   background-position: center;
 }
+/* Topbar variant: same image, but pinned to the viewport (not the topbar's
+   own small 54px box) via background-attachment:fixed, with the identical
+   size/position as the rail's copy below — the two boxes then act as
+   windows onto one shared, continuous backdrop instead of each cropping
+   the image independently and creating a seam at the shared edge. A
+   multiply-blended dark tint keeps the nav legible over whatever's there. */
+.topbar.gs-has-issue-bg{
+  background-image: var(--gs-issue-bg);
+  background-size: cover;
+  background-position: center top;
+  background-attachment: fixed;
+  background-color: rgba(10,10,22,.4);
+  background-blend-mode: multiply;
+}
 .gs-has-issue-bg .gs-rail{
   background: rgba(10,10,22,.62);
   --gs-fg: #f6f3ea;
@@ -1738,7 +1752,16 @@ html[data-lang="ar"] .ar-only{ direction: rtl; }
 .gs-has-issue-bg .gs-card:not(.gs-card-video):not(.gs-card-img) .gs-c-meta,
 .gs-has-issue-bg .gs-card:not(.gs-card-video):not(.gs-card-img) .gs-c-title,
 .gs-has-issue-bg .gs-card:not(.gs-card-video):not(.gs-card-img) .gs-c-desc,
-.gs-has-issue-bg .gs-card:not(.gs-card-video):not(.gs-card-img) .gs-c-cta{ color: #f6f3ea; }
+.gs-has-issue-bg .gs-card:not(.gs-card-video):not(.gs-card-img) .gs-c-cta,
+.gs-has-issue-bg .gs-card:not(.gs-card-video):not(.gs-card-img) .gs-list-heading,
+.gs-has-issue-bg .gs-card:not(.gs-card-video):not(.gs-card-img) .cx-row-meta,
+.gs-has-issue-bg .gs-card:not(.gs-card-video):not(.gs-card-img) .cx-row-title{ color: #f6f3ea; }
+.gs-has-issue-bg .gs-card:not(.gs-card-video):not(.gs-card-img) .cx-row-status{ color: #f6f3ea; border-color: #f6f3ea; }
+/* Poster-driven accent: swaps the site's --ink (and everything already
+   derived from it — borders, nav link color/hover, --gs-fg) for the cover
+   image's own dominant color, scoped to just the topbar and this rail so
+   the rest of the site keeps its normal royal blue. */
+.gs-has-issue-theme{ --ink: var(--gs-issue-accent, var(--ink)); }
 .gs-kicker{ font-family: var(--ff-sans); font-size: 11px; letter-spacing: 0; text-transform: uppercase; font-weight: 700; opacity: 1; }
 .gs-range{ font-family: var(--ff-sans); font-size: clamp(28px, 2.8vw, 42px); font-weight: 700; line-height: 1; letter-spacing: 0; }
 .gs-count{ font-family: var(--ff-sans); font-size: 14px; opacity: .7; }
