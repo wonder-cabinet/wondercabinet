@@ -1778,6 +1778,18 @@ html[data-lang="ar"] .ar-only{ direction: rtl; }
 .topbar.gs-has-issue-bg .lang-toggle button{ color: #f6f3ea; }
 .topbar.gs-has-issue-bg .logo{ background-color: #f6f3ea; }
 .topbar.gs-has-issue-bg .tpb-nav a:hover{ background: #f6f3ea; color: #0a0a16; }
+/* The topbar's own top/bottom edge already goes white via the border-color
+   rule above (.topbar.gs-has-issue-bg is included there) — but the
+   dividers BETWEEN the logo/nav items/language toggle are each declared on
+   their own child element (.tpb-logo, .tpb-nav a, .lang-toggle), not
+   inherited from .topbar's border, so they need their own override too. */
+.topbar.gs-has-issue-bg .tpb-logo,
+.topbar.gs-has-issue-bg .tpb-back,
+.topbar.gs-has-issue-bg .tpb-nav a,
+.topbar.gs-has-issue-bg .tpb-nav .lang-toggle,
+.topbar.gs-has-issue-bg .tpb-nav .lang-toggle button,
+.topbar.gs-has-issue-bg .lang-toggle,
+.topbar.gs-has-issue-bg .lang-toggle button{ border-color: #f6f3ea; }
 .gs-kicker{ font-family: var(--ff-sans); font-size: 11px; letter-spacing: 0; text-transform: uppercase; font-weight: 700; opacity: 1; }
 .gs-range{ font-family: var(--ff-sans); font-size: clamp(28px, 2.8vw, 42px); font-weight: 700; line-height: 1; letter-spacing: 0; }
 .gs-count{ font-family: var(--ff-sans); font-size: 14px; opacity: .7; }
