@@ -12,7 +12,7 @@
 <meta property="og:url" content="https://wondercabinet.space">
 <meta property="og:image" content="" id="og-image-meta">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="stylesheet" href="assets/app.css?v=95">
+<link rel="stylesheet" href="assets/app.css?v=96">
 </head>
 <body data-view="list">
 
@@ -1271,13 +1271,21 @@ function _gsHasElapsed(ev){
 function _gsEventCard(ev){
   const typeAr = TYPE_AR[ev.type] || ev.type;
   const videoSrc = _gsCardVideo(ev);
+  // Cover-image background: the same full-bleed treatment as the video
+  // background above, for whatever doesn't have a content video uploaded —
+  // so the This Week rail's theme/mood comes from each event's own poster
+  // (like the exhibition cards already did via their video) instead of
+  // falling back to a flat color block. Video still wins when both exist;
+  // a cover image is the fallback, not layered under a video.
+  const imgSrc = !videoSrc ? (ev.cover || "") : "";
   const _today = new Date(); _today.setHours(0,0,0,0);
   const isToday = eventDateOnly(ev).getTime() === _today.getTime();
   const elapsed = _gsHasElapsed(ev);
-  return `<a class="gs-card${videoSrc ? " gs-card-video" : ""}${isToday ? " gs-card-today" : ""}${elapsed ? " gs-card-elapsed" : ""}" href="event.html?id=${ev.id}" data-ev="${ev.id}">
+  return `<a class="gs-card${videoSrc ? " gs-card-video" : ""}${imgSrc ? " gs-card-img" : ""}${isToday ? " gs-card-today" : ""}${elapsed ? " gs-card-elapsed" : ""}" href="event.html?id=${ev.id}" data-ev="${ev.id}">
     ${isToday ? `<div class="gs-c-today-label"><span class="en-only">Today</span><span class="ar-only ar" dir="rtl">اليوم</span></div>` : ""}
     ${elapsed ? `<div class="gs-c-elapsed-label"><span class="en-only">Took place</span><span class="ar-only ar" dir="rtl">حدثت بالفعل</span></div>` : ""}
     ${videoSrc ? `<video class="gs-card-bg-video" autoplay muted loop playsinline preload="auto" src="${videoSrc}"></video><div class="gs-card-scrim"></div>` : ""}
+    ${imgSrc ? `<img class="gs-card-bg-img" src="${imgSrc}" alt="" loading="lazy"><div class="gs-card-scrim"></div>` : ""}
     ${_gsPlayButton(ev)}
     <div class="gs-card-inner">
       <div class="gs-c-meta">

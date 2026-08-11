@@ -1785,12 +1785,17 @@ html[data-lang="ar"] .gs-c-elapsed-label{ right: auto; left: 0; }
 }
 .gs-card-empty .gs-card-inner{ justify-content: center; }
 .gs-card-empty{ opacity: .8; }
-.gs-card-bg-video{ position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; }
+.gs-card-bg-video,
+.gs-card-bg-img{ position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; }
 .gs-card-scrim{ position: absolute; inset: 0; background: rgba(10,10,22,.55); z-index: 1; }
 .gs-card-video .gs-c-meta,
 .gs-card-video .gs-c-title,
 .gs-card-video .gs-c-desc,
-.gs-card-video .gs-c-cta{ color: #f6f3ea; }
+.gs-card-video .gs-c-cta,
+.gs-card-img .gs-c-meta,
+.gs-card-img .gs-c-title,
+.gs-card-img .gs-c-desc,
+.gs-card-img .gs-c-cta{ color: #f6f3ea; }
 .gs-c-meta{ font-family: var(--ff-sans); font-size: 22px; letter-spacing: 0; text-transform: uppercase; font-weight: 700; opacity: 1; }
 .gs-c-today-label{
   font-family: var(--ff-sans); font-size: 13px; font-weight: 700;
@@ -1943,11 +1948,13 @@ html[data-lang="ar"] .gs-list-heading{ text-align: right; }
    reads as one heading morphing into the bigger one, not a hard cut. */
 .gs-card-inner,
 .gs-card-bg-video,
+.gs-card-bg-img,
 .gs-card-scrim,
 .gs-card-list-inner{ transition: opacity .4s ease; }
 .gs-card-open .gs-c-desc,
 .gs-card-open .gs-c-cta{ transition: opacity .25s ease; opacity: 0; pointer-events: none; }
 .gs-card-reading .gs-card-bg-video,
+.gs-card-reading .gs-card-bg-img,
 .gs-card-reading .gs-card-scrim,
 .gs-card-reading .gs-card-inner,
 .gs-card-reading .gs-card-list-inner{ opacity: 0; pointer-events: none; }
