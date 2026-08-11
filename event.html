@@ -251,8 +251,13 @@
           month: ps ? MABBR[ps.getMonth()] : '',
           monthFull: ps ? MFULL[ps.getMonth()] : '',
           start: ps && (ps.getHours()||ps.getMinutes()) ? ps.toTimeString().slice(0,5) : '',
+          // Sort key only — soonest first. GROQ's programmeEvents[]-> preserves
+          // whichever order the refs happen to sit in in Studio, not date
+          // order, so without this a manually-reordered (or just differently
+          // added) reference list can render latest-first.
+          _ts: ps ? ps.getTime() : Infinity,
         };
-      }),
+      }).sort((a, b) => a._ts - b._ts),
     };
   }
 
