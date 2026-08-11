@@ -1767,13 +1767,17 @@ html[data-lang="ar"] .ar-only{ direction: rtl; }
 .topbar.gs-has-issue-bg{
   border-color: #f6f3ea;
 }
-/* Poster-driven accent: swaps the site's --ink (and everything else already
-   derived from it, like nav link color/hover) for the cover image's own
-   dominant color, scoped to just the topbar and this rail so the rest of
-   the site keeps its normal royal blue. Borders stay white (above), not
-   accent-colored — that read better in testing than a colored line against
-   a busy photo. */
-.gs-has-issue-theme{ --ink: var(--gs-issue-accent, var(--ink)); }
+/* Topbar text/logo over the shared image: explicit white, not the poster's
+   own accent color. An earlier version swapped --ink (which the logo's
+   mask-based fill also derives from) for the accent — on a pale/light
+   accent this made the logo blend invisibly into the similarly-toned
+   image behind it. White guarantees contrast regardless of what the
+   poster's dominant color happens to be. */
+.topbar.gs-has-issue-bg .tpb-logo,
+.topbar.gs-has-issue-bg .tpb-nav a,
+.topbar.gs-has-issue-bg .lang-toggle button{ color: #f6f3ea; }
+.topbar.gs-has-issue-bg .logo{ background-color: #f6f3ea; }
+.topbar.gs-has-issue-bg .tpb-nav a:hover{ background: #f6f3ea; color: #0a0a16; }
 .gs-kicker{ font-family: var(--ff-sans); font-size: 11px; letter-spacing: 0; text-transform: uppercase; font-weight: 700; opacity: 1; }
 .gs-range{ font-family: var(--ff-sans); font-size: clamp(28px, 2.8vw, 42px); font-weight: 700; line-height: 1; letter-spacing: 0; }
 .gs-count{ font-family: var(--ff-sans); font-size: 14px; opacity: .7; }

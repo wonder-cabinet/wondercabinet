@@ -12,7 +12,7 @@
 <meta property="og:url" content="https://wondercabinet.space">
 <meta property="og:image" content="" id="og-image-meta">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="stylesheet" href="assets/app.css?v=99">
+<link rel="stylesheet" href="assets/app.css?v=100">
 </head>
 <body data-view="list">
 
@@ -2832,11 +2832,12 @@ function renderFeatured(){
     // (background-attachment:fixed, same image/size/position on both
     // elements — see .gs-has-issue-bg in app.css) so the two independently
     // sticky boxes read as one continuous backdrop instead of a hard seam.
-    // When the cover has a usable palette, the site's royal-blue accent
-    // (--ink, which every border/link color in this section already
-    // derives from) is swapped for the poster's own dominant color, scoped
-    // to just the topbar + this rail — same "theme off the artwork" idea
-    // already used for the exhibitions rail's --cx-accent.
+    // Text/logo/borders in both go a fixed white rather than the poster's
+    // own accent color — an earlier version swapped --ink (which the
+    // logo's mask-fill also derives from) for the palette color, which on
+    // a pale poster made the logo blend invisibly into the similarly-toned
+    // image behind it. White guarantees contrast no matter what the cover
+    // looks like.
     const topbarEl = document.querySelector(".topbar");
     if (issue && issue.cover){
       sticky.style.setProperty("--gs-issue-bg", `url("${issue.cover}")`);
@@ -2845,20 +2846,9 @@ function renderFeatured(){
         topbarEl.style.setProperty("--gs-issue-bg", `url("${issue.cover}")`);
         topbarEl.classList.add("gs-has-issue-bg");
       }
-      if (issue.coverPalette){
-        sticky.style.setProperty("--gs-issue-accent", issue.coverPalette.bg);
-        sticky.classList.add("gs-has-issue-theme");
-        if (topbarEl){
-          topbarEl.style.setProperty("--gs-issue-accent", issue.coverPalette.bg);
-          topbarEl.classList.add("gs-has-issue-theme");
-        }
-      } else {
-        sticky.classList.remove("gs-has-issue-theme");
-        if (topbarEl) topbarEl.classList.remove("gs-has-issue-theme");
-      }
     } else {
-      sticky.classList.remove("gs-has-issue-bg", "gs-has-issue-theme");
-      if (topbarEl) topbarEl.classList.remove("gs-has-issue-bg", "gs-has-issue-theme");
+      sticky.classList.remove("gs-has-issue-bg");
+      if (topbarEl) topbarEl.classList.remove("gs-has-issue-bg");
     }
     kicker.innerHTML = `<span class="en-only">This week</span><span class="ar-only ar" dir="rtl">هذا الأسبوع</span>`;
     range.innerHTML = `<span class="en-only">${start.getDate()}—${end.getDate()} ${MONTH_NAME_EN[MABBR_G[end.getMonth()]]}</span><span class="ar-only ar" dir="rtl">${arNum(start.getDate())}—${arNum(end.getDate())} ${MONTH_NAME_AR[MABBR_G[end.getMonth()]]}</span>`;
