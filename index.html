@@ -12,7 +12,7 @@
 <meta property="og:url" content="https://wondercabinet.space">
 <meta property="og:image" content="" id="og-image-meta">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="stylesheet" href="assets/app.css?v=96">
+<link rel="stylesheet" href="assets/app.css?v=97">
 </head>
 <body data-view="list">
 
@@ -2823,6 +2823,17 @@ function renderFeatured(){
       : _gsWeekEvents(start);
     sticky.style.setProperty("--gs-bg", "var(--paper)");
     sticky.style.setProperty("--gs-fg", "var(--ink)");
+    // Ambient theme image: the weeklyIssue's cover (Studio: "Issue cover"),
+    // shown as a shared background behind the whole rail — the intro text
+    // sidebar, and any hero card that doesn't already have its own video or
+    // cover image. Cards that DO have their own video/img keep that,
+    // unaffected (see .gs-card-video/.gs-card-img in _gsEventCard).
+    if (issue && issue.cover){
+      sticky.style.setProperty("--gs-issue-bg", `url("${issue.cover}")`);
+      sticky.classList.add("gs-has-issue-bg");
+    } else {
+      sticky.classList.remove("gs-has-issue-bg");
+    }
     kicker.innerHTML = `<span class="en-only">This week</span><span class="ar-only ar" dir="rtl">هذا الأسبوع</span>`;
     range.innerHTML = `<span class="en-only">${start.getDate()}—${end.getDate()} ${MONTH_NAME_EN[MABBR_G[end.getMonth()]]}</span><span class="ar-only ar" dir="rtl">${arNum(start.getDate())}—${arNum(end.getDate())} ${MONTH_NAME_AR[MABBR_G[end.getMonth()]]}</span>`;
     // Count must include secondary ("Also happening this week") events too,
@@ -3142,7 +3153,7 @@ async function _boot(){
       "projects": *[_type == "project"] | order(year desc) { title, "slug": slug.current, description, year, coverImage },
       "residencies": *[_type == "residency"] | order(year desc) { title, "slug": slug.current, description, year, coverImage },
       "settings": *[_type == "siteSettings"][0]{ ogImage },
-      "issues": *[_type == "weeklyIssue"] | order(weekStart desc){ title, description, weekStart, weekEnd, "eventIds": events[]->slug.current, "secondaryEventIds": secondaryEvents[]->slug.current, eventsAutoAssigned, "secondaryFeaturedVideo": secondaryFeaturedVideo->slug.current }
+      "issues": *[_type == "weeklyIssue"] | order(weekStart desc){ title, description, weekStart, weekEnd, cover, "eventIds": events[]->slug.current, "secondaryEventIds": secondaryEvents[]->slug.current, eventsAutoAssigned, "secondaryFeaturedVideo": secondaryFeaturedVideo->slug.current }
     }`);
     const res = await fetch(`https://xdtj605l.api.sanity.io/v2024-01-01/data/query/production?query=${q}`);
     const { result } = await res.json();
@@ -3256,6 +3267,11 @@ async function _boot(){
       descAr:  doc.description?.ar || '',
       weekStart: doc.weekStart || '',
       weekEnd:   doc.weekEnd || '',
+      // Was defined in the schema but never actually used ("Not used yet"
+      // per its own description) — now doubles as the This Week rail's
+      // ambient theme image (see renderWeekMode()), not just the future
+      // archive flip-through view it was originally meant for.
+      cover: _sanityImg(doc.cover),
       // Present (as an array, possibly empty) once calendar-sync.mjs has
       // auto-assigned this issue's events at least once — see
       // studio/schemas/weeklyIssue.ts and the weekly-issue pass in

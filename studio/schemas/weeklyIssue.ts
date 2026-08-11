@@ -30,7 +30,7 @@ export const weeklyIssue = defineType({
     defineField({
       name: 'cover',
       title: 'Issue cover',
-      description: 'For the future archive view — flip-through featured issues. Not used yet.',
+      description: 'Shown as the ambient background behind this week\'s "This week" rail on the homepage — the intro-text sidebar and any hero card that doesn\'t already have its own video/cover image. Optional; leave blank for the normal flat background. (Also intended for a future archive flip-through view.)',
       type: 'image',
       options: {hotspot: true},
     }),

@@ -1716,6 +1716,29 @@ html[data-lang="ar"] .ar-only{ direction: rtl; }
   background: var(--gs-bg); color: var(--gs-fg); position: relative; z-index: 2;
   transition: background .35s ease, color .35s ease, border-color .35s ease;
 }
+/* Weekly-issue ambient theme image (Studio: weeklyIssue "Issue cover") —
+   shown behind the whole rail whenever one's set for the current week, with
+   the intro-text sidebar and any card that doesn't already have its own
+   video/cover image (see .gs-card-video/.gs-card-img) tinted with a dark
+   scrim over it instead of their normal flat backgrounds, so the theme reads
+   through everywhere there isn't already other imagery competing with it. */
+.gs-has-issue-bg{
+  background-image: var(--gs-issue-bg);
+  background-size: cover;
+  background-position: center;
+}
+.gs-has-issue-bg .gs-rail{
+  background: rgba(10,10,22,.62);
+  --gs-fg: #f6f3ea;
+}
+.gs-has-issue-bg .gs-theme-highlight{ color: var(--ink); }
+.gs-has-issue-bg .gs-card:not(.gs-card-video):not(.gs-card-img){
+  background: rgba(10,10,22,.5);
+}
+.gs-has-issue-bg .gs-card:not(.gs-card-video):not(.gs-card-img) .gs-c-meta,
+.gs-has-issue-bg .gs-card:not(.gs-card-video):not(.gs-card-img) .gs-c-title,
+.gs-has-issue-bg .gs-card:not(.gs-card-video):not(.gs-card-img) .gs-c-desc,
+.gs-has-issue-bg .gs-card:not(.gs-card-video):not(.gs-card-img) .gs-c-cta{ color: #f6f3ea; }
 .gs-kicker{ font-family: var(--ff-sans); font-size: 11px; letter-spacing: 0; text-transform: uppercase; font-weight: 700; opacity: 1; }
 .gs-range{ font-family: var(--ff-sans); font-size: clamp(28px, 2.8vw, 42px); font-weight: 700; line-height: 1; letter-spacing: 0; }
 .gs-count{ font-family: var(--ff-sans); font-size: 14px; opacity: .7; }
