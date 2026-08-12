@@ -1870,6 +1870,14 @@ html[data-lang="ar"] .gs-c-elapsed-label{ right: auto; left: 0; }
 .gs-card-img .gs-c-title,
 .gs-card-img .gs-c-desc,
 .gs-card-img .gs-c-cta{ color: #f6f3ea; }
+/* TODAY badge / play button over a photo or video card: these read
+   var(--gs-fg), which is the site's ink blue by default — illegible-ish
+   and inconsistent against a photo. Force the same guaranteed-contrast
+   white used for the text above, with dark ink text on top of it. */
+.gs-card-video .gs-c-today-label,
+.gs-card-img .gs-c-today-label,
+.gs-card-video .gs-c-play,
+.gs-card-img .gs-c-play{ background: #f6f3ea; color: #0a0a16; }
 .gs-c-meta{ font-family: var(--ff-sans); font-size: 22px; letter-spacing: 0; text-transform: uppercase; font-weight: 700; opacity: 1; }
 .gs-c-today-label{
   font-family: var(--ff-sans); font-size: 13px; font-weight: 700;
