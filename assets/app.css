@@ -2277,8 +2277,13 @@ body.gs-reader-open{ overflow: hidden; }
 /* Today's row in a compact list (Also happening this week / exhibitions
    rail) — same "fully bordered" highlight as .gs-card-today, scaled down
    for the row's shallower height. box-sizing:border-box on .cx-row keeps
-   this from changing the row's total height. */
-.cx-row-today{ border: 4px solid currentColor; }
+   this from changing the row's total height. Explicit white rather than
+   currentColor: .cx-row's color/border can come from that row's own
+   poster palette (--cx-ink, see below) or the weekly-issue background
+   theme, both of which can land on a tone that disappears against a
+   photo — the TODAY highlight itself should always read clearly no
+   matter what the row's own theming resolves to. */
+.cx-row-today{ border: 4px solid #f6f3ea; }
 /* Background video on a row — same idea as .gs-card-bg-video/.gs-card-scrim
    on the main hero cards, just fitted to a row's shallower box. .cx-row
    already has position:relative;overflow:hidden (see above), so this only
