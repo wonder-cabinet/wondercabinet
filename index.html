@@ -12,7 +12,7 @@
 <meta property="og:url" content="https://wondercabinet.space">
 <meta property="og:image" content="" id="og-image-meta">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="stylesheet" href="assets/app.css?v=107">
+<link rel="stylesheet" href="assets/app.css?v=108">
 </head>
 <body data-view="list">
 
@@ -1451,6 +1451,19 @@ function _gsHardReset(){
   _gsReaderOpen = false;
   window.dispatchEvent(new Event("resize"));
 }
+// Back/forward navigation while a reader is open restores the page from
+// the browser's bfcache — the ENTIRE JS state (including _gsReaderOpen
+// still true, document.body still position:fixed at the old scroll
+// offset, a stale .gs-card-frame iframe) comes back frozen exactly as it
+// was, not reset. That looks like a locked/blank page (fixed positioning
+// pinned to wherever the reader had scrolled to) and further clicks do
+// nothing (the open-reader guards see _gsReaderOpen already true) —
+// reported as "clicked twice and back and it broke". event.persisted is
+// true specifically for a bfcache restore (false for an ordinary fresh
+// load, where none of this teardown is needed or wanted).
+window.addEventListener("pageshow", function(e){
+  if (e.persisted) _gsHardReset();
+});
 /* ---------- CX POSTER IN-GRID READER ----------
    Clicking the exhibition poster grows it rightward over the rail,
    same wheel-driven/reversible expansion as _gsOpenReader but
