@@ -1488,7 +1488,19 @@ function _cxOpenReader(posterEl){
   document.body.style.right = '0';
   document.body.classList.add('gs-reader-open');
 
-  posterEl.classList.add('gs-card-open');
+  // .gs-card-frame (the iframe below) is opacity:0 by default in CSS —
+  // every other reader flips it visible by also adding "gs-card-reading"
+  // (see .gs-card-reading .gs-card-frame{opacity:1} in app.css), but this
+  // poster reader only ever added "gs-card-open", never "gs-card-reading".
+  // Net effect: the iframe was rendering (and even scrolling — confirmed
+  // via contentWindow.scrollY while debugging) completely invisibly the
+  // entire time: opening the exhibition poster never showed anything but
+  // its own static thumbnail image/title, never the actual event page
+  // (hero image, description, programme) underneath. No other CSS rule
+  // scoped to .gs-card-reading matches anything else inside .cx-poster
+  // (they all target .gs-card-* element classes the poster doesn't use),
+  // so adding it here only does the one thing it needs to.
+  posterEl.classList.add('gs-card-open', 'gs-card-reading');
   const frame = document.createElement('iframe');
   frame.className = 'gs-card-frame';
   frame.title = 'Exhibition';
@@ -1599,7 +1611,7 @@ function _cxOpenReader(posterEl){
     if (!instant){ animateOnce(); apply(0); }
     setTimeout(function(){
       frame.remove();
-      posterEl.classList.remove('gs-card-open');
+      posterEl.classList.remove('gs-card-open', 'gs-card-reading');
       posterEl.style.flexBasis = '';
       document.body.style.position = '';
       document.body.style.top = '';
