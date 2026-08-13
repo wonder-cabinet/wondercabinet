@@ -12,7 +12,7 @@
 <meta property="og:url" content="https://wondercabinet.space">
 <meta property="og:image" content="" id="og-image-meta">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="stylesheet" href="assets/app.css?v=106">
+<link rel="stylesheet" href="assets/app.css?v=107">
 </head>
 <body data-view="list">
 
@@ -1696,6 +1696,18 @@ function _cxRowOpenReader(rowEl, trackEl){
   // Force a reflow so the transition class is live before the first apply.
   void rowEl.offsetHeight;
   apply(CLICK_T);
+  // A collapsed past row (see .cx-row-collapsed in app.css, ~70-90px tall)
+  // is far shorter than a normal upcoming row (35-50vh) — the same CLICK_T
+  // nudge that reads as "clearly opening" on a tall row only grows a
+  // collapsed one by a few dozen pixels, which looked broken/cut-off
+  // rather than like an in-progress expansion (reported: overlapping text,
+  // looked stuck). Skip straight to fully open instead of requiring a
+  // follow-up scroll to finish what a click barely started.
+  if (rowEl.classList.contains("cx-row-collapsed")){
+    rawY = EXPAND_PX;
+    scrollT = 1;
+    apply(1);
+  }
 
   function onWheel(e){
     e.preventDefault();
