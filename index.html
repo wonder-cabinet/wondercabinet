@@ -3122,6 +3122,18 @@ function _sanityFile(ref){
   return `https://cdn.sanity.io/files/xdtj605l/production/${id}`;
 }
 function _loc(v){ return typeof v === 'object' && v !== null ? (v.en || v.ar || '') : (v || ''); }
+/* Top-level so cxRow() (defined earlier in the file, used for the
+   exhibition date-range display) can see it — a copy also lives inside
+   _boot() below for its own local use, but that one is scoped to _boot
+   only and isn't visible from cxRow, which crashed the whole render
+   pipeline with "Can't find variable: _ordinal" the first time an
+   exhibition doc actually hit that code path (renderCurrentExhibitions
+   throwing mid-render took down everything after it, not just that one
+   row — hence the fully blank homepage). */
+function _ordinal(n){
+  const s = ["th","st","nd","rd"], v = n % 100;
+  return n + (s[(v-20)%10] || s[v] || s[0]);
+}
 
 /* Sanity auto-computes a color palette for every uploaded image
    (metadata.palette). Prefer darkVibrant when it's meaningfully present
