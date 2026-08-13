@@ -12,7 +12,7 @@
 <meta property="og:url" content="https://wondercabinet.space">
 <meta property="og:image" content="" id="og-image-meta">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="stylesheet" href="assets/app.css?v=104">
+<link rel="stylesheet" href="assets/app.css?v=105">
 </head>
 <body data-view="list">
 
@@ -805,8 +805,6 @@ function renderCurrentExhibitions(){
     });
 
     const hasPast = past.length > 0;
-    const autoExpand = upcoming.length === 0;
-    const pastHidden = !autoExpand;
 
     return `<div class="cx-outer" id="cx-outer-${e.id}">
       <div class="cx-full-wrap" id="cx-full-${e.id}">
@@ -832,12 +830,12 @@ function renderCurrentExhibitions(){
         <div class="cx-rail" id="cx-rail-${e.id}">
           <div class="cx-track" id="cx-track-${e.id}">
             ${upcoming.map(pe => cxRow(pe, false)).join('')}
-            ${hasPast ? `<div class="cx-past-toggle" id="cx-ptoggle-${e.id}">
-              <span class="en-only">Past events (${past.length}) ${autoExpand ? '↑' : '↓'}</span>
-              <span class="ar-only ar" dir="rtl">الفعاليات السابقة (${arNum(past.length)}) ${autoExpand ? '↑' : '↓'}</span>
+            ${hasPast ? `<div class="cx-past-label">
+              <span class="en-only">Past events (${past.length})</span>
+              <span class="ar-only ar" dir="rtl">الفعاليات السابقة (${arNum(past.length)})</span>
             </div>
-            <div id="cx-past-rows-${e.id}"${pastHidden ? ' hidden' : ''}>
-              ${past.map(pe => cxRow(pe, true)).join('')}
+            <div id="cx-past-rows-${e.id}">
+              ${past.map(pe => cxRow(pe, true, null, false, false, true)).join('')}
             </div>` : ''}
           </div>
         </div>
@@ -1030,34 +1028,9 @@ function renderCurrentExhibitions(){
       }, CATCHUP_MS + 150);
     }
 
-    // Past toggle
-    const ptoggle = document.getElementById('cx-ptoggle-' + e.id);
-    const pastRows = document.getElementById('cx-past-rows-' + e.id);
-    if (ptoggle && pastRows){
-      let pastOpen = !pastRows.hidden;
-      ptoggle.addEventListener('click', function(){
-        pastOpen = !pastOpen;
-        pastRows.hidden = !pastOpen;
-        const n = pastRows.querySelectorAll('.cx-row').length;
-        ptoggle.innerHTML = pastOpen
-          ? `<span class="en-only">Past events (${n}) ↑</span><span class="ar-only ar" dir="rtl">الفعاليات السابقة (${arNum(n)}) ↑</span>`
-          : `<span class="en-only">Past events (${n}) ↓</span><span class="ar-only ar" dir="rtl">الفعاليات السابقة (${arNum(n)}) ↓</span>`;
-        // Toggling changes track.scrollHeight, which setup() uses to
-        // recompute railRunway — but the page itself hasn't scrolled, so
-        // re-deriving the track position from onScroll()'s live geometry
-        // right after this can land on a stale/inconsistent value and
-        // visibly jump the rail to an unrelated position (looking like the
-        // content just vanished). Hold the same relative position instead.
-        const keepProgress = currentProgress;
-        setTimeout(function(){
-          setup();
-          const railRunway = parseFloat(outer.dataset.railRunway || 0);
-          currentProgress = Math.min(keepProgress, railRunway);
-          progressInitialized = true;
-          applyTrack(currentProgress);
-        }, 20);
-      });
-    }
+    // Past events (see .cx-past-label / .cx-row-collapsed in app.css) are
+    // now always rendered, just collapsed to short rows — no more click-
+    // to-reveal toggle here, so there's nothing to wire up.
 
     // Poster click → in-grid reader (desktop) or mobile reader
     if (posterEl){
@@ -1315,7 +1288,7 @@ function _gsEmptyCard(en, ar){
 // (renderCurrentExhibitions) and the "Also happening this week" list card
 // (renderWeekMode) — hoisted to module scope so both can use the exact same
 // markup/CSS (.cx-row) rather than keeping two copies in sync.
-function cxRow(pe, isPast, statusTag, suppressVideo, elapsed){
+function cxRow(pe, isPast, statusTag, suppressVideo, elapsed, collapsed){
   // Exhibitions run over a range, not a single day — when the end date is
   // genuinely different from the start date, show "13–20 AUG" (or
   // "28 AUG – 3 SEP" across a month boundary) instead of just the opening
@@ -1362,7 +1335,7 @@ function cxRow(pe, isPast, statusTag, suppressVideo, elapsed){
   // list card's shared background (see _gsListCard) — skip rendering it a
   // second time inside its own row.
   const videoSrc = suppressVideo ? "" : _gsCardVideo(pe);
-  return `<a class="cx-row${isPast ? ' is-past' : ''}${isToday ? ' cx-row-today' : ''}${videoSrc ? ' cx-row-video' : ''}${elapsed ? ' cx-row-elapsed' : ''}" href="event.html?id=${encodeURIComponent(pe.id)}" data-ev="${pe.id}">
+  return `<a class="cx-row${isPast ? ' is-past' : ''}${isToday ? ' cx-row-today' : ''}${videoSrc ? ' cx-row-video' : ''}${elapsed ? ' cx-row-elapsed' : ''}${collapsed ? ' cx-row-collapsed' : ''}" href="event.html?id=${encodeURIComponent(pe.id)}" data-ev="${pe.id}">
     ${elapsed ? `<div class="cx-row-elapsed-label"><span class="en-only">Took place</span><span class="ar-only ar" dir="rtl">حدثت بالفعل</span></div>` : ''}
     ${videoSrc ? `<video class="cx-row-bg-video" autoplay muted loop playsinline preload="auto" src="${videoSrc}"></video><div class="cx-row-scrim"></div>` : ''}
     ${metaEn ? `<div class="cx-row-meta"><span class="en-only">${metaEn}</span><span class="ar-only ar" dir="rtl">${metaAr}</span></div>` : ''}
