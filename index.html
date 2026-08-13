@@ -12,7 +12,7 @@
 <meta property="og:url" content="https://wondercabinet.space">
 <meta property="og:image" content="" id="og-image-meta">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="stylesheet" href="assets/app.css?v=103">
+<link rel="stylesheet" href="assets/app.css?v=104">
 </head>
 <body data-view="list">
 
@@ -1315,7 +1315,7 @@ function _gsEmptyCard(en, ar){
 // (renderCurrentExhibitions) and the "Also happening this week" list card
 // (renderWeekMode) — hoisted to module scope so both can use the exact same
 // markup/CSS (.cx-row) rather than keeping two copies in sync.
-function cxRow(pe, isPast, statusTag, suppressVideo){
+function cxRow(pe, isPast, statusTag, suppressVideo, elapsed){
   // Exhibitions run over a range, not a single day — when the end date is
   // genuinely different from the start date, show "13–20 AUG" (or
   // "28 AUG – 3 SEP" across a month boundary) instead of just the opening
@@ -1362,7 +1362,8 @@ function cxRow(pe, isPast, statusTag, suppressVideo){
   // list card's shared background (see _gsListCard) — skip rendering it a
   // second time inside its own row.
   const videoSrc = suppressVideo ? "" : _gsCardVideo(pe);
-  return `<a class="cx-row${isPast ? ' is-past' : ''}${isToday ? ' cx-row-today' : ''}${videoSrc ? ' cx-row-video' : ''}" href="event.html?id=${encodeURIComponent(pe.id)}" data-ev="${pe.id}">
+  return `<a class="cx-row${isPast ? ' is-past' : ''}${isToday ? ' cx-row-today' : ''}${videoSrc ? ' cx-row-video' : ''}${elapsed ? ' cx-row-elapsed' : ''}" href="event.html?id=${encodeURIComponent(pe.id)}" data-ev="${pe.id}">
+    ${elapsed ? `<div class="cx-row-elapsed-label"><span class="en-only">Took place</span><span class="ar-only ar" dir="rtl">حدثت بالفعل</span></div>` : ''}
     ${videoSrc ? `<video class="cx-row-bg-video" autoplay muted loop playsinline preload="auto" src="${videoSrc}"></video><div class="cx-row-scrim"></div>` : ''}
     ${metaEn ? `<div class="cx-row-meta"><span class="en-only">${metaEn}</span><span class="ar-only ar" dir="rtl">${metaAr}</span></div>` : ''}
     ${statusTag ? `<div class="cx-row-status">${statusTag}</div>` : ''}
@@ -1389,7 +1390,7 @@ function _gsListCard(items, headingEn, headingAr, bgVideoEv){
     ${bgVideoSrc ? `<video class="gs-card-list-bg-video" autoplay muted loop playsinline preload="auto" src="${bgVideoSrc}"></video><div class="gs-card-list-scrim"></div>` : ''}
     <div class="gs-card-list-inner">
       <h4 class="gs-list-heading"><span class="en-only">${headingEn}</span><span class="ar-only ar" dir="rtl">${headingAr}</span></h4>
-      <div class="gs-list-rows">${items.map(it => cxRow(it, false, null, !!(bgVideoEv && it.id === bgVideoEv.id))).join('')}</div>
+      <div class="gs-list-rows">${items.map(it => cxRow(it, false, null, !!(bgVideoEv && it.id === bgVideoEv.id), _gsHasElapsed(it))).join('')}</div>
     </div>
   </div>`;
 }

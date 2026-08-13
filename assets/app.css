@@ -1767,6 +1767,14 @@ html[data-lang="ar"] .ar-only{ direction: rtl; }
 .topbar.gs-has-issue-bg{
   border-color: #f6f3ea;
 }
+/* TODAY badge / live-play button: these read var(--gs-fg), which
+   .gs-has-issue-bg .gs-rail already redefines to white further up — that
+   inheritance-only approach turned out not to be reliable everywhere (see
+   .cx-row-today below, which needed the same explicit treatment after
+   staying blue in practice), so force it directly here too rather than
+   trust the cascade alone. */
+.gs-has-issue-bg .gs-c-today-label,
+.gs-has-issue-bg .gs-c-play{ background: #f6f3ea; color: #0a0a16; }
 /* Topbar text/logo over the shared image: explicit white, not the poster's
    own accent color. An earlier version swapped --ink (which the logo's
    mask-based fill also derives from) for the accent — on a pale/light
@@ -1952,6 +1960,28 @@ html[data-lang="ar"] .gs-c-play{ right: auto; left: 0; }
    room above/below the vertically-centered meta/title block, which reads
    as space under the title since that's the last line in the stack. */
 .gs-card-list .cx-row{ height: 50vh; }
+/* A "Also happening this week" row whose own time has already passed
+   (see _gsHasElapsed, same logic as .gs-card-elapsed on the main hero
+   cards) collapses to a much shorter strip instead of keeping the full
+   row height — same "recede, don't disappear" treatment as the hero
+   cards, just height-based here since these rows stack vertically
+   instead of sitting side by side. Selector needs to match/beat
+   .gs-card-list .cx-row{height:50vh} above, hence the compound form. */
+.gs-card-list .cx-row-elapsed{ height: 14vh; }
+.cx-row-elapsed .cx-row-meta,
+.cx-row-elapsed .cx-row-title{ font-size: 16px; line-height: 1.25; margin-top: 0; margin-bottom: 4px; }
+.cx-row-elapsed .cx-row-status{ display: none; }
+.cx-row-elapsed-label{
+  font-family: var(--ff-sans); font-size: 13px; font-weight: 700;
+  letter-spacing: .06em; text-transform: uppercase;
+  color: var(--gs-bg); background: var(--gs-fg);
+  position: absolute; top: 0; right: 0; z-index: 3;
+  padding: 8px 16px; border-radius: 0;
+}
+html[data-lang="ar"] .cx-row-elapsed-label{ right: auto; left: 0; }
+.cx-row-elapsed-label .ar{ font-family: var(--ff-ar); letter-spacing: 0; }
+.cx-row-video .cx-row-elapsed-label,
+.cx-row-img .cx-row-elapsed-label{ background: #f6f3ea; color: #0a0a16; }
 .gs-card-list-inner{ display: flex; flex-direction: column; height: 100%; overflow: hidden; position: relative; z-index: 2; }
 .gs-list-heading{
   /* Matches .gs-c-meta (the day/date/time line on the main hero cards) so
