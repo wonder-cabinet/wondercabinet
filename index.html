@@ -12,7 +12,7 @@
 <meta property="og:url" content="https://wondercabinet.space">
 <meta property="og:image" content="" id="og-image-meta">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="stylesheet" href="assets/app.css?v=105">
+<link rel="stylesheet" href="assets/app.css?v=106">
 </head>
 <body data-view="list">
 
@@ -830,11 +830,7 @@ function renderCurrentExhibitions(){
         <div class="cx-rail" id="cx-rail-${e.id}">
           <div class="cx-track" id="cx-track-${e.id}">
             ${upcoming.map(pe => cxRow(pe, false)).join('')}
-            ${hasPast ? `<div class="cx-past-label">
-              <span class="en-only">Past events (${past.length})</span>
-              <span class="ar-only ar" dir="rtl">الفعاليات السابقة (${arNum(past.length)})</span>
-            </div>
-            <div id="cx-past-rows-${e.id}">
+            ${hasPast ? `<div id="cx-past-rows-${e.id}">
               ${past.map(pe => cxRow(pe, true, null, false, false, true)).join('')}
             </div>` : ''}
           </div>
@@ -1028,9 +1024,9 @@ function renderCurrentExhibitions(){
       }, CATCHUP_MS + 150);
     }
 
-    // Past events (see .cx-past-label / .cx-row-collapsed in app.css) are
-    // now always rendered, just collapsed to short rows — no more click-
-    // to-reveal toggle here, so there's nothing to wire up.
+    // Past events (see .cx-row-collapsed in app.css) are now always
+    // rendered, just collapsed to short rows with no section label — no
+    // more click-to-reveal toggle here, so there's nothing to wire up.
 
     // Poster click → in-grid reader (desktop) or mobile reader
     if (posterEl){

@@ -2359,28 +2359,14 @@ body.gs-reader-open{ overflow: hidden; }
   font-family: var(--ff-ar); text-transform: none; line-height: 1.1;
 }
 
-/* Past-events section label — plain heading now, not a click-to-reveal
-   toggle. Past rows always render (see .cx-row-collapsed below); this is
-   just a divider announcing what the shorter rows underneath are. */
-.cx-past-label{
-  height: 10vh; min-height: 60px;
-  display: flex; align-items: center; justify-content: center;
-  padding: 0 28px; text-align: center;
-  border-bottom: 2px solid currentColor;
-  font-family: var(--ff-sans); font-size: 13px; font-weight: 700;
-  text-transform: uppercase; letter-spacing: .06em;
-  opacity: .55;
-  user-select: none;
-  box-sizing: border-box;
-}
 /* A past exhibition-programme row inside a current exhibition's own rail
    (see the past.map(...) call passing collapsed=true in index.html) —
    always shown now rather than hidden behind the old toggle, but kept
    short so the rail still reads as upcoming-first, past-for-reference.
    Distinct from .cx-row-elapsed (the "Also happening this week" list's
    own same-day elapsed treatment) since this is keyed off isPast, not a
-   time-of-day check, and doesn't get its own badge — the .cx-past-label
-   heading above already establishes the context. */
+   time-of-day check. No section heading above it (removed per feedback) —
+   the row's own "Past" status/dimmed opacity is enough context. */
 .cx-row-collapsed{ height: 12vh; min-height: 70px; }
 .cx-row-collapsed .cx-row-meta,
 .cx-row-collapsed .cx-row-title{ font-size: 16px; line-height: 1.25; margin-top: 0; margin-bottom: 4px; }
@@ -2411,7 +2397,7 @@ body.gs-reader-open{ overflow: hidden; }
     overflow: visible;
   }
   .cx-track{ transform: none !important; }
-  .cx-row, .cx-past-label{
+  .cx-row{
     height: auto; min-height: 80px;
     padding: 18px 20px;
   }
@@ -3395,7 +3381,6 @@ html[data-lang="ar"] .cx-title-head { text-align: right; }
   html[data-lang="ar"] .cx-poster-band { text-align: right; direction: rtl; }
   html[data-lang="ar"] .cx-poster-meta { flex-direction: row-reverse; }
   html[data-lang="ar"] .cx-row { align-items: flex-end; direction: rtl; }
-  html[data-lang="ar"] .cx-past-label { direction: rtl; }
 }
 
 /* Footer */
