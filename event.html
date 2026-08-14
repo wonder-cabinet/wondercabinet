@@ -218,8 +218,8 @@
       status:   doc.status || 'upcoming',
       featured: !!doc.featured,
       register: doc.registerUrl || '',
-      admissionNote: doc.admissionNote?.en || '',
-      admissionNoteAr: doc.admissionNote?.ar || '',
+      admissionType: doc.admissionType || '',
+      ticketsUrl: doc.ticketsUrl || '',
       streamChannel: doc.streamChannel ? { name: doc.streamChannel.name || '', url: doc.streamChannel.streamUrl || '' } : null,
       isPast:   s ? s < new Date() : (doc.status === 'past'),
       // Registration should stay open (clickable) for the event's full
@@ -383,9 +383,13 @@
           ? `<span class="ep-register ep-register-disabled" aria-disabled="true"><span class="en-only">Registration closed</span><span class="ar-only ar">التسجيل مغلق</span></span>`
           : `<a href="${ev.register}" class="ep-register" target="_blank"><span class="en-only">Register →</span><span class="ar-only ar">← التسجيل</span></a>`)
       : (!ev.isPast
-          ? (ev.admissionNote
-              ? `<span class="ep-register ep-free"><span class="en-only">${ev.admissionNote}</span><span class="ar-only ar">${ev.admissionNoteAr||ev.admissionNote}</span></span>`
-              : `<span class="ep-register ep-free"><span class="en-only">Free entry</span><span class="ar-only ar">دخول حرّ</span></span>`)
+          ? (ev.admissionType === 'ticketed'
+              ? (ev.ticketsUrl
+                  ? `<a href="${ev.ticketsUrl}" class="ep-register" target="_blank"><span class="en-only">Tickets →</span><span class="ar-only ar">← تذاكر</span></a>`
+                  : `<span class="ep-register ep-free"><span class="en-only">Ticketed</span><span class="ar-only ar">تذاكر</span></span>`)
+              : ev.admissionType === 'free'
+                ? `<span class="ep-register ep-free"><span class="en-only">Free entry</span><span class="ar-only ar">دخول حرّ</span></span>`
+                : "")
           : "");
 
     // Audio bar sourced from a contentAudio block, if present.

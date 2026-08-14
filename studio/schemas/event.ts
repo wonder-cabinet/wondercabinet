@@ -99,13 +99,26 @@ export const event = defineType({
       type: 'string',
       options: {list: ['upcoming', 'past'], layout: 'radio'},
     }),
-    defineField({name: 'registerUrl', title: 'Registration URL', type: 'url'}),
     defineField({
-      name: 'admissionNote',
-      title: 'Admission tag override',
+      name: 'registerUrl',
+      title: 'Registration URL',
+      description: 'For free events that still need an RSVP. Shows a "Register" tag/link on listings — takes priority over Admission below.',
+      type: 'url',
+    }),
+    defineField({
+      name: 'admissionType',
+      title: 'Admission',
       description:
-        'Controls the small tag shown on event listings (top right of each Programme row). By default it shows "Register" if a Registration URL is set above, otherwise "Free entry". Set this to override that — e.g. "Ticketed", "20 NIS at the door", "Members only" — for anything that isn\'t simply free. Takes priority over the "Free entry" default, but a Registration URL still wins if both are set (the tag should stay actionable when there\'s a link to click).',
-      type: 'localeString',
+        'Controls the small tag shown on event listings (top right of each Programme row). Leave blank to show no tag at all. Ignored if a Registration URL is set above (that always shows "Register" instead).',
+      type: 'string',
+      options: {list: [{title: 'Free entry', value: 'free'}, {title: 'Ticketed', value: 'ticketed'}], layout: 'radio'},
+    }),
+    defineField({
+      name: 'ticketsUrl',
+      title: 'Tickets URL',
+      description: 'Where people can buy a ticket. Shown as a clickable "Tickets" tag/link on listings instead of plain "Ticketed" text.',
+      type: 'url',
+      hidden: ({document}) => (document as any)?.admissionType !== 'ticketed',
     }),
     defineField({
       name: 'streamChannel',
