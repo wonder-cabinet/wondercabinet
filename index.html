@@ -609,33 +609,33 @@ function renderYearMarker(year, direction){
 }
 
 function renderMonth(month, season){
-  // Collapse recurring series: show only first occurrence per title per month,
-  // listed at the top of the month body.
+  // Collapse recurring series: show only first occurrence per title per
+  // month (the underlying doc's date rolls forward to its next occurrence
+  // rather than pre-generating one row per future date, so in practice
+  // there's rarely more than one to collapse — this just guards against
+  // it). Recurring events used to be pulled out and always listed at the
+  // TOP of the month regardless of date — per feedback, that read as a
+  // made-up rule ("why is the recurring event always on top?"); it should
+  // just take its place on the calendar like anything else. So it's now
+  // grouped into its actual day, same as a one-off event, and the whole
+  // month sorts by day like normal.
   const seenRecurring = new Set();
-  const recurringFirst = [];
-  const oneoffs = [];
+  const evs = [];
   month.evs.forEach(e => {
     if (e.recurring) {
-      if (!seenRecurring.has(e.title)) {
-        seenRecurring.add(e.title);
-        recurringFirst.push(e);
-      }
-    } else {
-      oneoffs.push(e);
+      if (seenRecurring.has(e.title)) return;
+      seenRecurring.add(e.title);
     }
+    evs.push(e);
   });
 
-  // Recurring rows (one per series, shown at top)
-  const recurringRows = recurringFirst.map(e => renderEventRow(e, null, true)).join("");
-
-  // One-off rows grouped by day
   const days = {};
-  oneoffs.forEach(e => {
+  evs.forEach(e => {
     days[e.day] = days[e.day] || { day: e.day, dow: e.dow, dowAr: e.dowAr, evs: [] };
     days[e.day].evs.push(e);
   });
   const dayList = Object.values(days).sort((a,b) => a.day.localeCompare(b.day));
-  const oneoffRows = dayList.map(d => d.evs.map((e,i) => renderEventRow(e, d, i === 0)).join("")).join("");
+  const rows = dayList.map(d => d.evs.map((e,i) => renderEventRow(e, d, i === 0)).join("")).join("");
 
   return `
     <div class="tl-month" data-month="${month.key}">
@@ -649,7 +649,7 @@ function renderMonth(month, season){
           <span class="tl-month-count">${String(month.evs.length).padStart(2,"0")}</span>
         </div>
       </div>
-      <div class="tl-month-body">${recurringRows}${oneoffRows}</div>
+      <div class="tl-month-body">${rows}</div>
     </div>`;
 }
 
