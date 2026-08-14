@@ -784,27 +784,25 @@ function renderCurrentExhibitions(){
     const range = `${MONTH_NAME_EN[e.month]||''} ${_ordinal(parseInt(e.day,10))} — ${MONTH_NAME_EN[e.endMonth||e.month]||''} ${_ordinal(parseInt(e.endDay||e.day,10))}, ${e.endYear||e.year}`;
     const rangeAr = `${arNum(parseInt(e.day,10))} ${MONTH_NAME_AR[e.month]||''} — ${arNum(parseInt(e.endDay||e.day,10))} ${MONTH_NAME_AR[e.endMonth||e.month]||''} ${arNum(e.endYear||e.year)}`;
 
+    // Single chronological list (earliest first) rather than an
+    // upcoming-block-then-past-block split — a past row further down
+    // (e.g. yesterday's film) now sits in its actual date position
+    // instead of always trailing every upcoming row regardless of date,
+    // which read wrong when a same-day event happened to come first in
+    // Sanity's reference order. Past rows still get the collapsed/dimmed
+    // treatment (see cxRow's `collapsed` param below) — just positioned
+    // by date now, not shoved to the end.
     const allPe = e.programmeEvents || [];
-    const upcoming = allPe.filter(pe => {
-      if (!pe.day || !pe.month) return true;
-      const d = new Date(pe.year||e.year, MONTH_ORDER.indexOf(pe.month), parseInt(pe.day,10));
-      return d >= today;
-    }).sort((a,b) => {
-      const da = new Date(a.year||e.year, MONTH_ORDER.indexOf(a.month||'Jan'), parseInt(a.day||1,10));
-      const db = new Date(b.year||e.year, MONTH_ORDER.indexOf(b.month||'Jan'), parseInt(b.day||1,10));
-      return da - db;
+    const withDates = allPe.map(pe => {
+      const d = (pe.day && pe.month) ? new Date(pe.year||e.year, MONTH_ORDER.indexOf(pe.month), parseInt(pe.day,10)) : null;
+      return { pe: pe, d: d, isPast: d ? d < today : false };
     });
-    const past = allPe.filter(pe => {
-      if (!pe.day || !pe.month) return false;
-      const d = new Date(pe.year||e.year, MONTH_ORDER.indexOf(pe.month), parseInt(pe.day,10));
-      return d < today;
-    }).sort((a,b) => {
-      const da = new Date(a.year||e.year, MONTH_ORDER.indexOf(a.month||'Jan'), parseInt(a.day||1,10));
-      const db = new Date(b.year||e.year, MONTH_ORDER.indexOf(b.month||'Jan'), parseInt(b.day||1,10));
-      return db - da; // newest first
+    const sorted = withDates.slice().sort((a, b) => {
+      if (!a.d && !b.d) return 0;
+      if (!a.d) return 1;
+      if (!b.d) return -1;
+      return a.d - b.d;
     });
-
-    const hasPast = past.length > 0;
 
     return `<div class="cx-outer" id="cx-outer-${e.id}">
       <div class="cx-full-wrap" id="cx-full-${e.id}">
@@ -829,10 +827,7 @@ function renderCurrentExhibitions(){
         </div>
         <div class="cx-rail" id="cx-rail-${e.id}">
           <div class="cx-track" id="cx-track-${e.id}">
-            ${upcoming.map(pe => cxRow(pe, false)).join('')}
-            ${hasPast ? `<div id="cx-past-rows-${e.id}">
-              ${past.map(pe => cxRow(pe, true, null, false, false, true)).join('')}
-            </div>` : ''}
+            ${sorted.map(x => cxRow(x.pe, x.isPast, null, false, false, x.isPast)).join('')}
           </div>
         </div>
       </div>
