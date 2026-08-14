@@ -677,7 +677,9 @@ function renderEventRow(e, day, isFirst){
         ? `<span class="tl-tag tl-past"><span class="en-only">Past</span><span class="ar-only ar">سابق</span></span>`
         : (e.register
             ? `<span class="tl-tag tl-rsvp"><span class="en-only">Register</span><span class="ar-only ar">تسجيل</span></span>`
-            : `<span class="tl-tag tl-free"><span class="en-only">Free entry</span><span class="ar-only ar">دخول حرّ</span></span>`);
+            : e.admissionNote
+              ? `<span class="tl-tag tl-free"><span class="en-only">${e.admissionNote}</span><span class="ar-only ar">${e.admissionNoteAr||e.admissionNote}</span></span>`
+              : `<span class="tl-tag tl-free"><span class="en-only">Free entry</span><span class="ar-only ar">دخول حرّ</span></span>`);
   return `
     <a class="tl-row${isPast ? ' is-past' : ''}${isFirst ? ' tl-first' : ''}" href="event.html?id=${e.id}" data-ev="${e.id}">
       <div class="tl-date">
@@ -3226,6 +3228,8 @@ async function _boot(){
         status:   doc.status || 'upcoming',
         featured: !!doc.featured,
         register: doc.registerUrl || '',
+        admissionNote: doc.admissionNote?.en || '',
+        admissionNoteAr: doc.admissionNote?.ar || '',
         // streamChannel is a reference to a "Stream Channel" doc (its own
         // editable content type — see studio/schemas/streamChannel.ts) so
         // producers can add a new station or fix a channel's URL in Studio

@@ -101,6 +101,13 @@ export const event = defineType({
     }),
     defineField({name: 'registerUrl', title: 'Registration URL', type: 'url'}),
     defineField({
+      name: 'admissionNote',
+      title: 'Admission tag override',
+      description:
+        'Controls the small tag shown on event listings (top right of each Programme row). By default it shows "Register" if a Registration URL is set above, otherwise "Free entry". Set this to override that — e.g. "Ticketed", "20 NIS at the door", "Members only" — for anything that isn\'t simply free. Takes priority over the "Free entry" default, but a Registration URL still wins if both are set (the tag should stay actionable when there\'s a link to click).',
+      type: 'localeString',
+    }),
+    defineField({
       name: 'streamChannel',
       title: 'Live stream channel',
       description:
