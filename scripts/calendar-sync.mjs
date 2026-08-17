@@ -738,7 +738,7 @@ async function fetchExistingEvents() {
     return JSON.parse(fs.readFileSync(SANITY_SNAPSHOT, "utf8"));
   }
   return sanityQuery(
-    '*[_type=="event"]{_id,title,slug,startDateTime,endDateTime,googleCalendarEventId,eventType,recurring,recurringBaseTitle,body,"relatedArtistRefs":relatedArtists[]._ref,calendarSyncTitleEn,calendarSyncTitleAr,calendarSyncBodyEn,calendarSyncBodyAr}'
+    '*[_type=="event"]{_id,title,slug,startDateTime,endDateTime,googleCalendarEventId,eventType,recurring,recurringBaseTitle,body,neverHighlighted,"relatedArtistRefs":relatedArtists[]._ref,calendarSyncTitleEn,calendarSyncTitleAr,calendarSyncBodyEn,calendarSyncBodyAr}'
   );
 }
 
@@ -1141,8 +1141,11 @@ async function main() {
 
     // Events whose start date (Hebron wall-clock, same convention as
     // calendarDate() elsewhere in this file) falls within this Mon–Sun week.
+    // neverHighlighted events (e.g. the standing weekly Yoga class) are
+    // excluded up front — otherwise a recurring fixture would re-qualify for
+    // the highlighted list every single week just by rolling into range.
     const weekEventIds = existingDocs
-      .filter((d) => d.startDateTime && calendarDate(d.startDateTime) >= weekStart && calendarDate(d.startDateTime) <= weekEnd)
+      .filter((d) => d.startDateTime && !d.neverHighlighted && calendarDate(d.startDateTime) >= weekStart && calendarDate(d.startDateTime) <= weekEnd)
       .map((d) => d._id);
 
     if (alreadyExists && alreadyAutoAssigned) {

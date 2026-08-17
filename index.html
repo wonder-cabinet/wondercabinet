@@ -2831,14 +2831,18 @@ function renderFeatured(){
     // This is the escape hatch for "I added/marked this after the snapshot
     // locked" without weakening intentional removals from eventIds (which
     // this never re-adds unless the editor also ticks Featured).
+    // neverHighlighted (Studio: "Never show in This week highlights") is an
+    // absolute veto — for a standing weekly fixture like the Yoga class,
+    // which would otherwise re-qualify for the highlighted rail every single
+    // week just by having its recurring date land inside the current range.
     const evs = issue && Array.isArray(issue.eventIds)
       ? (() => {
-          const base = ALL.filter(ev => issue.eventIds.includes(ev.id) && eventDateOnly(ev) >= start && eventDateOnly(ev) <= end);
+          const base = ALL.filter(ev => !ev.neverHighlighted && issue.eventIds.includes(ev.id) && eventDateOnly(ev) >= start && eventDateOnly(ev) <= end);
           const baseIds = new Set(base.map(ev => ev.id));
-          const forced = ALL.filter(ev => ev.featured && !baseIds.has(ev.id) && eventDateOnly(ev) >= start && eventDateOnly(ev) <= end);
+          const forced = ALL.filter(ev => !ev.neverHighlighted && ev.featured && !baseIds.has(ev.id) && eventDateOnly(ev) >= start && eventDateOnly(ev) <= end);
           return base.concat(forced).sort((a,b) => eventTimestamp(a) - eventTimestamp(b));
         })()
-      : _gsWeekEvents(start);
+      : _gsWeekEvents(start).filter(ev => !ev.neverHighlighted);
     sticky.style.setProperty("--gs-bg", "var(--paper)");
     sticky.style.setProperty("--gs-fg", "var(--ink)");
     // Ambient theme image: the weeklyIssue's cover (Studio: "Issue cover"),
@@ -3199,7 +3203,7 @@ async function _boot(){
       "projects": *[_type == "project"] | order(year desc) { title, "slug": slug.current, description, year, coverImage },
       "residencies": *[_type == "residency"] | order(year desc) { title, "slug": slug.current, description, year, coverImage },
       "settings": *[_type == "siteSettings"][0]{ ogImage },
-      "issues": *[_type == "weeklyIssue"] | order(weekStart desc){ title, description, weekStart, weekEnd, cover, "coverPalette": cover.asset->metadata.palette, "eventIds": events[]->slug.current, "secondaryEventIds": secondaryEvents[]->slug.current, eventsAutoAssigned, "secondaryFeaturedVideo": secondaryFeaturedVideo->slug.current }
+      "issues": *[_type == "weeklyIssue"] | order(weekStart desc){ title, description, weekStart, weekEnd, cover, "coverPalette": cover.asset->metadata.palette, "eventIds": events[]->{"eid": coalesce(slug.current, _id)}.eid, "secondaryEventIds": secondaryEvents[]->{"eid": coalesce(slug.current, _id)}.eid, eventsAutoAssigned, "secondaryFeaturedVideo": secondaryFeaturedVideo->slug.current }
     }`);
     const res = await fetch(`https://xdtj605l.api.sanity.io/v2024-01-01/data/query/production?query=${q}`);
     const { result } = await res.json();
@@ -3237,6 +3241,7 @@ async function _boot(){
         endYear:  e ? e.getFullYear() : 0,
         location: locationName,
         recurring: !!doc.recurring,
+        neverHighlighted: !!doc.neverHighlighted,
         recurringLabel:   doc.recurringLabel?.en || '',
         recurringLabelAr: doc.recurringLabel?.ar || '',
         status:   doc.status || 'upcoming',

@@ -84,6 +84,13 @@ export const event = defineType({
       to: [{type: 'location'}],
     }),
     defineField({name: 'featured', title: 'Featured (fullscreen treatment)', type: 'boolean', initialValue: false, description: 'Shows a "Featured" tag in the Programme timeline, and also force-includes this event in the homepage\'s "This week" highlighted cards for its own week — even if it was added after that week\'s auto-assign already ran.'}),
+    defineField({
+      name: 'neverHighlighted',
+      title: 'Never show in "This week" highlights',
+      description: 'For a standing weekly fixture (e.g. the Yoga class) that shouldn\'t take up a big hero card every single week. It still shows normally in the Programme timeline — this only keeps it out of the homepage "This week" highlighted cards and out of auto-assign\'s weekly picks, permanently.',
+      type: 'boolean',
+      initialValue: false,
+    }),
     defineField({name: 'recurring', title: 'Recurring', type: 'boolean', initialValue: false}),
     defineField({name: 'recurringLabel', title: 'Recurring label', type: 'localeString', description: 'e.g. "Every Tuesday"'}),
     defineField({
