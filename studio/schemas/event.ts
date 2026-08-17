@@ -83,7 +83,7 @@ export const event = defineType({
       type: 'reference',
       to: [{type: 'location'}],
     }),
-    defineField({name: 'featured', title: 'Featured (fullscreen treatment)', type: 'boolean', initialValue: false}),
+    defineField({name: 'featured', title: 'Featured (fullscreen treatment)', type: 'boolean', initialValue: false, description: 'Shows a "Featured" tag in the Programme timeline, and also force-includes this event in the homepage\'s "This week" highlighted cards for its own week — even if it was added after that week\'s auto-assign already ran.'}),
     defineField({name: 'recurring', title: 'Recurring', type: 'boolean', initialValue: false}),
     defineField({name: 'recurringLabel', title: 'Recurring label', type: 'localeString', description: 'e.g. "Every Tuesday"'}),
     defineField({

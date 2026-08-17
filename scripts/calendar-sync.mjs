@@ -787,9 +787,20 @@ async function fetchExistingIssues() {
   // Using a dedicated flag instead of "is events empty?" means an editor can
   // remove events down to zero on purpose without the next sync run
   // silently re-populating it — see main()'s weekly-issue pass.
-  const docs = await sanityQuery('*[_type=="weeklyIssue"]{_id, eventsAutoAssigned}');
+  //
+  // eventsEverAssigned tracks every event id auto-assign has EVER proposed
+  // for that week (kept or since removed) — see main()'s weekly-issue pass
+  // for how it's used to add newly-created events without re-adding ones an
+  // editor deliberately removed.
+  const docs = await sanityQuery('*[_type=="weeklyIssue"]{_id, eventsAutoAssigned, eventsEverAssigned, "eventRefs": events[]._ref}');
   const byId = new Map();
-  for (const d of docs || []) byId.set(d._id, !!d.eventsAutoAssigned);
+  for (const d of docs || []) {
+    byId.set(d._id, {
+      autoAssigned: !!d.eventsAutoAssigned,
+      everAssigned: Array.isArray(d.eventsEverAssigned) ? d.eventsEverAssigned : [],
+      currentRefs: Array.isArray(d.eventRefs) ? d.eventRefs : [],
+    });
+  }
   return byId;
 }
 
@@ -1119,36 +1130,62 @@ async function main() {
   // hand-picking a whole week's events from scratch. `eventsAutoAssigned`
   // marks that the one-time fill has happened; later runs never touch
   // `events` again once that's set, so removals (even down to zero) stick.
-  const existingIssues = await fetchExistingIssues(); // Map<issueId, eventsAutoAssigned>
+  const existingIssues = await fetchExistingIssues(); // Map<issueId, {autoAssigned, everAssigned, currentRefs}>
   const thisWeek = getHebronWeekBounds(now);
   const nextWeek = getHebronWeekBounds(new Date(thisWeek.mondayDate.getTime() + 7 * 86400000));
   for (const { weekStart, weekEnd } of [thisWeek, nextWeek]) {
     const issueId = `weekly-issue-${weekStart}`;
-    const alreadyExists = existingIssues.has(issueId);
-    const alreadyAutoAssigned = existingIssues.get(issueId) === true;
-
-    if (alreadyExists && alreadyAutoAssigned) {
-      actions.push({ action: "OK", id: issueId, title: "(weekly issue)", date: weekStart, notes: "already exists; events list already auto-assigned (editor-curated from here)" });
-      continue;
-    }
+    const existing = existingIssues.get(issueId);
+    const alreadyExists = !!existing;
+    const alreadyAutoAssigned = !!existing?.autoAssigned;
 
     // Events whose start date (Hebron wall-clock, same convention as
     // calendarDate() elsewhere in this file) falls within this Mon–Sun week.
     const weekEventIds = existingDocs
       .filter((d) => d.startDateTime && calendarDate(d.startDateTime) >= weekStart && calendarDate(d.startDateTime) <= weekEnd)
       .map((d) => d._id);
+
+    if (alreadyExists && alreadyAutoAssigned) {
+      // The events list is editor-curated from here on — removals stick,
+      // never silently re-added. But an event created (or newly scheduled
+      // into this week) AFTER the one-time snapshot ran should still show
+      // up by default, same as everything else did at snapshot time.
+      // eventsEverAssigned is the memory of every id auto-assign has ever
+      // offered for this week — only ids NOT in that set are genuinely new,
+      // so a deliberate removal (which stays in eventsEverAssigned, just not
+      // in events) is never re-added.
+      const everAssigned = new Set(existing.everAssigned);
+      const newIds = weekEventIds.filter((id) => !everAssigned.has(id));
+      if (!newIds.length) {
+        actions.push({ action: "OK", id: issueId, title: "(weekly issue)", date: weekStart, notes: "already exists; events list already auto-assigned (editor-curated from here)" });
+        continue;
+      }
+      const currentRefs = new Set(existing.currentRefs);
+      const toAppend = newIds.filter((id) => !currentRefs.has(id));
+      mutations.push({
+        patch: {
+          id: issueId,
+          setIfMissing: { events: [] },
+          insert: toAppend.length ? { after: "events[-1]", items: toAppend.map((id) => ({ _type: "reference", _ref: id, _key: id })) } : undefined,
+          set: { eventsEverAssigned: [...existing.everAssigned, ...newIds] },
+        },
+      });
+      actions.push({ action: "PATCH", id: issueId, title: "(weekly issue)", date: weekStart, notes: `default-added ${newIds.length} newly-scheduled event(s) not previously offered (editor removals untouched)` });
+      continue;
+    }
+
     const eventsField = weekEventIds.map((id) => ({ _type: "reference", _ref: id, _key: id }));
 
     if (!alreadyExists) {
       mutations.push({
-        createIfNotExists: { _id: issueId, _type: "weeklyIssue", weekStart, weekEnd, events: eventsField, eventsAutoAssigned: true },
+        createIfNotExists: { _id: issueId, _type: "weeklyIssue", weekStart, weekEnd, events: eventsField, eventsAutoAssigned: true, eventsEverAssigned: weekEventIds },
       });
       actions.push({ action: "CREATE", id: issueId, title: "(weekly issue)", date: weekStart, notes: `week ${weekStart} → ${weekEnd}; theme left blank for editor; auto-assigned ${weekEventIds.length} event(s)` });
     } else {
       // Doc exists (e.g. created before this feature shipped) but never had
       // its events auto-filled — patch it in now, once.
       mutations.push({
-        patch: { id: issueId, set: { events: eventsField, eventsAutoAssigned: true } },
+        patch: { id: issueId, set: { events: eventsField, eventsAutoAssigned: true, eventsEverAssigned: weekEventIds } },
       });
       actions.push({ action: "PATCH", id: issueId, title: "(weekly issue)", date: weekStart, notes: `backfilled events list with ${weekEventIds.length} event(s) (one-time auto-assign)` });
     }

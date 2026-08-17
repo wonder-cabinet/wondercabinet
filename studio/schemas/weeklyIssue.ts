@@ -44,7 +44,7 @@ export const weeklyIssue = defineType({
     defineField({
       name: 'events',
       title: 'Highlighted events',
-      description: 'Auto-filled once with everything scheduled that week, shown as the big highlighted cards on the homepage. Remove any you don\'t want shown — the sync script won\'t add them back. To de-emphasize an event instead of hiding it, move it to "Also happening this week" below rather than deleting it here. You can also add events by hand (e.g. something that doesn\'t neatly fit a Mon–Sun week).',
+      description: 'Auto-filled with everything scheduled that week, shown as the big highlighted cards on the homepage — including events added to the calendar after this week started (the sync keeps adding those in by default). Remove any you don\'t want shown and the sync won\'t add that specific one back. To de-emphasize an event instead of hiding it, move it to "Also happening this week" below rather than deleting it here. You can also add events by hand (e.g. something that doesn\'t neatly fit a Mon–Sun week), or tick "Featured" on the event itself to force it in regardless of this list.',
       type: 'array',
       of: [{type: 'reference', to: [{type: 'event'}]}],
     }),
@@ -68,6 +68,14 @@ export const weeklyIssue = defineType({
       type: 'boolean',
       hidden: true,
       initialValue: false,
+    }),
+    defineField({
+      name: 'eventsEverAssigned',
+      title: 'Events ever auto-assigned (internal)',
+      description: 'Bookkeeping for scripts/calendar-sync.mjs — every event id auto-assign has ever offered for this week, kept or since removed. Lets a newly-created/rescheduled event still get added by default after the initial snapshot, without ever re-adding one an editor deliberately removed. Never edit by hand.',
+      type: 'array',
+      of: [{type: 'string'}],
+      hidden: true,
     }),
   ],
   orderings: [

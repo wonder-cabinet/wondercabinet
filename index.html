@@ -2824,8 +2824,20 @@ function renderFeatured(){
     // list. This filter drops anything whose real date has quietly moved
     // on, without weakening actual editor removals (a removal just means
     // absence from eventIds, which this doesn't touch).
+    // On top of the locked eventIds snapshot, always force-include any event
+    // an editor has explicitly checked "Featured" in Sanity and that falls
+    // within this week's range — even if it was added to Sanity after the
+    // one-time auto-assign already ran (so it never made it into eventIds).
+    // This is the escape hatch for "I added/marked this after the snapshot
+    // locked" without weakening intentional removals from eventIds (which
+    // this never re-adds unless the editor also ticks Featured).
     const evs = issue && Array.isArray(issue.eventIds)
-      ? ALL.filter(ev => issue.eventIds.includes(ev.id) && eventDateOnly(ev) >= start && eventDateOnly(ev) <= end).sort((a,b) => eventTimestamp(a) - eventTimestamp(b))
+      ? (() => {
+          const base = ALL.filter(ev => issue.eventIds.includes(ev.id) && eventDateOnly(ev) >= start && eventDateOnly(ev) <= end);
+          const baseIds = new Set(base.map(ev => ev.id));
+          const forced = ALL.filter(ev => ev.featured && !baseIds.has(ev.id) && eventDateOnly(ev) >= start && eventDateOnly(ev) <= end);
+          return base.concat(forced).sort((a,b) => eventTimestamp(a) - eventTimestamp(b));
+        })()
       : _gsWeekEvents(start);
     sticky.style.setProperty("--gs-bg", "var(--paper)");
     sticky.style.setProperty("--gs-fg", "var(--ink)");
