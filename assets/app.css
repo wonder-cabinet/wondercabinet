@@ -1919,6 +1919,15 @@ html[data-lang="ar"] .gs-c-play{ right: auto; left: 0; }
 .gs-c-title .ar{ font-family: var(--ff-ar); font-style: italic; letter-spacing: 0; text-transform: none; line-height: 1.1; }
 .gs-c-desc{ font-family: var(--ff-sans); font-size: 15px; line-height: 1.5; max-width: 38ch; opacity: .85; margin: 0; overflow-wrap: break-word; word-break: break-word; }
 .gs-c-cta{ font-family: var(--ff-sans); font-size: 11px; letter-spacing: 0; text-transform: uppercase; font-weight: 700; }
+.gs-c-tag{
+  display: inline-block; align-self: flex-start;
+  font-family: var(--ff-sans); font-size: 11px; letter-spacing: 0;
+  text-transform: uppercase; font-weight: 700;
+  border: 1px solid currentColor; padding: 5px 10px;
+}
+.gs-c-tag .ar{ font-family: var(--ff-ar); letter-spacing: 0; }
+.gs-card-video .gs-c-tag,
+.gs-card-img .gs-c-tag{ color: #f6f3ea; }
 /* A narrow (elapsed) card's title/meta previously overflowed past its own
    240px width into the neighboring card instead of wrapping inside it — the
    break-word rules above fix that for every card, narrow or not.
@@ -2064,7 +2073,8 @@ html[data-lang="ar"] .gs-list-heading{ text-align: right; }
 .gs-card-scrim,
 .gs-card-list-inner{ transition: opacity .4s ease; }
 .gs-card-open .gs-c-desc,
-.gs-card-open .gs-c-cta{ transition: opacity .25s ease; opacity: 0; pointer-events: none; }
+.gs-card-open .gs-c-cta,
+.gs-card-open .gs-c-tag{ transition: opacity .25s ease; opacity: 0; pointer-events: none; }
 .gs-card-reading .gs-card-bg-video,
 .gs-card-reading .gs-card-bg-img,
 .gs-card-reading .gs-card-scrim,

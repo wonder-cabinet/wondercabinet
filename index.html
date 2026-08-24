@@ -12,7 +12,7 @@
 <meta property="og:url" content="https://wondercabinet.space">
 <meta property="og:image" content="" id="og-image-meta">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="stylesheet" href="assets/app.css?v=108">
+<link rel="stylesheet" href="assets/app.css?v=109">
 </head>
 <body data-view="list">
 
@@ -1236,6 +1236,17 @@ function _gsHasElapsed(ev){
   return _gsEventEndMoment(ev).getTime() < Date.now();
 }
 
+// Small Register/Tickets/Free-entry badge for the This Week hero cards —
+// same priority order as the Programme timeline's tag (renderEventRow):
+// an explicit Register link always wins, then Tickets (only if a tickets
+// URL was actually given, not just the admission type), then Free entry.
+// Nothing shown if none of those apply, same as the timeline.
+function _gsAdmissionTag(ev){
+  if (ev.register) return `<div class="gs-c-tag"><span class="en-only">Register →</span><span class="ar-only ar" dir="rtl">← تسجيل</span></div>`;
+  if (ev.admissionType === 'ticketed' && ev.ticketsUrl) return `<div class="gs-c-tag"><span class="en-only">Tickets →</span><span class="ar-only ar" dir="rtl">← تذاكر</span></div>`;
+  if (ev.admissionType === 'free') return `<div class="gs-c-tag"><span class="en-only">Free entry</span><span class="ar-only ar" dir="rtl">دخول حرّ</span></div>`;
+  return '';
+}
 function _gsEventCard(ev){
   const typeAr = TYPE_AR[ev.type] || ev.type;
   const videoSrc = _gsCardVideo(ev);
@@ -1268,6 +1279,7 @@ function _gsEventCard(ev){
         <span class="en-only">${ev.shortDesc}</span>
         ${ev.shortDescAr ? `<span class="ar-only ar" dir="rtl">${ev.shortDescAr}</span>` : ""}
       </p>` : ""}
+      ${_gsAdmissionTag(ev)}
       <div class="gs-c-cta"><span class="en-only">View event →</span><span class="ar-only ar" dir="rtl">← عرض الفعالية</span></div>
     </div>
   </a>`;
@@ -1417,8 +1429,15 @@ let _gsReaderClosedAt = 0;
 // frozen.
 function _gsHardReset(){
   document.querySelectorAll(".gs-card-frame").forEach(f => f.remove());
-  document.querySelectorAll(".gs-card-open").forEach(c => {
-    c.classList.remove("gs-card-open", "gs-anim", "gs-card-open-m");
+  // Union of .gs-card-open and .gs-card-reading: normally every reader adds
+  // both to the same element together, but a bfcache-frozen mid-transition
+  // state (or a future reader that adds them at different ticks) could leave
+  // just one behind. Missing "gs-card-reading" here was the actual bug: with
+  // the iframe above removed but this class still on, .gs-card-reading
+  // .gs-card-inner{opacity:0} (app.css) stayed in effect with nothing to
+  // show in its place — a permanently blank card until full page reload.
+  document.querySelectorAll(".gs-card-open, .gs-card-reading").forEach(c => {
+    c.classList.remove("gs-card-open", "gs-anim", "gs-card-open-m", "gs-card-reading");
     c.style.flexBasis = "";
     c.style.height = "";
   });
@@ -3246,9 +3265,9 @@ async function _boot(){
         recurringLabelAr: doc.recurringLabel?.ar || '',
         status:   doc.status || 'upcoming',
         featured: !!doc.featured,
-        register: doc.registerUrl || '',
+        register: (doc.registerUrl || '').trim(),
         admissionType: doc.admissionType || '',
-        ticketsUrl: doc.ticketsUrl || '',
+        ticketsUrl: (doc.ticketsUrl || '').trim(),
         // streamChannel is a reference to a "Stream Channel" doc (its own
         // editable content type — see studio/schemas/streamChannel.ts) so
         // producers can add a new station or fix a channel's URL in Studio

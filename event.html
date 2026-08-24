@@ -11,7 +11,7 @@
 <meta property="og:description" content="A space for art production and cultural development in Bethlehem, Palestine." id="og-desc-meta">
 <meta property="og:image" content="" id="og-image-meta">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="stylesheet" href="assets/app.css?v=108" />
+<link rel="stylesheet" href="assets/app.css?v=109" />
 <style>
   /* This page uses the exact same .ep-* / .event-panel template as every
      other entry point on the site (the homepage hero cards, the Programme
@@ -217,9 +217,9 @@
       recurring: !!doc.recurring,
       status:   doc.status || 'upcoming',
       featured: !!doc.featured,
-      register: doc.registerUrl || '',
+      register: (doc.registerUrl || '').trim(),
       admissionType: doc.admissionType || '',
-      ticketsUrl: doc.ticketsUrl || '',
+      ticketsUrl: (doc.ticketsUrl || '').trim(),
       streamChannel: doc.streamChannel ? { name: doc.streamChannel.name || '', url: doc.streamChannel.streamUrl || '' } : null,
       isPast:   s ? s < new Date() : (doc.status === 'past'),
       // Registration should stay open (clickable) for the event's full
