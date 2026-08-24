@@ -2640,13 +2640,14 @@ a.ep-related-artist-name:hover{ opacity: .65; }
 .ep-register{
   display: flex; align-items: center; justify-content: space-between;
   padding: 14px 20px;
-  font-family: var(--ff-sans); font-size: 11px; letter-spacing: 0;
-  text-transform: uppercase; font-weight: 700;
+  font-family: var(--ff-sans); font-size: 30px; letter-spacing: 0;
+  text-transform: none; font-weight: 400;
   text-decoration: none; color: currentColor; background: transparent;
   cursor: pointer;
   border: 1px solid currentColor; border-radius: 0;
   transition: opacity .15s;
 }
+.ep-register .ar{ font-family: var(--ff-ar); font-size: 34px; }
 .ep-register:hover{ opacity: .7; }
 .ep-free{ cursor: default; opacity: .6; background: transparent; color: currentColor; padding: 0; }
 .ep-free:hover{ opacity: .6; }
