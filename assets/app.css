@@ -2922,9 +2922,15 @@ a.ep-related-artist-name:hover{ opacity: .65; }
 .cta-inline-link:hover{ opacity: .7; }
 [dir="rtl"] .cta-inline-link{ float: left; }
 
-/* Facts leader-list + register CTA at the bottom of the page — hidden
-   for now per request, not deleted, so it's easy to bring back later. */
-.ep-facts, .ep-content > .ep-register{ display: none; }
+/* Facts leader-list at the bottom of the page — hidden for now per
+   request, not deleted, so it's easy to bring back later. (This used to
+   also hide .ep-content > .ep-register, from back when that was a plain
+   "Register" leftover next to the facts block. The admission-type work
+   later reused that same .ep-register class for the real Register/
+   Tickets/Free-entry CTA — this old blanket display:none was silently
+   killing it site-wide ever since, on every event with a tickets/register
+   link, even though the href/data were always correct underneath.) */
+.ep-facts{ display: none; }
 
 /* Image block — open, no outline, soft rounded corners */
 .cb-image{ display: flex; flex-direction: column; gap: 10px; }
