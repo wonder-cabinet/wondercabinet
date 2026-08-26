@@ -129,6 +129,34 @@ export const structure = (S: StructureBuilder) =>
 
       S.divider(),
 
+      // ── THE BAR ──────────────────────────────────────
+      S.listItem()
+        .title('The Bar')
+        .child(
+          S.list()
+            .title('The Bar')
+            .items([
+              S.listItem()
+                .title('Settings')
+                .child(
+                  S.document()
+                    .schemaType('barSettings')
+                    .documentId('barSettings')
+                ),
+              S.listItem()
+                .title('Menu Items')
+                .schemaType('barMenuItem')
+                .child(
+                  S.documentList()
+                    .title('Menu Items')
+                    .filter('_type == "barMenuItem"')
+                    .defaultOrdering([{field: 'category', direction: 'asc'}, {field: 'sortOrder', direction: 'asc'}])
+                ),
+            ])
+        ),
+
+      S.divider(),
+
       // ── SETTINGS (singleton) ─────────────────────────
       S.listItem()
         .title('Site Settings')
