@@ -647,6 +647,7 @@ async function init(){
       `;
       document.getElementById("hero-full-hours-link").addEventListener("click", e => {
         e.preventDefault();
+        e.stopPropagation();
         openHoursPopover();
       });
       document.getElementById("hero-hours-back-link").addEventListener("click", e => {
