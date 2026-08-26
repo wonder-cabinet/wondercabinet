@@ -550,6 +550,17 @@ function wireToggle(btnId, renderFn){
   });
 }
 
+/* re-apply the italic-serif "accent" styling to key names/phrases, and
+   italicize the last word of headlines — since content now comes from
+   Sanity as plain text, this inline emphasis has to be re-inserted rather
+   than hand-authored in the HTML. */
+function accentify(escapedText){
+  return escapedText.replace(/(Chef Fadi Kattan|Fadi Kattan|Wonder Cabinet|الشيف فادي قطان|فادي قطان|وندر كابينت)/g, '<span class="accent">$1</span>');
+}
+function emLastWord(escapedText){
+  return escapedText.replace(/(\S+)\s*$/, '<em>$1</em>');
+}
+
 const STAR_SVG = `<svg class="wc-star" viewBox="60 20 50 50" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M71.2734 65.8047L71.7354 66.1127L85.1354 55.5617L98.5894 66.1587L98.9984 65.8577L93.1904 49.7547L107.56 40.1737L107.353 39.6127L90.1794 40.2207L85.4914 23.7627H84.8804L80.1374 40.2207L63.1714 39.6127L62.9634 40.2207L77.0814 49.7007L71.2734 65.8047Z" fill="currentColor"/></svg>`;
 
 function renderRow(name, ar, desc, price){
@@ -604,7 +615,7 @@ async function init(){
     const headline = ar ? (settings.heroHeadline?.ar || "") : (settings.heroHeadline?.en || "");
     const body = ar ? (settings.heroBody?.ar || "") : (settings.heroBody?.en || "");
     const el = document.getElementById("hero-i18n");
-    el.innerHTML = `<h1 class="hero-head">${escapeHtml(headline)}</h1>${body ? `<p class="hero-sub">${escapeHtml(body)}</p>` : ""}`;
+    el.innerHTML = `<h1 class="hero-head">${emLastWord(escapeHtml(headline))}</h1>${body ? `<p class="hero-sub">${accentify(escapeHtml(body))}</p>` : ""}`;
     el.classList.toggle("ar", ar);
     el.style.direction = ar ? "rtl" : "";
   });
@@ -615,7 +626,7 @@ async function init(){
     const paras = text.split(/\n\s*\n/).filter(Boolean);
     let html = "";
     paras.forEach((p, i) => {
-      html += `<p>${escapeHtml(p.trim())}</p>`;
+      html += `<p>${accentify(escapeHtml(p.trim()))}</p>`;
       if(i === 0 && paras.length > 1){
         html += `<div class="rule">${STAR_SVG}${STAR_SVG}${STAR_SVG}</div>`;
       }
