@@ -290,8 +290,7 @@ section:nth-of-type(6){--slide-alpha:.98}
 <div class="hero" id="hero">
   <button class="lang-toggle is-ar" id="hero-lang-toggle" style="margin-bottom:1.6rem; position:relative; z-index:1" aria-label="Switch to Arabic">ع</button>
   <div id="hero-i18n">
-    <h1 class="hero-head">Something new is happening <em>downstairs.</em></h1>
-    <p class="hero-sub">On Thursday, August 27, the bar at <span class="accent">Wonder Cabinet</span> gets a refresh. <span class="accent">Chef Fadi Kattan</span>, a longtime friend and collaborator of <span class="accent">Wonder Cabinet</span>, has developed a new menu drawing on Palestinian ingredients, seasonal produce and family recipes.</p>
+    <h1 class="hero-head">Loading&hellip;</h1>
   </div>
 </div>
 <div class="hero-spacer"></div>
@@ -318,16 +317,7 @@ section:nth-of-type(6){--slide-alpha:.98}
     <div style="text-align:center; margin-bottom:1.4rem">
       <button class="lang-toggle is-ar" id="narrative-lang-toggle" aria-label="Switch to Arabic">ع</button>
     </div>
-    <div class="narrative" id="narrative-i18n">
-      <p>The new menu is by chef <span class="accent">Fadi Kattan</span>, a longtime friend and collaborator of <span class="accent">Wonder Cabinet</span>.</p>
-      <p>Drawing on Palestinian culinary traditions, seasonal ingredients and family recipes, Fadi approaches Palestinian food as something living and evolving.</p>
-      <div class="rule">
-        <svg class="wc-star" viewBox="60 20 50 50" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M71.2734 65.8047L71.7354 66.1127L85.1354 55.5617L98.5894 66.1587L98.9984 65.8577L93.1904 49.7547L107.56 40.1737L107.353 39.6127L90.1794 40.2207L85.4914 23.7627H84.8804L80.1374 40.2207L63.1714 39.6127L62.9634 40.2207L77.0814 49.7007L71.2734 65.8047Z" fill="currentColor"/></svg>
-        <svg class="wc-star" viewBox="60 20 50 50" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M71.2734 65.8047L71.7354 66.1127L85.1354 55.5617L98.5894 66.1587L98.9984 65.8577L93.1904 49.7547L107.56 40.1737L107.353 39.6127L90.1794 40.2207L85.4914 23.7627H84.8804L80.1374 40.2207L63.1714 39.6127L62.9634 40.2207L77.0814 49.7007L71.2734 65.8047Z" fill="currentColor"/></svg>
-        <svg class="wc-star" viewBox="60 20 50 50" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M71.2734 65.8047L71.7354 66.1127L85.1354 55.5617L98.5894 66.1587L98.9984 65.8577L93.1904 49.7547L107.56 40.1737L107.353 39.6127L90.1794 40.2207L85.4914 23.7627H84.8804L80.1374 40.2207L63.1714 39.6127L62.9634 40.2207L77.0814 49.7007L71.2734 65.8047Z" fill="currentColor"/></svg>
-      </div>
-      <p>The menu moves between simple plates to share and more substantial dishes, from warm almonds with sumac and sage and labaneh with Teta Julia's tomatoes to pulled lamb neck arayes.</p>
-    </div>
+    <div class="narrative" id="narrative-i18n"></div>
   </div>
 </section>
 
@@ -337,15 +327,7 @@ section:nth-of-type(6){--slide-alpha:.98}
     <h2 class="section-title">Food at The Bar</h2>
     <p class="section-sub" style="margin-bottom:0">By chef Fadi Kattan <span class="ar">المطبخ</span></p>
   </div>
-  <div class="rows" style="border-top:none">
-    <div class="row"><span class="rname">Warm Almonds, Sumac &amp; Sage <span class="ar">لوز دافئ بالسماق والميرمية</span><span class="rdesc">roasted palestinian almonds, sumac, crisp sage</span></span><span class="rprice">—</span></div>
-    <div class="row"><span class="rname">Palestinian Olives, Pickled Lemon &amp; Chilli <span class="ar">زيتون فلسطيني بالليمون المخلل</span><span class="rdesc">brined olives, quick-pickled lemon, coriander seed</span></span><span class="rprice">—</span></div>
-    <div class="row"><span class="rname">Labaneh &amp; Teta Julia's Tomatoes <span class="ar">لبنة وبندورة تيتا جوليا</span><span class="rdesc">thick labaneh, za'atar, chilli-lemon olive oil</span></span><span class="rprice">—</span></div>
-    <div class="row"><span class="rname">Palestinian Herb Salad <span class="ar">سلطة أعشاب فلسطينية</span><span class="rdesc">garden herbs, cucumber, spring onion, sumac &amp; lemon</span></span><span class="rprice">—</span></div>
-    <div class="row"><span class="rname">Battata Harra Wedges <span class="ar">بطاطا حرة</span><span class="rdesc">crisp potato wedges, garlic, chilli, coriander</span></span><span class="rprice">—</span></div>
-    <div class="row"><span class="rname">Baladi Cheese Toastie <span class="ar">توستي جبنة بلدي</span><span class="rdesc">potato bread, herbs, za'atar &amp; shatta</span></span><span class="rprice">—</span></div>
-    <div class="row"><span class="rname">Pulled Lamb Neck Arayes <span class="ar">عرايس رقبة الخروف</span><span class="rdesc">two kmaj breads, herbs, lemon &amp; sumac</span></span><span class="rprice">—</span></div>
-  </div>
+  <div class="rows" id="food-rows" style="border-top:none"></div>
 </section>
 
 <!-- ═══ WINE — dark slide ═══ -->
@@ -356,37 +338,10 @@ section:nth-of-type(6){--slide-alpha:.98}
   </div>
 
   <div class="subhead">By the glass <span class="ar">بالكأس</span></div>
-  <div class="rows-note">By Glass</div>
-  <div class="rows">
-    <div class="row"><span class="rname">Dabouki — Cremisan<span class="rdesc">white · bethlehem</span></span><span class="rprice">—</span></div>
-    <div class="row"><span class="rname">Dabouki–Jandali — Domaine Kassis<span class="rdesc">white · birzeit</span></span><span class="rprice">—</span></div>
-    <div class="row"><span class="rname">Zeini — Nadim, Taybeh<span class="rdesc">white · taybeh</span></span><span class="rprice">—</span></div>
-    <div class="row"><span class="rname">Rosé — Julia<span class="rdesc">rosé · mi'ilya</span></span><span class="rprice">—</span></div>
-    <div class="row"><span class="rname">Stubborn Saints — Philokalia<span class="rdesc">red · bethlehem</span></span><span class="rprice">—</span></div>
-    <div class="row"><span class="rname">Doèr, La Trinité Rouge — Ashkar<span class="rdesc">red · iqrit</span></span><span class="rprice">—</span></div>
-    <div class="row"><span class="rname">Cabernet Franc — Jascala<span class="rdesc">red · al-jish</span></span><span class="rprice">—</span></div>
-  </div>
+  <div class="rows" id="wine-glass-rows"></div>
 
   <div class="subhead">By the bottle <span class="ar">بالقنينة</span></div>
-  <div class="rows">
-    <div class="row"><span class="rname">Cremisan — Dabouki<span class="rdesc">bethlehem</span></span><span class="rprice">—</span></div>
-    <div class="row"><span class="rname">Cremisan — Hamdani–Jandali<span class="rdesc">bethlehem</span></span><span class="rprice">—</span></div>
-    <div class="row"><span class="rname">Cremisan — Baladi<span class="rdesc">bethlehem</span></span><span class="rprice">—</span></div>
-    <div class="row"><span class="rname">Philokalia — Grapes of Wrath<span class="rdesc">bethlehem</span></span><span class="rprice">—</span></div>
-    <div class="row"><span class="rname">Philokalia — Stubborn Saints<span class="rdesc">bethlehem</span></span><span class="rprice">—</span></div>
-    <div class="row"><span class="rname">Domaine Kassis — Dabouki–Jandali<span class="rdesc">birzeit</span></span><span class="rprice">—</span></div>
-    <div class="row"><span class="rname">Domaine Kassis — Blind Blend<span class="rdesc">birzeit</span></span><span class="rprice">—</span></div>
-    <div class="row"><span class="rname">Nadim, Taybeh — Zeini<span class="rdesc">taybeh</span></span><span class="rprice">—</span></div>
-    <div class="row"><span class="rname">Nadim, Taybeh — Bitouni<span class="rdesc">taybeh</span></span><span class="rprice">—</span></div>
-    <div class="row"><span class="rname">Nadim, Taybeh — Cabernet Sauvignon Reserve<span class="rdesc">taybeh</span></span><span class="rprice">—</span></div>
-    <div class="row"><span class="rname">Julia — Bir'im<span class="rdesc">mi'ilya</span></span><span class="rprice">—</span></div>
-    <div class="row"><span class="rname">Ashkar — Bayãd, La Trinité Blanche<span class="rdesc">iqrit</span></span><span class="rprice">—</span></div>
-    <div class="row"><span class="rname">Ashkar — Doèr, La Trinité Rouge<span class="rdesc">iqrit</span></span><span class="rprice">—</span></div>
-    <div class="row"><span class="rname">Ashkar — Ras El-Ahmar Shiraz Reserve<span class="rdesc">iqrit</span></span><span class="rprice">—</span></div>
-    <div class="row"><span class="rname">Jascala — Sauvignon Blanc<span class="rdesc">al-jish</span></span><span class="rprice">—</span></div>
-    <div class="row"><span class="rname">Jascala — Cabernet Franc<span class="rdesc">al-jish</span></span><span class="rprice">—</span></div>
-    <div class="row"><span class="rname">Jascala — Cabernet Sauvignon Reserve<span class="rdesc">al-jish</span></span><span class="rprice">—</span></div>
-  </div>
+  <div class="rows" id="wine-bottle-rows"></div>
   <div style="height:clamp(2rem,5vw,3.5rem)"></div>
 </section>
 
@@ -401,15 +356,7 @@ section:nth-of-type(6){--slide-alpha:.98}
       <button class="lang-toggle is-ar" id="program-lang-toggle" aria-label="Switch to Arabic">ع</button>
     </div>
 
-    <div id="program-i18n">
-      <div class="journal-entry">
-        <div class="entry-meta"><span>Thursday, 27/08/2026</span><span>19:00 — 21:30</span></div>
-        <div class="entry-title">Listening Sessions: Nawras &amp; Fares Salameh</div>
-        <div class="entry-body">Live from Wonder Cabinet on Radio Al Hara. Nawras Mughrabi, a Palestinian experimental artist working across music, photography, film and performance, joins Fares Salameh, a Palestinian musician and filmmaker working across electronic, experimental and jazz idioms, for an evening of shared sound at the bar.</div>
-      </div>
-
-      <p class="journal-contact">For the full programme, visit <a href="https://wondercabinet.space" target="_blank" rel="noopener">wondercabinet.space</a></p>
-    </div>
+    <div id="program-i18n"></div>
   </div>
 </section>
 
@@ -460,14 +407,26 @@ section:nth-of-type(6){--slide-alpha:.98}
 </section>
 
 <script>
+/* ── fetch bar content from Sanity ── */
+const SANITY_PROJECT = "xdtj605l";
+const SANITY_DATASET = "production";
+const escapeHtml = s => (s || "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+async function fetchBarData(){
+  const nowIso = new Date().toISOString();
+  const q = `{
+    "settings": *[_type=="barSettings"][0]{heroHeadline, heroBody, narrative, hours},
+    "menu": *[_type=="barMenuItem" && available==true] | order(sortOrder asc){name, description, category, group, region, price},
+    "events": *[_type=="event" && eventType=="Bar" && startDateTime >= "${nowIso}"] | order(startDateTime asc)[0...3]{title, shortDescription, body, startDateTime, endDateTime}
+  }`;
+  const url = `https://${SANITY_PROJECT}.api.sanity.io/v2024-01-01/data/query/${SANITY_DATASET}?query=${encodeURIComponent(q)}`;
+  const res = await fetch(url);
+  const json = await res.json();
+  return json.result || {};
+}
+
 /* ── hours, Asia/Hebron — never says "closed", only when it opens ── */
 const TZ = "Asia/Hebron";
-const HOURS = {
-  Sun:{open:"14:00",close:"23:00"}, Mon:null,
-  Tue:{open:"16:00",close:"00:00"}, Wed:{open:"16:00",close:"00:00"},
-  Thu:{open:"16:00",close:"01:00"}, Fri:{open:"16:00",close:"02:00"},
-  Sat:{open:"14:00",close:"02:00"}
-};
 const ORDER=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
 const FULL={Sun:"Sunday",Mon:"Monday",Tue:"Tuesday",Wed:"Wednesday",Thu:"Thursday",Fri:"Friday",Sat:"Saturday"};
 const toMin=t=>(+t.slice(0,2))*60+(+t.slice(3,5));
@@ -494,6 +453,7 @@ function nextOpening(day,mins){
   }
   return "";
 }
+let HOURS = {}; // populated from Sanity once fetched
 function render(){
   const {day,mins}=localNow();
   const i=ORDER.indexOf(day);
@@ -515,7 +475,6 @@ function render(){
   }
   set(nextOpening(day,mins));
 }
-render();
 setInterval(render, 30000);
 
 /* ── shrink-on-scroll hero ── */
@@ -575,47 +534,130 @@ document.addEventListener("click", e => {
   }
 });
 
-/* ── manual per-section language toggles ── */
-function wireToggle(btnId, contentId, arHTML){
+/* ── manual per-section language toggles, driven by fetched Sanity data ── */
+function wireToggle(btnId, renderFn){
   const btn = document.getElementById(btnId);
-  const el = document.getElementById(contentId);
-  if(!btn || !el) return;
-  const enHTML = el.innerHTML;
+  if(!btn) return;
   let showingAr = false;
+  renderFn(false);
   btn.addEventListener("click", () => {
     showingAr = !showingAr;
-    el.innerHTML = showingAr ? arHTML : enHTML;
-    el.classList.toggle("ar", showingAr);
-    el.style.direction = showingAr ? "rtl" : "";
+    renderFn(showingAr);
     btn.textContent = showingAr ? "EN" : "ع";
     btn.classList.toggle("is-ar", !showingAr);
   });
 }
 
-wireToggle("hero-lang-toggle", "hero-i18n", `
-  <h1 class="hero-head">شيء جديد يحدث <em>في الطابق السفلي.</em></h1>
-  <p class="hero-sub">يوم الخميس، ٢٧ أغسطس، يشهد بار <span class="accent">وندر كابينت</span> تجديدًا. طوّر <span class="accent">الشيف فادي قطان</span>، صديق قديم ومتعاون مع <span class="accent">وندر كابينت</span>، قائمة طعام جديدة مستوحاة من المكونات الفلسطينية والمحاصيل الموسمية ووصفات العائلة.</p>
-`);
+const STAR_SVG = `<svg class="wc-star" viewBox="60 20 50 50" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M71.2734 65.8047L71.7354 66.1127L85.1354 55.5617L98.5894 66.1587L98.9984 65.8577L93.1904 49.7547L107.56 40.1737L107.353 39.6127L90.1794 40.2207L85.4914 23.7627H84.8804L80.1374 40.2207L63.1714 39.6127L62.9634 40.2207L77.0814 49.7007L71.2734 65.8047Z" fill="currentColor"/></svg>`;
 
-wireToggle("narrative-lang-toggle", "narrative-i18n", `
-  <p>القائمة الجديدة من إعداد الشيف <span class="accent">فادي قطان</span>، صديق قديم ومتعاون مع <span class="accent">وندر كابينت</span>.</p>
-  <p>مستلهمًا من التقاليد الطهي الفلسطينية والمكونات الموسمية ووصفات العائلة، يتعامل فادي مع الطعام الفلسطيني كشيء حي ومتطور.</p>
-  <div class="rule">
-    <svg class="wc-star" viewBox="60 20 50 50" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M71.2734 65.8047L71.7354 66.1127L85.1354 55.5617L98.5894 66.1587L98.9984 65.8577L93.1904 49.7547L107.56 40.1737L107.353 39.6127L90.1794 40.2207L85.4914 23.7627H84.8804L80.1374 40.2207L63.1714 39.6127L62.9634 40.2207L77.0814 49.7007L71.2734 65.8047Z" fill="currentColor"/></svg>
-    <svg class="wc-star" viewBox="60 20 50 50" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M71.2734 65.8047L71.7354 66.1127L85.1354 55.5617L98.5894 66.1587L98.9984 65.8577L93.1904 49.7547L107.56 40.1737L107.353 39.6127L90.1794 40.2207L85.4914 23.7627H84.8804L80.1374 40.2207L63.1714 39.6127L62.9634 40.2207L77.0814 49.7007L71.2734 65.8047Z" fill="currentColor"/></svg>
-    <svg class="wc-star" viewBox="60 20 50 50" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M71.2734 65.8047L71.7354 66.1127L85.1354 55.5617L98.5894 66.1587L98.9984 65.8577L93.1904 49.7547L107.56 40.1737L107.353 39.6127L90.1794 40.2207L85.4914 23.7627H84.8804L80.1374 40.2207L63.1714 39.6127L62.9634 40.2207L77.0814 49.7007L71.2734 65.8047Z" fill="currentColor"/></svg>
-  </div>
-  <p>تتنقل القائمة بين أطباق بسيطة للمشاركة وأطباق أكثر دسامة، من اللوز الدافئ بالسماق والميرمية واللبنة مع بندورة تيتا جوليا إلى عرايس رقبة الخروف المسحوبة.</p>
-`);
+function renderRow(name, ar, desc, price){
+  const priceTxt = (price !== undefined && price !== null && price !== "") ? `${price} NIS` : "—";
+  return `<div class="row"><span class="rname">${escapeHtml(name)} ${ar ? `<span class="ar">${escapeHtml(ar)}</span>` : ""}${desc ? `<span class="rdesc">${escapeHtml(desc)}</span>` : ""}</span><span class="rprice">${priceTxt}</span></div>`;
+}
 
-wireToggle("program-lang-toggle", "program-i18n", `
-  <div class="journal-entry">
-    <div class="entry-meta"><span>الخميس، ٢٧/٠٨/٢٠٢٦</span><span>١٩:٠٠ – ٢١:٣٠</span></div>
-    <div class="entry-title">جلسات استماع: نورس وفارس سلامة</div>
-    <div class="entry-body">بث مباشر من وندر كابينت عبر راديو الحارة. تنضم نورس مغربي، فنانة تجريبية فلسطينية تعمل في الموسيقى والتصوير والأفلام والأداء، إلى فارس سلامة، موسيقي وصانع أفلام فلسطيني يعمل في الموسيقى الإلكترونية والتجريبية والجاز، في أمسية من الصوت المشترك في البار.</div>
-  </div>
-  <p class="journal-contact">لمشاهدة البرنامج الكامل، تفضل بزيارة <a href="https://wondercabinet.space" target="_blank" rel="noopener">wondercabinet.space</a></p>
-`);
+function renderMenuRows(items, showAr){
+  return items.map(it => {
+    const name = showAr ? (it.name?.ar || it.name?.en || "") : (it.name?.en || it.name?.ar || "");
+    const ar = showAr ? "" : it.name?.ar;
+    const desc = showAr ? it.description?.ar : it.description?.en;
+    return renderRow(name, ar, desc, it.price);
+  }).join("");
+}
+
+function fmtEventDate(iso){
+  if(!iso) return "";
+  const d = new Date(iso);
+  return d.toLocaleDateString("en-GB", {weekday:"long", day:"2-digit", month:"2-digit", year:"numeric", timeZone: TZ});
+}
+function fmtEventTimeRange(startIso, endIso){
+  if(!startIso) return "";
+  const opts = {hour:"2-digit", minute:"2-digit", hour12:false, timeZone: TZ};
+  const start = new Date(startIso).toLocaleTimeString("en-GB", opts);
+  if(!endIso) return start;
+  const end = new Date(endIso).toLocaleTimeString("en-GB", opts);
+  return `${start} — ${end}`;
+}
+
+async function init(){
+  let data = {};
+  try{
+    data = await fetchBarData();
+  }catch(e){
+    console.error("Failed to load bar content from Sanity", e);
+  }
+  const settings = data.settings || {};
+  const menu = data.menu || [];
+  const events = data.events || [];
+
+  /* hours */
+  HOURS = {};
+  (settings.hours || []).forEach(h => {
+    HOURS[h.day] = h.closed ? null : {open: h.open, close: h.close};
+  });
+  render();
+  renderHoursPopover();
+
+  /* hero */
+  wireToggle("hero-lang-toggle", (ar) => {
+    const headline = ar ? (settings.heroHeadline?.ar || "") : (settings.heroHeadline?.en || "");
+    const body = ar ? (settings.heroBody?.ar || "") : (settings.heroBody?.en || "");
+    const el = document.getElementById("hero-i18n");
+    el.innerHTML = `<h1 class="hero-head">${escapeHtml(headline)}</h1>${body ? `<p class="hero-sub">${escapeHtml(body)}</p>` : ""}`;
+    el.classList.toggle("ar", ar);
+    el.style.direction = ar ? "rtl" : "";
+  });
+
+  /* narrative */
+  wireToggle("narrative-lang-toggle", (ar) => {
+    const text = ar ? (settings.narrative?.ar || "") : (settings.narrative?.en || "");
+    const paras = text.split(/\n\s*\n/).filter(Boolean);
+    let html = "";
+    paras.forEach((p, i) => {
+      html += `<p>${escapeHtml(p.trim())}</p>`;
+      if(i === 0 && paras.length > 1){
+        html += `<div class="rule">${STAR_SVG}${STAR_SVG}${STAR_SVG}</div>`;
+      }
+    });
+    const el = document.getElementById("narrative-i18n");
+    el.innerHTML = html;
+    el.classList.toggle("ar", ar);
+    el.style.direction = ar ? "rtl" : "";
+  });
+
+  /* food + wine rows (bilingual inline, not toggled) */
+  document.getElementById("food-rows").innerHTML =
+    renderMenuRows(menu.filter(m => m.category === "food"), false);
+  document.getElementById("wine-glass-rows").innerHTML =
+    renderMenuRows(menu.filter(m => m.category === "wineGlass"), false);
+  document.getElementById("wine-bottle-rows").innerHTML =
+    renderMenuRows(menu.filter(m => m.category === "wineBottle"), false);
+
+  /* program */
+  wireToggle("program-lang-toggle", (ar) => {
+    let html = "";
+    if(events.length){
+      events.forEach(ev => {
+        const title = ar ? (ev.title?.ar || ev.title?.en || "") : (ev.title?.en || ev.title?.ar || "");
+        const bodyField = ev.shortDescription || ev.body || {};
+        const body = ar ? (bodyField.ar || "") : (bodyField.en || "");
+        html += `<div class="journal-entry">
+          <div class="entry-meta"><span>${escapeHtml(fmtEventDate(ev.startDateTime))}</span><span>${escapeHtml(fmtEventTimeRange(ev.startDateTime, ev.endDateTime))}</span></div>
+          <div class="entry-title">${escapeHtml(title)}</div>
+          ${body ? `<div class="entry-body">${escapeHtml(body)}</div>` : ""}
+        </div>`;
+      });
+    } else {
+      html += `<p class="journal-note">${ar ? "لا توجد أحداث قادمة في البار حاليًا." : "Nothing on the calendar at the bar just yet."}</p>`;
+    }
+    html += `<p class="journal-contact">${ar ? "لمشاهدة البرنامج الكامل، تفضل بزيارة" : "For the full programme, visit"} <a href="https://wondercabinet.space" target="_blank" rel="noopener">wondercabinet.space</a></p>`;
+    const el = document.getElementById("program-i18n");
+    el.innerHTML = html;
+    el.classList.toggle("ar", ar);
+    el.style.direction = ar ? "rtl" : "";
+  });
+}
+
+init();
 </script>
 </body>
 </html>

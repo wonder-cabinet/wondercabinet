@@ -37,7 +37,13 @@ export const barSettings = defineType({
   __experimental_actions: ['update', 'publish'],
   fields: [
     defineField({name: 'heroHeadline', title: 'Hero Headline', type: 'localeString'}),
-    defineField({name: 'heroBody', title: 'Hero Body', type: 'localeString'}),
+    defineField({name: 'heroBody', title: 'Hero Body', type: 'localeText'}),
+    defineField({
+      name: 'narrative',
+      title: 'About text',
+      description: 'Shown in the "about" section under the hero. Separate paragraphs with a blank line.',
+      type: 'localeText',
+    }),
     defineField({
       name: 'hours',
       title: 'Weekly Hours',
