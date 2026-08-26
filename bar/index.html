@@ -443,38 +443,46 @@ function fmt12(t){
   const ap = H < 12 ? "am" : "pm";
   return M === 0 ? `${h12}${ap}` : `${h12}:${String(M).padStart(2,"0")}${ap}`;
 }
-function nextOpening(day,mins){
-  const i=ORDER.indexOf(day);
-  for(let d=0;d<8;d++){
-    const key=ORDER[(i+d)%7], h=HOURS[key];
-    if(!h) continue;
-    if(d===0 && toMin(h.open)<=mins) continue;
-    const when = d===0 ? "today" : d===1 ? "tomorrow" : FULL[key];
-    return `Opens ${when} at ${fmt12(h.open)}`;
-  }
-  return "";
-}
 let HOURS = {}; // populated from Sanity once fetched
-function render(){
+
+/* language-aware version of the "open now until / opens at" status message,
+   shared by the small corner label and the full-screen hero swap below */
+function statusPhrase(lang){
+  const ar = lang === "ar";
   const {day,mins}=localNow();
   const i=ORDER.indexOf(day);
   const prev=HOURS[ORDER[(i+6)%7]];
-  const corner=document.getElementById("corner-hours");
-  const set=txt=>{ corner.textContent=txt; };
+  const dayNames = ar ? FULL_AR : FULL;
+  const todayWord = ar ? "اليوم" : "today";
+  const tomorrowWord = ar ? "غدًا" : "tomorrow";
+
+  function nextOpening(){
+    for(let d=0;d<8;d++){
+      const key=ORDER[(i+d)%7], h=HOURS[key];
+      if(!h) continue;
+      if(d===0 && toMin(h.open)<=mins) continue;
+      const when = d===0 ? todayWord : d===1 ? tomorrowWord : dayNames[key];
+      return ar ? `يفتح ${when} الساعة ${fmt12(h.open)}` : `Opens ${when} at ${fmt12(h.open)}`;
+    }
+    return "";
+  }
 
   if(prev && toMin(prev.close)<=toMin(prev.open) && mins<toMin(prev.close)){
-    set(`Open now until ${fmt12(prev.close)}`); return;
+    return ar ? `مفتوح الآن حتى ${fmt12(prev.close)}` : `Open now until ${fmt12(prev.close)}`;
   }
   const t=HOURS[day];
   if(t){
     const o=toMin(t.open), c=toMin(t.close), end=c<=o?c+1440:c;
     if(mins>=o && mins<end){
       const left = end-mins;
-      set(left<=60 ? `Last call — closing in ${left} min` : `Open now until ${fmt12(t.close)}`);
-      return;
+      if(left<=60) return ar ? `آخر طلب — يغلق خلال ${left} دقيقة` : `Last call — closing in ${left} min`;
+      return ar ? `مفتوح الآن حتى ${fmt12(t.close)}` : `Open now until ${fmt12(t.close)}`;
     }
   }
-  set(nextOpening(day,mins));
+  return nextOpening();
+}
+function render(){
+  document.getElementById("corner-hours").textContent = statusPhrase("en");
 }
 setInterval(render, 30000);
 
@@ -522,11 +530,10 @@ function renderHoursPopover(){
 const hoursPop = document.getElementById("hours-pop");
 const hoursLink = document.getElementById("corner-hours");
 const hoursClose = document.getElementById("hours-pop-close");
-hoursLink.addEventListener("click", e => {
-  e.preventDefault();
+function openHoursPopover(){
   renderHoursPopover();
   hoursPop.classList.add("open");
-});
+}
 hoursClose.addEventListener("click", () => hoursPop.classList.remove("open"));
 document.addEventListener("keydown", e => { if(e.key === "Escape") hoursPop.classList.remove("open"); });
 document.addEventListener("click", e => {
@@ -609,14 +616,52 @@ async function init(){
   render();
   renderHoursPopover();
 
-  /* hero */
-  wireToggle("hero-lang-toggle", (ar) => {
-    const headline = ar ? (settings.heroHeadline?.ar || "") : (settings.heroHeadline?.en || "");
-    const body = ar ? (settings.heroBody?.ar || "") : (settings.heroBody?.en || "");
-    const el = document.getElementById("hero-i18n");
-    el.innerHTML = `<h1 class="hero-head">${emLastWord(escapeHtml(headline))}</h1>${body ? `<p class="hero-sub">${accentify(escapeHtml(body))}</p>` : ""}`;
-    el.classList.toggle("ar", ar);
-    el.style.direction = ar ? "rtl" : "";
+  /* hero — normal headline/body view, or a full-screen swap showing the
+     live opening-hours status in the same hero-head style, with a way back */
+  let heroShowingAr = false;
+  let heroShowingHours = false;
+  const heroLangBtn = document.getElementById("hero-lang-toggle");
+  const heroEl18n = document.getElementById("hero-i18n");
+
+  function renderHero(){
+    if(heroShowingHours){
+      const text = statusPhrase(heroShowingAr ? "ar" : "en");
+      heroEl18n.innerHTML = `
+        <h1 class="hero-head">${escapeHtml(text)}</h1>
+        <p class="hero-sub"><a href="#" id="hero-full-hours-link">${heroShowingAr ? "كل مواعيد الدوام" : "Full opening hours"}</a></p>
+        <p class="hero-sub" style="margin-top:.6rem; opacity:.7"><a href="#" id="hero-hours-back-link">${heroShowingAr ? "→ رجوع" : "← Back"}</a></p>
+      `;
+      document.getElementById("hero-full-hours-link").addEventListener("click", e => {
+        e.preventDefault();
+        openHoursPopover();
+      });
+      document.getElementById("hero-hours-back-link").addEventListener("click", e => {
+        e.preventDefault();
+        heroShowingHours = false;
+        renderHero();
+      });
+    } else {
+      const headline = heroShowingAr ? (settings.heroHeadline?.ar || "") : (settings.heroHeadline?.en || "");
+      const body = heroShowingAr ? (settings.heroBody?.ar || "") : (settings.heroBody?.en || "");
+      heroEl18n.innerHTML = `<h1 class="hero-head">${emLastWord(escapeHtml(headline))}</h1>${body ? `<p class="hero-sub">${accentify(escapeHtml(body))}</p>` : ""}`;
+    }
+    heroEl18n.classList.toggle("ar", heroShowingAr);
+    heroEl18n.style.direction = heroShowingAr ? "rtl" : "";
+  }
+  renderHero();
+
+  heroLangBtn.addEventListener("click", () => {
+    heroShowingAr = !heroShowingAr;
+    heroLangBtn.textContent = heroShowingAr ? "EN" : "ع";
+    heroLangBtn.classList.toggle("is-ar", !heroShowingAr);
+    renderHero();
+  });
+
+  hoursLink.addEventListener("click", e => {
+    e.preventDefault();
+    heroShowingHours = true;
+    renderHero();
+    window.scrollTo({top:0, behavior:"smooth"});
   });
 
   /* narrative */
