@@ -139,6 +139,16 @@ a{color:inherit; text-decoration:none}
 .hero-sub{font-family:var(--sans); font-size:clamp(1.15rem,2.3vw,1.65rem); line-height:1.35; max-width:44ch; margin:1.4rem auto 0; text-align:center; color:#90f; transition:opacity .3s}
 .hero-addr{font-size:.95rem; color:var(--dim); margin-top:.5rem; transition:opacity .3s}
 
+/* ── full opening hours, centered on the hero slide ─────── */
+.hero-hours-list{max-width:22rem; margin:1.6rem auto 0; text-align:left}
+.hero-hours-list[dir="rtl"], .ar .hero-hours-list{text-align:right}
+.hero-hours-row{
+  display:flex; justify-content:space-between; gap:1.5rem;
+  padding:.6rem 0; border-bottom:1px solid rgba(17,17,16,.15);
+  font-family:var(--sans); font-size:clamp(1.05rem,2.2vw,1.4rem); color:#111;
+}
+.hero-hours-row.today{color:#90f}
+
 /* ── slides: each sticks at top and stacks over the previous ── */
 section{
   position:sticky; top:var(--bar-h); z-index:1;
@@ -630,15 +640,16 @@ async function init(){
   render();
   renderHoursPopover();
 
-  /* hero — normal headline/body view, or a full-screen swap showing the
-     live opening-hours status in the same hero-head style, with a way back */
+  /* hero — normal headline/body view, or a full-screen swap showing either
+     the live opening-hours status or the full week's hours, in the same
+     hero-head style, with a way back at each step */
   let heroShowingAr = false;
-  let heroShowingHours = false;
+  let heroMode = "normal"; // "normal" | "status" | "full"
   const heroLangBtn = document.getElementById("hero-lang-toggle");
   const heroEl18n = document.getElementById("hero-i18n");
 
   function renderHero(){
-    if(heroShowingHours){
+    if(heroMode === "status"){
       const text = statusPhrase(heroShowingAr ? "ar" : "en");
       heroEl18n.innerHTML = `
         <h1 class="hero-head">${escapeHtml(text)}</h1>
@@ -647,12 +658,30 @@ async function init(){
       `;
       document.getElementById("hero-full-hours-link").addEventListener("click", e => {
         e.preventDefault();
-        e.stopPropagation();
-        openHoursPopover();
+        heroMode = "full";
+        renderHero();
       });
       document.getElementById("hero-hours-back-link").addEventListener("click", e => {
         e.preventDefault();
-        heroShowingHours = false;
+        heroMode = "normal";
+        renderHero();
+      });
+    } else if(heroMode === "full"){
+      const {day: todayKey} = localNow();
+      const dayNames = heroShowingAr ? FULL_AR : FULL;
+      const rows = ORDER.map(k => {
+        const h = HOURS[k];
+        const time = h ? `${fmt12(h.open)} – ${fmt12(h.close)}` : (heroShowingAr ? "مغلق" : "Closed");
+        return `<div class="hero-hours-row${k===todayKey?" today":""}"><span>${dayNames[k]}</span><span>${time}</span></div>`;
+      }).join("");
+      heroEl18n.innerHTML = `
+        <h1 class="hero-head" style="font-size:clamp(1.8rem,4.4vw,3rem)">${heroShowingAr ? "أوقات الدوام" : "Opening Hours"}</h1>
+        <div class="hero-hours-list">${rows}</div>
+        <p class="hero-sub" style="margin-top:1.4rem; opacity:.7"><a href="#" id="hero-hours-back-link">${heroShowingAr ? "→ رجوع" : "← Back"}</a></p>
+      `;
+      document.getElementById("hero-hours-back-link").addEventListener("click", e => {
+        e.preventDefault();
+        heroMode = "status";
         renderHero();
       });
     } else {
@@ -674,7 +703,7 @@ async function init(){
 
   hoursLink.addEventListener("click", e => {
     e.preventDefault();
-    heroShowingHours = true;
+    heroMode = "status";
     renderHero();
     window.scrollTo({top:0, behavior:"smooth"});
   });
