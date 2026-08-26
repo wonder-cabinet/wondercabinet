@@ -1,0 +1,19 @@
+diff --git a/studio/schemas/index.ts b/studio/schemas/index.ts
+index 2215fa4..a53c869 100644
+--- a/studio/schemas/index.ts
++++ b/studio/schemas/index.ts
+@@ -23,6 +23,7 @@ import {siteSettings} from './siteSettings'
+ import {weeklyIssue} from './weeklyIssue'
+ import {socialPost} from './socialPost'
+ import {streamChannel} from './streamChannel'
++import {barMenuItem, barSettings} from './barMenuItem'
+ 
+ export const schemaTypes = [
+   // Objects
+@@ -50,4 +51,6 @@ export const schemaTypes = [
+   weeklyIssue,
+   socialPost,
+   streamChannel,
++  barMenuItem,
++  barSettings,
+ ]

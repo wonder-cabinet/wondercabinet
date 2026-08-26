@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Bar — Wonder Cabinet, Bethlehem</title>
+<meta name="description" content="Something new is happening downstairs. A new menu by chef Fadi Kattan at the bar at Wonder Cabinet, Bethlehem.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Noto+Naskh+Arabic:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --dark:#1C1C1A;
+  --paper:#EFEDE8;
+  --ink:#111110;
+  --red:#D8140A;
+  --yellow:#F4E63C;
+  --blue:#3A22F5;
+  --grey:#7C776E;
+  --dim:#8A867C;
+  --serif:"Instrument Serif",Georgia,"Times New Roman",serif;
+  --sans:-apple-system,"Helvetica Neue",Arial,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,monospace;
+  --bar-h:4.4rem;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+h1,h2,h3,h4,strong,b{font-weight:400}
+html{-webkit-text-size-adjust:100%; scroll-behavior:smooth}
+body{background:#F1E9E7; color:var(--paper); font-family:var(--sans); line-height:1.45}
+a{color:inherit; text-decoration:none}
+:focus-visible{outline:2px solid var(--red); outline-offset:3px}
+.ar{font-family:"Noto Naskh Arabic","Segoe UI",Tahoma,Arial,sans-serif; direction:rtl}
+
+/* ── sticky nav bar (sits at bottom of hero, rides up and sticks) ── */
+.navbar{
+  position:sticky; top:0; z-index:40;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:1rem clamp(1.2rem,3vw,2.4rem);
+  background:transparent; color:#000;
+  height:var(--bar-h);
+  backdrop-filter:blur(10px) saturate(1.1); -webkit-backdrop-filter:blur(10px) saturate(1.1);
+}
+.navbar-logo{
+  font-size:clamp(1.3rem,2.8vw,1.9rem); letter-spacing:0; font-weight:400; line-height:1.25;
+  display:flex; align-items:center; gap:.7rem;
+}
+.navbar-logo .wc-mark{width:1.8em; height:1.8em; flex:none; animation:wc-spin 18s linear infinite}
+.lockup-text{display:inline-block; transition:opacity .4s ease}
+.lockup-text.ar{font-size:1em; opacity:.95; margin-top:.05rem}
+@keyframes wc-spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.navbar-logo .wc-mark, .wc-mark-big{animation:none !important}}
+.navbar-nav{font-size:clamp(1.05rem,2.4vw,1.5rem)}
+.navbar-nav a{text-underline-offset:5px}
+.navbar-nav a:hover{text-decoration:underline}
+
+/* ── hero corners ───────────────────────────────────────── */
+.hero-corner{
+  position:fixed; top:0; left:0; right:0; z-index:3;
+  height:var(--bar-h); overflow:hidden;
+  display:flex; justify-content:space-between; align-items:center;
+  padding:0 clamp(1.2rem,3vw,2.4rem);
+  font-size:clamp(1.05rem,2.4vw,1.5rem); pointer-events:none;
+  color:#000;
+  transition:opacity .3s;
+}
+.hero-corner a{pointer-events:auto}
+.hero-corner .map{text-decoration:underline; text-underline-offset:5px}
+.hero-corner .map:hover{color:var(--red)}
+.hero-corner .hours{color:#000; cursor:pointer}
+.hero-corner .hours:hover{color:var(--red)}
+
+/* ── hours popover ──────────────────────────────────────── */
+.hours-pop{
+  position:fixed; top:0; right:0; z-index:41;
+  background:var(--dark); color:var(--paper);
+  padding:5.5rem clamp(1.4rem,3.5vw,2.4rem) 2rem;
+  min-width:min(20rem,90vw);
+  transform:translateY(-8px); opacity:0; pointer-events:none;
+  transition:opacity .25s, transform .25s;
+  border-left:1px solid rgba(239,237,232,.16); border-bottom:1px solid rgba(239,237,232,.16);
+}
+.hours-pop.open{opacity:1; pointer-events:auto; transform:translateY(0)}
+.hours-pop h3{font-size:.85rem; letter-spacing:.1em; text-transform:uppercase; opacity:.6; margin-bottom:1.2rem}
+.hours-pop .hrow{display:flex; justify-content:space-between; gap:1.5rem; padding:.5rem 0; border-bottom:1px solid rgba(239,237,232,.12); font-size:1.05rem}
+.hours-pop .hrow.today{color:var(--yellow); font-weight:400}
+.hours-pop .hrow.off span:last-child{opacity:.55}
+.hours-pop .close{position:absolute; top:1.2rem; right:1.4rem; background:none; border:none; color:var(--paper); font-size:1.6rem; cursor:pointer; line-height:1; opacity:.7}
+.hours-pop .close:hover{opacity:1; color:var(--yellow)}
+
+/* ── hero (dark slide) ──────────────────────────────────── */
+.hero-spacer{height:calc(100vh - var(--bar-h))}
+.hero{
+  position:fixed; top:0; left:0; right:0; height:calc(100vh - var(--bar-h));
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  text-align:center; padding:4.5rem clamp(1.2rem,4vw,2rem) 2rem;
+  transform-origin:top center; will-change:transform; z-index:2;
+}
+
+/* ── page-wide fixed glow layer — sits behind everything, never scrolls or shrinks ── */
+.bg-blob-layer{position:fixed; inset:0; z-index:-1; overflow:hidden; pointer-events:none}
+.blob{position:absolute; filter:blur(90px); will-change:transform, border-radius}
+.blob-red{
+  width:56%; height:66%; top:14%; left:22%;
+  background:var(--yellow); opacity:.82;
+  border-radius:48% 52% 55% 45%/55% 45% 55% 45%;
+  animation:blob-red-move 130s ease-in-out infinite;
+}
+@keyframes blob-red-move{
+  0%  {transform:translate(0,0)      scale(1);    border-radius:48% 52% 55% 45%/55% 45% 55% 45%}
+  22% {transform:translate(6%,-9%)   scale(1.12); border-radius:62% 38% 42% 58%/40% 60% 38% 62%}
+  46% {transform:translate(-8%,4%)   scale(0.92); border-radius:38% 62% 60% 40%/58% 42% 60% 40%}
+  70% {transform:translate(4%,9%)    scale(1.06); border-radius:55% 45% 48% 52%/45% 55% 48% 52%}
+  100%{transform:translate(0,0)      scale(1);    border-radius:48% 52% 55% 45%/55% 45% 55% 45%}
+}
+@media (prefers-reduced-motion:reduce){.blob{animation:none}}
+#hero-i18n{display:flex; flex-direction:column; align-items:center; text-align:center; width:100%; position:relative; z-index:1}
+.hero-head{font-family:var(--sans); font-weight:400; font-size:clamp(2.4rem,6.6vw,5.4rem); line-height:1.02; max-width:18ch; text-align:center}
+.hero-head em, .accent{font-style:italic; font-family:var(--serif)}
+.hero-head em{color:#90f}
+
+/* ── language toggle button ─────────────────────────────── */
+.lang-toggle{
+  display:inline-flex; align-items:center; justify-content:center;
+  width:2rem; height:2rem; border-radius:50%; border:1px solid currentColor;
+  background:none; color:inherit; opacity:.55; cursor:pointer; padding:0;
+  font-family:var(--sans); font-size:.85rem; line-height:1; text-align:center;
+  transition:opacity .2s, transform .2s;
+}
+.lang-toggle.is-ar{font-family:"Noto Naskh Arabic",sans-serif; font-size:1.05rem}
+.lang-toggle:hover{opacity:1; transform:scale(1.08)}
+.hero-sub{font-family:var(--sans); font-size:clamp(1.15rem,2.3vw,1.65rem); line-height:1.35; max-width:44ch; margin:1.4rem auto 0; text-align:center; color:#90f; transition:opacity .3s}
+.hero-addr{font-size:.95rem; color:var(--dim); margin-top:.5rem; transition:opacity .3s}
+
+/* ── slides: each sticks at top and stacks over the previous ── */
+section{
+  position:sticky; top:var(--bar-h); z-index:1;
+  min-height:calc(100vh - var(--bar-h));
+  overflow-x:hidden;
+  display:flex; flex-direction:column;
+}
+section:nth-of-type(1){z-index:1}
+section:nth-of-type(2){z-index:2}
+section:nth-of-type(3){z-index:3}
+section:nth-of-type(4){z-index:4}
+section:nth-of-type(5){z-index:5}
+section:nth-of-type(6){z-index:6}
+.center-wrap{margin:auto 0; width:100%}
+
+/* Food & Wine are long lists — they scroll with the page instead of
+   sticking as a card, since a long list pinned in place can freeze
+   the scroll while its lower rows sit hidden below the fold. */
+#menu, #wine{
+  position:relative; top:auto; min-height:100vh;
+  display:block; box-shadow:none;
+}
+section.has-sticky{justify-content:flex-start}
+.pad{padding:clamp(2.8rem,7vw,5rem) clamp(1.2rem,4.5vw,3.6rem)}
+.slide-light,.slide-dark,.slide-yellow,.slide-blue{
+  background:rgba(241,233,231,var(--slide-alpha,.6)); color:var(--ink);
+  border-top:1px solid rgba(17,17,16,.18);
+  backdrop-filter:blur(18px) saturate(1.1); -webkit-backdrop-filter:blur(18px) saturate(1.1);
+}
+section:nth-of-type(1){--slide-alpha:.30}
+section:nth-of-type(2){--slide-alpha:.46}
+section:nth-of-type(3){--slide-alpha:.60}
+section:nth-of-type(4){--slide-alpha:.74}
+section:nth-of-type(5){--slide-alpha:.87}
+section:nth-of-type(6){--slide-alpha:.98}
+
+/* sticky section header — holds at the top of its own scrollable card */
+.menu-head{
+  position:static;
+  padding:clamp(1.6rem,4vw,2.6rem) clamp(1.2rem,4.5vw,3.6rem) 1rem;
+}
+
+.section-title{font-family:var(--sans); font-weight:400; font-size:clamp(2.2rem,6vw,4rem); line-height:1; margin-bottom:.3rem}
+.section-sub{font-family:var(--mono); font-size:.78rem; letter-spacing:.12em; text-transform:uppercase; opacity:.6; margin-bottom:clamp(1.8rem,4vw,2.6rem)}
+
+/* narrative */
+.narrative{max-width:38rem; margin:0 auto; text-align:center; font-family:var(--sans); font-size:clamp(1.15rem,2.2vw,1.5rem); line-height:1.45}
+.narrative p{margin-bottom:1.4rem}
+.narrative .rule{opacity:.5; margin:2rem 0; display:flex; justify-content:center; gap:1.4rem}
+.narrative .rule .wc-star{width:1.1rem; height:1.1rem; color:var(--ink)}
+
+/* ── menu rows (dark slide, laika-style) ───────────────── */
+.rows{border-top:1px solid rgba(239,237,232,.16)}
+.row{
+  display:grid; grid-template-columns:1fr 4.5rem; gap:1.2rem; align-items:start;
+  padding:1.8rem clamp(1.2rem,4.5vw,3.6rem);
+  border-bottom:1px solid rgba(17,17,16,.15);
+  transition:background .18s, color .18s;
+}
+.row:hover{background:var(--paper); color:var(--ink)}
+.row:hover .rdesc{color:rgba(17,17,16,.6)}
+.row:hover .rprice{color:var(--ink)}
+.rname{
+  font-size:clamp(1.5rem,3.6vw,2.3rem); font-weight:400; line-height:1.1;
+  text-transform:none; letter-spacing:0;
+  text-decoration:underline; text-decoration-thickness:1px; text-underline-offset:6px;
+  text-decoration-color:currentColor;
+}
+.rname .ar{text-decoration:none; display:inline-block}
+.rdesc{
+  display:block; font-style:normal; text-transform:uppercase; font-size:.72rem;
+  color:var(--dim); margin-top:.55rem; letter-spacing:.12em;
+}
+.rprice{font-size:1rem; text-align:right; color:var(--grey); align-self:start; padding-top:.2rem}
+.subhead{
+  font-family:var(--mono); font-size:.78rem; letter-spacing:.14em; text-transform:uppercase;
+  color:var(--yellow); padding:2rem clamp(1.2rem,4.5vw,3.6rem) .7rem;
+}
+.rows-note{font-family:var(--sans); font-style:italic; opacity:.6; font-size:1.1rem; padding:.4rem clamp(1.2rem,4.5vw,3.6rem) 1.4rem}
+
+/* ── journal (yellow slide) ─────────────────────────────── */
+.journal-entry{border-top:1px solid rgba(19,18,0,.25); padding:clamp(1.6rem,3vw,2.2rem) 0}
+.journal-entry:last-of-type{border-bottom:1px solid rgba(19,18,0,.25)}
+.entry-meta{font-family:var(--mono); font-size:.75rem; letter-spacing:.1em; text-transform:uppercase; opacity:.6; display:flex; gap:1.5rem; margin-bottom:.5rem}
+.entry-title{font-family:var(--sans); font-weight:400; font-size:clamp(1.5rem,3.2vw,2.1rem); line-height:1.1; margin-bottom:.6rem}
+.entry-title .ar{font-family:"Noto Naskh Arabic",sans-serif; font-size:.55em; opacity:.7}
+.entry-body{font-size:1rem; line-height:1.6; max-width:60ch}
+.journal-contact{margin-top:1.8rem; font-size:.98rem}
+.journal-contact a{text-decoration:underline}
+.journal-note{font-family:var(--sans); font-style:italic; opacity:.7; font-size:1rem; margin-top:1.6rem; max-width:54ch}
+
+/* ── blue slide: elsewhere grid ─────────────────────────── */
+.elsewhere{
+  display:grid; grid-template-columns:repeat(3,1fr);
+  border-top:1px solid rgba(17,17,16,.2);
+}
+.el-item{
+  position:relative; overflow:hidden;
+  padding:clamp(1.8rem,4vw,3rem) clamp(1.2rem,3vw,2.2rem);
+  border-right:1px solid rgba(17,17,16,.2);
+  display:flex; flex-direction:column; gap:.5rem; min-height:12rem;
+  transition:background .2s;
+}
+.wc-mark-big{
+  position:absolute; top:50%; left:50%; width:220%; height:220%;
+  transform:translate(-50%,-50%); color:rgba(17,17,16,.08);
+  animation:wc-spin 40s linear infinite; pointer-events:none; z-index:0;
+}
+.el-item > *{position:relative; z-index:1}
+.el-item:last-child{border-right:none}
+.el-item:hover{background:rgba(17,17,16,.06)}
+.el-idx{font-family:var(--mono); font-size:.72rem; letter-spacing:.14em; opacity:.65}
+.el-name{font-family:var(--sans); font-weight:400; font-size:clamp(1.6rem,3.4vw,2.4rem); line-height:1.05; margin-top:auto}
+.el-item:hover .el-name{text-decoration:underline; text-underline-offset:6px}
+.el-note{font-size:.88rem; opacity:.7; line-height:1.4}
+
+@media (max-width:760px){
+  .elsewhere{grid-template-columns:1fr}
+  .el-item{border-right:none; border-bottom:1px solid rgba(17,17,16,.2); min-height:0}
+  .el-name{margin-top:.3rem}
+}
+
+/* ── find (light slide) ─────────────────────────────────── */
+.find-line{font-family:var(--sans); font-size:clamp(1.2rem,2.4vw,1.6rem); margin-bottom:.6rem}
+.find-line a{text-decoration:underline; text-underline-offset:4px}
+.find-line a:hover{color:var(--red)}
+.find-line.small{font-family:var(--sans); font-size:.95rem; opacity:.6}
+
+@media (max-width:760px){
+  .topbar-nav{gap:.35rem; font-size:.8rem}
+  .row{grid-template-columns:1fr 3.4rem; gap:.7rem}
+}
+@media (prefers-reduced-motion:reduce){.hero{transition:none}}
+</style>
+</head>
+<body>
+
+<!-- ═══ FIXED BACKGROUND GLOW — page-wide, never scrolls or shrinks ═══ -->
+<div class="bg-blob-layer">
+  <div class="blob blob-red"></div>
+</div>
+
+<!-- ═══ HERO CORNERS ═══ -->
+<div class="hero-corner" id="hero-corner">
+  <a class="map" href="https://maps.google.com/?q=Wonder+Cabinet+Bethlehem" target="_blank" rel="noopener">Wonder Cabinet, Bethlehem (Map)</a>
+  <a class="hours" href="#" id="corner-hours">—</a>
+</div>
+
+<!-- ═══ HOURS POPOVER ═══ -->
+<div class="hours-pop" id="hours-pop">
+  <button class="close" id="hours-pop-close" aria-label="Close">×</button>
+  <h3>Opening Hours <span class="ar" style="text-transform:none; opacity:.8">أوقات الدوام</span></h3>
+  <div id="hours-pop-list"></div>
+</div>
+
+<!-- ═══ HERO — dark slide ═══ -->
+<div class="hero" id="hero">
+  <button class="lang-toggle is-ar" id="hero-lang-toggle" style="margin-bottom:1.6rem; position:relative; z-index:1" aria-label="Switch to Arabic">ع</button>
+  <div id="hero-i18n">
+    <h1 class="hero-head">Something new is happening <em>downstairs.</em></h1>
+    <p class="hero-sub">On Thursday, August 27, the bar at <span class="accent">Wonder Cabinet</span> gets a refresh. <span class="accent">Chef Fadi Kattan</span>, a longtime friend and collaborator of <span class="accent">Wonder Cabinet</span>, has developed a new menu drawing on Palestinian ingredients, seasonal produce and family recipes.</p>
+  </div>
+</div>
+<div class="hero-spacer"></div>
+
+<!-- ═══ STICKY NAV — sits at bottom of hero, rides up and sticks ═══ -->
+<nav class="navbar">
+  <span class="navbar-logo">
+    <svg class="wc-mark" viewBox="0 0 126 126" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path fill-rule="evenodd" clip-rule="evenodd" d="M67.2464 100.498C66.7904 98.716 65.6394 97.411 63.3764 97.411C60.0514 97.411 58.6594 100.346 58.6594 103.324C58.6594 106.302 60.0514 109.236 63.3764 109.236C65.7894 109.236 67.1154 107.434 67.3334 105.172H69.9854C69.7674 108.889 67.1384 111.454 63.3764 111.454C58.7254 111.454 55.9424 107.759 55.9424 103.324C55.9424 98.89 58.7254 95.194 63.3764 95.194C66.8764 95.216 69.6384 97.15 69.9644 100.498H67.2464Z" fill="currentColor"/>
+      <path fill-rule="evenodd" clip-rule="evenodd" d="M52.4219 92.6473H73.5059V90.8283H52.4219V92.6473Z" fill="currentColor"/>
+      <path fill-rule="evenodd" clip-rule="evenodd" d="M62.964 3C29.9 3 3 29.899 3 62.964C3 96.028 29.9 122.928 62.964 122.928C96.027 122.928 122.927 96.028 122.927 62.964C122.927 29.899 96.027 3 62.964 3ZM62.964 125.928C28.246 125.928 0 97.683 0 62.964C0 28.245 28.246 0 62.964 0C97.682 0 125.927 28.245 125.927 62.964C125.927 97.683 97.682 125.928 62.964 125.928Z" fill="currentColor"/>
+      <path fill-rule="evenodd" clip-rule="evenodd" d="M71.2734 65.8047L71.7354 66.1127L85.1354 55.5617L98.5894 66.1587L98.9984 65.8577L93.1904 49.7547L107.56 40.1737L107.353 39.6127L90.1794 40.2207L85.4914 23.7627H84.8804L80.1374 40.2207L63.1714 39.6127L62.9634 40.2207L77.0814 49.7007L71.2734 65.8047Z" fill="currentColor"/>
+      <path fill-rule="evenodd" clip-rule="evenodd" d="M27.0912 65.8047L27.5532 66.1127L40.9532 55.5617L54.4072 66.1587L54.8162 65.8577L49.0082 49.7547L63.3792 40.1737L63.1722 39.6127L45.9982 40.2207L41.3082 23.7627H40.6992L35.9562 40.2207L18.9892 39.6127L18.7822 40.2207L32.8992 49.7007L27.0912 65.8047Z" fill="currentColor"/>
+      <path fill-rule="evenodd" clip-rule="evenodd" d="M52.8335 72.0205H55.5955L58.3985 83.8895H58.4425L61.5725 72.0205H64.3545L67.3985 83.8895H67.4415L70.3335 72.0205H73.0945L68.8125 87.5415H66.0505L62.9425 75.6725H62.8985L59.7255 87.5415H56.9215L52.8335 72.0205Z" fill="currentColor"/>
+    </svg>
+    <span class="lockup-text" id="lockup-text">The Bar at Wonder Cabinet</span>
+  </span>
+  <span class="navbar-nav"><a href="#menu">Food</a>, <a href="#wine">Wine</a>, <a href="#journal">Program</a>, <a href="#find">Contact</a></span>
+</nav>
+
+<!-- ═══ NARRATIVE — light slide ═══ -->
+<section class="slide-light" id="about">
+  <div class="pad center-wrap">
+    <div style="text-align:center; margin-bottom:1.4rem">
+      <button class="lang-toggle is-ar" id="narrative-lang-toggle" aria-label="Switch to Arabic">ع</button>
+    </div>
+    <div class="narrative" id="narrative-i18n">
+      <p>The new menu is by chef <span class="accent">Fadi Kattan</span>, a longtime friend and collaborator of <span class="accent">Wonder Cabinet</span>.</p>
+      <p>Drawing on Palestinian culinary traditions, seasonal ingredients and family recipes, Fadi approaches Palestinian food as something living and evolving.</p>
+      <div class="rule">
+        <svg class="wc-star" viewBox="60 20 50 50" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M71.2734 65.8047L71.7354 66.1127L85.1354 55.5617L98.5894 66.1587L98.9984 65.8577L93.1904 49.7547L107.56 40.1737L107.353 39.6127L90.1794 40.2207L85.4914 23.7627H84.8804L80.1374 40.2207L63.1714 39.6127L62.9634 40.2207L77.0814 49.7007L71.2734 65.8047Z" fill="currentColor"/></svg>
+        <svg class="wc-star" viewBox="60 20 50 50" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M71.2734 65.8047L71.7354 66.1127L85.1354 55.5617L98.5894 66.1587L98.9984 65.8577L93.1904 49.7547L107.56 40.1737L107.353 39.6127L90.1794 40.2207L85.4914 23.7627H84.8804L80.1374 40.2207L63.1714 39.6127L62.9634 40.2207L77.0814 49.7007L71.2734 65.8047Z" fill="currentColor"/></svg>
+        <svg class="wc-star" viewBox="60 20 50 50" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M71.2734 65.8047L71.7354 66.1127L85.1354 55.5617L98.5894 66.1587L98.9984 65.8577L93.1904 49.7547L107.56 40.1737L107.353 39.6127L90.1794 40.2207L85.4914 23.7627H84.8804L80.1374 40.2207L63.1714 39.6127L62.9634 40.2207L77.0814 49.7007L71.2734 65.8047Z" fill="currentColor"/></svg>
+      </div>
+      <p>The menu moves between simple plates to share and more substantial dishes, from warm almonds with sumac and sage and labaneh with Teta Julia's tomatoes to pulled lamb neck arayes.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ FOOD — dark slide ═══ -->
+<section class="slide-dark has-sticky" id="menu">
+  <div class="menu-head">
+    <h2 class="section-title">Food at The Bar</h2>
+    <p class="section-sub" style="margin-bottom:0">By chef Fadi Kattan <span class="ar">المطبخ</span></p>
+  </div>
+  <div class="rows" style="border-top:none">
+    <div class="row"><span class="rname">Warm Almonds, Sumac &amp; Sage <span class="ar">لوز دافئ بالسماق والميرمية</span><span class="rdesc">roasted palestinian almonds, sumac, crisp sage</span></span><span class="rprice">—</span></div>
+    <div class="row"><span class="rname">Palestinian Olives, Pickled Lemon &amp; Chilli <span class="ar">زيتون فلسطيني بالليمون المخلل</span><span class="rdesc">brined olives, quick-pickled lemon, coriander seed</span></span><span class="rprice">—</span></div>
+    <div class="row"><span class="rname">Labaneh &amp; Teta Julia's Tomatoes <span class="ar">لبنة وبندورة تيتا جوليا</span><span class="rdesc">thick labaneh, za'atar, chilli-lemon olive oil</span></span><span class="rprice">—</span></div>
+    <div class="row"><span class="rname">Palestinian Herb Salad <span class="ar">سلطة أعشاب فلسطينية</span><span class="rdesc">garden herbs, cucumber, spring onion, sumac &amp; lemon</span></span><span class="rprice">—</span></div>
+    <div class="row"><span class="rname">Battata Harra Wedges <span class="ar">بطاطا حرة</span><span class="rdesc">crisp potato wedges, garlic, chilli, coriander</span></span><span class="rprice">—</span></div>
+    <div class="row"><span class="rname">Baladi Cheese Toastie <span class="ar">توستي جبنة بلدي</span><span class="rdesc">potato bread, herbs, za'atar &amp; shatta</span></span><span class="rprice">—</span></div>
+    <div class="row"><span class="rname">Pulled Lamb Neck Arayes <span class="ar">عرايس رقبة الخروف</span><span class="rdesc">two kmaj breads, herbs, lemon &amp; sumac</span></span><span class="rprice">—</span></div>
+  </div>
+</section>
+
+<!-- ═══ WINE — dark slide ═══ -->
+<section class="slide-dark has-sticky" id="wine">
+  <div class="menu-head">
+    <h2 class="section-title">Local Wine at The Bar</h2>
+    <p class="section-sub" style="margin-bottom:0"><span class="ar">نبيذ محلي</span></p>
+  </div>
+
+  <div class="subhead">By the glass <span class="ar">بالكأس</span></div>
+  <div class="rows-note">By Glass</div>
+  <div class="rows">
+    <div class="row"><span class="rname">Dabouki — Cremisan<span class="rdesc">white · bethlehem</span></span><span class="rprice">—</span></div>
+    <div class="row"><span class="rname">Dabouki–Jandali — Domaine Kassis<span class="rdesc">white · birzeit</span></span><span class="rprice">—</span></div>
+    <div class="row"><span class="rname">Zeini — Nadim, Taybeh<span class="rdesc">white · taybeh</span></span><span class="rprice">—</span></div>
+    <div class="row"><span class="rname">Rosé — Julia<span class="rdesc">rosé · mi'ilya</span></span><span class="rprice">—</span></div>
+    <div class="row"><span class="rname">Stubborn Saints — Philokalia<span class="rdesc">red · bethlehem</span></span><span class="rprice">—</span></div>
+    <div class="row"><span class="rname">Doèr, La Trinité Rouge — Ashkar<span class="rdesc">red · iqrit</span></span><span class="rprice">—</span></div>
+    <div class="row"><span class="rname">Cabernet Franc — Jascala<span class="rdesc">red · al-jish</span></span><span class="rprice">—</span></div>
+  </div>
+
+  <div class="subhead">By the bottle <span class="ar">بالقنينة</span></div>
+  <div class="rows">
+    <div class="row"><span class="rname">Cremisan — Dabouki<span class="rdesc">bethlehem</span></span><span class="rprice">—</span></div>
+    <div class="row"><span class="rname">Cremisan — Hamdani–Jandali<span class="rdesc">bethlehem</span></span><span class="rprice">—</span></div>
+    <div class="row"><span class="rname">Cremisan — Baladi<span class="rdesc">bethlehem</span></span><span class="rprice">—</span></div>
+    <div class="row"><span class="rname">Philokalia — Grapes of Wrath<span class="rdesc">bethlehem</span></span><span class="rprice">—</span></div>
+    <div class="row"><span class="rname">Philokalia — Stubborn Saints<span class="rdesc">bethlehem</span></span><span class="rprice">—</span></div>
+    <div class="row"><span class="rname">Domaine Kassis — Dabouki–Jandali<span class="rdesc">birzeit</span></span><span class="rprice">—</span></div>
+    <div class="row"><span class="rname">Domaine Kassis — Blind Blend<span class="rdesc">birzeit</span></span><span class="rprice">—</span></div>
+    <div class="row"><span class="rname">Nadim, Taybeh — Zeini<span class="rdesc">taybeh</span></span><span class="rprice">—</span></div>
+    <div class="row"><span class="rname">Nadim, Taybeh — Bitouni<span class="rdesc">taybeh</span></span><span class="rprice">—</span></div>
+    <div class="row"><span class="rname">Nadim, Taybeh — Cabernet Sauvignon Reserve<span class="rdesc">taybeh</span></span><span class="rprice">—</span></div>
+    <div class="row"><span class="rname">Julia — Bir'im<span class="rdesc">mi'ilya</span></span><span class="rprice">—</span></div>
+    <div class="row"><span class="rname">Ashkar — Bayãd, La Trinité Blanche<span class="rdesc">iqrit</span></span><span class="rprice">—</span></div>
+    <div class="row"><span class="rname">Ashkar — Doèr, La Trinité Rouge<span class="rdesc">iqrit</span></span><span class="rprice">—</span></div>
+    <div class="row"><span class="rname">Ashkar — Ras El-Ahmar Shiraz Reserve<span class="rdesc">iqrit</span></span><span class="rprice">—</span></div>
+    <div class="row"><span class="rname">Jascala — Sauvignon Blanc<span class="rdesc">al-jish</span></span><span class="rprice">—</span></div>
+    <div class="row"><span class="rname">Jascala — Cabernet Franc<span class="rdesc">al-jish</span></span><span class="rprice">—</span></div>
+    <div class="row"><span class="rname">Jascala — Cabernet Sauvignon Reserve<span class="rdesc">al-jish</span></span><span class="rprice">—</span></div>
+  </div>
+  <div style="height:clamp(2rem,5vw,3.5rem)"></div>
+</section>
+
+<!-- ═══ JOURNAL — yellow slide ═══ -->
+<section class="slide-yellow" id="journal">
+  <div class="pad center-wrap">
+    <div style="display:flex; align-items:baseline; gap:1rem; justify-content:space-between">
+      <div>
+        <h2 class="section-title">Program</h2>
+        <p class="section-sub">This week, at the bar</p>
+      </div>
+      <button class="lang-toggle is-ar" id="program-lang-toggle" aria-label="Switch to Arabic">ع</button>
+    </div>
+
+    <div id="program-i18n">
+      <div class="journal-entry">
+        <div class="entry-meta"><span>Thursday, 27/08/2026</span><span>19:00 — 21:30</span></div>
+        <div class="entry-title">Listening Sessions: Nawras &amp; Fares Salameh</div>
+        <div class="entry-body">Live from Wonder Cabinet on Radio Al Hara. Nawras Mughrabi, a Palestinian experimental artist working across music, photography, film and performance, joins Fares Salameh, a Palestinian musician and filmmaker working across electronic, experimental and jazz idioms, for an evening of shared sound at the bar.</div>
+      </div>
+
+      <p class="journal-contact">For the full programme, visit <a href="https://wondercabinet.space" target="_blank" rel="noopener">wondercabinet.space</a></p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ BLUE SLIDE — elsewhere ═══ -->
+<section class="slide-blue" id="elsewhere">
+  <div class="center-wrap">
+  <div class="pad" style="padding-bottom:clamp(1.4rem,3vw,2rem)">
+    <h2 class="section-title">Elsewhere</h2>
+    <p class="section-sub">Upstairs, on air, and on the map</p>
+  </div>
+  <div class="elsewhere">
+    <a class="el-item" href="https://wondercabinet.space" target="_blank" rel="noopener">
+      <svg class="wc-mark-big" viewBox="0 0 126 126" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M67.2464 100.498C66.7904 98.716 65.6394 97.411 63.3764 97.411C60.0514 97.411 58.6594 100.346 58.6594 103.324C58.6594 106.302 60.0514 109.236 63.3764 109.236C65.7894 109.236 67.1154 107.434 67.3334 105.172H69.9854C69.7674 108.889 67.1384 111.454 63.3764 111.454C58.7254 111.454 55.9424 107.759 55.9424 103.324C55.9424 98.89 58.7254 95.194 63.3764 95.194C66.8764 95.216 69.6384 97.15 69.9644 100.498H67.2464Z" fill="currentColor"/>
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M52.4219 92.6473H73.5059V90.8283H52.4219V92.6473Z" fill="currentColor"/>
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M62.964 3C29.9 3 3 29.899 3 62.964C3 96.028 29.9 122.928 62.964 122.928C96.027 122.928 122.927 96.028 122.927 62.964C122.927 29.899 96.027 3 62.964 3ZM62.964 125.928C28.246 125.928 0 97.683 0 62.964C0 28.245 28.246 0 62.964 0C97.682 0 125.927 28.245 125.927 62.964C125.927 97.683 97.682 125.928 62.964 125.928Z" fill="currentColor"/>
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M71.2734 65.8047L71.7354 66.1127L85.1354 55.5617L98.5894 66.1587L98.9984 65.8577L93.1904 49.7547L107.56 40.1737L107.353 39.6127L90.1794 40.2207L85.4914 23.7627H84.8804L80.1374 40.2207L63.1714 39.6127L62.9634 40.2207L77.0814 49.7007L71.2734 65.8047Z" fill="currentColor"/>
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M27.0912 65.8047L27.5532 66.1127L40.9532 55.5617L54.4072 66.1587L54.8162 65.8577L49.0082 49.7547L63.3792 40.1737L63.1722 39.6127L45.9982 40.2207L41.3082 23.7627H40.6992L35.9562 40.2207L18.9892 39.6127L18.7822 40.2207L32.8992 49.7007L27.0912 65.8047Z" fill="currentColor"/>
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M52.8335 72.0205H55.5955L58.3985 83.8895H58.4425L61.5725 72.0205H64.3545L67.3985 83.8895H67.4415L70.3335 72.0205H73.0945L68.8125 87.5415H66.0505L62.9425 75.6725H62.8985L59.7255 87.5415H56.9215L52.8335 72.0205Z" fill="currentColor"/>
+      </svg>
+      <span class="el-idx">01 / THE BUILDING</span>
+      <span class="el-note">Residencies, exhibitions, workshops and production — the whole programme, four floors up from the bar.</span>
+      <span class="el-name">Wonder Cabinet</span>
+    </a>
+    <a class="el-item" href="https://radioalhara.net" target="_blank" rel="noopener">
+      <span class="el-idx">02 / ON AIR</span>
+      <span class="el-note">Broadcasting from the studio next door, most nights. If you hear it in the room, it's probably live.</span>
+      <span class="el-name">Radio alHara</span>
+    </a>
+    <a class="el-item" href="https://maps.google.com/?q=Wonder+Cabinet+Bethlehem" target="_blank" rel="noopener">
+      <span class="el-idx">03 / GETTING HERE</span>
+      <span class="el-note">Wonder Cabinet: Minus One Floor, Bethlehem.</span>
+      <span class="el-name">Directions</span>
+    </a>
+  </div>
+  </div>
+</section>
+
+<!-- ═══ FIND US — light slide ═══ -->
+<section class="slide-light" id="find">
+  <div class="pad center-wrap">
+    <h2 class="section-title">Find Us</h2>
+    <p class="section-sub">Bethlehem, Palestine</p>
+    <div class="find-line">Wonder Cabinet: Minus One Floor</div>
+    <div class="find-line small">Next to Radio alHara's studio</div>
+    <div class="find-line" style="margin-top:1.4rem"><a href="mailto:bar@wondercabinet.space">bar@wondercabinet.space</a></div>
+  </div>
+</section>
+
+<script>
+/* ── hours, Asia/Hebron — never says "closed", only when it opens ── */
+const TZ = "Asia/Hebron";
+const HOURS = {
+  Sun:{open:"14:00",close:"23:00"}, Mon:null,
+  Tue:{open:"16:00",close:"00:00"}, Wed:{open:"16:00",close:"00:00"},
+  Thu:{open:"16:00",close:"01:00"}, Fri:{open:"16:00",close:"02:00"},
+  Sat:{open:"14:00",close:"02:00"}
+};
+const ORDER=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+const FULL={Sun:"Sunday",Mon:"Monday",Tue:"Tuesday",Wed:"Wednesday",Thu:"Thursday",Fri:"Friday",Sat:"Saturday"};
+const toMin=t=>(+t.slice(0,2))*60+(+t.slice(3,5));
+function localNow(){
+  const p=new Intl.DateTimeFormat("en-GB",{timeZone:TZ,hour12:false,weekday:"short",hour:"2-digit",minute:"2-digit"}).formatToParts(new Date());
+  const g=t=>p.find(x=>x.type===t).value;
+  let h=+g("hour"); if(h===24)h=0;
+  return {day:g("weekday"), mins:h*60+(+g("minute"))};
+}
+function fmt12(t){
+  const [H,M]=t.split(":").map(Number);
+  const h12 = H % 12 === 0 ? 12 : H % 12;
+  const ap = H < 12 ? "am" : "pm";
+  return M === 0 ? `${h12}${ap}` : `${h12}:${String(M).padStart(2,"0")}${ap}`;
+}
+function nextOpening(day,mins){
+  const i=ORDER.indexOf(day);
+  for(let d=0;d<8;d++){
+    const key=ORDER[(i+d)%7], h=HOURS[key];
+    if(!h) continue;
+    if(d===0 && toMin(h.open)<=mins) continue;
+    const when = d===0 ? "today" : d===1 ? "tomorrow" : FULL[key];
+    return `Opens ${when} at ${fmt12(h.open)}`;
+  }
+  return "";
+}
+function render(){
+  const {day,mins}=localNow();
+  const i=ORDER.indexOf(day);
+  const prev=HOURS[ORDER[(i+6)%7]];
+  const corner=document.getElementById("corner-hours");
+  const set=txt=>{ corner.textContent=txt; };
+
+  if(prev && toMin(prev.close)<=toMin(prev.open) && mins<toMin(prev.close)){
+    set(`Open now until ${fmt12(prev.close)}`); return;
+  }
+  const t=HOURS[day];
+  if(t){
+    const o=toMin(t.open), c=toMin(t.close), end=c<=o?c+1440:c;
+    if(mins>=o && mins<end){
+      const left = end-mins;
+      set(left<=60 ? `Last call — closing in ${left} min` : `Open now until ${fmt12(t.close)}`);
+      return;
+    }
+  }
+  set(nextOpening(day,mins));
+}
+render();
+setInterval(render, 30000);
+
+/* ── shrink-on-scroll hero ── */
+const heroEl = document.getElementById("hero");
+const fadeEls = document.querySelectorAll(".hero-sub, .hero-corner, #hero-lang-toggle");
+const SHRINK_DISTANCE = 460, MIN_SCALE = 0.34;
+function onScroll(){
+  const y = window.scrollY || window.pageYOffset;
+  const p = Math.min(Math.max(y / SHRINK_DISTANCE, 0), 1);
+  heroEl.style.transform = `translateY(${-y * 0.4}px) scale(${1 - p * (1 - MIN_SCALE)})`;
+  const o = Math.max(1 - p * 1.6, 0);
+  fadeEls.forEach(el => el.style.opacity = o);
+}
+window.addEventListener("scroll", onScroll, { passive:true });
+onScroll();
+
+/* ── nav logo: crossfade EN / AR every 10s ── */
+const lockupEl = document.getElementById("lockup-text");
+const LOCKUP_EN = "The Bar at Wonder Cabinet";
+const LOCKUP_AR = "البار في مجلس العجب";
+let lockupIsAr = false;
+setInterval(() => {
+  lockupEl.style.opacity = 0;
+  setTimeout(() => {
+    lockupIsAr = !lockupIsAr;
+    lockupEl.textContent = lockupIsAr ? LOCKUP_AR : LOCKUP_EN;
+    lockupEl.classList.toggle("ar", lockupIsAr);
+    lockupEl.style.opacity = 1;
+  }, 400);
+}, 10000);
+
+/* ── hours popover ── */
+const FULL_AR = {Sun:"الأحد",Mon:"الإثنين",Tue:"الثلاثاء",Wed:"الأربعاء",Thu:"الخميس",Fri:"الجمعة",Sat:"السبت"};
+function renderHoursPopover(){
+  const {day} = localNow();
+  document.getElementById("hours-pop-list").innerHTML = ORDER.map(k => {
+    const h = HOURS[k];
+    return `<div class="hrow ${k===day?"today":""} ${h?"":"off"}">
+      <span>${FULL[k]}</span>
+      <span>${h ? fmt12(h.open)+" – "+fmt12(h.close) : "Closed"}</span>
+    </div>`;
+  }).join("");
+}
+const hoursPop = document.getElementById("hours-pop");
+const hoursLink = document.getElementById("corner-hours");
+const hoursClose = document.getElementById("hours-pop-close");
+hoursLink.addEventListener("click", e => {
+  e.preventDefault();
+  renderHoursPopover();
+  hoursPop.classList.add("open");
+});
+hoursClose.addEventListener("click", () => hoursPop.classList.remove("open"));
+document.addEventListener("keydown", e => { if(e.key === "Escape") hoursPop.classList.remove("open"); });
+document.addEventListener("click", e => {
+  if(hoursPop.classList.contains("open") && !hoursPop.contains(e.target) && e.target !== hoursLink){
+    hoursPop.classList.remove("open");
+  }
+});
+
+/* ── manual per-section language toggles ── */
+function wireToggle(btnId, contentId, arHTML){
+  const btn = document.getElementById(btnId);
+  const el = document.getElementById(contentId);
+  if(!btn || !el) return;
+  const enHTML = el.innerHTML;
+  let showingAr = false;
+  btn.addEventListener("click", () => {
+    showingAr = !showingAr;
+    el.innerHTML = showingAr ? arHTML : enHTML;
+    el.classList.toggle("ar", showingAr);
+    el.style.direction = showingAr ? "rtl" : "";
+    btn.textContent = showingAr ? "EN" : "ع";
+    btn.classList.toggle("is-ar", !showingAr);
+  });
+}
+
+wireToggle("hero-lang-toggle", "hero-i18n", `
+  <h1 class="hero-head">شيء جديد يحدث <em>في الطابق السفلي.</em></h1>
+  <p class="hero-sub">يوم الخميس، ٢٧ أغسطس، يشهد بار <span class="accent">وندر كابينت</span> تجديدًا. طوّر <span class="accent">الشيف فادي قطان</span>، صديق قديم ومتعاون مع <span class="accent">وندر كابينت</span>، قائمة طعام جديدة مستوحاة من المكونات الفلسطينية والمحاصيل الموسمية ووصفات العائلة.</p>
+`);
+
+wireToggle("narrative-lang-toggle", "narrative-i18n", `
+  <p>القائمة الجديدة من إعداد الشيف <span class="accent">فادي قطان</span>، صديق قديم ومتعاون مع <span class="accent">وندر كابينت</span>.</p>
+  <p>مستلهمًا من التقاليد الطهي الفلسطينية والمكونات الموسمية ووصفات العائلة، يتعامل فادي مع الطعام الفلسطيني كشيء حي ومتطور.</p>
+  <div class="rule">
+    <svg class="wc-star" viewBox="60 20 50 50" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M71.2734 65.8047L71.7354 66.1127L85.1354 55.5617L98.5894 66.1587L98.9984 65.8577L93.1904 49.7547L107.56 40.1737L107.353 39.6127L90.1794 40.2207L85.4914 23.7627H84.8804L80.1374 40.2207L63.1714 39.6127L62.9634 40.2207L77.0814 49.7007L71.2734 65.8047Z" fill="currentColor"/></svg>
+    <svg class="wc-star" viewBox="60 20 50 50" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M71.2734 65.8047L71.7354 66.1127L85.1354 55.5617L98.5894 66.1587L98.9984 65.8577L93.1904 49.7547L107.56 40.1737L107.353 39.6127L90.1794 40.2207L85.4914 23.7627H84.8804L80.1374 40.2207L63.1714 39.6127L62.9634 40.2207L77.0814 49.7007L71.2734 65.8047Z" fill="currentColor"/></svg>
+    <svg class="wc-star" viewBox="60 20 50 50" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M71.2734 65.8047L71.7354 66.1127L85.1354 55.5617L98.5894 66.1587L98.9984 65.8577L93.1904 49.7547L107.56 40.1737L107.353 39.6127L90.1794 40.2207L85.4914 23.7627H84.8804L80.1374 40.2207L63.1714 39.6127L62.9634 40.2207L77.0814 49.7007L71.2734 65.8047Z" fill="currentColor"/></svg>
+  </div>
+  <p>تتنقل القائمة بين أطباق بسيطة للمشاركة وأطباق أكثر دسامة، من اللوز الدافئ بالسماق والميرمية واللبنة مع بندورة تيتا جوليا إلى عرايس رقبة الخروف المسحوبة.</p>
+`);
+
+wireToggle("program-lang-toggle", "program-i18n", `
+  <div class="journal-entry">
+    <div class="entry-meta"><span>الخميس، ٢٧/٠٨/٢٠٢٦</span><span>١٩:٠٠ – ٢١:٣٠</span></div>
+    <div class="entry-title">جلسات استماع: نورس وفارس سلامة</div>
+    <div class="entry-body">بث مباشر من وندر كابينت عبر راديو الحارة. تنضم نورس مغربي، فنانة تجريبية فلسطينية تعمل في الموسيقى والتصوير والأفلام والأداء، إلى فارس سلامة، موسيقي وصانع أفلام فلسطيني يعمل في الموسيقى الإلكترونية والتجريبية والجاز، في أمسية من الصوت المشترك في البار.</div>
+  </div>
+  <p class="journal-contact">لمشاهدة البرنامج الكامل، تفضل بزيارة <a href="https://wondercabinet.space" target="_blank" rel="noopener">wondercabinet.space</a></p>
+`);
+</script>
+</body>
+</html>
