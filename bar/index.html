@@ -187,7 +187,7 @@ section:nth-of-type(6){--slide-alpha:.98}
 
 /* sticky section header — holds at the top of its own scrollable card */
 .menu-head{
-  position:static;
+  position:static; max-width:44rem; margin:0 auto; text-align:center;
   padding:clamp(1.6rem,4vw,2.6rem) clamp(1.2rem,4.5vw,3.6rem) 1rem;
 }
 
@@ -201,9 +201,9 @@ section:nth-of-type(6){--slide-alpha:.98}
 .narrative .rule .wc-star{width:1.1rem; height:1.1rem; color:#90f}
 
 /* ── menu rows (dark slide, laika-style) ───────────────── */
-.rows{border-top:1px solid rgba(239,237,232,.16)}
+.rows{border-top:1px solid rgba(239,237,232,.16); max-width:44rem; margin:0 auto}
 .row{
-  display:grid; grid-template-columns:1fr 4.5rem; gap:1.2rem; align-items:start;
+  display:flex; flex-direction:column; align-items:center; gap:.2rem; text-align:center;
   padding:1.8rem clamp(1.2rem,4.5vw,3.6rem);
   border-bottom:1px solid rgba(17,17,16,.15);
   transition:background .18s, color .18s;
@@ -222,10 +222,10 @@ section:nth-of-type(6){--slide-alpha:.98}
   display:block; font-family:var(--serif); font-style:italic; text-transform:none; font-size:.95rem;
   color:var(--ink); margin-top:.55rem; letter-spacing:0;
 }
-.rprice{font-size:1rem; text-align:right; color:var(--grey); align-self:start; padding-top:.2rem}
+.rprice{font-size:1rem; text-align:center; color:var(--grey); margin-top:.3rem}
 .subhead{
   font-family:var(--serif); font-style:italic; font-size:clamp(1.3rem,2.8vw,1.9rem); letter-spacing:0; text-transform:none;
-  color:#90f; padding:2rem clamp(1.2rem,4.5vw,3.6rem) .7rem;
+  color:#90f; padding:2rem clamp(1.2rem,4.5vw,3.6rem) .7rem; max-width:44rem; margin:0 auto; text-align:center;
 }
 .rows-note{font-family:var(--sans); font-style:italic; opacity:.6; font-size:1.1rem; padding:.4rem clamp(1.2rem,4.5vw,3.6rem) 1.4rem}
 
@@ -279,7 +279,7 @@ section:nth-of-type(6){--slide-alpha:.98}
 
 @media (max-width:760px){
   .topbar-nav{gap:.35rem; font-size:.8rem}
-  .row{grid-template-columns:1fr 3.4rem; gap:.7rem}
+  .row{gap:.4rem}
 }
 @media (prefers-reduced-motion:reduce){.hero{transition:none}}
 </style>
