@@ -126,6 +126,21 @@ a{color:inherit; text-decoration:none}
 .ar-accent, .hero-head em.ar-accent{font-family:"Aref Ruqaa",var(--serif); font-style:normal}
 .hero-head{color:#111}
 
+/* ── scroll-driven flip-clock headline (English → Arabic) ── */
+.flip-word{display:inline-flex; flex-wrap:wrap; justify-content:center}
+.flip-char{
+  display:inline-block; position:relative; height:1.05em; line-height:1.05em;
+  perspective:400px; vertical-align:top;
+}
+.flip-inner{
+  position:relative; width:100%; height:100%; transform-style:preserve-3d;
+  will-change:transform;
+}
+.flip-char .face{
+  position:absolute; inset:0; backface-visibility:hidden; white-space:pre;
+}
+.flip-char .face.back{transform:rotateX(180deg)}
+
 /* ── language toggle button ─────────────────────────────── */
 .lang-toggle{
   display:inline-flex; align-items:center; justify-content:center;
@@ -565,6 +580,26 @@ function accentify(escapedText){
     return `<span class="${cls}">${m}</span>`;
   });
 }
+/* scroll-driven "flip clock" headline: one card per character position,
+   front face = English, back face = Arabic. Character positions don't
+   correspond to a real transliteration — it's a visual flip effect, not
+   a letter-for-letter translation. */
+function buildFlipHeadline(enWeekday, enRest, arWeekday, arRest){
+  const en = enWeekday + enRest;
+  const ar = arWeekday + arRest;
+  const len = Math.max(en.length, ar.length);
+  let html = '<span class="flip-word" dir="ltr">';
+  for(let i=0;i<len;i++){
+    const f = en[i] || " ";
+    const b = ar[i] || " ";
+    const fCls = i < enWeekday.length ? "accent" : "";
+    const bCls = i < arWeekday.length ? "ar-accent accent" : "";
+    html += `<span class="flip-char"><span class="flip-inner"><span class="face front ${fCls}">${escapeHtml(f)}</span><span class="face back ${bCls}">${escapeHtml(b)}</span></span></span>`;
+  }
+  html += "</span>";
+  return html;
+}
+
 function emLastWord(escapedText){
   return escapedText.replace(/(\S+)\s*$/, (m, word) => {
     const cls = isArabicText(word) ? "ar-accent" : "";
@@ -639,6 +674,7 @@ async function init(){
      hero-head style, with a way back at each step */
   let heroShowingAr = false;
   let heroMode = "normal"; // "normal" | "status" | "full"
+  let heroFlipManualOverride = false; // true once the ع/EN button has been used
   const heroLangBtn = document.getElementById("hero-lang-toggle");
   const heroEl18n = document.getElementById("hero-i18n");
 
@@ -678,6 +714,15 @@ async function init(){
         heroMode = "status";
         renderHero();
       });
+    } else if(!heroFlipManualOverride){
+      const en = heroDateParts("en");
+      const ar = heroDateParts("ar");
+      const bodyEn = settings.heroBody?.en || "";
+      heroEl18n.innerHTML = `<h1 class="hero-head">${buildFlipHeadline(en.weekday, en.rest, ar.weekday, ar.rest)}</h1>${bodyEn ? `<p class="hero-sub" id="hero-sub-text">${accentify(escapeHtml(bodyEn))}</p>` : ""}`;
+      heroEl18n.classList.remove("ar");
+      heroEl18n.style.direction = "";
+      updateHeroFlip();
+      return;
     } else {
       const {weekday, rest} = heroDateParts(heroShowingAr ? "ar" : "en");
       const body = heroShowingAr ? (settings.heroBody?.ar || "") : (settings.heroBody?.en || "");
@@ -689,7 +734,38 @@ async function init(){
   }
   renderHero();
 
+  /* scroll drives the flip from English to Arabic across the hero's
+     shrink zone; the ع/EN button, if used, takes over permanently and
+     falls back to the old instant plain-text swap */
+  const HERO_FLIP_DISTANCE = SHRINK_DISTANCE;
+  function updateHeroFlip(){
+    if(heroMode !== "normal" || heroFlipManualOverride) return;
+    const chars = heroEl18n.querySelectorAll(".flip-inner");
+    const n = chars.length;
+    if(!n) return;
+    const y = window.scrollY || window.pageYOffset;
+    const overall = Math.min(Math.max(y / HERO_FLIP_DISTANCE, 0), 1);
+    const staggerSpan = 0.5;
+    chars.forEach((el, i) => {
+      const delay = (i / n) * staggerSpan;
+      const local = Math.min(Math.max((overall - delay) / (1 - staggerSpan), 0), 1);
+      el.style.transform = `rotateX(${local * 180}deg)`;
+    });
+    const subEl = document.getElementById("hero-sub-text");
+    if(overall >= 0.999 && !heroShowingAr){
+      heroShowingAr = true;
+      if(subEl) subEl.dir = "rtl";
+      if(subEl && settings.heroBody?.ar) subEl.innerHTML = accentify(escapeHtml(settings.heroBody.ar));
+    } else if(overall <= 0.001 && heroShowingAr){
+      heroShowingAr = false;
+      if(subEl) subEl.removeAttribute("dir");
+      if(subEl && settings.heroBody?.en) subEl.innerHTML = accentify(escapeHtml(settings.heroBody.en));
+    }
+  }
+  window.addEventListener("scroll", updateHeroFlip, { passive:true });
+
   heroLangBtn.addEventListener("click", () => {
+    heroFlipManualOverride = true;
     heroShowingAr = !heroShowingAr;
     heroLangBtn.textContent = heroShowingAr ? "EN" : "ع";
     heroLangBtn.classList.toggle("is-ar", !heroShowingAr);
