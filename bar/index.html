@@ -514,6 +514,7 @@ setInterval(render, 30000);
 
 /* ── shrink-on-scroll hero ── */
 const heroEl = document.getElementById("hero");
+const heroSpacerEl = document.querySelector(".hero-spacer");
 const fadeEls = document.querySelectorAll(".hero-corner");
 const SHRINK_DISTANCE = 460;
 function onScroll(){
@@ -522,6 +523,15 @@ function onScroll(){
   heroEl.style.transform = `translateY(${-y * 0.22}px)`;
   const o = Math.max(1 - p * 1.6, 0);
   fadeEls.forEach(el => el.style.opacity = o);
+
+  /* the hero is still translating slowly (parallax) when the next
+     section's sticky position arrives — fade the whole hero out before
+     that happens, so it never overlaps the section scrolling up behind
+     it. Fade window: last 30% of the hero-spacer's scroll distance. */
+  const spacerH = heroSpacerEl.offsetHeight;
+  const fadeStart = spacerH * 0.7;
+  const heroOpacity = y <= fadeStart ? 1 : Math.max(0, 1 - (y - fadeStart) / (spacerH - fadeStart));
+  heroEl.style.opacity = heroOpacity;
 }
 window.addEventListener("scroll", onScroll, { passive:true });
 onScroll();
