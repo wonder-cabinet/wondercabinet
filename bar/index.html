@@ -137,8 +137,7 @@ a{color:inherit; text-decoration:none}
    rather than a clean transition, so it swaps whole once the wipe
    reaches it. */
 .hero-sub-mask-wrap{position:relative; width:100%}
-.hero-mask-en, .hero-mask-ar{display:flex; flex-direction:column; align-items:center; text-align:center; width:100%}
-.hero-mask-ar{position:absolute; top:0; left:0; height:100%; direction:rtl}
+.hero-mask-ar{position:absolute; top:0; left:0; width:100%; direction:rtl; margin-top:0}
 .hero-mask-en{
   -webkit-mask-image:linear-gradient(to bottom, transparent 0%, transparent calc(var(--reveal,0%) - 6%), black var(--reveal,0%), black 100%);
   mask-image:linear-gradient(to bottom, transparent 0%, transparent calc(var(--reveal,0%) - 6%), black var(--reveal,0%), black 100%);
