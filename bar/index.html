@@ -123,6 +123,37 @@ a{color:inherit; text-decoration:none}
   100% {background-color:var(--yellow)}
 }
 @media (prefers-reduced-motion:reduce){.blob{animation:none}}
+
+/* ── metaball glass cluster: melted glass "dots" that pop above the
+   slides as you scroll, using backdrop-filter so whatever is behind
+   each dot visibly blurs/melts through it ── */
+.metaball-layer{position:fixed; inset:0; z-index:5; overflow:hidden; pointer-events:none; display:flex; align-items:center; justify-content:center}
+.metaball-cluster{position:relative; width:340px; height:340px; opacity:0; will-change:transform, opacity}
+.mb-dot{
+  position:absolute; top:50%; left:50%; border-radius:50%;
+  width:var(--s); height:var(--s);
+  margin:calc(var(--s) / -2) 0 0 calc(var(--s) / -2);
+  transform:translate(var(--x), var(--y));
+  backdrop-filter:blur(14px) saturate(1.6) contrast(1.08);
+  -webkit-backdrop-filter:blur(14px) saturate(1.6) contrast(1.08);
+  background:radial-gradient(circle at 32% 26%, rgba(255,255,255,.85), rgba(255,230,180,.35) 30%, rgba(255,140,120,.18) 60%, rgba(20,10,10,.25) 100%);
+  box-shadow:
+    inset -10px -10px 24px rgba(0,0,0,.35),
+    inset 8px 8px 18px rgba(255,255,255,.5),
+    0 12px 30px rgba(0,0,0,.25);
+  animation:mb-float 10s ease-in-out infinite;
+}
+.mb-dot:nth-child(2){animation-duration:12s; animation-delay:-2s}
+.mb-dot:nth-child(3){animation-duration:14s; animation-delay:-5s}
+.mb-dot:nth-child(4){animation-duration:9s;  animation-delay:-1s}
+.mb-dot:nth-child(5){animation-duration:11s; animation-delay:-3s}
+.mb-dot:nth-child(6){animation-duration:13s; animation-delay:-6s}
+.mb-dot:nth-child(7){animation-duration:15s; animation-delay:-4s}
+@keyframes mb-float{
+  0%,100%{transform:translate(var(--x), var(--y)) scale(1)}
+  50%{transform:translate(calc(var(--x) + 5px), calc(var(--y) - 7px)) scale(1.06)}
+}
+@media (prefers-reduced-motion:reduce){.mb-dot{animation:none}}
 #hero-i18n{display:flex; flex-direction:column; align-items:center; text-align:center; width:100%; position:relative; z-index:1; overflow:visible; padding-top:.15em}
 .hero-head{font-family:var(--sans); font-weight:400; font-size:clamp(2.4rem,6.6vw,5.4rem); line-height:1.25; max-width:18ch; text-align:center; overflow:visible}
 .hero-head em, .accent{font-style:italic; font-family:var(--serif); color:#90f}
@@ -330,6 +361,21 @@ section:nth-of-type(6){--slide-alpha:.98}
 <!-- ═══ FIXED BACKGROUND GLOW — page-wide, never scrolls or shrinks ═══ -->
 <div class="bg-blob-layer">
   <div class="blob blob-red"></div>
+</div>
+
+<!-- ═══ METABALL GLASS CLUSTER — melted glass dots that float up and grow
+     as you scroll, popping above the slides and blurring/melting whatever
+     is behind them via backdrop-filter ═══ -->
+<div class="metaball-layer" id="metaball-layer">
+  <div class="metaball-cluster" id="metaball-cluster">
+    <span class="mb-dot" style="--x:-14%; --y:-8%; --s:170px"></span>
+    <span class="mb-dot" style="--x:10%; --y:-16%; --s:120px"></span>
+    <span class="mb-dot" style="--x:-4%; --y:12%; --s:210px"></span>
+    <span class="mb-dot" style="--x:20%; --y:2%; --s:100px"></span>
+    <span class="mb-dot" style="--x:-22%; --y:16%; --s:90px"></span>
+    <span class="mb-dot" style="--x:6%; --y:-4%; --s:150px"></span>
+    <span class="mb-dot" style="--x:-8%; --y:26%; --s:80px"></span>
+  </div>
 </div>
 
 <!-- ═══ HERO CORNERS ═══ -->
@@ -556,6 +602,24 @@ function onScroll(){
 }
 window.addEventListener("scroll", onScroll, { passive:true });
 onScroll();
+
+/* ── metaball glass cluster: grows, drifts and pops above the slides
+   the further you scroll down the page ── */
+const metaballLayer = document.getElementById("metaball-layer");
+const metaballCluster = document.getElementById("metaball-cluster");
+function onMetaballScroll(){
+  const y = window.scrollY || window.pageYOffset;
+  const docH = Math.max(document.documentElement.scrollHeight - window.innerHeight, 1);
+  const p = Math.min(Math.max(y / docH, 0), 1);
+  metaballCluster.style.opacity = Math.min(p * 4, 1);
+  const scale = 1 + p * 1.8;
+  const rise = -p * 260;
+  const drift = Math.sin(p * Math.PI * 2.4) * 70;
+  metaballCluster.style.transform = `translate(${drift}px, ${rise}px) scale(${scale})`;
+  metaballLayer.style.zIndex = p > 0.1 ? 45 : 5; /* pops above the nav/slides once you're scrolled in */
+}
+window.addEventListener("scroll", onMetaballScroll, { passive:true });
+onMetaballScroll();
 
 /* ── nav logo: crossfade EN / AR every 10s ── */
 const lockupEl = document.getElementById("lockup-text");
