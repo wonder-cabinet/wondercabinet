@@ -198,8 +198,11 @@ section:nth-of-type(6){z-index:6}
 
 /* Food & Wine are long lists — they scroll with the page instead of
    sticking as a card, since a long list pinned in place can freeze
-   the scroll while its lower rows sit hidden below the fold. */
-#menu, #wine{
+   the scroll while its lower rows sit hidden below the fold. About's
+   narrative text can run long too (editable copy), so it gets the same
+   treatment — otherwise anything past one viewport's worth of text
+   would be stuck out of reach while the section is pinned. */
+#menu, #wine, #about{
   position:relative; top:auto; min-height:100vh;
   display:block; box-shadow:none;
 }
@@ -598,11 +601,13 @@ document.addEventListener("click", e => {
 });
 
 /* ── manual per-section language toggles, driven by fetched Sanity data ── */
-function wireToggle(btnId, renderFn){
+function wireToggle(btnId, renderFn, defaultAr){
   const btn = document.getElementById(btnId);
   if(!btn) return;
-  let showingAr = false;
-  renderFn(false);
+  let showingAr = !!defaultAr;
+  renderFn(showingAr);
+  btn.textContent = showingAr ? "EN" : "ع";
+  btn.classList.toggle("is-ar", !showingAr);
   btn.addEventListener("click", () => {
     showingAr = !showingAr;
     renderFn(showingAr);
@@ -806,7 +811,7 @@ async function init(){
     el.innerHTML = html;
     el.classList.toggle("ar", ar);
     el.style.direction = ar ? "rtl" : "";
-  });
+  }, true);
 
   /* food + wine rows (bilingual inline, not toggled) */
   document.getElementById("food-rows").innerHTML =
