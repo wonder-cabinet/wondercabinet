@@ -132,7 +132,8 @@ a{color:inherit; text-decoration:none}
 .metaball-layer{position:fixed; inset:0; z-index:5; overflow:hidden; pointer-events:none}
 .mb-dot{
   position:fixed; top:0; left:0;
-  opacity:0; will-change:transform, opacity, border-radius;
+  /* never fades — forms arrive and leave purely by growing and shrinking */
+  transform:scale(0); will-change:transform, border-radius;
   /* heavy refraction — these are big water-membranes, not beads. The
      hue-rotate is driven per-bead from JS so colour swims and bends as
      they pass over content: the woozy, euphoric part. No specular
@@ -613,24 +614,62 @@ const mbEls = MB_BEADS.map(b => {
   metaballLayer.appendChild(el);
   return el;
 });
-function onMetaballScroll(){
+/* each form carries a set of spores. They sit at zero size for its whole
+   life, then take over at the end: the body breaks apart into them and they
+   scatter outward, each shrinking to nothing. Nothing ever fades — things
+   arrive and leave by growing and shrinking only. */
+const MB_SPORES = 9;
+const mbSpores = MB_BEADS.map((b, i) => {
+  const arr = [];
+  for(let k = 0; k < MB_SPORES; k++){
+    const el = document.createElement("span");
+    el.className = "mb-dot";
+    const size = b.size * (.07 + (k % 4) * .045);
+    el.style.width = el.style.height = size + "px";
+    el._size = size;
+    el._ang  = (k / MB_SPORES) * Math.PI * 2 + i * 1.3;
+    el._dist = b.size * (.55 + (k % 5) * .30);
+    metaballLayer.appendChild(el);
+    arr.push(el);
+  }
+  return arr;
+});
+/* the headline's position at rest — captured once, because the hero itself
+   parallaxes away and we want the forms to keep travelling down the whole
+   page long after it's gone */
+let mbOrigin = null;
+function mbCaptureOrigin(){
   const wrap = document.getElementById("hero-head-wrap");
+  if(!wrap) return;
+  const r = wrap.getBoundingClientRect();
   const y = window.scrollY || window.pageYOffset;
-  /* same end point the hero uses — beads are fully gone once slide 2 owns
-     the screen, so they never trespass into the About section */
-  const end = Math.max(heroSpacerEl.offsetHeight + heroClearEl.offsetHeight, 1);
+  mbOrigin = {left:r.left, width:r.width, top:r.top + y, height:r.height};
+}
+function onMetaballScroll(){
+  if(!mbOrigin) mbCaptureOrigin();
+  const y = window.scrollY || window.pageYOffset;
+  /* they now travel the entire page — only breaking up near the end of the
+     menu, so the whole scroll is accompanied rather than just the hero */
+  const wineEl = document.getElementById("wine");
+  const endAnchor = wineEl ? wineEl.offsetTop + wineEl.offsetHeight : document.documentElement.scrollHeight;
+  const end = Math.max(endAnchor - window.innerHeight, 1);
   const p = Math.min(Math.max(y / end, 0), 1);
-  if(!wrap || p <= 0){
-    mbEls.forEach(el => el.style.opacity = 0);
+  if(!mbOrigin || p <= 0){
+    mbEls.forEach(el => el.style.transform = "scale(0)");
+    mbSpores.forEach(g => g.forEach(el => el.style.transform = "scale(0)"));
     return;
   }
-  const r = wrap.getBoundingClientRect();
+  const r = {left:mbOrigin.left, width:mbOrigin.width, top:mbOrigin.top - y, height:mbOrigin.height};
   const vh = window.innerHeight;
   MB_BEADS.forEach((b, i) => {
     const el = mbEls[i];
-    /* each bead runs its own 0→1 life across the remaining scroll */
+    /* each form runs its own 0→1 life across the remaining scroll */
     const t = Math.min(Math.max((p - b.delay) / Math.max(1 - b.delay, .01), 0), 1);
-    if(t <= 0){ el.style.opacity = 0; return; }
+    if(t <= 0){
+      el.style.transform = "scale(0)";
+      mbSpores[i].forEach(s => s.style.transform = "scale(0)");
+      return;
+    }
     /* GROWTH is the whole gesture: from a spore-sized nub it keeps swelling
        the entire way, ending several times its own size — so it reads as
        something pushing up out of the screen toward you, not a ball that
@@ -638,9 +677,8 @@ function onMetaballScroll(){
        big, the way a mushroom actually opens. */
     const swell = Math.pow(t, .48);
     const grow  = .06 + swell * 2.9;
-    const fade  = t > .74 ? Math.max(1 - (t - .74) / .26, 0) : Math.min(t / .10, 1);
-    /* barely falls — it's rooted and rising, only drifting a little */
-    const drop = t * b.fall * vh * .30;
+    /* travels the full height of the page as you scroll */
+    const drop = t * b.fall * vh * 1.05;
     /* slow, out-of-phase wander on each axis — nothing repeats cleanly, so
        it breathes rather than oscillates */
     const x = r.left + r.width * b.ox
@@ -653,12 +691,32 @@ function onMetaballScroll(){
     const sx = grow * (1 + Math.sin(t * 2.6 + i * 1.3) * .20);
     const sy = grow * (1 + Math.cos(t * 2.1 + i * 0.9) * .16);
     const rot = Math.sin(t * 1.3 + i * 2.1) * 26;
-    el.style.transform =
-      `translate3d(${x - b.size / 2}px, ${yy - b.size / 2}px, 0) rotate(${rot}deg) scale(${sx}, ${sy})`;
-    el.style.opacity = fade;
     el.style.borderRadius = mbBorderRadius(t, i);
     /* colour swims as it opens — the woozy part */
     el.style.setProperty("--hue", (Math.sin(t * 1.4 + i * 1.1) * 85) + "deg");
+
+    /* ── final act: the body breaks into spores and they shrink out ── */
+    const SHATTER = .80;
+    if(t < SHATTER){
+      el.style.transform =
+        `translate3d(${x - b.size / 2}px, ${yy - b.size / 2}px, 0) rotate(${rot}deg) scale(${sx}, ${sy})`;
+      mbSpores[i].forEach(s => s.style.transform = "scale(0)");
+    } else {
+      const s = (t - SHATTER) / (1 - SHATTER);          // 0→1 through the break-up
+      const collapse = Math.max(1 - s * 1.35, 0);        // body shrinks away fast
+      el.style.transform =
+        `translate3d(${x - b.size / 2}px, ${yy - b.size / 2}px, 0) rotate(${rot}deg) scale(${sx * collapse}, ${sy * collapse})`;
+      mbSpores[i].forEach(sp => {
+        const spread = sp._dist * s * 2.4;
+        const px = x + Math.cos(sp._ang) * spread;
+        const py = yy + Math.sin(sp._ang) * spread + s * s * vh * .18;
+        const sc = Math.max(1 - s * s, 0);               // smaller and smaller, then gone
+        sp.style.borderRadius = mbBorderRadius(t + sp._ang, i);
+        sp.style.setProperty("--hue", (Math.sin(t * 1.4 + i * 1.1) * 85) + "deg");
+        sp.style.transform =
+          `translate3d(${px - sp._size / 2}px, ${py - sp._size / 2}px, 0) scale(${sc})`;
+      });
+    }
   });
 }
 /* a slowly reshaping, lopsided outline instead of a circle — each of the 8
@@ -670,7 +728,7 @@ function mbBorderRadius(t, i){
   return `${w(0)}% ${100-w(1)}% ${w(2)}% ${100-w(3)}% / ${w(4)}% ${w(5)}% ${100-w(6)}% ${100-w(7)}%`;
 }
 window.addEventListener("scroll", onMetaballScroll, { passive:true });
-window.addEventListener("resize", onMetaballScroll);
+window.addEventListener("resize", () => { mbCaptureOrigin(); onMetaballScroll(); });
 onMetaballScroll();
 
 /* ── nav logo: crossfade EN / AR every 10s ── */
