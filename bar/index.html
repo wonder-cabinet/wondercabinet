@@ -128,24 +128,22 @@ a{color:inherit; text-decoration:none}
 .ar-accent, .hero-head em.ar-accent{font-family:"Aref Ruqaa",var(--serif); font-style:normal}
 .hero-head{color:#111}
 
-/* ── scroll-driven mask wipe, subtitle only: English and Arabic sit
-   stacked in the same spot; a mask line moves down through them as you
-   scroll, so the part that's "passed" reads Arabic while the rest is
-   still English. The headline itself flips as a single unit instead —
-   it's one short, large line of text, and a wipe line crossing straight
-   through the middle of tall glyphs looks like broken half-letters
-   rather than a clean transition, so it swaps whole once the wipe
-   reaches it. */
-.hero-sub-mask-wrap{position:relative; width:100%}
-.hero-mask-ar{position:absolute; top:0; left:0; width:100%; direction:rtl; margin-top:0}
-.hero-mask-en{
-  -webkit-mask-image:linear-gradient(to bottom, transparent 0%, transparent calc(var(--reveal,0%) - 6%), black var(--reveal,0%), black 100%);
-  mask-image:linear-gradient(to bottom, transparent 0%, transparent calc(var(--reveal,0%) - 6%), black var(--reveal,0%), black 100%);
+/* ── scroll-driven wipe line: a single line travels down over the hero
+   text as you scroll; the text itself flips whole from English to Arabic
+   exactly as the line crosses it, so what's revealed once the line has
+   passed is the Arabic version. Only one language is ever rendered at a
+   time (no stacked layers), which avoids the overlap/slicing that comes
+   from English and Arabic wrapping to different line counts. */
+#hero-i18n-content{transition:filter .12s ease}
+#hero-i18n-content.wipe-flash{filter:blur(6px)}
+.hero-wipe-line{
+  position:absolute; left:50%; top:0%; transform:translate(-50%,-50%);
+  width:min(94%,44rem); height:2px; z-index:2; pointer-events:none;
+  background:linear-gradient(to right, transparent, #90f 12%, #90f 88%, transparent);
+  box-shadow:0 0 16px 2px rgba(153,0,255,.6);
+  opacity:0; transition:opacity .15s ease;
 }
-.hero-mask-ar{
-  -webkit-mask-image:linear-gradient(to bottom, black calc(var(--reveal,0%) - 6%), transparent var(--reveal,0%), transparent 100%);
-  mask-image:linear-gradient(to bottom, black calc(var(--reveal,0%) - 6%), transparent var(--reveal,0%), transparent 100%);
-}
+.hero-wipe-line.visible{opacity:.9}
 
 /* ── language toggle button ─────────────────────────────── */
 .lang-toggle{
@@ -332,7 +330,8 @@ section:nth-of-type(6){--slide-alpha:.98}
 <!-- ═══ HERO — dark slide ═══ -->
 <div class="hero" id="hero">
   <div id="hero-i18n">
-    <h1 class="hero-head">Loading&hellip;</h1>
+    <div id="hero-i18n-content"><h1 class="hero-head">Loading&hellip;</h1></div>
+    <div class="hero-wipe-line" id="hero-wipe-line"></div>
   </div>
 </div>
 <div class="hero-spacer"></div>
@@ -664,6 +663,8 @@ async function init(){
   let heroShowingAr = false;
   let heroMode = "normal"; // "normal" | "full"
   const heroEl18n = document.getElementById("hero-i18n");
+  const heroContent = document.getElementById("hero-i18n-content");
+  const wipeLine = document.getElementById("hero-wipe-line");
 
   function renderHero(){
     if(heroMode === "full"){
@@ -674,7 +675,7 @@ async function init(){
         const time = h ? `${fmt12(h.open)} – ${fmt12(h.close)}` : (heroShowingAr ? "مغلق" : "Closed");
         return `<div class="hero-hours-row${k===todayKey?" today":""}"><span>${dayNames[k]}</span><span>${time}</span></div>`;
       }).join("");
-      heroEl18n.innerHTML = `
+      heroContent.innerHTML = `
         <h1 class="hero-head" style="font-size:clamp(1.8rem,4.4vw,3rem)">${heroShowingAr ? "أوقات الدوام" : "Opening Hours"}</h1>
         <div class="hero-hours-list">${rows}</div>
         <p class="hero-sub" style="margin-top:1.4rem; opacity:.7"><a href="#" id="hero-hours-back-link">${heroShowingAr ? "→ رجوع" : "← Back"}</a></p>
@@ -685,55 +686,42 @@ async function init(){
         renderHero();
       });
     } else {
-      const en = heroDateParts("en");
-      const ar = heroDateParts("ar");
-      const bodyEn = settings.heroBody?.en || "";
-      const bodyAr = settings.heroBody?.ar || "";
-      heroEl18n.dataset.enHeadline = `<em>${escapeHtml(en.weekday)}</em>${escapeHtml(en.rest)}`;
-      heroEl18n.dataset.arHeadline = `<em class="ar-accent">${escapeHtml(ar.weekday)}</em>${escapeHtml(ar.rest)}`;
-      heroEl18n.innerHTML = `
-        <h1 class="hero-head" id="hero-headline">${heroShowingAr ? heroEl18n.dataset.arHeadline : heroEl18n.dataset.enHeadline}</h1>
-        <div class="hero-sub-mask-wrap">
-          ${bodyEn ? `<p class="hero-sub hero-mask-en">${accentify(escapeHtml(bodyEn))}</p>` : ""}
-          ${bodyAr ? `<p class="hero-sub hero-mask-ar">${accentify(escapeHtml(bodyAr))}</p>` : ""}
-        </div>
-      `;
-      const headlineEl = document.getElementById("hero-headline");
-      if(headlineEl) headlineEl.style.direction = heroShowingAr ? "rtl" : "";
-      heroEl18n.style.setProperty("--reveal", currentRevealPct() + "%");
+      const {weekday, rest} = heroDateParts(heroShowingAr ? "ar" : "en");
+      const body = heroShowingAr ? (settings.heroBody?.ar || "") : (settings.heroBody?.en || "");
+      const weekdayCls = heroShowingAr ? "ar-accent" : "";
+      heroContent.innerHTML = `<h1 class="hero-head"><em class="${weekdayCls}">${escapeHtml(weekday)}</em>${escapeHtml(rest)}</h1>${body ? `<p class="hero-sub">${accentify(escapeHtml(body))}</p>` : ""}`;
     }
-    heroEl18n.classList.toggle("ar", heroMode !== "normal" && heroShowingAr);
-    heroEl18n.style.direction = heroMode !== "normal" && heroShowingAr ? "rtl" : "";
+    heroEl18n.classList.toggle("ar", heroShowingAr);
+    heroEl18n.style.direction = heroShowingAr ? "rtl" : "";
   }
   renderHero();
 
-  /* scroll drives a mask wipe on the subtitle (a soft line moves down
-     through the stacked English/Arabic paragraphs as you scroll — text
-     above the line reads Arabic, text below is still English), while the
-     short single-line headline flips whole the moment the wipe reaches
-     it, instead of being sliced mid-glyph by the same continuous line.
-     The hero itself keeps its slower parallax drift (translateY above);
-     this only controls how far down the reveal has travelled. */
-  function currentRevealPct(){
+  /* scroll drives a single visible line traveling down over the hero
+     text; the content flips whole from English to Arabic exactly as the
+     line crosses it (a quick blur-flash right at that instant hides the
+     swap), so whatever the line has already passed reads Arabic. Only
+     one language renders at a time — no stacked layers — so there's no
+     risk of the two texts overlapping or misaligning. */
+  function updateHeroLangScroll(){
+    if(heroMode !== "normal"){
+      wipeLine.classList.remove("visible");
+      return;
+    }
     const y = window.scrollY || window.pageYOffset;
-    return Math.min(Math.max(y / SHRINK_DISTANCE, 0), 1) * 100;
-  }
-  function updateHeroReveal(){
-    if(heroMode !== "normal") return;
-    const revealPct = currentRevealPct();
-    heroEl18n.style.setProperty("--reveal", revealPct + "%");
-    const shouldBeAr = revealPct >= 50;
+    const overall = Math.min(Math.max(y / SHRINK_DISTANCE, 0), 1);
+    const swapAt = 0.5;
+    wipeLine.style.top = (overall * 100) + "%";
+    wipeLine.classList.toggle("visible", overall > 0.01 && overall < 0.99);
+    const shouldBeAr = overall >= swapAt;
     if(shouldBeAr !== heroShowingAr){
       heroShowingAr = shouldBeAr;
-      const headlineEl = document.getElementById("hero-headline");
-      if(headlineEl){
-        headlineEl.innerHTML = heroShowingAr ? heroEl18n.dataset.arHeadline : heroEl18n.dataset.enHeadline;
-        headlineEl.style.direction = heroShowingAr ? "rtl" : "";
-      }
+      heroContent.classList.add("wipe-flash");
+      renderHero();
+      requestAnimationFrame(() => heroContent.classList.remove("wipe-flash"));
     }
   }
-  window.addEventListener("scroll", updateHeroReveal, { passive:true });
-  updateHeroReveal();
+  window.addEventListener("scroll", updateHeroLangScroll, { passive:true });
+  updateHeroLangScroll();
 
   hoursLink.addEventListener("click", e => {
     e.preventDefault();
