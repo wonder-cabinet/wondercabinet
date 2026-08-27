@@ -131,8 +131,8 @@ a{color:inherit; text-decoration:none}
    describes what a single bead looks like. ── */
 .metaball-layer{position:fixed; inset:0; z-index:5; overflow:hidden; pointer-events:none}
 .mb-dot{
-  position:fixed; top:0; left:0; border-radius:50%;
-  opacity:0; will-change:transform, opacity;
+  position:fixed; top:0; left:0;
+  opacity:0; will-change:transform, opacity, border-radius;
   /* light blur only — enough to bend what's behind it without going milky,
      so the bead reads as clear glass rather than a solid pearl */
   backdrop-filter:blur(2px) saturate(1.2) brightness(1.04);
@@ -149,10 +149,7 @@ a{color:inherit; text-decoration:none}
       rgba(255,255,255,.10) 78%,
       rgba(255,255,255,.42) 93%,
       rgba(255,255,255,.10) 100%);
-  box-shadow:
-    inset 0 0 7px rgba(255,255,255,.5),
-    inset -2px -3px 7px rgba(0,0,0,.10),
-    0 2px 7px rgba(0,0,0,.10);
+  /* no box-shadow — shape alone (morphed per-frame from JS) carries it */
 }
 #hero-i18n{display:flex; flex-direction:column; align-items:center; text-align:center; width:100%; position:relative; z-index:1; overflow:visible; padding-top:.15em}
 .hero-head{font-family:var(--sans); font-weight:400; font-size:clamp(2.4rem,6.6vw,5.4rem); line-height:1.25; max-width:18ch; text-align:center; overflow:visible}
@@ -645,7 +642,16 @@ function onMetaballScroll(){
     const yy = r.top + r.height * b.oy + drop;
     el.style.transform = `translate3d(${x - b.size / 2}px, ${yy - b.size / 2}px, 0) scale(${grow})`;
     el.style.opacity = fade;
+    el.style.borderRadius = mbBorderRadius(t, i);
   });
+}
+/* a wobbling, lopsided blob outline instead of a plain circle — each of
+   the 8 corner-radius values drifts on its own sine wave (offset by bead
+   index i and corner) so it keeps reshaping itself the whole way down,
+   like a drop of glass still finding its shape rather than a fixed bead */
+function mbBorderRadius(t, i){
+  const w = k => 50 + Math.sin(t * 6 + i * 1.7 + k) * 18;
+  return `${w(0)}% ${100-w(1)}% ${w(2)}% ${100-w(3)}% / ${w(4)}% ${w(5)}% ${100-w(6)}% ${100-w(7)}%`;
 }
 window.addEventListener("scroll", onMetaballScroll, { passive:true });
 window.addEventListener("resize", onMetaballScroll);
