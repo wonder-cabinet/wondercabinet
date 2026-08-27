@@ -515,6 +515,7 @@ setInterval(render, 30000);
 
 /* ── shrink-on-scroll hero ── */
 const heroEl = document.getElementById("hero");
+const heroSpacerEl = document.querySelector(".hero-spacer");
 const fadeEls = document.querySelectorAll(".hero-corner");
 const SHRINK_DISTANCE = 460;
 function onScroll(){
@@ -523,6 +524,12 @@ function onScroll(){
   heroEl.style.transform = `translateY(${-y * 0.13}px)`;
   const o = Math.max(1 - p * 1.6, 0);
   fadeEls.forEach(el => el.style.opacity = o);
+
+  /* no fade — the slow parallax means the hero is still faintly visible
+     behind the sticky nav for a long scroll distance; once the next
+     section has fully taken over (scrolled past the hero-spacer), just
+     cut the hero instantly rather than let it linger as a ghost. */
+  heroEl.style.visibility = y >= heroSpacerEl.offsetHeight ? "hidden" : "visible";
 }
 window.addEventListener("scroll", onScroll, { passive:true });
 onScroll();
