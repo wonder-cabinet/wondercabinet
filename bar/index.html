@@ -123,7 +123,7 @@ a{color:inherit; text-decoration:none}
 #hero-i18n{display:flex; flex-direction:column; align-items:center; text-align:center; width:100%; position:relative; z-index:1}
 .hero-head{font-family:var(--sans); font-weight:400; font-size:clamp(2.4rem,6.6vw,5.4rem); line-height:1.02; max-width:18ch; text-align:center}
 .hero-head em, .accent{font-style:italic; font-family:var(--serif); color:#90f}
-.ar-accent{font-family:"Aref Ruqaa",var(--serif); font-style:normal}
+.ar-accent, .hero-head em.ar-accent{font-family:"Aref Ruqaa",var(--serif); font-style:normal}
 .hero-head{color:#111}
 
 /* ── language toggle button ─────────────────────────────── */
@@ -681,7 +681,8 @@ async function init(){
     } else {
       const {weekday, rest} = heroDateParts(heroShowingAr ? "ar" : "en");
       const body = heroShowingAr ? (settings.heroBody?.ar || "") : (settings.heroBody?.en || "");
-      heroEl18n.innerHTML = `<h1 class="hero-head"><em>${escapeHtml(weekday)}</em>${escapeHtml(rest)}</h1>${body ? `<p class="hero-sub">${accentify(escapeHtml(body))}</p>` : ""}`;
+      const weekdayCls = heroShowingAr ? "ar-accent" : "";
+      heroEl18n.innerHTML = `<h1 class="hero-head"><em class="${weekdayCls}">${escapeHtml(weekday)}</em>${escapeHtml(rest)}</h1>${body ? `<p class="hero-sub">${accentify(escapeHtml(body))}</p>` : ""}`;
     }
     heroEl18n.classList.toggle("ar", heroShowingAr);
     heroEl18n.style.direction = heroShowingAr ? "rtl" : "";
