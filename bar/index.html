@@ -128,13 +128,27 @@ a{color:inherit; text-decoration:none}
 .ar-accent, .hero-head em.ar-accent{font-family:"Aref Ruqaa",var(--serif); font-style:normal}
 .hero-head{color:#111}
 
-/* ── the real header bar is the line: as the hero content scrolls up
-   and its top edge reaches the sticky header, it flips from English to
-   Arabic right there (a quick blur-flash hides the instant swap). No
-   invented decoration — the trigger is the actual header, not an
-   arbitrary scroll fraction. */
+/* ── the real header bar is the line. The headline is one short, large
+   line of text — a continuous wipe would slice straight through its
+   glyphs — so it flips whole the moment the header reaches its middle
+   (a quick blur-flash hides that instant swap). The subtitle, being
+   multiple lines, can do the real thing: it's unveiled continuously as
+   the header passes over it — English and Arabic stacked in the same
+   spot, each masked independently against the header's real position,
+   so whatever has already gone under the header reads Arabic. */
 #hero-i18n-content{transition:filter .12s ease}
 #hero-i18n-content.wipe-flash{filter:blur(6px)}
+.hero-sub-mask-wrap{position:relative; width:100%}
+.hero-sub-mask-wrap .hero-sub{position:relative}
+.hero-sub-mask-wrap .hero-sub.hero-sub-ar{position:absolute; top:0; left:0; direction:rtl}
+.hero-sub-mask-wrap .hero-sub-en{
+  -webkit-mask-image:linear-gradient(to bottom, transparent 0%, transparent calc(var(--reveal-en,0%) - 5%), black var(--reveal-en,0%), black 100%);
+  mask-image:linear-gradient(to bottom, transparent 0%, transparent calc(var(--reveal-en,0%) - 5%), black var(--reveal-en,0%), black 100%);
+}
+.hero-sub-mask-wrap .hero-sub-ar{
+  -webkit-mask-image:linear-gradient(to bottom, black calc(var(--reveal-ar,0%) - 5%), transparent var(--reveal-ar,0%), transparent 100%);
+  mask-image:linear-gradient(to bottom, black calc(var(--reveal-ar,0%) - 5%), transparent var(--reveal-ar,0%), transparent 100%);
+}
 
 /* ── language toggle button ─────────────────────────────── */
 .lang-toggle{
@@ -677,9 +691,16 @@ async function init(){
       });
     } else {
       const {weekday, rest} = heroDateParts(heroShowingAr ? "ar" : "en");
-      const body = heroShowingAr ? (settings.heroBody?.ar || "") : (settings.heroBody?.en || "");
       const weekdayCls = heroShowingAr ? "ar-accent" : "";
-      heroContent.innerHTML = `<h1 class="hero-head"><em class="${weekdayCls}">${escapeHtml(weekday)}</em>${escapeHtml(rest)}</h1>${body ? `<p class="hero-sub">${accentify(escapeHtml(body))}</p>` : ""}`;
+      const bodyEn = settings.heroBody?.en || "";
+      const bodyAr = settings.heroBody?.ar || "";
+      heroContent.innerHTML = `
+        <h1 class="hero-head" id="hero-headline"><em class="${weekdayCls}">${escapeHtml(weekday)}</em>${escapeHtml(rest)}</h1>
+        <div class="hero-sub-mask-wrap" id="hero-sub-wrap">
+          ${bodyEn ? `<p class="hero-sub hero-sub-en" id="hero-sub-en">${accentify(escapeHtml(bodyEn))}</p>` : ""}
+          ${bodyAr ? `<p class="hero-sub hero-sub-ar" id="hero-sub-ar">${accentify(escapeHtml(bodyAr))}</p>` : ""}
+        </div>
+      `;
     }
     heroEl18n.classList.toggle("ar", heroShowingAr);
     heroEl18n.style.direction = heroShowingAr ? "rtl" : "";
@@ -688,22 +709,43 @@ async function init(){
 
   /* the real header bar is the line — not an invented one. The sticky
      nav rises up from the bottom of the screen as you scroll (it moves
-     a full 1:1 with scroll, while the hero drifts up slower, parallax-
-     style) — the instant its top edge reaches the bottom of the hero
-     text, it's about to start sliding over it, so that's when the text
-     flips whole to Arabic (a quick blur-flash hides the swap). The
-     trigger is tied to something actually on screen, not an arbitrary
-     scroll fraction with no visible relationship to the header. */
+     1:1 with scroll, while the hero drifts up slower, parallax-style),
+     sweeping up through the hero text. The headline is one short, large
+     line — a continuous wipe would slice through its glyphs — so it
+     flips whole the instant the header reaches its own local midpoint
+     (a quick blur-flash hides that swap). The subtitle, having real
+     lines, is unveiled continuously: each language layer is masked
+     against the header's real position measured against THAT layer's
+     own height, so English and Arabic wrapping to a different number of
+     lines never breaks the alignment. */
+  const clamp01 = n => Math.min(Math.max(n, 0), 1);
   function updateHeroLangScroll(){
     if(heroMode !== "normal") return;
     const navTop = headerBar.getBoundingClientRect().top;
-    const contentBottom = heroContent.getBoundingClientRect().bottom;
-    const shouldBeAr = navTop <= contentBottom;
-    if(shouldBeAr !== heroShowingAr){
-      heroShowingAr = shouldBeAr;
-      heroContent.classList.add("wipe-flash");
-      renderHero();
-      requestAnimationFrame(() => heroContent.classList.remove("wipe-flash"));
+
+    const headEl = document.getElementById("hero-headline");
+    if(headEl){
+      const headRect = headEl.getBoundingClientRect();
+      const headLocalPct = headRect.height > 0 ? (navTop - headRect.top) / headRect.height : 0;
+      const shouldBeAr = headLocalPct >= 0.5;
+      if(shouldBeAr !== heroShowingAr){
+        heroShowingAr = shouldBeAr;
+        heroContent.classList.add("wipe-flash");
+        renderHero();
+        requestAnimationFrame(() => heroContent.classList.remove("wipe-flash"));
+      }
+    }
+
+    const subWrap = document.getElementById("hero-sub-wrap");
+    const subEn = document.getElementById("hero-sub-en");
+    const subAr = document.getElementById("hero-sub-ar");
+    if(subWrap && subEn && subAr){
+      const enRect = subEn.getBoundingClientRect();
+      const arRect = subAr.getBoundingClientRect();
+      const enPct = enRect.height > 0 ? clamp01((navTop - enRect.top) / enRect.height) * 100 : 0;
+      const arPct = arRect.height > 0 ? clamp01((navTop - arRect.top) / arRect.height) * 100 : 0;
+      subWrap.style.setProperty("--reveal-en", enPct + "%");
+      subWrap.style.setProperty("--reveal-ar", arPct + "%");
     }
   }
   window.addEventListener("scroll", updateHeroLangScroll, { passive:true });
