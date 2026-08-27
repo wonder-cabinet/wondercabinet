@@ -135,12 +135,12 @@ a{color:inherit; text-decoration:none}
 .hero-mask-en, .hero-mask-ar{display:flex; flex-direction:column; align-items:center; text-align:center; width:100%}
 .hero-mask-ar{position:absolute; top:0; left:0; height:100%; direction:rtl}
 .hero-mask-en{
-  -webkit-mask-image:linear-gradient(to bottom, transparent 0%, transparent var(--reveal,0%), black calc(var(--reveal,0%) + 8%), black 100%);
-  mask-image:linear-gradient(to bottom, transparent 0%, transparent var(--reveal,0%), black calc(var(--reveal,0%) + 8%), black 100%);
+  -webkit-mask-image:linear-gradient(to bottom, transparent 0%, transparent calc(var(--reveal,0%) - 8%), black var(--reveal,0%), black 100%);
+  mask-image:linear-gradient(to bottom, transparent 0%, transparent calc(var(--reveal,0%) - 8%), black var(--reveal,0%), black 100%);
 }
 .hero-mask-ar{
-  -webkit-mask-image:linear-gradient(to bottom, black 0%, black var(--reveal,0%), transparent calc(var(--reveal,0%) + 8%), transparent 100%);
-  mask-image:linear-gradient(to bottom, black 0%, black var(--reveal,0%), transparent calc(var(--reveal,0%) + 8%), transparent 100%);
+  -webkit-mask-image:linear-gradient(to bottom, black calc(var(--reveal,0%) - 8%), transparent var(--reveal,0%), transparent 100%);
+  mask-image:linear-gradient(to bottom, black calc(var(--reveal,0%) - 8%), transparent var(--reveal,0%), transparent 100%);
 }
 
 /* ── language toggle button ─────────────────────────────── */
