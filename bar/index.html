@@ -492,7 +492,7 @@ setInterval(render, 30000);
 
 /* ── shrink-on-scroll hero ── */
 const heroEl = document.getElementById("hero");
-const fadeEls = document.querySelectorAll(".hero-sub, .hero-corner, #hero-lang-toggle");
+const fadeEls = document.querySelectorAll(".hero-corner, #hero-lang-toggle");
 const SHRINK_DISTANCE = 460;
 function onScroll(){
   const y = window.scrollY || window.pageYOffset;
@@ -756,14 +756,24 @@ async function init(){
       }
     });
     const subEl = document.getElementById("hero-sub-text");
-    if(overall >= 0.999 && !heroShowingAr){
-      heroShowingAr = true;
-      if(subEl) subEl.dir = "rtl";
-      if(subEl && settings.heroBody?.ar) subEl.innerHTML = accentify(escapeHtml(settings.heroBody.ar));
-    } else if(overall <= 0.001 && heroShowingAr){
-      heroShowingAr = false;
-      if(subEl) subEl.removeAttribute("dir");
-      if(subEl && settings.heroBody?.en) subEl.innerHTML = accentify(escapeHtml(settings.heroBody.en));
+    if(subEl){
+      const BLUR_MAX = 10, rampWidth = 0.16, swapAt = 0.5;
+      let blur = 0;
+      if(overall >= swapAt - rampWidth && overall < swapAt){
+        blur = ((overall - (swapAt - rampWidth)) / rampWidth) * BLUR_MAX;
+      } else if(overall >= swapAt && overall <= swapAt + rampWidth){
+        blur = (1 - (overall - swapAt) / rampWidth) * BLUR_MAX;
+      }
+      subEl.style.filter = blur > 0.05 ? `blur(${blur}px)` : "";
+      if(overall >= swapAt && !heroShowingAr){
+        heroShowingAr = true;
+        subEl.dir = "rtl";
+        if(settings.heroBody?.ar) subEl.innerHTML = accentify(escapeHtml(settings.heroBody.ar));
+      } else if(overall < swapAt && heroShowingAr){
+        heroShowingAr = false;
+        subEl.removeAttribute("dir");
+        if(settings.heroBody?.en) subEl.innerHTML = accentify(escapeHtml(settings.heroBody.en));
+      }
     }
   }
   window.addEventListener("scroll", updateHeroFlip, { passive:true });
