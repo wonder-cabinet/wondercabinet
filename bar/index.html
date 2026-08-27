@@ -120,8 +120,8 @@ a{color:inherit; text-decoration:none}
   100% {background-color:var(--yellow)}
 }
 @media (prefers-reduced-motion:reduce){.blob{animation:none}}
-#hero-i18n{display:flex; flex-direction:column; align-items:center; text-align:center; width:100%; position:relative; z-index:1}
-.hero-head{font-family:var(--sans); font-weight:400; font-size:clamp(2.4rem,6.6vw,5.4rem); line-height:1.02; max-width:18ch; text-align:center}
+#hero-i18n{display:flex; flex-direction:column; align-items:center; text-align:center; width:100%; position:relative; z-index:1; overflow:visible; padding-top:.15em}
+.hero-head{font-family:var(--sans); font-weight:400; font-size:clamp(2.4rem,6.6vw,5.4rem); line-height:1.25; max-width:18ch; text-align:center; overflow:visible}
 .hero-head em, .accent{font-style:italic; font-family:var(--serif); color:#90f}
 .ar-accent, .hero-head em.ar-accent{font-family:"Aref Ruqaa",var(--serif); font-style:normal}
 .hero-head{color:#111}
@@ -641,28 +641,11 @@ async function init(){
      the live opening-hours status or the full week's hours, in the same
      hero-head style, with a way back at each step */
   let heroShowingAr = false;
-  let heroMode = "normal"; // "normal" | "status" | "full"
+  let heroMode = "normal"; // "normal" | "full"
   const heroEl18n = document.getElementById("hero-i18n");
 
   function renderHero(){
-    if(heroMode === "status"){
-      const text = statusPhrase(heroShowingAr ? "ar" : "en");
-      heroEl18n.innerHTML = `
-        <h1 class="hero-head">${escapeHtml(text)}</h1>
-        <p class="hero-sub"><a href="#" id="hero-full-hours-link">${heroShowingAr ? "كل مواعيد الدوام" : "Full opening hours"}</a></p>
-        <p class="hero-sub" style="margin-top:.6rem; opacity:.7"><a href="#" id="hero-hours-back-link">${heroShowingAr ? "→ رجوع" : "← Back"}</a></p>
-      `;
-      document.getElementById("hero-full-hours-link").addEventListener("click", e => {
-        e.preventDefault();
-        heroMode = "full";
-        renderHero();
-      });
-      document.getElementById("hero-hours-back-link").addEventListener("click", e => {
-        e.preventDefault();
-        heroMode = "normal";
-        renderHero();
-      });
-    } else if(heroMode === "full"){
+    if(heroMode === "full"){
       const {day: todayKey} = localNow();
       const dayNames = heroShowingAr ? FULL_AR : FULL;
       const rows = ORDER.map(k => {
@@ -677,7 +660,7 @@ async function init(){
       `;
       document.getElementById("hero-hours-back-link").addEventListener("click", e => {
         e.preventDefault();
-        heroMode = "status";
+        heroMode = "normal";
         renderHero();
       });
     } else {
@@ -717,7 +700,7 @@ async function init(){
 
   hoursLink.addEventListener("click", e => {
     e.preventDefault();
-    heroMode = "status";
+    heroMode = "full";
     renderHero();
     window.scrollTo({top:0, behavior:"smooth"});
   });
