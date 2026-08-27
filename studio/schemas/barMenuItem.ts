@@ -36,7 +36,26 @@ export const barSettings = defineType({
   type: 'document',
   __experimental_actions: ['update', 'publish'],
   fields: [
-    defineField({name: 'heroHeadline', title: 'Hero Headline', type: 'localeString'}),
+    defineField({
+      name: 'heroDisplay',
+      title: 'Hero Headline Display',
+      description: 'Choose whether the big hero headline shows today\'s date, or the custom Hero Headline text below.',
+      type: 'string',
+      options: {
+        list: [
+          {title: 'Date (e.g. "Thursday, August 27")', value: 'date'},
+          {title: 'Custom headline text', value: 'custom'},
+        ],
+        layout: 'radio',
+      },
+      initialValue: 'date',
+    }),
+    defineField({
+      name: 'heroHeadline',
+      title: 'Hero Headline',
+      description: 'Shown as the big hero headline when "Custom headline text" is selected above.',
+      type: 'localeString',
+    }),
     defineField({name: 'heroBody', title: 'Hero Body', type: 'localeText'}),
     defineField({
       name: 'narrative',

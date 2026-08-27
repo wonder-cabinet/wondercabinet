@@ -360,7 +360,7 @@ section:nth-of-type(6){--slide-alpha:.98}
       <path fill-rule="evenodd" clip-rule="evenodd" d="M27.0912 65.8047L27.5532 66.1127L40.9532 55.5617L54.4072 66.1587L54.8162 65.8577L49.0082 49.7547L63.3792 40.1737L63.1722 39.6127L45.9982 40.2207L41.3082 23.7627H40.6992L35.9562 40.2207L18.9892 39.6127L18.7822 40.2207L32.8992 49.7007L27.0912 65.8047Z" fill="currentColor"/>
       <path fill-rule="evenodd" clip-rule="evenodd" d="M52.8335 72.0205H55.5955L58.3985 83.8895H58.4425L61.5725 72.0205H64.3545L67.3985 83.8895H67.4415L70.3335 72.0205H73.0945L68.8125 87.5415H66.0505L62.9425 75.6725H62.8985L59.7255 87.5415H56.9215L52.8335 72.0205Z" fill="currentColor"/>
     </svg>
-    <span class="lockup-text" id="lockup-text">The Bar at Wonder Cabinet</span>
+    <span class="lockup-text" id="lockup-text">Bar Wonder Cabinet</span>
   </span>
   <span class="navbar-nav"><a href="#menu">Food</a>, <a href="#wine">Wine</a>, <a href="#journal">Program</a>, <a href="#find">Contact</a></span>
 </nav>
@@ -449,7 +449,7 @@ async function fetchBarData(){
   const weekEndIso = weekEnd.toISOString();
 
   const q = `{
-    "settings": *[_type=="barSettings"][0]{heroHeadline, heroBody, narrative, hours},
+    "settings": *[_type=="barSettings"][0]{heroDisplay, heroHeadline, heroBody, narrative, hours},
     "menu": *[_type=="barMenuItem" && available==true] | order(sortOrder asc){name, description, category, group, region, price},
     "events": *[_type=="event" && startDateTime >= "${weekStartIso}" && startDateTime < "${weekEndIso}" && (eventType=="Bar" || location->_id=="location-main-hall-bar")] | order(startDateTime asc)[0...5]{title, shortDescription, body, startDateTime, endDateTime}
   }`;
@@ -556,8 +556,8 @@ onScroll();
 /* ── nav logo: crossfade EN / AR every 10s ── */
 const lockupEl = document.getElementById("lockup-text");
 const IS_SMALL_SCREEN = window.innerWidth < 600;
-const LOCKUP_EN = IS_SMALL_SCREEN ? "The Bar" : "The Bar at Wonder Cabinet";
-const LOCKUP_AR = IS_SMALL_SCREEN ? "البار" : "البار في مجلس العجب";
+const LOCKUP_EN = IS_SMALL_SCREEN ? "Bar" : "Bar Wonder Cabinet";
+const LOCKUP_AR = IS_SMALL_SCREEN ? "بار" : "بار مجلس العجب";
 lockupEl.textContent = LOCKUP_EN;
 let lockupIsAr = false;
 setInterval(() => {
@@ -724,14 +724,23 @@ async function init(){
         renderHero();
       });
     } else {
-      const en = heroDateParts("en");
-      const ar = heroDateParts("ar");
+      const useCustom = settings.heroDisplay === "custom" && (settings.heroHeadline?.en || settings.heroHeadline?.ar);
+      let headEnHtml, headArHtml;
+      if(useCustom){
+        headEnHtml = accentify(escapeHtml(settings.heroHeadline?.en || ""));
+        headArHtml = accentify(escapeHtml(settings.heroHeadline?.ar || ""));
+      } else {
+        const en = heroDateParts("en");
+        const ar = heroDateParts("ar");
+        headEnHtml = `<em>${escapeHtml(en.weekday)}</em>${escapeHtml(en.rest)}`;
+        headArHtml = `<em class="ar-accent">${escapeHtml(ar.weekday)}</em>${escapeHtml(ar.rest)}`;
+      }
       const bodyEn = settings.heroBody?.en || "";
       const bodyAr = settings.heroBody?.ar || "";
       heroContent.innerHTML = `
         <div class="hero-head-mask-wrap" id="hero-head-wrap">
-          <h1 class="hero-head hero-head-en" id="hero-head-en"><em>${escapeHtml(en.weekday)}</em>${escapeHtml(en.rest)}</h1>
-          <h1 class="hero-head hero-head-ar" id="hero-head-ar"><em class="ar-accent">${escapeHtml(ar.weekday)}</em>${escapeHtml(ar.rest)}</h1>
+          <h1 class="hero-head hero-head-en" id="hero-head-en">${headEnHtml}</h1>
+          <h1 class="hero-head hero-head-ar" id="hero-head-ar">${headArHtml}</h1>
         </div>
         <div class="hero-sub-mask-wrap" id="hero-sub-wrap">
           ${bodyEn ? `<p class="hero-sub hero-sub-en" id="hero-sub-en">${accentify(escapeHtml(bodyEn))}</p>` : ""}
