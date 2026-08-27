@@ -631,35 +631,42 @@ function onMetaballScroll(){
     /* each bead runs its own 0→1 life across the remaining scroll */
     const t = Math.min(Math.max((p - b.delay) / Math.max(1 - b.delay, .01), 0), 1);
     if(t <= 0){ el.style.opacity = 0; return; }
-    const grow = Math.min(t / .18, 1);                  // swell out of the letter
-    const fade = t > .70 ? Math.max(1 - (t - .70) / .30, 0) : 1; // drain away
-    const drop = t * t * b.fall * vh;                   // accelerates as it falls
-    /* two out-of-phase waves per axis — the paths never quite repeat, so it
-       reads as something swimming rather than a tidy oscillation */
+    /* GROWTH is the whole gesture: from a spore-sized nub it keeps swelling
+       the entire way, ending several times its own size — so it reads as
+       something pushing up out of the screen toward you, not a ball that
+       pops to full size and then just moves. Fast early, easing as it gets
+       big, the way a mushroom actually opens. */
+    const swell = Math.pow(t, .48);
+    const grow  = .06 + swell * 2.9;
+    const fade  = t > .74 ? Math.max(1 - (t - .74) / .26, 0) : Math.min(t / .10, 1);
+    /* barely falls — it's rooted and rising, only drifting a little */
+    const drop = t * b.fall * vh * .30;
+    /* slow, out-of-phase wander on each axis — nothing repeats cleanly, so
+       it breathes rather than oscillates */
     const x = r.left + r.width * b.ox
-            + Math.sin(t * Math.PI * 1.6) * b.sway
-            + Math.sin(t * 7.3 + i) * b.size * .22;
+            + Math.sin(t * Math.PI * 1.1) * b.sway * .55
+            + Math.sin(t * 2.1 + i) * b.size * .16;
     const yy = r.top + r.height * b.oy + drop
-             + Math.cos(t * 5.1 + i * 1.4) * b.size * .18;
-    /* squash and stretch on each axis independently, plus tumble — a body
-       of water reacting to its own motion, not a rigid sphere */
-    const sx = grow * (1 + Math.sin(t * 9.4 + i * 1.3) * .26);
-    const sy = grow * (1 + Math.cos(t * 7.7 + i * 0.9) * .26);
-    const rot = Math.sin(t * 4.6 + i * 2.1) * 55;
+             + Math.cos(t * 1.7 + i * 1.4) * b.size * .14;
+    /* the cap swells wider than it is tall as it opens — independent axes,
+       drifting slowly out of sync */
+    const sx = grow * (1 + Math.sin(t * 2.6 + i * 1.3) * .20);
+    const sy = grow * (1 + Math.cos(t * 2.1 + i * 0.9) * .16);
+    const rot = Math.sin(t * 1.3 + i * 2.1) * 26;
     el.style.transform =
       `translate3d(${x - b.size / 2}px, ${yy - b.size / 2}px, 0) rotate(${rot}deg) scale(${sx}, ${sy})`;
     el.style.opacity = fade;
     el.style.borderRadius = mbBorderRadius(t, i);
-    /* colour swims as it travels — the woozy part */
-    el.style.setProperty("--hue", (Math.sin(t * 3.8 + i * 1.1) * 85) + "deg");
+    /* colour swims as it opens — the woozy part */
+    el.style.setProperty("--hue", (Math.sin(t * 1.4 + i * 1.1) * 85) + "deg");
   });
 }
-/* a violently wobbling, lopsided outline instead of a circle — each of the
-   8 corner-radius values rides its own fast sine (offset by bead index and
-   corner), so the silhouette keeps tearing itself into new organic shapes
-   the whole way down: closer to a growing organism than a falling drop */
+/* a slowly reshaping, lopsided outline instead of a circle — each of the 8
+   corner-radius values rides its own slow sine (offset by bead index and
+   corner). Kept unhurried on purpose: the silhouette should look like a cap
+   unfurling in slow motion, not a blob vibrating. */
 function mbBorderRadius(t, i){
-  const w = k => 50 + Math.sin(t * 13 + i * 2.3 + k * 1.4) * 34;
+  const w = k => 50 + Math.sin(t * 3.4 + i * 2.3 + k * 1.4) * 30;
   return `${w(0)}% ${100-w(1)}% ${w(2)}% ${100-w(3)}% / ${w(4)}% ${w(5)}% ${100-w(6)}% ${100-w(7)}%`;
 }
 window.addEventListener("scroll", onMetaballScroll, { passive:true });
