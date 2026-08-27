@@ -310,7 +310,6 @@ section:nth-of-type(6){--slide-alpha:.98}
 
 <!-- ═══ HERO — dark slide ═══ -->
 <div class="hero" id="hero">
-  <button class="lang-toggle is-ar" id="hero-lang-toggle" style="margin-bottom:1.6rem; position:relative; z-index:1" aria-label="Switch to Arabic">ع</button>
   <div id="hero-i18n">
     <h1 class="hero-head">Loading&hellip;</h1>
   </div>
@@ -484,7 +483,7 @@ setInterval(render, 30000);
 
 /* ── shrink-on-scroll hero ── */
 const heroEl = document.getElementById("hero");
-const fadeEls = document.querySelectorAll(".hero-corner, #hero-lang-toggle");
+const fadeEls = document.querySelectorAll(".hero-corner");
 const SHRINK_DISTANCE = 460;
 function onScroll(){
   const y = window.scrollY || window.pageYOffset;
@@ -643,8 +642,6 @@ async function init(){
      hero-head style, with a way back at each step */
   let heroShowingAr = false;
   let heroMode = "normal"; // "normal" | "status" | "full"
-  let heroFlipManualOverride = false; // true once the ع/EN button has been used
-  const heroLangBtn = document.getElementById("hero-lang-toggle");
   const heroEl18n = document.getElementById("hero-i18n");
 
   function renderHero(){
@@ -699,7 +696,7 @@ async function init(){
      punctuation/shaping is correct — no per-word tricks), blur back in.
      The ع/EN button, once used, takes over permanently. */
   function updateHeroLangScroll(){
-    if(heroMode !== "normal" || heroFlipManualOverride) return;
+    if(heroMode !== "normal") return;
     const y = window.scrollY || window.pageYOffset;
     const overall = Math.min(Math.max(y / SHRINK_DISTANCE, 0), 1);
     const BLUR_MAX = 10, rampWidth = 0.16, swapAt = 0.5;
@@ -717,14 +714,6 @@ async function init(){
     }
   }
   window.addEventListener("scroll", updateHeroLangScroll, { passive:true });
-
-  heroLangBtn.addEventListener("click", () => {
-    heroFlipManualOverride = true;
-    heroShowingAr = !heroShowingAr;
-    heroLangBtn.textContent = heroShowingAr ? "EN" : "ع";
-    heroLangBtn.classList.toggle("is-ar", !heroShowingAr);
-    renderHero();
-  });
 
   hoursLink.addEventListener("click", e => {
     e.preventDefault();
