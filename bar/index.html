@@ -90,7 +90,7 @@ a{color:inherit; text-decoration:none}
 .hours-pop .close:hover{opacity:1; color:var(--yellow)}
 
 /* ── hero (dark slide) ──────────────────────────────────── */
-.hero-spacer{height:calc(190vh - var(--bar-h))}
+.hero-spacer{height:calc(170vh - var(--bar-h))}
 .hero{
   position:fixed; top:0; left:0; right:0; height:calc(100vh - var(--bar-h));
   display:flex; flex-direction:column; align-items:center; justify-content:center;
@@ -204,7 +204,6 @@ section:nth-of-type(6){z-index:6}
 }
 section.has-sticky{justify-content:flex-start}
 .pad{padding:clamp(2.8rem,7vw,5rem) clamp(1.2rem,4.5vw,3.6rem)}
-#about{padding-top:clamp(10rem,26vh,18rem)}
 .slide-light,.slide-dark,.slide-yellow,.slide-blue{
   background:rgba(241,233,231,var(--slide-alpha,.6)); color:var(--ink);
   border-top:1px solid rgba(17,17,16,.18);
@@ -518,18 +517,36 @@ const heroEl = document.getElementById("hero");
 const heroSpacerEl = document.querySelector(".hero-spacer");
 const fadeEls = document.querySelectorAll(".hero-corner");
 const SHRINK_DISTANCE = 460;
+const HERO_SLOW = 0.09; /* slow parallax while the language reveal is readable */
 function onScroll(){
   const y = window.scrollY || window.pageYOffset;
+  const vh = window.innerHeight;
+  const heroH = heroEl.offsetHeight;
+  /* E = scroll distance at which the hero must be fully off-screen —
+     exactly when the About section's top edge reaches the bottom of the
+     viewport, i.e. the moment it starts sliding into view. That keeps the
+     hero and About from ever being on screen at the same time, with no
+     dead empty gap and no instant vanish. */
+  const E = Math.max(heroSpacerEl.offsetHeight - vh, 1);
+  const R = E * 0.55; /* slow readable phase, then catch up and scroll away */
+  let ty;
+  if(y <= R){
+    ty = -y * HERO_SLOW;
+  } else if(y <= E){
+    const startTy = -R * HERO_SLOW;
+    const t = (y - R) / (E - R);
+    ty = startTy + (-heroH - startTy) * t;
+  } else {
+    ty = -heroH - (y - E); /* fully gone — keep moving at natural scroll speed */
+  }
+  heroEl.style.transform = `translateY(${ty}px)`;
+
   const p = Math.min(Math.max(y / SHRINK_DISTANCE, 0), 1);
-  heroEl.style.transform = `translateY(${-y * 0.09}px)`;
   const o = Math.max(1 - p * 1.6, 0);
   fadeEls.forEach(el => el.style.opacity = o);
 
-  /* no fade — the slow parallax means the hero is still faintly visible
-     behind the sticky nav for a long scroll distance; once the next
-     section has fully taken over (scrolled past the hero-spacer), just
-     cut the hero instantly rather than let it linger as a ghost. */
-  heroEl.style.visibility = y >= heroSpacerEl.offsetHeight ? "hidden" : "visible";
+  /* safety cutoff only once it's long off-screen either way — imperceptible */
+  heroEl.style.visibility = y >= E + heroH ? "hidden" : "visible";
 }
 window.addEventListener("scroll", onScroll, { passive:true });
 onScroll();
