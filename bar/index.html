@@ -90,7 +90,7 @@ a{color:inherit; text-decoration:none}
 .hours-pop .close:hover{opacity:1; color:var(--yellow)}
 
 /* ── hero (dark slide) ──────────────────────────────────── */
-.hero-spacer{height:calc(140vh - var(--bar-h))}
+.hero-spacer{height:calc(190vh - var(--bar-h))}
 .hero{
   position:fixed; top:0; left:0; right:0; height:calc(100vh - var(--bar-h));
   display:flex; flex-direction:column; align-items:center; justify-content:center;
@@ -204,6 +204,7 @@ section:nth-of-type(6){z-index:6}
 }
 section.has-sticky{justify-content:flex-start}
 .pad{padding:clamp(2.8rem,7vw,5rem) clamp(1.2rem,4.5vw,3.6rem)}
+#about{padding-top:clamp(4rem,10vh,8rem)}
 .slide-light,.slide-dark,.slide-yellow,.slide-blue{
   background:rgba(241,233,231,var(--slide-alpha,.6)); color:var(--ink);
   border-top:1px solid rgba(17,17,16,.18);
@@ -519,7 +520,7 @@ const SHRINK_DISTANCE = 460;
 function onScroll(){
   const y = window.scrollY || window.pageYOffset;
   const p = Math.min(Math.max(y / SHRINK_DISTANCE, 0), 1);
-  heroEl.style.transform = `translateY(${-y * 0.22}px)`;
+  heroEl.style.transform = `translateY(${-y * 0.13}px)`;
   const o = Math.max(1 - p * 1.6, 0);
   fadeEls.forEach(el => el.style.opacity = o);
 }
