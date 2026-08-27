@@ -737,14 +737,13 @@ async function init(){
   /* scroll drives the flip from English to Arabic across the hero's
      shrink zone; the ع/EN button, if used, takes over permanently and
      falls back to the old instant plain-text swap */
-  const HERO_FLIP_DISTANCE = SHRINK_DISTANCE;
   function updateHeroFlip(){
     if(heroMode !== "normal" || heroFlipManualOverride) return;
     const chars = heroEl18n.querySelectorAll(".flip-inner");
     const n = chars.length;
     if(!n) return;
     const y = window.scrollY || window.pageYOffset;
-    const overall = Math.min(Math.max(y / HERO_FLIP_DISTANCE, 0), 1);
+    const overall = Math.min(Math.max(y / SHRINK_DISTANCE, 0), 1);
     const staggerSpan = 0.5;
     chars.forEach((el, i) => {
       const delay = (i / n) * staggerSpan;
