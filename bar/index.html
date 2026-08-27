@@ -93,7 +93,7 @@ a{color:inherit; text-decoration:none}
 .hero-spacer{height:calc(190vh - var(--bar-h))}
 .hero{
   position:fixed; top:0; left:0; right:0; height:calc(100vh - var(--bar-h));
-  display:flex; flex-direction:column; align-items:center; justify-content:flex-start;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
   text-align:center; padding:1.5rem clamp(1.2rem,4vw,2rem) clamp(6rem,14vh,10rem);
   transform-origin:top center; will-change:transform; z-index:2;
   pointer-events:none;
@@ -521,7 +521,7 @@ const SHRINK_DISTANCE = 460;
 function onScroll(){
   const y = window.scrollY || window.pageYOffset;
   const p = Math.min(Math.max(y / SHRINK_DISTANCE, 0), 1);
-  heroEl.style.transform = `translateY(${-y * 0.13}px)`;
+  heroEl.style.transform = `translateY(${-y * 0.09}px)`;
   const o = Math.max(1 - p * 1.6, 0);
   fadeEls.forEach(el => el.style.opacity = o);
 
