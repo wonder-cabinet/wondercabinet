@@ -91,6 +91,7 @@ a{color:inherit; text-decoration:none}
 
 /* ── hero (dark slide) ──────────────────────────────────── */
 .hero-spacer{height:calc(100vh - var(--bar-h))}
+.hero-clear-spacer{height:65vh}
 .hero{
   position:fixed; top:0; left:0; right:0; height:calc(100vh - var(--bar-h));
   display:flex; flex-direction:column; align-items:center; justify-content:center;
@@ -364,6 +365,11 @@ section:nth-of-type(6){--slide-alpha:.98}
   <span class="navbar-nav"><a href="#menu">Food</a>, <a href="#wine">Wine</a>, <a href="#journal">Program</a>, <a href="#find">Contact</a></span>
 </nav>
 
+<!-- once the nav locks at the top, this gives the still-fixed hero real
+     room to finish scrolling itself away before the About text below
+     ever reaches the screen — no overlap, no instant vanish -->
+<div class="hero-clear-spacer"></div>
+
 <!-- ═══ NARRATIVE — light slide ═══ -->
 <section class="slide-light" id="about">
   <div class="pad center-wrap">
@@ -516,20 +522,33 @@ setInterval(render, 30000);
 /* ── shrink-on-scroll hero ── */
 const heroEl = document.getElementById("hero");
 const heroSpacerEl = document.querySelector(".hero-spacer");
+const heroClearEl = document.querySelector(".hero-clear-spacer");
 const fadeEls = document.querySelectorAll(".hero-corner");
-const HERO_SLOW = 0.09; /* one constant slow speed, same in both scroll directions */
+const HERO_SLOW = 0.09; /* slow, readable speed while the nav sweeps up over it */
 function onScroll(){
   const y = window.scrollY || window.pageYOffset;
-  const spacerH = heroSpacerEl.offsetHeight;
-  heroEl.style.transform = `translateY(${-y * HERO_SLOW}px)`;
+  const spacerH = heroSpacerEl.offsetHeight; /* nav locks at the top here */
+  const heroH = heroEl.offsetHeight;
+  const clearEnd = spacerH + heroClearEl.offsetHeight; /* hero must be fully gone by here, right before About reaches the screen */
+
+  let ty;
+  if(y <= spacerH){
+    ty = -y * HERO_SLOW; /* slow reveal while nav sweeps up */
+  } else if(y <= clearEnd){
+    const startTy = -spacerH * HERO_SLOW;
+    const t = (y - spacerH) / (clearEnd - spacerH);
+    ty = startTy + (-heroH - startTy) * t; /* smoothly finish scrolling away */
+  } else {
+    ty = -heroH - (y - clearEnd); /* fully gone — keep moving at natural scroll speed */
+  }
+  heroEl.style.transform = `translateY(${ty}px)`;
 
   const p = Math.min(Math.max(y / spacerH, 0), 1);
   const o = Math.max(1 - p * 1.6, 0);
   fadeEls.forEach(el => el.style.opacity = o);
 
-  /* only cut once fully past the spacer — a single clean handoff, not an
-     early or accelerating one */
-  heroEl.style.visibility = y >= spacerH ? "hidden" : "visible";
+  /* safety cutoff only once it's long off-screen either way — imperceptible */
+  heroEl.style.visibility = y >= clearEnd + heroH ? "hidden" : "visible";
 }
 window.addEventListener("scroll", onScroll, { passive:true });
 onScroll();
