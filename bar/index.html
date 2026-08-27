@@ -128,18 +128,11 @@ a{color:inherit; text-decoration:none}
 
 /* ── scroll-driven flip-clock headline (English → Arabic) ── */
 .flip-word{display:inline-flex; flex-wrap:wrap; justify-content:center}
-.flip-char{
-  display:inline-block; position:relative; height:1.05em; line-height:1.05em;
-  perspective:400px; vertical-align:top;
-}
-.flip-inner{
-  position:relative; width:100%; height:100%; transform-style:preserve-3d;
-  will-change:transform;
-}
-.flip-char .face{
-  position:absolute; inset:0; backface-visibility:hidden; white-space:pre;
-}
-.flip-char .face.back{transform:rotateX(180deg)}
+.flip-char{display:inline-block; position:relative; perspective:400px; vertical-align:top}
+.flip-inner{position:relative; width:100%; height:100%; transform-style:preserve-3d; will-change:transform}
+.flip-char .face{backface-visibility:hidden; white-space:pre}
+.flip-char .face.front{position:relative}
+.flip-char .face.back{position:absolute; inset:0; transform:rotateX(180deg)}
 
 /* ── language toggle button ─────────────────────────────── */
 .lang-toggle{
