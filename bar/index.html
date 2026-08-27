@@ -132,7 +132,7 @@ a{color:inherit; text-decoration:none}
 .flip-inner{display:inline-block; position:relative; transform-style:preserve-3d; will-change:transform}
 .flip-char .face{backface-visibility:hidden; white-space:pre}
 .flip-char .face.front{position:relative}
-.flip-char .face.back{position:absolute; inset:0; transform:rotateX(180deg)}
+.flip-char .face.back{position:absolute; top:0; left:0; transform:rotateX(180deg)}
 
 /* ── language toggle button ─────────────────────────────── */
 .lang-toggle{
@@ -715,6 +715,13 @@ async function init(){
       heroEl18n.innerHTML = `<h1 class="hero-head">${buildFlipHeadline(en.weekday, en.rest, ar.weekday, ar.rest)}</h1>${bodyEn ? `<p class="hero-sub" id="hero-sub-text">${accentify(escapeHtml(bodyEn))}</p>` : ""}`;
       heroEl18n.classList.remove("ar");
       heroEl18n.style.direction = "";
+      heroEl18n.querySelectorAll(".flip-char").forEach(fc => {
+        const fw = fc.querySelector(".face.front").offsetWidth;
+        const bw = fc.querySelector(".face.back").offsetWidth;
+        fc.dataset.fw = fw;
+        fc.dataset.bw = bw;
+        fc.style.width = fw + "px";
+      });
       updateHeroFlip();
       return;
     } else {
@@ -743,6 +750,10 @@ async function init(){
       const delay = (i / n) * staggerSpan;
       const local = Math.min(Math.max((overall - delay) / (1 - staggerSpan), 0), 1);
       el.style.transform = `rotateX(${local * 180}deg)`;
+      const fc = el.parentElement;
+      if(fc.dataset.fw !== undefined){
+        fc.style.width = (local < 0.5 ? fc.dataset.fw : fc.dataset.bw) + "px";
+      }
     });
     const subEl = document.getElementById("hero-sub-text");
     if(overall >= 0.999 && !heroShowingAr){
