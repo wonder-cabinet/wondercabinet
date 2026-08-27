@@ -126,14 +126,6 @@ a{color:inherit; text-decoration:none}
 .ar-accent, .hero-head em.ar-accent{font-family:"Aref Ruqaa",var(--serif); font-style:normal}
 .hero-head{color:#111}
 
-/* ── scroll-driven flip-clock headline (English → Arabic) ── */
-.flip-word{display:inline-flex; flex-wrap:wrap; justify-content:center; gap:.3em}
-.flip-char{display:inline-block; position:relative; perspective:400px; vertical-align:top}
-.flip-inner{display:inline-block; position:relative; transform-style:preserve-3d; will-change:transform}
-.flip-char .face{backface-visibility:hidden; white-space:pre}
-.flip-char .face.front{position:relative}
-.flip-char .face.back{position:absolute; top:0; left:0; transform:rotateX(180deg)}
-
 /* ── language toggle button ─────────────────────────────── */
 .lang-toggle{
   display:inline-flex; align-items:center; justify-content:center;
@@ -577,23 +569,6 @@ function accentify(escapedText){
    front face = English, back face = Arabic. Character positions don't
    correspond to a real transliteration — it's a visual flip effect, not
    a letter-for-letter translation. */
-function buildFlipHeadline(enWeekday, enRest, arWeekday, arRest){
-  const enWords = (enWeekday + enRest).split(" ");
-  const arWordsOrig = (arWeekday + arRest).split(" ");
-  const arWords = [...arWordsOrig].reverse();
-  const n = Math.max(enWords.length, arWords.length);
-  let html = '<span class="flip-word" dir="ltr">';
-  for(let i=0;i<n;i++){
-    const f = enWords[i] !== undefined ? enWords[i] : "";
-    const b = arWords[i] !== undefined ? arWords[i] : "";
-    const origArIndex = arWordsOrig.length - 1 - i;
-    const fCls = i === 0 ? "accent" : "";
-    const bCls = origArIndex === 0 ? "ar-accent accent" : "ar-accent";
-    html += `<span class="flip-char"><span class="flip-inner"><span class="face front ${fCls}">${escapeHtml(f)}</span><span class="face back ${bCls}">${escapeHtml(b)}</span></span></span>`;
-  }
-  html += "</span>";
-  return html;
-}
 function emLastWord(escapedText){
   return escapedText.replace(/(\S+)\s*$/, (m, word) => {
     const cls = isArabicText(word) ? "ar-accent" : "";
@@ -708,22 +683,6 @@ async function init(){
         heroMode = "status";
         renderHero();
       });
-    } else if(!heroFlipManualOverride){
-      const en = heroDateParts("en");
-      const ar = heroDateParts("ar");
-      const bodyEn = settings.heroBody?.en || "";
-      heroEl18n.innerHTML = `<h1 class="hero-head">${buildFlipHeadline(en.weekday, en.rest, ar.weekday, ar.rest)}</h1>${bodyEn ? `<p class="hero-sub" id="hero-sub-text">${accentify(escapeHtml(bodyEn))}</p>` : ""}`;
-      heroEl18n.classList.remove("ar");
-      heroEl18n.style.direction = "";
-      heroEl18n.querySelectorAll(".flip-char").forEach(fc => {
-        const fw = fc.querySelector(".face.front").offsetWidth;
-        const bw = fc.querySelector(".face.back").offsetWidth;
-        fc.dataset.fw = fw;
-        fc.dataset.bw = bw;
-        fc.style.width = fw + "px";
-      });
-      updateHeroFlip();
-      return;
     } else {
       const {weekday, rest} = heroDateParts(heroShowingAr ? "ar" : "en");
       const body = heroShowingAr ? (settings.heroBody?.ar || "") : (settings.heroBody?.en || "");
@@ -735,48 +694,29 @@ async function init(){
   }
   renderHero();
 
-  /* scroll drives the flip from English to Arabic across the hero's
-     shrink zone; the ع/EN button, if used, takes over permanently and
-     falls back to the old instant plain-text swap */
-  function updateHeroFlip(){
+  /* scroll drives the language swap: blur the whole headline+subtitle out,
+     swap to plain Arabic text at peak blur (a normal RTL text run, so
+     punctuation/shaping is correct — no per-word tricks), blur back in.
+     The ع/EN button, once used, takes over permanently. */
+  function updateHeroLangScroll(){
     if(heroMode !== "normal" || heroFlipManualOverride) return;
-    const chars = heroEl18n.querySelectorAll(".flip-inner");
-    const n = chars.length;
-    if(!n) return;
     const y = window.scrollY || window.pageYOffset;
     const overall = Math.min(Math.max(y / SHRINK_DISTANCE, 0), 1);
-    const staggerSpan = 0.5;
-    chars.forEach((el, i) => {
-      const delay = (i / n) * staggerSpan;
-      const local = Math.min(Math.max((overall - delay) / (1 - staggerSpan), 0), 1);
-      el.style.transform = `rotateX(${local * 180}deg)`;
-      const fc = el.parentElement;
-      if(fc.dataset.fw !== undefined){
-        fc.style.width = (local < 0.5 ? fc.dataset.fw : fc.dataset.bw) + "px";
-      }
-    });
-    const subEl = document.getElementById("hero-sub-text");
-    if(subEl){
-      const BLUR_MAX = 10, rampWidth = 0.16, swapAt = 0.5;
-      let blur = 0;
-      if(overall >= swapAt - rampWidth && overall < swapAt){
-        blur = ((overall - (swapAt - rampWidth)) / rampWidth) * BLUR_MAX;
-      } else if(overall >= swapAt && overall <= swapAt + rampWidth){
-        blur = (1 - (overall - swapAt) / rampWidth) * BLUR_MAX;
-      }
-      subEl.style.filter = blur > 0.05 ? `blur(${blur}px)` : "";
-      if(overall >= swapAt && !heroShowingAr){
-        heroShowingAr = true;
-        subEl.dir = "rtl";
-        if(settings.heroBody?.ar) subEl.innerHTML = accentify(escapeHtml(settings.heroBody.ar));
-      } else if(overall < swapAt && heroShowingAr){
-        heroShowingAr = false;
-        subEl.removeAttribute("dir");
-        if(settings.heroBody?.en) subEl.innerHTML = accentify(escapeHtml(settings.heroBody.en));
-      }
+    const BLUR_MAX = 10, rampWidth = 0.16, swapAt = 0.5;
+    let blur = 0;
+    if(overall >= swapAt - rampWidth && overall < swapAt){
+      blur = ((overall - (swapAt - rampWidth)) / rampWidth) * BLUR_MAX;
+    } else if(overall >= swapAt && overall <= swapAt + rampWidth){
+      blur = (1 - (overall - swapAt) / rampWidth) * BLUR_MAX;
+    }
+    heroEl18n.style.filter = blur > 0.05 ? `blur(${blur}px)` : "";
+    const shouldBeAr = overall >= swapAt;
+    if(shouldBeAr !== heroShowingAr){
+      heroShowingAr = shouldBeAr;
+      renderHero();
     }
   }
-  window.addEventListener("scroll", updateHeroFlip, { passive:true });
+  window.addEventListener("scroll", updateHeroLangScroll, { passive:true });
 
   heroLangBtn.addEventListener("click", () => {
     heroFlipManualOverride = true;
