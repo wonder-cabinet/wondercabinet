@@ -128,22 +128,13 @@ a{color:inherit; text-decoration:none}
 .ar-accent, .hero-head em.ar-accent{font-family:"Aref Ruqaa",var(--serif); font-style:normal}
 .hero-head{color:#111}
 
-/* ── scroll-driven wipe line: a single line travels down over the hero
-   text as you scroll; the text itself flips whole from English to Arabic
-   exactly as the line crosses it, so what's revealed once the line has
-   passed is the Arabic version. Only one language is ever rendered at a
-   time (no stacked layers), which avoids the overlap/slicing that comes
-   from English and Arabic wrapping to different line counts. */
+/* ── the real header bar is the line: as the hero content scrolls up
+   and its top edge reaches the sticky header, it flips from English to
+   Arabic right there (a quick blur-flash hides the instant swap). No
+   invented decoration — the trigger is the actual header, not an
+   arbitrary scroll fraction. */
 #hero-i18n-content{transition:filter .12s ease}
 #hero-i18n-content.wipe-flash{filter:blur(6px)}
-.hero-wipe-line{
-  position:absolute; left:50%; top:0%; transform:translate(-50%,-50%);
-  width:min(94%,44rem); height:2px; z-index:2; pointer-events:none;
-  background:linear-gradient(to right, transparent, #90f 12%, #90f 88%, transparent);
-  box-shadow:0 0 16px 2px rgba(153,0,255,.6);
-  opacity:0; transition:opacity .15s ease;
-}
-.hero-wipe-line.visible{opacity:.9}
 
 /* ── language toggle button ─────────────────────────────── */
 .lang-toggle{
@@ -331,7 +322,6 @@ section:nth-of-type(6){--slide-alpha:.98}
 <div class="hero" id="hero">
   <div id="hero-i18n">
     <div id="hero-i18n-content"><h1 class="hero-head">Loading&hellip;</h1></div>
-    <div class="hero-wipe-line" id="hero-wipe-line"></div>
   </div>
 </div>
 <div class="hero-spacer"></div>
@@ -664,7 +654,7 @@ async function init(){
   let heroMode = "normal"; // "normal" | "full"
   const heroEl18n = document.getElementById("hero-i18n");
   const heroContent = document.getElementById("hero-i18n-content");
-  const wipeLine = document.getElementById("hero-wipe-line");
+  const headerBar = document.getElementById("hero-corner");
 
   function renderHero(){
     if(heroMode === "full"){
@@ -696,23 +686,17 @@ async function init(){
   }
   renderHero();
 
-  /* scroll drives a single visible line traveling down over the hero
-     text; the content flips whole from English to Arabic exactly as the
-     line crosses it (a quick blur-flash right at that instant hides the
-     swap), so whatever the line has already passed reads Arabic. Only
-     one language renders at a time — no stacked layers — so there's no
-     risk of the two texts overlapping or misaligning. */
+  /* the real header bar is the line — not an invented one. As you scroll,
+     the hero content's own top edge moves up toward the sticky header;
+     the instant it reaches the header, the text flips whole from English
+     to Arabic (a quick blur-flash hides the swap). So the trigger is
+     tied to something actually on screen, not an arbitrary scroll
+     fraction with no visible relationship to the header. */
   function updateHeroLangScroll(){
-    if(heroMode !== "normal"){
-      wipeLine.classList.remove("visible");
-      return;
-    }
-    const y = window.scrollY || window.pageYOffset;
-    const overall = Math.min(Math.max(y / SHRINK_DISTANCE, 0), 1);
-    const swapAt = 0.5;
-    wipeLine.style.top = (overall * 100) + "%";
-    wipeLine.classList.toggle("visible", overall > 0.01 && overall < 0.99);
-    const shouldBeAr = overall >= swapAt;
+    if(heroMode !== "normal") return;
+    const headerBottom = headerBar.getBoundingClientRect().bottom;
+    const contentTop = heroContent.getBoundingClientRect().top;
+    const shouldBeAr = contentTop <= headerBottom;
     if(shouldBeAr !== heroShowingAr){
       heroShowingAr = shouldBeAr;
       heroContent.classList.add("wipe-flash");
