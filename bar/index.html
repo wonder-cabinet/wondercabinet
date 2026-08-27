@@ -94,7 +94,7 @@ a{color:inherit; text-decoration:none}
 .hero{
   position:fixed; top:0; left:0; right:0; height:calc(100vh - var(--bar-h));
   display:flex; flex-direction:column; align-items:center; justify-content:center;
-  text-align:center; padding:4.5rem clamp(1.2rem,4vw,2rem) 2rem;
+  text-align:center; padding:4.5rem clamp(1.2rem,4vw,2rem) clamp(6rem,14vh,10rem);
   transform-origin:top center; will-change:transform; z-index:2;
   pointer-events:none;
 }
@@ -128,16 +128,23 @@ a{color:inherit; text-decoration:none}
 .ar-accent, .hero-head em.ar-accent{font-family:"Aref Ruqaa",var(--serif); font-style:normal}
 .hero-head{color:#111}
 
-/* ── the real header bar is the line. The headline is one short, large
-   line of text — a continuous wipe would slice straight through its
-   glyphs — so it flips whole the moment the header reaches its middle
-   (a quick blur-flash hides that instant swap). The subtitle, being
-   multiple lines, can do the real thing: it's unveiled continuously as
-   the header passes over it — English and Arabic stacked in the same
-   spot, each masked independently against the header's real position,
-   so whatever has already gone under the header reads Arabic. */
-#hero-i18n-content{transition:filter .12s ease}
-#hero-i18n-content.wipe-flash{filter:blur(6px)}
+/* ── the real header bar is the line. Both the headline and the
+   subtitle are unveiled continuously as the header sweeps over them:
+   English and Arabic sit stacked in the same spot, each masked
+   independently against the header's real position measured against
+   THAT layer's own height, so whatever has already gone under the
+   header reads Arabic — no discrete swap, no invented decoration. */
+.hero-head-mask-wrap{position:relative; width:100%; display:flex; justify-content:center}
+.hero-head-mask-wrap .hero-head{position:relative}
+.hero-head-mask-wrap .hero-head.hero-head-ar{position:absolute; top:0; left:50%; transform:translateX(-50%); direction:rtl}
+.hero-head-mask-wrap .hero-head-en{
+  -webkit-mask-image:linear-gradient(to bottom, black 0%, black var(--reveal-head-en,0%), transparent calc(var(--reveal-head-en,0%) + 4%), transparent 100%);
+  mask-image:linear-gradient(to bottom, black 0%, black var(--reveal-head-en,0%), transparent calc(var(--reveal-head-en,0%) + 4%), transparent 100%);
+}
+.hero-head-mask-wrap .hero-head-ar{
+  -webkit-mask-image:linear-gradient(to bottom, transparent 0%, transparent var(--reveal-head-ar,0%), black calc(var(--reveal-head-ar,0%) + 4%), black 100%);
+  mask-image:linear-gradient(to bottom, transparent 0%, transparent var(--reveal-head-ar,0%), black calc(var(--reveal-head-ar,0%) + 4%), black 100%);
+}
 .hero-sub-mask-wrap{position:relative; width:100%}
 .hero-sub-mask-wrap .hero-sub{position:relative}
 .hero-sub-mask-wrap .hero-sub.hero-sub-ar{position:absolute; top:0; left:0; direction:rtl}
@@ -512,7 +519,7 @@ const SHRINK_DISTANCE = 460;
 function onScroll(){
   const y = window.scrollY || window.pageYOffset;
   const p = Math.min(Math.max(y / SHRINK_DISTANCE, 0), 1);
-  heroEl.style.transform = `translateY(${-y * 0.4}px)`;
+  heroEl.style.transform = `translateY(${-y * 0.22}px)`;
   const o = Math.max(1 - p * 1.6, 0);
   fadeEls.forEach(el => el.style.opacity = o);
 }
@@ -690,12 +697,15 @@ async function init(){
         renderHero();
       });
     } else {
-      const {weekday, rest} = heroDateParts(heroShowingAr ? "ar" : "en");
-      const weekdayCls = heroShowingAr ? "ar-accent" : "";
+      const en = heroDateParts("en");
+      const ar = heroDateParts("ar");
       const bodyEn = settings.heroBody?.en || "";
       const bodyAr = settings.heroBody?.ar || "";
       heroContent.innerHTML = `
-        <h1 class="hero-head" id="hero-headline"><em class="${weekdayCls}">${escapeHtml(weekday)}</em>${escapeHtml(rest)}</h1>
+        <div class="hero-head-mask-wrap" id="hero-head-wrap">
+          <h1 class="hero-head hero-head-en" id="hero-head-en"><em>${escapeHtml(en.weekday)}</em>${escapeHtml(en.rest)}</h1>
+          <h1 class="hero-head hero-head-ar" id="hero-head-ar"><em class="ar-accent">${escapeHtml(ar.weekday)}</em>${escapeHtml(ar.rest)}</h1>
+        </div>
         <div class="hero-sub-mask-wrap" id="hero-sub-wrap">
           ${bodyEn ? `<p class="hero-sub hero-sub-en" id="hero-sub-en">${accentify(escapeHtml(bodyEn))}</p>` : ""}
           ${bodyAr ? `<p class="hero-sub hero-sub-ar" id="hero-sub-ar">${accentify(escapeHtml(bodyAr))}</p>` : ""}
@@ -710,43 +720,30 @@ async function init(){
   /* the real header bar is the line — not an invented one. The sticky
      nav rises up from the bottom of the screen as you scroll (it moves
      1:1 with scroll, while the hero drifts up slower, parallax-style),
-     sweeping up through the hero text. The headline is one short, large
-     line — a continuous wipe would slice through its glyphs — so it
-     flips whole the instant the header reaches its own local midpoint
-     (a quick blur-flash hides that swap). The subtitle, having real
-     lines, is unveiled continuously: each language layer is masked
-     against the header's real position measured against THAT layer's
-     own height, so English and Arabic wrapping to a different number of
-     lines never breaks the alignment. */
+     sweeping up through the hero text. Headline and subtitle are both
+     unveiled continuously: each language layer is masked against the
+     header's real position measured against THAT layer's own height, so
+     English and Arabic wrapping to a different width/line-count never
+     breaks the alignment. */
   const clamp01 = n => Math.min(Math.max(n, 0), 1);
+  function maskPair(navTop, wrapId, enId, arId, enVar, arVar){
+    const wrap = document.getElementById(wrapId);
+    const enEl = document.getElementById(enId);
+    const arEl = document.getElementById(arId);
+    if(!wrap || !enEl || !arEl) return;
+    const enRect = enEl.getBoundingClientRect();
+    const arRect = arEl.getBoundingClientRect();
+    const enPct = enRect.height > 0 ? clamp01((navTop - enRect.top) / enRect.height) * 100 : 0;
+    const arPct = arRect.height > 0 ? clamp01((navTop - arRect.top) / arRect.height) * 100 : 0;
+    wrap.style.setProperty(enVar, enPct + "%");
+    wrap.style.setProperty(arVar, arPct + "%");
+    heroShowingAr = enPct >= 50;
+  }
   function updateHeroLangScroll(){
     if(heroMode !== "normal") return;
     const navTop = headerBar.getBoundingClientRect().top;
-
-    const headEl = document.getElementById("hero-headline");
-    if(headEl){
-      const headRect = headEl.getBoundingClientRect();
-      const headLocalPct = headRect.height > 0 ? (navTop - headRect.top) / headRect.height : 0;
-      const shouldBeAr = headLocalPct <= 0.5;
-      if(shouldBeAr !== heroShowingAr){
-        heroShowingAr = shouldBeAr;
-        heroContent.classList.add("wipe-flash");
-        renderHero();
-        requestAnimationFrame(() => heroContent.classList.remove("wipe-flash"));
-      }
-    }
-
-    const subWrap = document.getElementById("hero-sub-wrap");
-    const subEn = document.getElementById("hero-sub-en");
-    const subAr = document.getElementById("hero-sub-ar");
-    if(subWrap && subEn && subAr){
-      const enRect = subEn.getBoundingClientRect();
-      const arRect = subAr.getBoundingClientRect();
-      const enPct = enRect.height > 0 ? clamp01((navTop - enRect.top) / enRect.height) * 100 : 0;
-      const arPct = arRect.height > 0 ? clamp01((navTop - arRect.top) / arRect.height) * 100 : 0;
-      subWrap.style.setProperty("--reveal-en", enPct + "%");
-      subWrap.style.setProperty("--reveal-ar", arPct + "%");
-    }
+    maskPair(navTop, "hero-head-wrap", "hero-head-en", "hero-head-ar", "--reveal-head-en", "--reveal-head-ar");
+    maskPair(navTop, "hero-sub-wrap", "hero-sub-en", "hero-sub-ar", "--reveal-en", "--reveal-ar");
   }
   window.addEventListener("scroll", updateHeroLangScroll, { passive:true });
   updateHeroLangScroll();
