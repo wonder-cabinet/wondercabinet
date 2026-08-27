@@ -110,14 +110,20 @@ a{color:inherit; text-decoration:none}
   width:56%; height:66%; top:14%; left:22%;
   background:var(--yellow); opacity:.82;
   border-radius:48% 52% 55% 45%/55% 45% 55% 45%;
-  animation:blob-red-move 130s ease-in-out infinite;
+  animation:blob-red-move 260s ease-in-out infinite, blob-color-shift 150s ease-in-out infinite;
 }
 @keyframes blob-red-move{
-  0%  {transform:translate(0,0)      scale(1);    border-radius:48% 52% 55% 45%/55% 45% 55% 45%}
-  22% {transform:translate(6%,-9%)   scale(1.12); border-radius:62% 38% 42% 58%/40% 60% 38% 62%}
-  46% {transform:translate(-8%,4%)   scale(0.92); border-radius:38% 62% 60% 40%/58% 42% 60% 40%}
-  70% {transform:translate(4%,9%)    scale(1.06); border-radius:55% 45% 48% 52%/45% 55% 48% 52%}
-  100%{transform:translate(0,0)      scale(1);    border-radius:48% 52% 55% 45%/55% 45% 55% 45%}
+  0%  {transform:translate(0,0)     scale(1);     border-radius:48% 52% 55% 45%/55% 45% 55% 45%}
+  25% {transform:translate(2%,-2%)  scale(1.03);  border-radius:55% 45% 48% 52%/50% 50% 45% 55%}
+  50% {transform:translate(-2%,1%)  scale(0.98);  border-radius:45% 55% 52% 48%/52% 48% 55% 45%}
+  75% {transform:translate(1%,2%)   scale(1.02);  border-radius:50% 50% 45% 55%/48% 52% 50% 50%}
+  100%{transform:translate(0,0)     scale(1);     border-radius:48% 52% 55% 45%/55% 45% 55% 45%}
+}
+@keyframes blob-color-shift{
+  0%   {background-color:var(--yellow)}
+  33%  {background-color:var(--blue)}
+  66%  {background-color:var(--red)}
+  100% {background-color:var(--yellow)}
 }
 @media (prefers-reduced-motion:reduce){.blob{animation:none}}
 #hero-i18n{display:flex; flex-direction:column; align-items:center; text-align:center; width:100%; position:relative; z-index:1}
@@ -607,6 +613,19 @@ function renderMenuRows(items, showAr){
   }).join("");
 }
 
+/* today's date, split into weekday (styled purple/accent in the hero) and
+   the rest ("Thursday" + ", August 27") — recomputed on every page load so
+   it's always current */
+function heroDateParts(lang){
+  const ar = lang === "ar";
+  const opts = {weekday:"long", month:"long", day:"numeric", timeZone: TZ};
+  if(ar) opts.calendar = "gregory";
+  const parts = new Intl.DateTimeFormat(ar ? "ar" : "en-US", opts).formatToParts(new Date());
+  let weekday = "", rest = "";
+  parts.forEach(p => { if(p.type === "weekday") weekday += p.value; else rest += p.value; });
+  return {weekday, rest};
+}
+
 function fmtEventDate(iso){
   if(!iso) return "";
   const d = new Date(iso);
@@ -685,9 +704,9 @@ async function init(){
         renderHero();
       });
     } else {
-      const headline = heroShowingAr ? (settings.heroHeadline?.ar || "") : (settings.heroHeadline?.en || "");
+      const {weekday, rest} = heroDateParts(heroShowingAr ? "ar" : "en");
       const body = heroShowingAr ? (settings.heroBody?.ar || "") : (settings.heroBody?.en || "");
-      heroEl18n.innerHTML = `<h1 class="hero-head">${emLastWord(escapeHtml(headline))}</h1>${body ? `<p class="hero-sub">${accentify(escapeHtml(body))}</p>` : ""}`;
+      heroEl18n.innerHTML = `<h1 class="hero-head"><em>${escapeHtml(weekday)}</em>${escapeHtml(rest)}</h1>${body ? `<p class="hero-sub">${accentify(escapeHtml(body))}</p>` : ""}`;
     }
     heroEl18n.classList.toggle("ar", heroShowingAr);
     heroEl18n.style.direction = heroShowingAr ? "rtl" : "";
