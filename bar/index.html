@@ -727,7 +727,7 @@ async function init(){
     if(headEl){
       const headRect = headEl.getBoundingClientRect();
       const headLocalPct = headRect.height > 0 ? (navTop - headRect.top) / headRect.height : 0;
-      const shouldBeAr = headLocalPct >= 0.5;
+      const shouldBeAr = headLocalPct <= 0.5;
       if(shouldBeAr !== heroShowingAr){
         heroShowingAr = shouldBeAr;
         heroContent.classList.add("wipe-flash");
