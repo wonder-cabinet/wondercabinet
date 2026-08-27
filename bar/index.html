@@ -128,6 +128,21 @@ a{color:inherit; text-decoration:none}
 .ar-accent, .hero-head em.ar-accent{font-family:"Aref Ruqaa",var(--serif); font-style:normal}
 .hero-head{color:#111}
 
+/* ── scroll-driven mask wipe: English and Arabic sit stacked in the same
+   spot; a soft mask line moves down through them as you scroll, so the
+   part that's "passed" reads Arabic while the rest is still English —
+   no blur, no discrete swap, just a reveal keyed to scroll position. */
+.hero-mask-en, .hero-mask-ar{display:flex; flex-direction:column; align-items:center; text-align:center; width:100%}
+.hero-mask-ar{position:absolute; top:0; left:0; height:100%; direction:rtl}
+.hero-mask-en{
+  -webkit-mask-image:linear-gradient(to bottom, transparent 0%, transparent var(--reveal,0%), black calc(var(--reveal,0%) + 8%), black 100%);
+  mask-image:linear-gradient(to bottom, transparent 0%, transparent var(--reveal,0%), black calc(var(--reveal,0%) + 8%), black 100%);
+}
+.hero-mask-ar{
+  -webkit-mask-image:linear-gradient(to bottom, black 0%, black var(--reveal,0%), transparent calc(var(--reveal,0%) + 8%), transparent 100%);
+  mask-image:linear-gradient(to bottom, black 0%, black var(--reveal,0%), transparent calc(var(--reveal,0%) + 8%), transparent 100%);
+}
+
 /* ── language toggle button ─────────────────────────────── */
 .lang-toggle{
   display:inline-flex; align-items:center; justify-content:center;
@@ -666,39 +681,44 @@ async function init(){
         renderHero();
       });
     } else {
-      const {weekday, rest} = heroDateParts(heroShowingAr ? "ar" : "en");
-      const body = heroShowingAr ? (settings.heroBody?.ar || "") : (settings.heroBody?.en || "");
-      const weekdayCls = heroShowingAr ? "ar-accent" : "";
-      heroEl18n.innerHTML = `<h1 class="hero-head"><em class="${weekdayCls}">${escapeHtml(weekday)}</em>${escapeHtml(rest)}</h1>${body ? `<p class="hero-sub">${accentify(escapeHtml(body))}</p>` : ""}`;
+      const en = heroDateParts("en");
+      const ar = heroDateParts("ar");
+      const bodyEn = settings.heroBody?.en || "";
+      const bodyAr = settings.heroBody?.ar || "";
+      heroEl18n.innerHTML = `
+        <div class="hero-mask-en">
+          <h1 class="hero-head"><em>${escapeHtml(en.weekday)}</em>${escapeHtml(en.rest)}</h1>
+          ${bodyEn ? `<p class="hero-sub">${accentify(escapeHtml(bodyEn))}</p>` : ""}
+        </div>
+        <div class="hero-mask-ar">
+          <h1 class="hero-head"><em class="ar-accent">${escapeHtml(ar.weekday)}</em>${escapeHtml(ar.rest)}</h1>
+          ${bodyAr ? `<p class="hero-sub">${accentify(escapeHtml(bodyAr))}</p>` : ""}
+        </div>
+      `;
+      heroEl18n.style.setProperty("--reveal", currentRevealPct() + "%");
     }
-    heroEl18n.classList.toggle("ar", heroShowingAr);
-    heroEl18n.style.direction = heroShowingAr ? "rtl" : "";
+    heroEl18n.classList.toggle("ar", heroMode !== "normal" && heroShowingAr);
+    heroEl18n.style.direction = heroMode !== "normal" && heroShowingAr ? "rtl" : "";
   }
   renderHero();
 
-  /* scroll drives the language swap: blur the whole headline+subtitle out,
-     swap to plain Arabic text at peak blur (a normal RTL text run, so
-     punctuation/shaping is correct — no per-word tricks), blur back in.
-     The ع/EN button, once used, takes over permanently. */
-  function updateHeroLangScroll(){
-    if(heroMode !== "normal") return;
+  /* scroll drives a mask wipe, not a swap: English and Arabic sit stacked
+     in the exact same spot, and a soft line moves down through the block
+     as you scroll — text above the line reads Arabic, text below is still
+     English. The hero itself keeps its slower parallax drift (translateY
+     above); this only controls how far down the reveal line has travelled. */
+  function currentRevealPct(){
     const y = window.scrollY || window.pageYOffset;
-    const overall = Math.min(Math.max(y / SHRINK_DISTANCE, 0), 1);
-    const BLUR_MAX = 10, rampWidth = 0.16, swapAt = 0.5;
-    let blur = 0;
-    if(overall >= swapAt - rampWidth && overall < swapAt){
-      blur = ((overall - (swapAt - rampWidth)) / rampWidth) * BLUR_MAX;
-    } else if(overall >= swapAt && overall <= swapAt + rampWidth){
-      blur = (1 - (overall - swapAt) / rampWidth) * BLUR_MAX;
-    }
-    heroEl18n.style.filter = blur > 0.05 ? `blur(${blur}px)` : "";
-    const shouldBeAr = overall >= swapAt;
-    if(shouldBeAr !== heroShowingAr){
-      heroShowingAr = shouldBeAr;
-      renderHero();
-    }
+    return Math.min(Math.max(y / SHRINK_DISTANCE, 0), 1) * 100;
   }
-  window.addEventListener("scroll", updateHeroLangScroll, { passive:true });
+  function updateHeroReveal(){
+    if(heroMode !== "normal") return;
+    const revealPct = currentRevealPct();
+    heroEl18n.style.setProperty("--reveal", revealPct + "%");
+    heroShowingAr = revealPct >= 50;
+  }
+  window.addEventListener("scroll", updateHeroReveal, { passive:true });
+  updateHeroReveal();
 
   hoursLink.addEventListener("click", e => {
     e.preventDefault();
