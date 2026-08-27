@@ -127,9 +127,9 @@ a{color:inherit; text-decoration:none}
 .hero-head{color:#111}
 
 /* ── scroll-driven flip-clock headline (English → Arabic) ── */
-.flip-word{display:inline-flex; flex-wrap:wrap; justify-content:center}
+.flip-word{display:inline-flex; flex-wrap:wrap; justify-content:center; gap:.3em}
 .flip-char{display:inline-block; position:relative; perspective:400px; vertical-align:top}
-.flip-inner{position:relative; width:100%; height:100%; transform-style:preserve-3d; will-change:transform}
+.flip-inner{display:inline-block; position:relative; transform-style:preserve-3d; will-change:transform}
 .flip-char .face{backface-visibility:hidden; white-space:pre}
 .flip-char .face.front{position:relative}
 .flip-char .face.back{position:absolute; inset:0; transform:rotateX(180deg)}
@@ -493,11 +493,11 @@ setInterval(render, 30000);
 /* ── shrink-on-scroll hero ── */
 const heroEl = document.getElementById("hero");
 const fadeEls = document.querySelectorAll(".hero-sub, .hero-corner, #hero-lang-toggle");
-const SHRINK_DISTANCE = 460, MIN_SCALE = 0.34;
+const SHRINK_DISTANCE = 460;
 function onScroll(){
   const y = window.scrollY || window.pageYOffset;
   const p = Math.min(Math.max(y / SHRINK_DISTANCE, 0), 1);
-  heroEl.style.transform = `translateY(${-y * 0.4}px) scale(${1 - p * (1 - MIN_SCALE)})`;
+  heroEl.style.transform = `translateY(${-y * 0.4}px)`;
   const o = Math.max(1 - p * 1.6, 0);
   fadeEls.forEach(el => el.style.opacity = o);
 }
@@ -578,21 +578,22 @@ function accentify(escapedText){
    correspond to a real transliteration — it's a visual flip effect, not
    a letter-for-letter translation. */
 function buildFlipHeadline(enWeekday, enRest, arWeekday, arRest){
-  const en = enWeekday + enRest;
-  const ar = arWeekday + arRest;
-  const len = Math.max(en.length, ar.length);
+  const enWords = (enWeekday + enRest).split(" ");
+  const arWordsOrig = (arWeekday + arRest).split(" ");
+  const arWords = [...arWordsOrig].reverse();
+  const n = Math.max(enWords.length, arWords.length);
   let html = '<span class="flip-word" dir="ltr">';
-  for(let i=0;i<len;i++){
-    const f = en[i] || " ";
-    const b = ar[i] || " ";
-    const fCls = i < enWeekday.length ? "accent" : "";
-    const bCls = i < arWeekday.length ? "ar-accent accent" : "";
+  for(let i=0;i<n;i++){
+    const f = enWords[i] !== undefined ? enWords[i] : "";
+    const b = arWords[i] !== undefined ? arWords[i] : "";
+    const origArIndex = arWordsOrig.length - 1 - i;
+    const fCls = i === 0 ? "accent" : "";
+    const bCls = origArIndex === 0 ? "ar-accent accent" : "ar-accent";
     html += `<span class="flip-char"><span class="flip-inner"><span class="face front ${fCls}">${escapeHtml(f)}</span><span class="face back ${bCls}">${escapeHtml(b)}</span></span></span>`;
   }
   html += "</span>";
   return html;
 }
-
 function emLastWord(escapedText){
   return escapedText.replace(/(\S+)\s*$/, (m, word) => {
     const cls = isArabicText(word) ? "ar-accent" : "";
