@@ -124,29 +124,28 @@ a{color:inherit; text-decoration:none}
 }
 @media (prefers-reduced-motion:reduce){.blob{animation:none}}
 
-/* ── glass droplets: small chrome/glass beads that seep out from between
-   the hero letters as you start scrolling, trickle down the screen, and
-   are gone by the time slide 2 takes over. Position/scale/opacity are all
-   driven from JS against the headline's real geometry — this layer only
-   describes what a single bead looks like. ── */
+/* ── glass forms: single-colour bodies that rise out of the hero type and
+   swell toward the viewer as you scroll, going progressively out of focus
+   as they come "past the lens", until they dissolve. Everything —
+   position, scale, blur, dissolve — is driven from JS against the scroll
+   position, so the whole thing is welded to the scrollbar. ── */
 .metaball-layer{position:fixed; inset:0; z-index:5; overflow:hidden; pointer-events:none}
 .mb-dot{
   position:fixed; top:0; left:0;
-  /* never fades — forms arrive and leave purely by growing and shrinking */
-  transform:scale(0); will-change:transform, border-radius;
-  /* heavy refraction — these are big water-membranes, not beads. The
-     hue-rotate is driven per-bead from JS so colour swims and bends as
-     they pass over content: the woozy, euphoric part. No specular
-     hotspot / lens flare — light lives only in the rim. */
-  backdrop-filter:blur(10px) saturate(2.4) hue-rotate(var(--hue,0deg)) contrast(1.16) brightness(1.05);
-  -webkit-backdrop-filter:blur(10px) saturate(2.4) hue-rotate(var(--hue,0deg)) contrast(1.16) brightness(1.05);
+  transform:scale(0); will-change:transform, border-radius, filter, opacity;
+  /* ONE colour throughout — no hue swimming, no rainbow. Just a single
+     cool-white glass tint that refracts whatever it passes over. */
+  backdrop-filter:blur(10px) saturate(1.35) brightness(1.04);
+  -webkit-backdrop-filter:blur(10px) saturate(1.35) brightness(1.04);
   background:
-    /* membrane edge only — interior stays open so the page swims through */
     radial-gradient(ellipse at 50% 50%,
-      rgba(255,255,255,.012) 38%,
-      rgba(255,255,255,.05) 70%,
-      rgba(255,255,255,.22) 90%,
-      rgba(255,255,255,.03) 100%);
+      rgba(244,248,255,.015) 38%,
+      rgba(244,248,255,.06) 70%,
+      rgba(244,248,255,.24) 90%,
+      rgba(244,248,255,.03) 100%);
+  /* defocus grows as the form comes at you, so it melts rather than
+     simply enlarging — set per-frame from JS */
+  filter:blur(var(--soft,0px));
 }
 #hero-i18n{display:flex; flex-direction:column; align-items:center; text-align:center; width:100%; position:relative; z-index:1; overflow:visible; padding-top:.15em}
 .hero-head{font-family:var(--sans); font-weight:400; font-size:clamp(2.4rem,6.6vw,5.4rem); line-height:1.25; max-width:18ch; text-align:center; overflow:visible}
@@ -614,26 +613,6 @@ const mbEls = MB_BEADS.map(b => {
   metaballLayer.appendChild(el);
   return el;
 });
-/* each form carries a set of spores. They sit at zero size for its whole
-   life, then take over at the end: the body breaks apart into them and they
-   scatter outward, each shrinking to nothing. Nothing ever fades — things
-   arrive and leave by growing and shrinking only. */
-const MB_SPORES = 9;
-const mbSpores = MB_BEADS.map((b, i) => {
-  const arr = [];
-  for(let k = 0; k < MB_SPORES; k++){
-    const el = document.createElement("span");
-    el.className = "mb-dot";
-    const size = b.size * (.07 + (k % 4) * .045);
-    el.style.width = el.style.height = size + "px";
-    el._size = size;
-    el._ang  = (k / MB_SPORES) * Math.PI * 2 + i * 1.3;
-    el._dist = b.size * (.55 + (k % 5) * .30);
-    metaballLayer.appendChild(el);
-    arr.push(el);
-  }
-  return arr;
-});
 /* the headline's position at rest — captured once, because the hero itself
    parallaxes away and we want the forms to keep travelling down the whole
    page long after it's gone */
@@ -656,7 +635,6 @@ function onMetaballScroll(){
   const p = Math.min(Math.max(y / end, 0), 1);
   if(!mbOrigin || p <= 0){
     mbEls.forEach(el => el.style.transform = "scale(0)");
-    mbSpores.forEach(g => g.forEach(el => el.style.transform = "scale(0)"));
     return;
   }
   const r = {left:mbOrigin.left, width:mbOrigin.width, top:mbOrigin.top - y, height:mbOrigin.height};
@@ -667,16 +645,13 @@ function onMetaballScroll(){
     const t = Math.min(Math.max((p - b.delay) / Math.max(1 - b.delay, .01), 0), 1);
     if(t <= 0){
       el.style.transform = "scale(0)";
-      mbSpores[i].forEach(s => s.style.transform = "scale(0)");
       return;
     }
-    /* GROWTH is the whole gesture: from a spore-sized nub it keeps swelling
-       the entire way, ending several times its own size — so it reads as
-       something pushing up out of the screen toward you, not a ball that
-       pops to full size and then just moves. Fast early, easing as it gets
-       big, the way a mushroom actually opens. */
-    const swell = Math.pow(t, .48);
-    const grow  = .06 + swell * 2.9;
+    /* GROWTH IS THE WHOLE GESTURE — and it never stops. The form keeps
+       accelerating toward the viewer for its entire life, ending many times
+       its starting size: it should feel like it's coming past the lens and
+       into your face, not settling at some final size. */
+    const grow = .05 + Math.pow(t, 1.35) * 11;
     /* travels the full height of the page as you scroll */
     const drop = t * b.fall * vh * 1.05;
     /* slow, out-of-phase wander on each axis — nothing repeats cleanly, so
@@ -686,37 +661,20 @@ function onMetaballScroll(){
             + Math.sin(t * 2.1 + i) * b.size * .16;
     const yy = r.top + r.height * b.oy + drop
              + Math.cos(t * 1.7 + i * 1.4) * b.size * .14;
-    /* the cap swells wider than it is tall as it opens — independent axes,
-       drifting slowly out of sync */
+    /* independent axes, drifting slowly out of sync */
     const sx = grow * (1 + Math.sin(t * 2.6 + i * 1.3) * .20);
     const sy = grow * (1 + Math.cos(t * 2.1 + i * 0.9) * .16);
     const rot = Math.sin(t * 1.3 + i * 2.1) * 26;
     el.style.borderRadius = mbBorderRadius(t, i);
-    /* colour swims as it opens — the woozy part */
-    el.style.setProperty("--hue", (Math.sin(t * 1.4 + i * 1.1) * 85) + "deg");
-
-    /* ── final act: the body breaks into spores and they shrink out ── */
-    const SHATTER = .80;
-    if(t < SHATTER){
-      el.style.transform =
-        `translate3d(${x - b.size / 2}px, ${yy - b.size / 2}px, 0) rotate(${rot}deg) scale(${sx}, ${sy})`;
-      mbSpores[i].forEach(s => s.style.transform = "scale(0)");
-    } else {
-      const s = (t - SHATTER) / (1 - SHATTER);          // 0→1 through the break-up
-      const collapse = Math.max(1 - s * 1.35, 0);        // body shrinks away fast
-      el.style.transform =
-        `translate3d(${x - b.size / 2}px, ${yy - b.size / 2}px, 0) rotate(${rot}deg) scale(${sx * collapse}, ${sy * collapse})`;
-      mbSpores[i].forEach(sp => {
-        const spread = sp._dist * s * 2.4;
-        const px = x + Math.cos(sp._ang) * spread;
-        const py = yy + Math.sin(sp._ang) * spread + s * s * vh * .18;
-        const sc = Math.max(1 - s * s, 0);               // smaller and smaller, then gone
-        sp.style.borderRadius = mbBorderRadius(t + sp._ang, i);
-        sp.style.setProperty("--hue", (Math.sin(t * 1.4 + i * 1.1) * 85) + "deg");
-        sp.style.transform =
-          `translate3d(${px - sp._size / 2}px, ${py - sp._size / 2}px, 0) scale(${sc})`;
-      });
-    }
+    el.style.transform =
+      `translate3d(${x - b.size / 2}px, ${yy - b.size / 2}px, 0) rotate(${rot}deg) scale(${sx}, ${sy})`;
+    /* DEFOCUS: as it swells past the lens it goes progressively out of
+       focus, so the edges lose definition and it stops reading as an
+       object — this is what turns "getting bigger" into "dissolving". */
+    el.style.setProperty("--soft", (Math.pow(t, 2.1) * 46).toFixed(1) + "px");
+    /* and in the last stretch the smear finishes the job and it's gone */
+    const DISSOLVE = .72;
+    el.style.opacity = t < DISSOLVE ? 1 : Math.max(1 - (t - DISSOLVE) / (1 - DISSOLVE), 0);
   });
 }
 /* a slowly reshaping, lopsided outline instead of a circle — each of the 8
