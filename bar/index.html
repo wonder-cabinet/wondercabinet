@@ -138,8 +138,8 @@ a{color:inherit; text-decoration:none}
   transform:scale(0); will-change:transform, border-radius, filter, opacity;
   /* ONE colour throughout — no hue swimming, no rainbow. Just a single
      cool-white glass tint that refracts whatever it passes over. */
-  backdrop-filter:blur(var(--bd,10px)) saturate(1.35) brightness(1.04);
-  -webkit-backdrop-filter:blur(var(--bd,10px)) saturate(1.35) brightness(1.04);
+  backdrop-filter:blur(var(--bd,10px)) saturate(1.65) brightness(1.04);
+  -webkit-backdrop-filter:blur(var(--bd,10px)) saturate(1.65) brightness(1.04);
   background:
     radial-gradient(ellipse at 50% 50%,
       rgba(244,248,255,.015) 38%,
@@ -699,14 +699,16 @@ function onMetaballScroll(){
     /* DEFOCUS: low while covering (needs to read as solid), then climbing
        steeply through the dissolve so the form smears out of existence */
     el.style.setProperty("--soft", (4 + Math.pow(post, 1.15) * 60).toFixed(1) + "px");
-    /* the veil thickens to full opacity exactly at the cover point — that
-       is what makes the language swap genuinely invisible — then thins out
-       through the dissolve */
-    const veil = cover < 1 ? Math.pow(cover, 1.5) * .94 : .94 * Math.max(1 - post * 3.6, 0);
+    /* it's the BLUR that hides the text, not a coat of paint — a light veil
+       just keeps the colour honest, so what you see is glass distorting the
+       page behind it, not a flat opaque blob */
+    const veil = cover < 1 ? Math.pow(cover, 1.5) * .5 : .5 * Math.max(1 - post * 3.6, 0);
     el.style.setProperty("--veil", veil.toFixed(3));
-    /* refraction deepens as it closes in, so any type still showing through
-       the edges is smeared past reading well before the swap */
-    el.style.setProperty("--bd", (10 + cover * 26).toFixed(1) + "px");
+    /* refraction deepens hard as it closes in — by full cover the blur
+       radius alone is enough that no letterform survives it, which is what
+       makes the swap invisible, while still reading as glass rather than
+       a painted-over shape */
+    el.style.setProperty("--bd", (10 + Math.pow(cover, 1.2) * 70).toFixed(1) + "px");
     /* opaque right through the cover, then thinning away — and fully gone
        well before the next section takes the screen, so it never sits
        washing out the About text */
