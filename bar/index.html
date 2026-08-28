@@ -90,8 +90,11 @@ a{color:inherit; text-decoration:none}
 .hours-pop .close:hover{opacity:1; color:var(--yellow)}
 
 /* ── hero (dark slide) ──────────────────────────────────── */
-.hero-spacer{height:calc(100vh - var(--bar-h))}
-.hero-clear-spacer{height:150vh}
+/* long on purpose: the hero holds its place for this whole stretch, which
+   is the room the glass transition needs to grow, cover, swap and dissolve
+   while the text is still on screen to be revealed in Arabic */
+.hero-spacer{height:calc(260vh - var(--bar-h))}
+.hero-clear-spacer{height:80vh}
 .hero{
   position:fixed; top:0; left:0; right:0; height:calc(100vh - var(--bar-h));
   display:flex; flex-direction:column; align-items:center; justify-content:center;
@@ -626,7 +629,11 @@ const MB_COVER = .5;
    the whole gesture is slow */
 function mbScrollProgress(){
   const y = window.scrollY || window.pageYOffset;
-  const end = Math.max(heroSpacerEl.offsetHeight + heroClearEl.offsetHeight, 1);
+  /* the arc runs only while the hero is still holding its position. Past
+     the spacer the hero starts its exit, and anything still happening then
+     would never be seen — so the cover, swap and dissolve all have to be
+     finished by that point. */
+  const end = Math.max(heroSpacerEl.offsetHeight, 1);
   return Math.min(Math.max(y / end, 0), 1);
 }
 function onMetaballScroll(){
