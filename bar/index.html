@@ -702,7 +702,7 @@ function onMetaballScroll(){
     /* the veil thickens to full opacity exactly at the cover point — that
        is what makes the language swap genuinely invisible — then thins out
        through the dissolve */
-    const veil = cover < 1 ? Math.pow(cover, 1.5) * .94 : .94 * Math.max(1 - post * 2.2, 0);
+    const veil = cover < 1 ? Math.pow(cover, 1.5) * .94 : .94 * Math.max(1 - post * 3.6, 0);
     el.style.setProperty("--veil", veil.toFixed(3));
     /* refraction deepens as it closes in, so any type still showing through
        the edges is smeared past reading well before the swap */
@@ -710,7 +710,10 @@ function onMetaballScroll(){
     /* opaque right through the cover, then thinning away — and fully gone
        well before the next section takes the screen, so it never sits
        washing out the About text */
-    const DISSOLVE = .15, DONE = .62;   // measured within phase 2
+    /* clears quickly once the swap has happened — the Arabic underneath has
+       to actually be seen, and a slow dissolve just sits on top obscuring it
+       for the rest of the scroll */
+    const DISSOLVE = .02, DONE = .34;   // measured within phase 2
     el.style.opacity = post < DISSOLVE
       ? 1
       : Math.max(1 - (post - DISSOLVE) / (DONE - DISSOLVE), 0);
