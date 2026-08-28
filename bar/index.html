@@ -692,14 +692,18 @@ function onMetaballScroll(){
     /* the veil thickens to full opacity exactly at the cover point — that
        is what makes the language swap genuinely invisible — then thins out
        through the dissolve */
-    const veil = cover < 1 ? Math.pow(cover, 1.5) * .94 : .94 * Math.max(1 - post * 1.25, 0);
+    const veil = cover < 1 ? Math.pow(cover, 1.5) * .94 : .94 * Math.max(1 - post * 2.2, 0);
     el.style.setProperty("--veil", veil.toFixed(3));
     /* refraction deepens as it closes in, so any type still showing through
        the edges is smeared past reading well before the swap */
     el.style.setProperty("--bd", (10 + cover * 26).toFixed(1) + "px");
-    /* opaque right through the cover, then thinning away to nothing */
-    const DISSOLVE = .30;   // measured within phase 2
-    el.style.opacity = post < DISSOLVE ? 1 : Math.max(1 - (post - DISSOLVE) / (1 - DISSOLVE), 0);
+    /* opaque right through the cover, then thinning away — and fully gone
+       well before the next section takes the screen, so it never sits
+       washing out the About text */
+    const DISSOLVE = .15, DONE = .62;   // measured within phase 2
+    el.style.opacity = post < DISSOLVE
+      ? 1
+      : Math.max(1 - (post - DISSOLVE) / (DONE - DISSOLVE), 0);
   });
 }
 /* a slowly reshaping, lopsided outline instead of a circle — each of the 8
