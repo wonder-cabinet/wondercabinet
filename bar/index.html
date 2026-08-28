@@ -637,7 +637,16 @@ function onMetaballScroll(){
     mbEls.forEach(el => el.style.transform = "scale(0)");
     return;
   }
-  const r = {left:mbOrigin.left, width:mbOrigin.width, top:mbOrigin.top - y, height:mbOrigin.height};
+  /* track the headline's LIVE position. The hero is position:fixed and
+     parallaxes, so it stays on screen while the page scrolls past it —
+     anchoring to document coordinates would send the forms off the top of
+     the viewport while the text they're meant to be covering is still
+     sitting in the middle of it. */
+  const wrapEl = document.getElementById("hero-head-wrap");
+  const live = wrapEl && wrapEl.getBoundingClientRect();
+  const r = (live && live.height > 0)
+    ? {left:live.left, width:live.width, top:live.top, height:live.height}
+    : {left:mbOrigin.left, width:mbOrigin.width, top:mbOrigin.top - y, height:mbOrigin.height};
   const vh = window.innerHeight;
   MB_BEADS.forEach((b, i) => {
     const el = mbEls[i];
