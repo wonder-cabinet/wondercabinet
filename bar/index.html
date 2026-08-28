@@ -677,7 +677,10 @@ function onMetaballScroll(){
     const cover = Math.min(t / MB_COVER, 1);          // 0→1 across phase 1
     const post  = Math.max((t - MB_COVER) / (1 - MB_COVER), 0); // 0→1 across phase 2
     /* eased so it slows as it closes in, then opens out again far bigger */
-    const grow = .25 + Math.pow(cover, .8) * 11.5 + Math.pow(post, 1.15) * 17;
+    /* sized to blanket the text block with margin — NOT the whole screen.
+       Overshooting here turns the cover into a full white-out and loses the
+       forms entirely. The dissolve phase is what goes properly oversized. */
+    const grow = .25 + Math.pow(cover, .8) * 4 + Math.pow(post, 1.15) * 9;
     /* barely moves while sealing the text; drifts and rises as it dissolves */
     const drop = post * b.fall * vh * .55;
     const wander = (1 - cover * .8);                   // wander settles as it closes
