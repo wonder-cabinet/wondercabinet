@@ -27,6 +27,7 @@
       <div class="foot-col-head">Programme</div>
       <div class="foot-col-body">
         <a href="index.html#programme">Events</a>
+        <a href="/bar">The Bar</a>
         <a href="index.html">Archive</a>
         <a href="index.html">Contribute</a>
         <a href="index.html">About</a>
