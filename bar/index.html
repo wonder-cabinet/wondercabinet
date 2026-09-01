@@ -90,11 +90,11 @@ a{color:inherit; text-decoration:none}
 .hours-pop .close:hover{opacity:1; color:var(--yellow)}
 
 /* ── hero (dark slide) ──────────────────────────────────── */
-/* long on purpose: the hero holds its place for this whole stretch, which
-   is the room the glass transition needs to grow, cover, swap and dissolve
-   while the text is still on screen to be revealed in Arabic */
-.hero-spacer{height:calc(260vh - var(--bar-h))}
-.hero-clear-spacer{height:80vh}
+.hero-spacer{height:calc(100vh - var(--bar-h))}
+/* once the nav locks at the top, this gives the still-fixed hero real room
+   to finish scrolling itself away before the About text below ever
+   reaches the screen — no overlap, no instant vanish */
+.hero-clear-spacer{height:65vh}
 .hero{
   position:fixed; top:0; left:0; right:0; height:calc(100vh - var(--bar-h));
   display:flex; flex-direction:column; align-items:center; justify-content:center;
@@ -102,7 +102,7 @@ a{color:inherit; text-decoration:none}
   transform-origin:top center; will-change:transform; z-index:2;
   pointer-events:none;
 }
-#hero-i18n a{pointer-events:auto}
+#hero-i18n a, #hero-i18n button{pointer-events:auto}
 
 /* ── page-wide fixed glow layer — sits behind everything, never scrolls or shrinks ── */
 .bg-blob-layer{position:fixed; inset:0; z-index:-1; overflow:hidden; pointer-events:none}
@@ -127,56 +127,12 @@ a{color:inherit; text-decoration:none}
 }
 @media (prefers-reduced-motion:reduce){.blob{animation:none}}
 
-/* ── glass forms: single-colour bodies that rise out of the hero type and
-   swell toward the viewer as you scroll, going progressively out of focus
-   as they come "past the lens", until they dissolve. Everything —
-   position, scale, blur, dissolve — is driven from JS against the scroll
-   position, so the whole thing is welded to the scrollbar. ── */
-.metaball-layer{position:fixed; inset:0; z-index:5; overflow:hidden; pointer-events:none}
-.mb-dot{
-  position:fixed; top:0; left:0;
-  transform:scale(0); will-change:transform, border-radius, filter, opacity;
-  /* ONE colour throughout — no hue swimming, no rainbow. Just a single
-     cool-white glass tint that refracts whatever it passes over. */
-  backdrop-filter:blur(var(--bd,10px)) saturate(1.65) brightness(1.04);
-  -webkit-backdrop-filter:blur(var(--bd,10px)) saturate(1.65) brightness(1.04);
-  background:
-    radial-gradient(ellipse at 50% 50%,
-      rgba(244,248,255,.015) 38%,
-      rgba(244,248,255,.06) 70%,
-      rgba(244,248,255,.24) 90%,
-      rgba(244,248,255,.03) 100%),
-    /* the veil: thickens as the form closes over the text so the type is
-       genuinely hidden at the swap, then thins back out as it dissolves */
-    radial-gradient(ellipse at 50% 50%,
-      rgba(247,243,238,var(--veil,0)) 0%,
-      rgba(247,243,238,var(--veil,0)) 62%,
-      rgba(247,243,238,calc(var(--veil,0) * .55)) 84%,
-      rgba(247,243,238,0) 100%);
-  /* defocus grows as the form comes at you, so it melts rather than
-     simply enlarging — set per-frame from JS */
-  filter:blur(var(--soft,0px));
-}
 #hero-i18n{display:flex; flex-direction:column; align-items:center; text-align:center; width:100%; position:relative; z-index:1; overflow:visible; padding-top:.15em}
 .hero-head{font-family:var(--sans); font-weight:400; font-size:clamp(2.4rem,6.6vw,5.4rem); line-height:1.25; max-width:18ch; text-align:center; overflow:visible}
 .hero-head em, .accent{font-style:italic; font-family:var(--serif); color:#90f}
 .ar-accent, .hero-head em.ar-accent{font-family:"Aref Ruqaa",var(--serif); font-style:normal}
 .hero-head{color:#111}
-
-/* ── the glass forms are the transition. English and Arabic sit stacked
-   in the same spot; the swap happens instantly at the moment the growing
-   forms have the text completely covered, so it is never seen changing —
-   the forms then dissolve and the text underneath simply reads Arabic. */
-.hero-head-mask-wrap{position:relative; width:100%; display:flex; justify-content:center}
-.hero-head-mask-wrap .hero-head{position:relative}
-.hero-head-mask-wrap .hero-head.hero-head-ar{position:absolute; top:-.5em; left:50%; transform:translateX(-50%); direction:rtl; max-width:none; white-space:nowrap; padding-top:.5em}
-.hero-sub-mask-wrap{position:relative; width:100%}
-.hero-sub-mask-wrap .hero-sub{position:relative}
-.hero-sub-mask-wrap .hero-sub.hero-sub-ar{position:absolute; top:0; left:0; direction:rtl}
-/* one language visible at a time — no transition, the change is hidden */
-.hero-head-ar, .hero-sub-ar{visibility:hidden}
-.hero-lang-ar .hero-head-en, .hero-lang-ar .hero-sub-en{visibility:hidden}
-.hero-lang-ar .hero-head-ar, .hero-lang-ar .hero-sub-ar{visibility:visible}
+#hero-i18n .lang-toggle{margin-top:1.4rem}
 
 /* ── language toggle button ─────────────────────────────── */
 .lang-toggle{
@@ -393,10 +349,6 @@ section:nth-of-type(6){--slide-alpha:.98}
   <div class="blob blob-red"></div>
 </div>
 
-<!-- ═══ GLASS DROPLETS — seep out from between the hero letters on scroll,
-     trickle down over the page, gone by slide 2. Beads are created by JS. ═══ -->
-<div class="metaball-layer" id="metaball-layer"></div>
-
 <!-- ═══ HERO CORNERS ═══ -->
 <div class="hero-corner" id="hero-corner">
   <a class="map" href="https://maps.google.com/?q=Wonder+Cabinet+Bethlehem" target="_blank" rel="noopener">Wonder Cabinet, Bethlehem (Map)</a>
@@ -414,6 +366,7 @@ section:nth-of-type(6){--slide-alpha:.98}
 <div class="hero" id="hero">
   <div id="hero-i18n">
     <div id="hero-i18n-content"><h1 class="hero-head">Loading&hellip;</h1></div>
+    <button class="lang-toggle is-ar" id="hero-lang-toggle" aria-label="Switch to Arabic">ع</button>
   </div>
 </div>
 <div class="hero-spacer"></div>
@@ -621,158 +574,6 @@ function onScroll(){
 }
 window.addEventListener("scroll", onScroll, { passive:true });
 onScroll();
-
-/* ── glass droplets: nothing at rest. As you begin scrolling they seep out
-   from between the hero letters, trickle down the screen picking up speed,
-   and have fully drained away by the time slide 2 takes over. Each bead's
-   origin is a real point along the headline box, so they genuinely emerge
-   from the type rather than from an arbitrary spot. ── */
-const metaballLayer = document.getElementById("metaball-layer");
-/* ox/oy = origin as a fraction of the headline box (oy>.5 = lower half of
-   the letters). size in px, delay = how far into the scroll it appears,
-   fall = how far down it travels (fraction of viewport), sway = lateral drift. */
-const MB_BEADS = [
-  {ox:.12, oy:.55, size:182, delay:.000, fall:1.25, sway:-210},
-  {ox:.31, oy:.28, size:150, delay:.018, fall:1.10, sway: 130},
-  {ox:.48, oy:.62, size:238, delay:.008, fall:1.35, sway:  60},
-  {ox:.66, oy:.24, size:140, delay:.036, fall:1.00, sway:-155},
-  {ox:.84, oy:.58, size:190, delay:.024, fall:1.20, sway: 185},
-  {ox:.22, oy:.86, size:150, delay:.048, fall:0.95, sway:  90},
-  {ox:.52, oy:.14, size:165, delay:.057, fall:1.15, sway:-115},
-  {ox:.90, oy:.22, size:145, delay:.042, fall:1.05, sway: 145},
-  {ox:.06, oy:.20, size:150, delay:.066, fall:0.90, sway: -85},
-  {ox:.72, oy:.88, size:203, delay:.033, fall:1.30, sway:  35},
-];
-const mbEls = MB_BEADS.map(b => {
-  const el = document.createElement("span");
-  el.className = "mb-dot";
-  el.style.width = el.style.height = b.size + "px";
-  metaballLayer.appendChild(el);
-  return el;
-});
-/* the headline's position at rest — captured once, because the hero itself
-   parallaxes away and we want the forms to keep travelling down the whole
-   page long after it's gone */
-let mbOrigin = null;
-function mbCaptureOrigin(){
-  const wrap = document.getElementById("hero-head-wrap");
-  if(!wrap) return;
-  const r = wrap.getBoundingClientRect();
-  const y = window.scrollY || window.pageYOffset;
-  mbOrigin = {left:r.left, width:r.width, top:r.top + y, height:r.height};
-}
-/* MB_COVER is the hinge of the whole thing: below it the forms are still
-   growing and closing over the text; at it the text is completely hidden
-   and the language swaps unseen; above it they dissolve and Arabic is
-   revealed. Both the glass and the language swap read this one number. */
-const MB_COVER = .5;
-/* the arc is spread over the hero's own scroll life, deliberately long so
-   the whole gesture is slow */
-function mbScrollProgress(){
-  const y = window.scrollY || window.pageYOffset;
-  /* the arc runs only while the hero is still holding its position. Past
-     the spacer the hero starts its exit, and anything still happening then
-     would never be seen — so the cover, swap and dissolve all have to be
-     finished by that point. */
-  const end = Math.max(heroSpacerEl.offsetHeight, 1);
-  return Math.min(Math.max(y / end, 0), 1);
-}
-function onMetaballScroll(){
-  if(!mbOrigin) mbCaptureOrigin();
-  const y = window.scrollY || window.pageYOffset;
-  const p = mbScrollProgress();
-  if(!mbOrigin || p <= 0){
-    mbEls.forEach(el => el.style.transform = "scale(0)");
-    return;
-  }
-  /* track the headline's LIVE position. The hero is position:fixed and
-     parallaxes, so it stays on screen while the page scrolls past it —
-     anchoring to document coordinates would send the forms off the top of
-     the viewport while the text they're meant to be covering is still
-     sitting in the middle of it. */
-  /* the whole text block (headline AND subtitle), so the forms are spread
-     across everything they have to hide — not just the headline */
-  const wrapEl = document.getElementById("hero-i18n-content") || document.getElementById("hero-head-wrap");
-  const live = wrapEl && wrapEl.getBoundingClientRect();
-  const r = (live && live.height > 0)
-    ? {left:live.left, width:live.width, top:live.top, height:live.height}
-    : {left:mbOrigin.left, width:mbOrigin.width, top:mbOrigin.top - y, height:mbOrigin.height};
-  const vh = window.innerHeight;
-  MB_BEADS.forEach((b, i) => {
-    const el = mbEls[i];
-    /* each form runs its own 0→1 life across the remaining scroll */
-    const t = Math.min(Math.max((p - b.delay) / Math.max(1 - b.delay, .01), 0), 1);
-    if(t <= 0){
-      el.style.transform = "scale(0)";
-      return;
-    }
-    /* ── PHASE 1 (t < MB_COVER): close over the text ──
-       Growth is steady and unhurried, reaching a size that blankets the
-       whole headline and subtitle by the time it hits MB_COVER. It stays
-       nearly in place while it does this — drifting far would leave gaps,
-       and the point is to seal the text off completely. Blur stays low so
-       it reads as a solid body covering, not a haze.
-       ── PHASE 2 (t > MB_COVER): dissolve away ──
-       It keeps opening, much larger now, while the defocus climbs hard and
-       it thins out — uncovering the Arabic that was swapped in underneath. */
-    const cover = Math.min(t / MB_COVER, 1);          // 0→1 across phase 1
-    const post  = Math.max((t - MB_COVER) / (1 - MB_COVER), 0); // 0→1 across phase 2
-    /* eased so it slows as it closes in, then opens out again far bigger */
-    /* sized to blanket the text block with margin — NOT the whole screen.
-       Overshooting here turns the cover into a full white-out and loses the
-       forms entirely. The dissolve phase is what goes properly oversized. */
-    const grow = .25 + Math.pow(cover, .8) * 4 + Math.pow(post, 1.15) * 9;
-    /* barely moves while sealing the text; drifts and rises as it dissolves */
-    const drop = post * b.fall * vh * .55;
-    const wander = (1 - cover * .8);                   // wander settles as it closes
-    const x = r.left + r.width * b.ox
-            + Math.sin(t * Math.PI * .9) * b.sway * .30 * wander
-            + Math.sin(t * 1.5 + i) * b.size * .10;
-    const yy = r.top + r.height * b.oy + drop
-             + Math.cos(t * 1.2 + i * 1.4) * b.size * .09 * wander;
-    /* independent axes, drifting slowly out of sync */
-    const sx = grow * (1 + Math.sin(t * 1.7 + i * 1.3) * .16);
-    const sy = grow * (1 + Math.cos(t * 1.4 + i * 0.9) * .13);
-    const rot = Math.sin(t * .9 + i * 2.1) * 20;
-    el.style.borderRadius = mbBorderRadius(t, i);
-    el.style.transform =
-      `translate3d(${x - b.size / 2}px, ${yy - b.size / 2}px, 0) rotate(${rot}deg) scale(${sx}, ${sy})`;
-    /* DEFOCUS: low while covering (needs to read as solid), then climbing
-       steeply through the dissolve so the form smears out of existence */
-    el.style.setProperty("--soft", (4 + Math.pow(post, 1.15) * 60).toFixed(1) + "px");
-    /* it's the BLUR that hides the text, not a coat of paint — a light veil
-       just keeps the colour honest, so what you see is glass distorting the
-       page behind it, not a flat opaque blob */
-    const veil = cover < 1 ? Math.pow(cover, 1.5) * .5 : .5 * Math.max(1 - post * 3.6, 0);
-    el.style.setProperty("--veil", veil.toFixed(3));
-    /* refraction deepens hard as it closes in — by full cover the blur
-       radius alone is enough that no letterform survives it, which is what
-       makes the swap invisible, while still reading as glass rather than
-       a painted-over shape */
-    el.style.setProperty("--bd", (10 + Math.pow(cover, 1.2) * 70).toFixed(1) + "px");
-    /* opaque right through the cover, then thinning away — and fully gone
-       well before the next section takes the screen, so it never sits
-       washing out the About text */
-    /* clears quickly once the swap has happened — the Arabic underneath has
-       to actually be seen, and a slow dissolve just sits on top obscuring it
-       for the rest of the scroll */
-    const DISSOLVE = .02, DONE = .34;   // measured within phase 2
-    el.style.opacity = post < DISSOLVE
-      ? 1
-      : Math.max(1 - (post - DISSOLVE) / (DONE - DISSOLVE), 0);
-  });
-}
-/* a slowly reshaping, lopsided outline instead of a circle — each of the 8
-   corner-radius values rides its own slow sine (offset by bead index and
-   corner). Kept unhurried on purpose: the silhouette should look like a cap
-   unfurling in slow motion, not a blob vibrating. */
-function mbBorderRadius(t, i){
-  const w = k => 50 + Math.sin(t * 3.4 + i * 2.3 + k * 1.4) * 30;
-  return `${w(0)}% ${100-w(1)}% ${w(2)}% ${100-w(3)}% / ${w(4)}% ${w(5)}% ${100-w(6)}% ${100-w(7)}%`;
-}
-window.addEventListener("scroll", onMetaballScroll, { passive:true });
-window.addEventListener("resize", () => { mbCaptureOrigin(); onMetaballScroll(); });
-onMetaballScroll();
 
 /* ── nav logo: crossfade EN / AR every 10s ── */
 const lockupEl = document.getElementById("lockup-text");
@@ -989,40 +790,22 @@ async function init(){
         headEnHtml = `<em>${escapeHtml(en.weekday)}</em>${escapeHtml(en.rest)}`;
         headArHtml = `<em class="ar-accent">${escapeHtml(ar.weekday)}</em>${escapeHtml(ar.rest)}`;
       }
-      const bodyEn = settings.heroBody?.en || "";
-      const bodyAr = settings.heroBody?.ar || "";
+      const bodyText = heroShowingAr ? (settings.heroBody?.ar || "") : (settings.heroBody?.en || "");
+      const headHtml = heroShowingAr ? headArHtml : headEnHtml;
       heroContent.innerHTML = `
-        <div class="hero-head-mask-wrap" id="hero-head-wrap">
-          <h1 class="hero-head hero-head-en" id="hero-head-en">${headEnHtml}</h1>
-          <h1 class="hero-head hero-head-ar" id="hero-head-ar">${headArHtml}</h1>
-        </div>
-        <div class="hero-sub-mask-wrap" id="hero-sub-wrap">
-          ${bodyEn ? `<p class="hero-sub hero-sub-en" id="hero-sub-en">${accentify(escapeHtml(bodyEn))}</p>` : ""}
-          ${bodyAr ? `<p class="hero-sub hero-sub-ar" id="hero-sub-ar">${accentify(escapeHtml(bodyAr))}</p>` : ""}
-        </div>
+        <h1 class="hero-head">${headHtml}</h1>
+        ${bodyText ? `<p class="hero-sub">${accentify(escapeHtml(bodyText))}</p>` : ""}
       `;
     }
     heroEl18n.classList.toggle("ar", heroShowingAr);
-    heroEl18n.classList.toggle("hero-lang-ar", heroShowingAr && heroMode === "normal");
     heroEl18n.style.direction = heroShowingAr ? "rtl" : "";
   }
   renderHero();
 
-  /* the glass forms carry the language change. They grow until the text is
-     completely hidden behind them; at exactly that point the swap happens,
-     unseen, and the forms then dissolve to reveal Arabic underneath. The
-     threshold is MB_COVER, shared with the glass animation so the two can
-     never drift apart. */
-  function updateHeroLangScroll(){
-    if(heroMode !== "normal") return;
-    const covered = mbScrollProgress() >= MB_COVER;
-    if(covered === heroShowingAr) return;
-    heroShowingAr = covered;
-    heroEl18n.classList.toggle("hero-lang-ar", covered);
-    heroEl18n.style.direction = covered ? "rtl" : "";
-  }
-  window.addEventListener("scroll", updateHeroLangScroll, { passive:true });
-  updateHeroLangScroll();
+  wireToggle("hero-lang-toggle", (ar) => {
+    heroShowingAr = ar;
+    renderHero();
+  }, false);
 
   hoursLink.addEventListener("click", e => {
     e.preventDefault();
