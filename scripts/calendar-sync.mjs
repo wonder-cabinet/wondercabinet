@@ -1027,6 +1027,17 @@ async function main() {
           if (doc.recurringBaseTitle.ar && doc.title?.ar !== doc.recurringBaseTitle.ar) patch["title.ar"] = doc.recurringBaseTitle.ar;
           patch.calendarSyncTitleEn = doc.recurringBaseTitle.en;
           if (doc.recurringBaseTitle.ar) patch.calendarSyncTitleAr = doc.recurringBaseTitle.ar;
+          // A rollover means this is a genuinely new episode — whatever guest
+          // artist was linked to the PREVIOUS episode has no business staying
+          // linked forever. relatedArtists is normally append-only (see below)
+          // specifically so a hand-linked guest survives casual re-syncs
+          // *within* the same episode; a rollover is different, it's a new
+          // one. Clear it here so "Artists this week" doesn't keep surfacing
+          // a guest from a month-old episode. Confirmed incident 2026-08-31:
+          // Busher Kanji (linked to a previous month's NTS x Wonder Cabinet
+          // episode) was still showing as "this week's" artist weeks later,
+          // with no future rollover ever having cleared the stale link.
+          if ((doc.relatedArtistRefs || []).length) patch.relatedArtists = [];
         } else {
           syncField(doc.title?.en, enTitle, "calendarSyncTitleEn", "title.en");
           syncField(doc.title?.ar, arTitle, "calendarSyncTitleAr", "title.ar");
@@ -1038,7 +1049,12 @@ async function main() {
       // Newly-detected artist: append-only (never remove/replace whatever's
       // already linked), and only if this exact artist isn't linked yet —
       // keeps repeated runs idempotent instead of piling up duplicate refs.
-      const needsArtistLink = artistRef && !(doc.relatedArtistRefs || []).includes(artistRef.id);
+      // If this run just cleared relatedArtists above (rollover to a new
+      // episode), treat the "currently linked" list as empty so this
+      // episode's own detected guest (if any) still gets linked fresh.
+      const clearedArtistsThisRun = Array.isArray(patch.relatedArtists) && patch.relatedArtists.length === 0;
+      const currentArtistRefs = clearedArtistsThisRun ? [] : (doc.relatedArtistRefs || []);
+      const needsArtistLink = artistRef && !currentArtistRefs.includes(artistRef.id);
 
       if (Object.keys(patch).length || needsArtistLink) {
         const patchBody = { id: doc._id };
