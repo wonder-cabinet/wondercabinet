@@ -1064,6 +1064,39 @@ async function main() {
       continue;
     }
 
+    // --- duplicate guard: if an existing doc — already linked to a
+    // DIFFERENT Google Calendar id — covers the same date with a
+    // near-identical title, this is almost certainly a duplicated entry on
+    // the calendar itself (e.g. an editor used "Duplicate event" instead of
+    // editing the one occurrence) rather than a genuinely new event. Don't
+    // silently create a second Sanity doc for it and let it reappear as a
+    // second homepage card — flag it instead, so an editor can go delete
+    // the stray entry on the calendar. Without this, a duplicated calendar
+    // entry recreates its Sanity doc every single hourly run even after
+    // someone deletes it in Studio, since the sync has no memory that it
+    // was ever removed on purpose. Confirmed incident 2026-08-31: a
+    // duplicated "NTS x Wonder Cabinet" entry (different UID, same
+    // date/time) kept reappearing this way.
+    const dateKey = calendarDate(startIso);
+    const dupDoc = existingDocs.find(
+      (d) =>
+        d.googleCalendarEventId &&
+        d.googleCalendarEventId !== gcalId &&
+        d.startDateTime &&
+        calendarDate(d.startDateTime) === dateKey &&
+        titlesLikelyMatch(d.title?.en, enTitle)
+    );
+    if (dupDoc) {
+      actions.push({
+        action: "WARNING",
+        id: gcalId,
+        title: enTitle,
+        date: startIso.slice(0, 10),
+        notes: `looks like a duplicate of existing doc "${dupDoc._id}" (same date + title, different Google Calendar id ${gcalId} vs ${dupDoc.googleCalendarEventId}) — NOT creating a second doc. Delete the extra entry on the calendar itself.`,
+      });
+      continue;
+    }
+
     // --- create new doc ---
     const docId = buildDocId(enTitle, startIso, { recurring: isRecurring });
     const doc2 = {
