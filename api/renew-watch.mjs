@@ -2,14 +2,18 @@
 // it expires (Calendar API watch channels are time-limited — typically on
 // the order of a week).
 //
-// STATUS: inactive. This was meant to run daily via a `crons` entry in
-// vercel.json, but Vercel cron invocations cost money on this plan, and the
-// team decided to sync via the GitHub Actions hourly poll instead (see
-// scripts/calendar-sync.mjs + .github/workflows/calendar-sync.yml). The
-// vercel.json cron entry has been removed. This file (and setup-watch.mjs /
-// calendar-webhook.mjs) is left in place in case real-time sync is wanted
-// again later, but nothing currently calls it — no watch channel is
-// registered, so there's nothing to renew even if it were invoked manually.
+// STATUS: active, via the `crons` entry in vercel.json ("0 3 * * *" — once
+// daily, the minimum interval a Hobby-plan Vercel cron allows). This was
+// previously turned off in favor of the GitHub Actions hourly poll alone
+// (scripts/calendar-sync.mjs + .github/workflows/calendar-sync.yml) to avoid
+// Vercel cron costs — re-enabled 2026-09-07 so calendar adds/edits also
+// reach Sanity in near-real-time via the webhook, with the hourly poll as a
+// backstop. The channel that existed before this had already silently
+// expired weeks earlier (Calendar API watch channels self-expire and were
+// never being renewed with the cron off), which is why edits stopped
+// reaching Sanity until the next hourly poll. This cron's first run will
+// find no valid channel and register a fresh one automatically — no manual
+// /api/setup-watch call needed.
 //
 // Best-effort stops the old channel, then registers a fresh one via
 // registerWatch() (shared with /api/setup-watch), updating the
