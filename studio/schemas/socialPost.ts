@@ -48,6 +48,14 @@ export const socialPost = defineType({
       readOnly: true,
     }),
     defineField({
+      name: 'printPoster',
+      title: 'Print poster (A3)',
+      description: 'Auto-generated print-ready A3 landscape poster PDF (420\u00d7297mm), same branded look as the share image. Download and send to print.',
+      type: 'file',
+      options: {accept: 'application/pdf'},
+      readOnly: true,
+    }),
+    defineField({
       name: 'instagramCaption',
       title: 'Instagram caption',
       type: 'localeText',
