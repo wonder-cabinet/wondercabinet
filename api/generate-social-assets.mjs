@@ -26,7 +26,7 @@ export const config = {
 
 const EVENT_PROJECTION = `{
   _id, _type, title, subtitle, eventType, startDateTime, endDateTime,
-  location, "slug": slug.current, shortDescription, body
+  "location": location->{name}, "slug": slug.current, shortDescription, body
 }`;
 
 export default async function handler(req, res) {
