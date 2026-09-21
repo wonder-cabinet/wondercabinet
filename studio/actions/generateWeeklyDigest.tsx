@@ -2,9 +2,9 @@ import React, {useCallback, useState} from 'react'
 import type {DocumentActionComponent, DocumentActionProps} from 'sanity'
 
 // Manual trigger for api/generate-weekly-digest.mjs, shown on `weeklyIssue`
-// documents. Renders the three digest slides (cover/EN/AR) plus the
-// combined A3 print PDF from that week's Highlighted/Also-happening
-// events, and writes them onto this same weeklyIssue doc.
+// documents. Renders the three digest slides (cover/EN/AR) plus a combined
+// EN-over-AR A3 print sheet from that week's Highlighted events, and
+// writes them onto this same weeklyIssue doc.
 //
 // Reuses the same SANITY_STUDIO_SITE_ORIGIN / SANITY_STUDIO_GENERATE_TOKEN
 // env vars as generateSocialAssets.tsx -- one shared secret, two actions.
@@ -41,7 +41,13 @@ export const generateWeeklyDigestAction: DocumentActionComponent = (props: Docum
         throw new Error(json.error || `Request failed (${res.status})`)
       }
       setState('done')
-      setMessage('Generated -- see the Digest fields below for the 3 slides and the A3 PDF.')
+      const missing = json.missingArCount || 0
+      const base = `Generated ${json.eventCount} event${json.eventCount === 1 ? '' : 's'} -- see the Digest fields below for the 3 slides and the A3 PDF.`
+      setMessage(
+        missing > 0
+          ? `${base}\n\n${missing} event${missing === 1 ? '' : 's'} had no Arabic title yet, so the English title/description was used in its place on the Arabic slide/print section. Worth adding Arabic text to those events when there's time.`
+          : base,
+      )
     } catch (err: any) {
       setState('error')
       setMessage(String(err?.message || err))
@@ -70,7 +76,7 @@ export const generateWeeklyDigestAction: DocumentActionComponent = (props: Docum
             type: 'dialog',
             onClose: () => setState('idle'),
             header: state === 'done' ? 'Done' : 'Failed',
-            content: <div style={{padding: 16}}>{message}</div>,
+            content: <div style={{padding: 16, whiteSpace: 'pre-wrap'}}>{message}</div>,
           }
         : undefined,
   }

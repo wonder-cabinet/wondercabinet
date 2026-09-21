@@ -84,9 +84,21 @@ export const weeklyIssue = defineType({
       readOnly: true,
     }),
     defineField({
+      name: 'digestThemeBg',
+      title: 'Digest: background color',
+      description: "This week's 2-color theme for the 3 Instagram slides (hex, e.g. #77FF90). Pick a new pair each week -- leave blank to reuse last week's.",
+      type: 'string',
+    }),
+    defineField({
+      name: 'digestThemeFg',
+      title: 'Digest: text/foreground color',
+      description: "Paired with the background color above (hex, e.g. #4450D6). The print sheet stays on its own fixed blue/white regardless of this.",
+      type: 'string',
+    }),
+    defineField({
       name: 'digestPdf',
       title: 'Digest: A3 print PDF (generated)',
-      description: 'All three slides above, stacked vertically and centered on one A3 portrait sheet (297×420mm) at their exact proportions — same yellow background so there’s no visible seam. Download and send to print.',
+      description: 'One A3 portrait sheet (297×420mm): the shared header, the English event grid, then the Arabic event grid directly underneath it in the same columns (no repeated header, no dividing line -- reads as one continuous grid top to bottom). Download and send to print.',
       type: 'file',
       options: {accept: 'application/pdf'},
       readOnly: true,

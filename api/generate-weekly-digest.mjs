@@ -1,18 +1,26 @@
 // Manual "generate weekly digest" endpoint, called from a Sanity Studio
 // document action (studio/actions/generateWeeklyDigest.tsx) on a
-// weeklyIssue document. Renders the three digest slides (cover/EN/AR,
-// lib/social-weekly.mjs — a faithful rebuild of the Figma
-// "Weekly -Sep-WKxx" reference frames driven by that week's real events)
-// plus a combined A3 print PDF, and writes them onto the weeklyIssue doc
-// itself (digestCoverImage / digestEnImage / digestArImage / digestPdf /
-// digestGeneratedAt) — additive, separate from the per-event
-// generate-social-assets.mjs pipeline.
+// weeklyIssue document. Renders the three digest slides (cover/EN/AR) plus
+// a combined EN-over-AR A3 print PDF using lib/weekly-digest-render.mjs (a
+// real SVG/HTML rebuild -- see lib/weekly-digest/weekly-svg.mjs for why --
+// replacing the old satori-based lib/social-weekly.mjs), and writes them
+// onto the weeklyIssue doc itself (digestCoverImage / digestEnImage /
+// digestArImage / digestPdf / digestGeneratedAt) -- additive, separate
+// from the per-event generate-social-assets.mjs pipeline.
 //
-// Auth: same shared-secret pattern as generate-social-assets.mjs — reuses
+// Auth: same shared-secret pattern as generate-social-assets.mjs -- reuses
 // STUDIO_GENERATE_TOKEN / SANITY_STUDIO_GENERATE_TOKEN, no need for a
 // second token pair.
 import { sanityQuery, sanityMutate, sanityUploadImage, sanityUploadFile } from "../lib/sanity-client.mjs";
-import { renderWeeklyCoverPng, renderWeeklyEnPng, renderWeeklyArPng, renderWeeklyDigestPdf } from "../lib/social-weekly.mjs";
+import {
+  sanityDocToWeekly,
+  renderWeeklyCoverPng,
+  renderWeeklyEnPng,
+  renderWeeklyArPng,
+  renderWeeklyDigestPdfCombined,
+  DEFAULT_THEME,
+  PRINT_THEME,
+} from "../lib/weekly-digest-render.mjs";
 
 export const config = {
   maxDuration: 60,
@@ -20,9 +28,8 @@ export const config = {
 
 const EVENT_FIELDS = `{title, eventType, startDateTime, endDateTime, "location": location->{name}, shortDescription}`;
 const WEEKLY_PROJECTION = `{
-  _id, _type, weekStart, weekEnd,
-  "events": events[]->${EVENT_FIELDS},
-  "secondaryEvents": secondaryEvents[]->${EVENT_FIELDS}
+  _id, _type, weekStart, weekEnd, digestThemeBg, digestThemeFg,
+  "events": events[]->${EVENT_FIELDS}
 }`;
 
 export default async function handler(req, res) {
@@ -55,11 +62,22 @@ export default async function handler(req, res) {
       return;
     }
 
+    const weekly = sanityDocToWeekly(doc);
+    if (weekly.totalCount === 0) {
+      res.status(400).json({ error: "This weekly issue has no Highlighted events to put in the digest" });
+      return;
+    }
+
+    const theme = {
+      bg: doc.digestThemeBg || DEFAULT_THEME.bg,
+      fg: doc.digestThemeFg || DEFAULT_THEME.fg,
+    };
+
     const [coverBuf, enBuf, arBuf, pdfBuf] = await Promise.all([
-      renderWeeklyCoverPng(doc),
-      renderWeeklyEnPng(doc),
-      renderWeeklyArPng(doc),
-      renderWeeklyDigestPdf(doc),
+      renderWeeklyCoverPng(weekly, theme),
+      renderWeeklyEnPng(weekly, theme),
+      renderWeeklyArPng(weekly, theme),
+      renderWeeklyDigestPdfCombined(weekly, PRINT_THEME),
     ]);
 
     const [coverAsset, enAsset, arAsset, pdfAsset] = await Promise.all([
@@ -84,7 +102,12 @@ export default async function handler(req, res) {
       },
     ]);
 
-    res.status(200).json({ ok: true, weeklyIssueId: doc._id });
+    res.status(200).json({
+      ok: true,
+      weeklyIssueId: doc._id,
+      eventCount: weekly.totalCount,
+      missingArCount: weekly.missingArCount,
+    });
   } catch (err) {
     console.error("generate-weekly-digest: failed", err);
     res.status(500).json({ ok: false, error: String((err && err.message) || err) });
