@@ -165,4 +165,12 @@ export const structure = (S: StructureBuilder) =>
             .schemaType('siteSettings')
             .documentId('siteSettings')
         ),
+
+      S.listItem()
+        .title('Digest Color History')
+        .child(
+          S.document()
+            .schemaType('digestColorHistory')
+            .documentId('digestColorHistory')
+        ),
     ])

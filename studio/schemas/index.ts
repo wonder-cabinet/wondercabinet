@@ -21,6 +21,7 @@ import {residency} from './residency'
 import {artwork} from './artwork'
 import {siteSettings} from './siteSettings'
 import {weeklyIssue} from './weeklyIssue'
+import {digestColorHistory} from './digestColorHistory'
 import {socialPost} from './socialPost'
 import {streamChannel} from './streamChannel'
 import {barMenuItem, barSettings} from './barMenuItem'
@@ -49,6 +50,7 @@ export const schemaTypes = [
   artwork,
   siteSettings,
   weeklyIssue,
+  digestColorHistory,
   socialPost,
   streamChannel,
   barMenuItem,

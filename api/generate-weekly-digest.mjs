@@ -38,6 +38,28 @@ const WEEKLY_PROJECTION = `{
   "events": events[]->${EVENT_FIELDS}
 }`;
 
+// Every successful generation "uses" its theme pair for real, so this
+// records it on a small singleton document (digestColorHistory) that the
+// Studio's color-picker component (DigestThemeTools.tsx) reads to offer
+// one-click reuse of past weeks' pairs -- an auto-growing preset list
+// instead of a fixed one someone has to maintain by hand. Most-recent-first,
+// deduped, capped so it doesn't grow forever. Never lets a hiccup here fail
+// the actual digest generation, which has already succeeded by this point.
+async function registerColorPair(bg, fg) {
+  try {
+    const existing = await sanityQuery(`*[_id == "digestColorHistory"][0]{pairs}`);
+    const pairs = (existing && existing.pairs) || [];
+    const filtered = pairs.filter((p) => !(p.bg === bg && p.fg === fg));
+    const next = [{ _key: `pair-${Date.now()}`, bg, fg }, ...filtered].slice(0, 16);
+    await sanityMutate([
+      { createIfNotExists: { _id: "digestColorHistory", _type: "digestColorHistory", pairs: [] } },
+      { patch: { id: "digestColorHistory", set: { pairs: next } } },
+    ]);
+  } catch (err) {
+    console.error("registerColorPair: failed (non-fatal)", err);
+  }
+}
+
 export default async function handler(req, res) {
   if (applyCors(req, res)) return;
   if (req.method !== "POST") {
@@ -108,6 +130,8 @@ export default async function handler(req, res) {
         },
       },
     ]);
+
+    await registerColorPair(theme.bg, theme.fg);
 
     res.status(200).json({
       ok: true,

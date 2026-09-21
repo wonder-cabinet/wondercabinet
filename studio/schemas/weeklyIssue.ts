@@ -1,4 +1,5 @@
 import {defineType, defineField} from 'sanity'
+import {DigestThemeTools} from '../components/DigestThemeTools'
 
 // Each week of programming, archived as its own "issue" — like a magazine
 // issue: a title/theme, a short description, the date range it covers, and
@@ -82,6 +83,14 @@ export const weeklyIssue = defineType({
       description: 'Auto-generated 1080×1350 Arabic event-grid slide, mirrored right-to-left.',
       type: 'image',
       readOnly: true,
+    }),
+    defineField({
+      name: 'digestThemeTools',
+      title: 'Theme presets & live preview',
+      description: 'Click a swatch to reuse a past week\'s color pair, or watch the cover preview update as you pick colors below.',
+      type: 'string',
+      readOnly: true,
+      components: {input: DigestThemeTools},
     }),
     defineField({
       name: 'digestThemeBg',
