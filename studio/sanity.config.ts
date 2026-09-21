@@ -1,6 +1,7 @@
 import {defineConfig} from 'sanity'
 import {structureTool} from 'sanity/structure'
 import {visionTool} from '@sanity/vision'
+import {colorInput} from '@sanity/color-input'
 import {schemaTypes} from './schemas'
 import {structure} from './structure'
 import {generateSocialAssetsAction} from './actions/generateSocialAssets'
@@ -16,6 +17,9 @@ export default defineConfig({
   plugins: [
     structureTool({structure}),
     visionTool(),              // lets you run GROQ queries directly in Studio
+    colorInput(),              // color-swatch picker widget, used by weeklyIssue's
+                                // digestThemeBg/digestThemeFg fields (the week's
+                                // 2-color digest theme)
   ],
 
   schema: {

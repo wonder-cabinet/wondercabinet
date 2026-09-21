@@ -27,8 +27,14 @@ export const config = {
 };
 
 const EVENT_FIELDS = `{title, eventType, startDateTime, endDateTime, "location": location->{name}, shortDescription}`;
+// digestThemeBg/digestThemeFg are @sanity/color-input "color" fields (an
+// object with hex/hsl/rgb/alpha) now that the Studio has a real color-swatch
+// picker for them -- pull out just the hex string here so the rest of this
+// file (and lib/weekly-digest-render.mjs) can keep treating theme.bg/fg as
+// plain hex strings.
 const WEEKLY_PROJECTION = `{
-  _id, _type, weekStart, weekEnd, digestThemeBg, digestThemeFg,
+  _id, _type, weekStart, weekEnd,
+  "digestThemeBg": digestThemeBg.hex, "digestThemeFg": digestThemeFg.hex,
   "events": events[]->${EVENT_FIELDS}
 }`;
 

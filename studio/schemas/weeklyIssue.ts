@@ -86,14 +86,16 @@ export const weeklyIssue = defineType({
     defineField({
       name: 'digestThemeBg',
       title: 'Digest: background color',
-      description: "This week's 2-color theme for the 3 Instagram slides (hex, e.g. #77FF90). Pick a new pair each week -- leave blank to reuse last week's.",
-      type: 'string',
+      description: "This week's 2-color theme for the 3 Instagram slides. Pick a new pair each week -- leave blank to reuse last week's.",
+      type: 'color',
+      options: {disableAlpha: true},
     }),
     defineField({
       name: 'digestThemeFg',
       title: 'Digest: text/foreground color',
-      description: "Paired with the background color above (hex, e.g. #4450D6). The print sheet stays on its own fixed blue/white regardless of this.",
-      type: 'string',
+      description: 'Paired with the background color above. The print sheet stays on its own fixed blue/white regardless of this.',
+      type: 'color',
+      options: {disableAlpha: true},
     }),
     defineField({
       name: 'digestPdf',
