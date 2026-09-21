@@ -16,7 +16,7 @@
 // client JS since it's prefixed SANITY_STUDIO_, so this is not secret from
 // anyone who can open Studio's devtools; acceptable for a small in-house
 // tool used only by the Wonder Cabinet team, not a public surface).
-import { sanityQuery, sanityMutate, sanityUploadImage, sanityUploadFile } from "../lib/sanity-client.mjs";
+import { sanityQuery, sanityMutate, sanityUploadImage, sanityUploadFile, applyCors } from "../lib/sanity-client.mjs";
 import { renderShareImage } from "../lib/social-image.mjs";
 import { renderPrintPosterPdf } from "../lib/social-print.mjs";
 
@@ -30,6 +30,7 @@ const EVENT_PROJECTION = `{
 }`;
 
 export default async function handler(req, res) {
+  if (applyCors(req, res)) return;
   if (req.method !== "POST") {
     res.status(405).json({ error: "Method not allowed" });
     return;

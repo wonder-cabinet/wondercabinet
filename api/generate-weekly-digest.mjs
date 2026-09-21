@@ -11,7 +11,7 @@
 // Auth: same shared-secret pattern as generate-social-assets.mjs -- reuses
 // STUDIO_GENERATE_TOKEN / SANITY_STUDIO_GENERATE_TOKEN, no need for a
 // second token pair.
-import { sanityQuery, sanityMutate, sanityUploadImage, sanityUploadFile } from "../lib/sanity-client.mjs";
+import { sanityQuery, sanityMutate, sanityUploadImage, sanityUploadFile, applyCors } from "../lib/sanity-client.mjs";
 import {
   sanityDocToWeekly,
   renderWeeklyCoverPng,
@@ -39,6 +39,7 @@ const WEEKLY_PROJECTION = `{
 }`;
 
 export default async function handler(req, res) {
+  if (applyCors(req, res)) return;
   if (req.method !== "POST") {
     res.status(405).json({ error: "Method not allowed" });
     return;
