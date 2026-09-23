@@ -26,7 +26,10 @@ export const config = {
   maxDuration: 60,
 };
 
-const EVENT_FIELDS = `{title, eventType, startDateTime, endDateTime, "location": location->{name}, shortDescription}`;
+// subtitle (short localeString), not shortDescription (longer localeText
+// blurb) -- lib/weekly-digest-render.mjs's adaptEvent() uses subtitle for
+// the grid's one-line description, see its comment for why.
+const EVENT_FIELDS = `{title, eventType, startDateTime, endDateTime, "location": location->{name}, subtitle}`;
 // digestThemeBg/digestThemeFg are @sanity/color-input "color" fields (an
 // object with hex/hsl/rgb/alpha) now that the Studio has a real color-swatch
 // picker for them -- pull out just the hex string here so the rest of this
