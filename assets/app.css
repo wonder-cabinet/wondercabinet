@@ -3552,6 +3552,7 @@ html[data-lang="ar"] .art-past-toggle{ direction: rtl; }
   text-transform: uppercase; font-weight: 700; color: #f6f3ea;
 }
 .about-kicker .ar{ font-family: var(--ff-ar); font-size: 16px; text-transform: none; }
+html[data-lang="ar"] .about-kicker{ text-align: right; direction: rtl; }
 .about-text{
   margin: 0; color: #f6f3ea;
   font-family: var(--ff-sans); font-weight: 700;
