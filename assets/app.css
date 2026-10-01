@@ -3533,17 +3533,18 @@ html[data-lang="ar"] .art-past-toggle{ direction: rtl; }
   display: flex; align-items: center;
   isolation: isolate; /* so the video blends against this section's blue, not the page */
 }
-/* Blue duotone: grayscale video multiplied into the section's --ink blue —
-   brightest areas read as full blue, darkest as black. */
+/* Blue duotone: grayscale video screened over the section's --ink blue at low
+   opacity — darkest areas are exactly the site blue, highlights lift slightly. */
 .about-bg-video{
   position: absolute; inset: 0; width: 100%; height: 100%;
   object-fit: cover; z-index: 0;
-  filter: grayscale(1) brightness(1.2) contrast(.95);
-  mix-blend-mode: multiply;
+  filter: grayscale(1) contrast(1.1);
+  mix-blend-mode: screen;
+  opacity: .4;
 }
-.about-scrim{ position: absolute; inset: 0; background: rgba(29,36,255,.12); z-index: 1; }
+.about-scrim{ position: absolute; inset: 0; background: transparent; z-index: 1; }
 .about-inner{
-  position: relative; z-index: 2; width: 100%; max-width: 1100px;
+  position: relative; z-index: 2; width: 100%; max-width: 1500px;
   padding: 56px 40px; display: flex; flex-direction: column; gap: 22px;
 }
 .about-kicker{
@@ -3552,11 +3553,12 @@ html[data-lang="ar"] .art-past-toggle{ direction: rtl; }
 }
 .about-kicker .ar{ font-family: var(--ff-ar); font-size: 16px; text-transform: none; }
 .about-text{
-  margin: 0; max-width: 30em; color: #f6f3ea;
+  margin: 0; color: #f6f3ea;
   font-family: var(--ff-sans); font-weight: 700;
-  font-size: clamp(20px, 2.5vw, 36px); line-height: 1.25; letter-spacing: 0;
+  font-size: var(--wc-title-size); line-height: .98; letter-spacing: 0;
+  text-transform: uppercase; overflow-wrap: break-word;
 }
-.about-text.ar{ font-family: var(--ff-ar); font-weight: 400; line-height: 1.85; font-size: clamp(22px, 2.6vw, 38px); }
+.about-text.ar{ font-family: var(--ff-ar); font-weight: 400; font-style: italic; text-transform: none; line-height: 1.3; }
 html[data-lang="ar"] .about-inner{ margin-left: auto; }
 @media (max-width: 560px){
   .about-home{ min-height: 0; }
