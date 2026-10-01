@@ -20,6 +20,7 @@ import {project} from './project'
 import {residency} from './residency'
 import {artwork} from './artwork'
 import {siteSettings} from './siteSettings'
+import {aboutSection} from './aboutSection'
 import {weeklyIssue} from './weeklyIssue'
 import {digestColorHistory} from './digestColorHistory'
 import {socialPost} from './socialPost'
@@ -49,6 +50,7 @@ export const schemaTypes = [
   residency,
   artwork,
   siteSettings,
+  aboutSection,
   weeklyIssue,
   digestColorHistory,
   socialPost,

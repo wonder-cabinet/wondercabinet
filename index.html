@@ -12,7 +12,7 @@
 <meta property="og:url" content="https://wondercabinet.space">
 <meta property="og:image" content="" id="og-image-meta">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="stylesheet" href="assets/app.css?v=112">
+<link rel="stylesheet" href="assets/app.css?v=113">
 </head>
 <body data-view="list">
 
@@ -108,6 +108,19 @@
     <div class="cx-count" id="cx-count"></div>
   </div>
   <div class="cx-list" id="cx-list"></div>
+</section>
+
+<!-- ABOUT — short about over a looping video, same treatment as the video
+     cards in the events section above. Text + video are Sanity-driven
+     (aboutSection); the English text below is the fallback until it's filled in. -->
+<section class="about-home" id="about">
+  <video class="about-bg-video" id="about-video" autoplay muted loop playsinline preload="auto"></video>
+  <div class="about-scrim"></div>
+  <div class="about-inner">
+    <h2 class="about-kicker"><span class="en-only">About</span><span class="ar-only ar" dir="rtl">نبذة</span></h2>
+    <p class="about-text en-only" id="about-text-en">Wonder Cabinet is a space for artistic production, social and cultural development in Bethlehem, Palestine. Convening people and entities from different backgrounds, it brings together art, design, sound, food, heritage and material culture through research and production, education and public programs, shaped around a continuous multidisciplinary artist and chef residency platform.</p>
+    <p class="about-text ar-only ar" dir="rtl" id="about-text-ar"></p>
+  </div>
 </section>
 
 <!-- THIS WEEK 7-day grid retired — redundant with the gscroll "this week"
@@ -3157,6 +3170,35 @@ function _sanityImg(ref){
   const id = r.replace(/^image-/, '').replace(/-([a-z0-9]+)$/, '.$1');
   return `https://cdn.sanity.io/images/xdtj605l/production/${id}`;
 }
+/* ============================================================
+   ABOUT — homepage short-about section (Sanity: aboutSection)
+   Falls back to the hard-coded English text/video in the markup.
+   ============================================================ */
+function renderAbout(){
+  const sec = document.getElementById('about');
+  if (!sec) return;
+  const a = window.__WC_ABOUT || {};
+  const sa = a.shortAbout || {};
+  const enEl = document.getElementById('about-text-en');
+  const arEl = document.getElementById('about-text-ar');
+  if (sa.en && enEl) enEl.textContent = sa.en;
+  if (arEl){
+    // No Arabic yet -> show the English text rather than an empty block.
+    if (sa.ar){ arEl.textContent = sa.ar; }
+    else { arEl.textContent = sa.en || (enEl ? enEl.textContent : ''); arEl.classList.remove('ar'); arEl.dir = 'ltr'; arEl.style.direction = 'ltr'; }
+  }
+  const v = document.getElementById('about-video');
+  if (v){
+    const src = _sanityFile(a.backgroundVideo);
+    // Video comes only from Sanity (aboutSection > Homepage background video).
+    // None uploaded, or it can't play -> keep the plain dark section.
+    if (src){
+      v.addEventListener('error', () => { v.style.display = 'none'; }, { once:true });
+      v.src = src;
+      const p = v.play && v.play(); if (p && p.catch) p.catch(() => {});
+    } else { v.style.display = 'none'; }
+  }
+}
 function _sanityFile(ref){
   const r = typeof ref === 'string' ? ref : (ref && ref.asset && ref.asset._ref) || '';
   if (!r) return '';
@@ -3223,10 +3265,12 @@ async function _boot(){
       "projects": *[_type == "project"] | order(year desc) { title, "slug": slug.current, description, year, coverImage },
       "residencies": *[_type == "residency"] | order(year desc) { title, "slug": slug.current, description, year, coverImage },
       "settings": *[_type == "siteSettings"][0]{ ogImage },
+      "about": *[_type == "aboutSection"][0]{ shortAbout, backgroundVideo },
       "issues": *[_type == "weeklyIssue"] | order(weekStart desc){ title, description, weekStart, weekEnd, cover, "coverPalette": cover.asset->metadata.palette, "eventIds": events[]->{"eid": coalesce(slug.current, _id)}.eid, "secondaryEventIds": secondaryEvents[]->{"eid": coalesce(slug.current, _id)}.eid, eventsAutoAssigned, "secondaryFeaturedVideo": secondaryFeaturedVideo->slug.current }
     }`);
     const res = await fetch(`https://xdtj605l.api.sanity.io/v2024-01-01/data/query/production?query=${q}`);
     const { result } = await res.json();
+    window.__WC_ABOUT = (result && result.about) || null;
 
     ALL = ((result && result.events) || []).map(doc => {
       const s = _iso(doc.startDateTime), e = _iso(doc.endDateTime);
@@ -3396,6 +3440,7 @@ async function _boot(){
   // Render all sections
   renderThisWeek();
   renderCurrentExhibitions();
+  renderAbout();
   renderFilters();
   renderSeasonRail();
   renderPastArchive();

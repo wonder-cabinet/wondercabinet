@@ -157,6 +157,15 @@ export const structure = (S: StructureBuilder) =>
 
       S.divider(),
 
+      // ── ABOUT (singleton) ────────────────────────────
+      S.listItem()
+        .title('About Wonder Cabinet')
+        .child(
+          S.document()
+            .schemaType('aboutSection')
+            .documentId('aboutSection')
+        ),
+
       // ── SETTINGS (singleton) ─────────────────────────
       S.listItem()
         .title('Site Settings')
