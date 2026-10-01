@@ -3531,12 +3531,17 @@ html[data-lang="ar"] .art-past-toggle{ direction: rtl; }
   border-top: 2px solid var(--ink); border-bottom: 2px solid var(--ink);
   min-height: clamp(420px, 72vh, 760px);
   display: flex; align-items: center;
+  isolation: isolate; /* so the video blends against this section's blue, not the page */
 }
+/* Blue duotone: grayscale video multiplied into the section's --ink blue —
+   brightest areas read as full blue, darkest as black. */
 .about-bg-video{
   position: absolute; inset: 0; width: 100%; height: 100%;
   object-fit: cover; z-index: 0;
+  filter: grayscale(1) brightness(1.2) contrast(.95);
+  mix-blend-mode: multiply;
 }
-.about-scrim{ position: absolute; inset: 0; background: rgba(29,36,255,.5); z-index: 1; } /* --ink blue tint over the video */
+.about-scrim{ position: absolute; inset: 0; background: rgba(29,36,255,.12); z-index: 1; }
 .about-inner{
   position: relative; z-index: 2; width: 100%; max-width: 1100px;
   padding: 56px 40px; display: flex; flex-direction: column; gap: 22px;
