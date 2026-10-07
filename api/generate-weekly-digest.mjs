@@ -11,7 +11,7 @@
 // Auth: same shared-secret pattern as generate-social-assets.mjs -- reuses
 // STUDIO_GENERATE_TOKEN / SANITY_STUDIO_GENERATE_TOKEN, no need for a
 // second token pair.
-import { sanityQuery, sanityMutate, sanityUploadImage, sanityUploadFile, applyCors } from "../lib/sanity-client.mjs";
+import { sanityQuery, sanityQueryAsEditor, sanityMutate, sanityUploadImage, sanityUploadFile, applyCors } from "../lib/sanity-client.mjs";
 import {
   sanityDocToWeekly,
   renderWeeklyCoverPng,
@@ -84,8 +84,20 @@ export default async function handler(req, res) {
   }
 
   try {
-    const doc = await sanityQuery(`*[_id==${JSON.stringify(weeklyIssueId)}][0]${WEEKLY_PROJECTION}`);
-    if (!doc || doc._type !== "weeklyIssue") {
+    // The Studio shows an editor the DRAFT version of a document whenever one
+    // exists, so that is what they expect the digest to be built from AND
+    // written back onto. Before this, the endpoint read and wrote the
+    // published document only: with a pending draft (found 2026-10-07, week
+    // of Oct 5 -- draft had 3 events, published had 4), generation
+    // "succeeded" on the published doc but the Studio form kept showing the
+    // draft's empty Digest fields, so it looked like nothing had generated,
+    // and the digest was built from the stale published event list.
+    // Anonymous reads can't see drafts, so this reads with the editor token.
+    const baseId = weeklyIssueId.replace(/^drafts\./, "");
+    const storedIds =
+      (await sanityQueryAsEditor(`*[_id in ${JSON.stringify([baseId, `drafts.${baseId}`])}]._id`, "raw")) || [];
+    const doc = await sanityQueryAsEditor(`*[_id==${JSON.stringify(baseId)}][0]${WEEKLY_PROJECTION}`, "drafts");
+    if (!doc || doc._type !== "weeklyIssue" || storedIds.length === 0) {
       res.status(404).json({ error: "Weekly issue not found" });
       return;
     }
@@ -113,32 +125,29 @@ export default async function handler(req, res) {
     ]);
 
     const [coverAsset, enAsset, arAsset, pdfAsset] = await Promise.all([
-      sanityUploadImage(coverBuf, `weekly-${doc._id}-cover.png`),
-      sanityUploadImage(enBuf, `weekly-${doc._id}-en.png`),
-      sanityUploadImage(arBuf, `weekly-${doc._id}-ar.png`),
-      sanityUploadFile(pdfBuf, `weekly-${doc._id}-a3.pdf`, "application/pdf"),
+      sanityUploadImage(coverBuf, `weekly-${baseId}-cover.png`),
+      sanityUploadImage(enBuf, `weekly-${baseId}-en.png`),
+      sanityUploadImage(arBuf, `weekly-${baseId}-ar.png`),
+      sanityUploadFile(pdfBuf, `weekly-${baseId}-a3.pdf`, "application/pdf"),
     ]);
 
-    await sanityMutate([
-      {
-        patch: {
-          id: doc._id,
-          set: {
-            digestCoverImage: { _type: "image", asset: { _type: "reference", _ref: coverAsset._id } },
-            digestEnImage: { _type: "image", asset: { _type: "reference", _ref: enAsset._id } },
-            digestArImage: { _type: "image", asset: { _type: "reference", _ref: arAsset._id } },
-            digestPdf: { _type: "file", asset: { _type: "reference", _ref: pdfAsset._id } },
-            digestGeneratedAt: new Date().toISOString(),
-          },
-        },
-      },
-    ]);
+    // Write onto every stored version (draft and/or published) so the result
+    // shows up in the Studio form regardless of which one the editor has
+    // open -- and survives publishing the draft later.
+    const digestFields = {
+      digestCoverImage: { _type: "image", asset: { _type: "reference", _ref: coverAsset._id } },
+      digestEnImage: { _type: "image", asset: { _type: "reference", _ref: enAsset._id } },
+      digestArImage: { _type: "image", asset: { _type: "reference", _ref: arAsset._id } },
+      digestPdf: { _type: "file", asset: { _type: "reference", _ref: pdfAsset._id } },
+      digestGeneratedAt: new Date().toISOString(),
+    };
+    await sanityMutate(storedIds.map((id) => ({ patch: { id, set: digestFields } })));
 
     await registerColorPair(theme.bg, theme.fg);
 
     res.status(200).json({
       ok: true,
-      weeklyIssueId: doc._id,
+      weeklyIssueId: baseId,
       eventCount: weekly.totalCount,
       missingArCount: weekly.missingArCount,
     });
