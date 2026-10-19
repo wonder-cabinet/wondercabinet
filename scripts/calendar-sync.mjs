@@ -287,6 +287,51 @@ function parseRrule(rrule) {
   };
 }
 
+// ---------------------------------------------------------------------------
+// Recurrence label — derived from the RRULE so a recurring event never falls
+// back to the site's generic "Every <weekday of the next date>" (which turned
+// "NTS x Wonder Cabinet", a 4-weekly Monday event, into "Every Monday";
+// reported 2026-10-19). Only ever used to FILL an empty label — an editor's
+// own label in Studio is never overwritten. Returns null for shapes it
+// doesn't understand, which keeps the old fallback.
+// ---------------------------------------------------------------------------
+const DAY_EN = { SU: "Sunday", MO: "Monday", TU: "Tuesday", WE: "Wednesday", TH: "Thursday", FR: "Friday", SA: "Saturday" };
+const DAY_AR = { SU: "الأحد", MO: "الاثنين", TU: "الثلاثاء", WE: "الأربعاء", TH: "الخميس", FR: "الجمعة", SA: "السبت" };
+const NTH_EN = { 1: "1st", 2: "2nd", 3: "3rd", 4: "4th", 5: "5th", "-1": "last" };
+const NTH_AR = { 1: "أول", 2: "ثاني", 3: "ثالث", 4: "رابع", 5: "خامس", "-1": "آخر" };
+
+export function recurrenceLabel(rrule) {
+  if (!rrule) return null;
+  const r = parseRrule(rrule);
+  const n = r.interval || 1;
+  const days = r.byday || [];
+  const single = days.length === 1 ? days[0] : null;
+
+  if (r.freq === "WEEKLY") {
+    if (n === 1) {
+      if (single && /^[A-Z]{2}$/.test(single)) {
+        return { en: `Every ${DAY_EN[single]}`, ar: `كل يوم ${DAY_AR[single].replace(/^ال/, "")}` };
+      }
+      return null;
+    }
+    return { en: `Every ${n} weeks`, ar: `كل ${n} أسابيع` };
+  }
+  if (r.freq === "MONTHLY" && n === 1 && single) {
+    const m = single.match(/^(-?\d)([A-Z]{2})$/);
+    if (m && NTH_EN[m[1]] && DAY_EN[m[2]]) {
+      return {
+        en: `Every ${NTH_EN[m[1]]} ${DAY_EN[m[2]]} of the month`,
+        ar: `كل ${NTH_AR[m[1]]} يوم ${DAY_AR[m[2]].replace(/^ال/, "")} من الشهر`,
+      };
+    }
+    return null;
+  }
+  if (r.freq === "DAILY") {
+    return n === 1 ? { en: "Every day", ar: "كل يوم" } : { en: `Every ${n} days`, ar: `كل ${n} أيام` };
+  }
+  return null;
+}
+
 function parseUntil(v) {
   const m = v.match(/^(\d{4})(\d{2})(\d{2})(T(\d{2})(\d{2})(\d{2})Z?)?$/);
   if (!m) return null;
@@ -738,7 +783,7 @@ async function fetchExistingEvents() {
     return JSON.parse(fs.readFileSync(SANITY_SNAPSHOT, "utf8"));
   }
   return sanityQuery(
-    '*[_type=="event"]{_id,title,slug,startDateTime,endDateTime,googleCalendarEventId,eventType,recurring,recurringBaseTitle,body,neverHighlighted,"relatedArtistRefs":relatedArtists[]._ref,calendarSyncTitleEn,calendarSyncTitleAr,calendarSyncBodyEn,calendarSyncBodyAr}'
+    '*[_type=="event"]{_id,title,slug,startDateTime,endDateTime,googleCalendarEventId,eventType,recurring,recurringLabel,recurringBaseTitle,body,neverHighlighted,"relatedArtistRefs":relatedArtists[]._ref,calendarSyncTitleEn,calendarSyncTitleAr,calendarSyncBodyEn,calendarSyncBodyAr}'
   );
 }
 
@@ -957,6 +1002,12 @@ async function main() {
       if (doc.startDateTime !== startIso) patch.startDateTime = startIso;
       if (endIso && doc.endDateTime !== endIso) patch.endDateTime = endIso;
       if (adopted) patch.googleCalendarEventId = gcalId;
+      // Fill an EMPTY recurrence label from the calendar's repeat rule; never
+      // touch one an editor has set.
+      if (isRecurring && !doc.recurringLabel?.en && !doc.recurringLabel?.ar) {
+        const lbl = recurrenceLabel(ev.rrule);
+        if (lbl) patch.recurringLabel = { _type: "localeString", en: lbl.en, ar: lbl.ar };
+      }
 
       // Keep title / description in sync with the calendar — but only ever
       // apply a change to a field an editor hasn't touched since the last
@@ -1127,6 +1178,9 @@ async function main() {
       startDateTime: startIso,
       endDateTime: endIso || undefined,
       recurring: isRecurring || undefined,
+      recurringLabel: isRecurring && recurrenceLabel(ev.rrule)
+        ? { _type: "localeString", ...recurrenceLabel(ev.rrule) }
+        : undefined,
       registerUrl: registerUrl || undefined,
       body: enBody || arBody
         ? { _type: "localeText", en: enBody || undefined, ar: arBody || undefined }
