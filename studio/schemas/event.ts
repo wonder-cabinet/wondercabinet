@@ -96,9 +96,25 @@ export const event = defineType({
     defineField({
       name: 'recurringBaseTitle',
       title: 'Default title (recurring)',
-      description: 'Only used for recurring events. The show\'s generic name (e.g. "NTS x Wonder Cabinet"), with no specific guest/episode in it. Every time the calendar sync advances this event to its next occurrence, the Title field above is automatically reset back to this — so a guest name you added for one episode doesn\'t linger on the listing after that episode has aired. Set this once; then edit Title by hand for each upcoming episode\'s guest as it\'s confirmed.',
+      description: 'Only used for recurring events (and for "each occurrence is its own episode" shows, where new episodes are created with this title). The show\'s generic name (e.g. "NTS x Wonder Cabinet"), with no specific guest/episode in it. Every time the calendar sync advances this event to its next occurrence, the Title field above is automatically reset back to this — so a guest name you added for one episode doesn\'t linger on the listing after that episode has aired. Set this once; then edit Title by hand for each upcoming episode\'s guest as it\'s confirmed.',
       type: 'localeString',
-      hidden: ({document}) => !(document as any)?.recurring,
+      hidden: ({document}) => !((document as any)?.recurring || (document as any)?.separateEpisodes),
+    }),
+    defineField({
+      name: 'separateEpisodes',
+      title: 'Each occurrence is its own episode',
+      description:
+        "For a recurring show where every date has different content (e.g. NTS x Wonder Cabinet — a new guest each time). Tick this and the calendar sync stops moving this one event from date to date. This event stays as its current episode, and a separate event is created for each of the next few dates — each with its own title, image, artists and text, which the sync never changes or resets. Past episodes stay on the site as normal past events. To skip an episode, delete its event: it won't be recreated.",
+      type: 'boolean',
+      initialValue: false,
+      hidden: ({document}) => !((document as any)?.recurring || (document as any)?.separateEpisodes),
+    }),
+    defineField({
+      name: 'episodeIdsCreated',
+      title: 'Episodes created by the calendar sync',
+      type: 'array',
+      of: [{type: 'string'}],
+      hidden: true,
     }),
     defineField({
       name: 'status',

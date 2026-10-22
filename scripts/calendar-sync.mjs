@@ -14,7 +14,9 @@
 //    as `project` documents).
 //  - STATUS:CANCELLED events are skipped.
 //  - Recurring (RRULE) events collapse to a single Sanity doc keyed by the
-//    *master* UID; we never expand occurrences into separate docs.
+//    *master* UID — unless that doc has "Each occurrence is its own episode"
+//    ticked (separateEpisodes), in which case see planEpisodeSeries() below:
+//    one doc per occurrence, never reset by the sync.
 //  - Matching order: (1) googleCalendarEventId === ICS UID (master UID for
 //    recurring), stripped of any "@google.com" suffix. (2) Adoption pass —
 //    for existing docs that lack googleCalendarEventId, match by same
@@ -366,65 +368,77 @@ function hebronWeekFloorUtc(now) {
   return new Date(Date.UTC(y, mo - 1, da, 0, 0, 0) - offMin * 60000);
 }
 
-// Compute the next occurrence (as a UTC Date, same wall-clock time as the
-// master) at or after `now`, given the master's first occurrence `dtstartUtc`.
+// Asia/Hebron wall-clock fields (y, mo, da, h, mi, s) of a UTC instant.
+function hebronLocalParts(utcDate) {
+  const m = utcToHebronIso(utcDate).match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})/);
+  return { y: +m[1], mo: +m[2], da: +m[3], h: +m[4], mi: +m[5], s: +m[6] };
+}
+
+// Compute the next occurrence (as a UTC Date) at or after `now`, given the
+// master's first occurrence `dtstartUtc`.
+//
+// Occurrences are stepped on the Asia/Hebron WALL CLOCK, the way Google
+// Calendar does it: a 13:00 event stays 13:00 local all year, so its UTC
+// instant moves an hour when Palestine changes its clocks (last Saturday of
+// March / October). This used to step in UTC, which made every recurring
+// event land an hour early (12:00 instead of 13:00) once its next occurrence
+// fell after the October clock change.
 function nextRecurrenceOccurrence(dtstartUtc, rrule, now) {
   const rule = parseRrule(rrule);
   const maxIterations = 5000;
+  const DAY_MS = 86400000;
+  const p = hebronLocalParts(dtstartUtc);
+  // dtstart's local calendar date; a UTC-midnight Date stands in for it so
+  // day arithmetic is plain +N*DAY_MS with no DST involved.
+  const baseDay = Date.UTC(p.y, p.mo - 1, p.da);
+  // Local calendar day (UTC-midnight stand-in) + dtstart's wall-clock time → real instant.
+  const at = (dayMs) => {
+    const d = new Date(dayMs);
+    return new Date(wallClockToHebronIso(d.getUTCFullYear(), d.getUTCMonth() + 1, d.getUTCDate(), p.h, p.mi, p.s));
+  };
 
   if (rule.freq === "WEEKLY") {
-    const days = (rule.byday && rule.byday.length ? rule.byday : [DAY_CODES[dtstartUtc.getUTCDay()]]);
+    const days = (rule.byday && rule.byday.length ? rule.byday : [DAY_CODES[new Date(baseDay).getUTCDay()]]);
     const dayNums = days.map((d) => DAY_CODES.indexOf(d)).filter((n) => n >= 0).sort((a, b) => a - b);
     // Walk week-by-week (respecting INTERVAL) from the week containing dtstart.
-    const weekStart0 = addUtcDays(dtstartUtc, -dtstartUtc.getUTCDay()); // Sunday of the start week, at dtstart's time-of-day
-    let weekIndex = 0;
-    for (let iter = 0; iter < maxIterations; iter++) {
-      const weekStart = addUtcDays(weekStart0, weekIndex * 7 * rule.interval);
+    const weekStart0 = baseDay - new Date(baseDay).getUTCDay() * DAY_MS; // Sunday of the start week
+    for (let weekIndex = 0; weekIndex < maxIterations; weekIndex++) {
+      const weekStart = weekStart0 + weekIndex * 7 * rule.interval * DAY_MS;
       for (const dn of dayNums) {
-        const occ = addUtcDays(weekStart, dn);
-        if (occ < dtstartUtc) continue;
+        const dayMs = weekStart + dn * DAY_MS;
+        if (dayMs < baseDay) continue;
+        const occ = at(dayMs);
         if (rule.until && occ > rule.until) return null;
         if (occ >= now) {
           if (rule.count) {
-            // Rough count check: count occurrences from dtstart up to occ.
-            const n = countWeeklyOccurrencesUpTo(dtstartUtc, dayNums, rule.interval, occ);
+            const n = countWeeklyOccurrencesUpTo(baseDay, dayNums, rule.interval, dayMs);
             if (n > rule.count) return null;
           }
           return occ;
         }
       }
-      weekIndex++;
-      if (rule.until && weekStart > rule.until) return null;
+      if (rule.until && at(weekStart) > rule.until) return null;
     }
     return null;
   }
 
   if (rule.freq === "DAILY") {
-    const stepMs = rule.interval * 86400000;
-    let occ = new Date(dtstartUtc.getTime());
-    let n = 0;
-    for (let iter = 0; iter < maxIterations; iter++) {
+    for (let n = 0; n < maxIterations; n++) {
+      const occ = at(baseDay + n * rule.interval * DAY_MS);
       if (rule.until && occ > rule.until) return null;
       if (rule.count && n >= rule.count) return null;
       if (occ >= now) return occ;
-      occ = new Date(occ.getTime() + stepMs);
-      n++;
     }
     return null;
   }
 
   if (rule.freq === "MONTHLY" || rule.freq === "YEARLY") {
     const monthsStep = rule.freq === "MONTHLY" ? rule.interval : rule.interval * 12;
-    let occ = new Date(dtstartUtc.getTime());
-    let n = 0;
-    for (let iter = 0; iter < maxIterations; iter++) {
+    for (let n = 0; n < maxIterations; n++) {
+      const occ = at(Date.UTC(p.y, p.mo - 1 + n * monthsStep, p.da));
       if (rule.until && occ > rule.until) return null;
       if (rule.count && n >= rule.count) return null;
       if (occ >= now) return occ;
-      const next = new Date(occ.getTime());
-      next.setUTCMonth(next.getUTCMonth() + monthsStep);
-      occ = next;
-      n++;
     }
     return null;
   }
@@ -432,16 +446,18 @@ function nextRecurrenceOccurrence(dtstartUtc, rrule, now) {
   return null;
 }
 
-function countWeeklyOccurrencesUpTo(dtstartUtc, dayNums, interval, occ) {
-  const weekStart0 = addUtcDays(dtstartUtc, -dtstartUtc.getUTCDay());
+// Count weekly occurrences from dtstart's local day up to and including occDay.
+function countWeeklyOccurrencesUpTo(baseDay, dayNums, interval, occDay) {
+  const DAY_MS = 86400000;
+  const weekStart0 = baseDay - new Date(baseDay).getUTCDay() * DAY_MS;
   let count = 0;
   for (let weekIndex = 0; ; weekIndex++) {
-    const weekStart = addUtcDays(weekStart0, weekIndex * 7 * interval);
-    if (weekStart > occ) break;
+    const weekStart = weekStart0 + weekIndex * 7 * interval * DAY_MS;
+    if (weekStart > occDay) break;
     for (const dn of dayNums) {
-      const d = addUtcDays(weekStart, dn);
-      if (d < dtstartUtc) continue;
-      if (d > occ) break;
+      const d = weekStart + dn * DAY_MS;
+      if (d < baseDay) continue;
+      if (d > occDay) break;
       count++;
     }
   }
@@ -783,7 +799,7 @@ async function fetchExistingEvents() {
     return JSON.parse(fs.readFileSync(SANITY_SNAPSHOT, "utf8"));
   }
   return sanityQuery(
-    '*[_type=="event"]{_id,title,slug,startDateTime,endDateTime,googleCalendarEventId,eventType,recurring,recurringLabel,recurringBaseTitle,body,neverHighlighted,"relatedArtistRefs":relatedArtists[]._ref,calendarSyncTitleEn,calendarSyncTitleAr,calendarSyncBodyEn,calendarSyncBodyAr}'
+    '*[_type=="event"]{_id,title,slug,startDateTime,endDateTime,googleCalendarEventId,eventType,recurring,recurringLabel,recurringBaseTitle,separateEpisodes,episodeIdsCreated,location,admissionType,registerUrl,streamChannel,colorTheme,body,neverHighlighted,"relatedArtistRefs":relatedArtists[]._ref,calendarSyncTitleEn,calendarSyncTitleAr,calendarSyncBodyEn,calendarSyncBodyAr}'
   );
 }
 
@@ -860,11 +876,133 @@ async function fetchIcsText() {
 }
 
 // ---------------------------------------------------------------------------
+// Episode series — a recurring calendar event whose Sanity doc has
+// "Each occurrence is its own episode" ticked (field `separateEpisodes`).
+//
+// Instead of ONE doc that keeps rolling to the next date (and gets its
+// title reset), every occurrence is its own `event` doc, so each episode has
+// its own title / guest / image / text / artists that nothing ever resets.
+//  - The existing doc becomes the episode for the date it currently holds
+//    and stops moving (and is switched to recurring:false).
+//  - The next EPISODES_AHEAD occurrences each get a doc, created once with
+//    the series' default title + the calendar's description, id
+//    "<slug>-<YYYY-MM-DD>", googleCalendarEventId "<calendar uid>_<YYYYMMDD>".
+//  - After creation the sync never touches an episode again (title, time,
+//    image, artists are all the editor's). A created episode that is later
+//    deleted in Studio is NOT recreated (ids are remembered on the series doc
+//    in `episodeIdsCreated`).
+//  - Past episodes simply stay as ordinary past events (archive).
+// ---------------------------------------------------------------------------
+const EPISODES_AHEAD = 4;
+
+function planEpisodeSeries({ ev, master, gcalId, enTitle, arTitle, enBody, arBody, now, existingDocs, byGcalId, matchedDocIds, mutations, actions }) {
+  matchedDocIds.add(master._id);
+  const masterDate = master.startDateTime ? calendarDate(master.startDateTime) : null;
+  const baseEn = ((master.recurringBaseTitle && master.recurringBaseTitle.en) || enTitle || "").trim();
+  // Arabic default title: the series' own default, else the calendar's, else the
+  // series doc's current Arabic title — but only if its English title is still
+  // the calendar's (i.e. not yet turned into one episode's special title).
+  const masterTitleUntouched = !!master.title?.en && master.title.en === master.calendarSyncTitleEn;
+  const baseAr = ((master.recurringBaseTitle && master.recurringBaseTitle.ar) || arTitle || (masterTitleUntouched ? master.title?.ar : "") || "").trim();
+  const rememberedIds = new Set(master.episodeIdsCreated || []);
+  const durationMs = ev.dtend ? ev.dtend.utc.getTime() - ev.dtstart.utc.getTime() : null;
+
+  const newEpisodeIds = [];
+  const creates = [];
+  let from = hebronWeekFloorUtc(now);
+  const horizon = addUtcDays(now, WINDOW_FUTURE_DAYS);
+  let considered = 0;
+  for (let guard = 0; guard < 50 && considered < EPISODES_AHEAD; guard++) {
+    const occ = nextRecurrenceOccurrence(ev.dtstart.utc, ev.rrule, from);
+    if (!occ || occ > horizon) break;
+    from = new Date(occ.getTime() + 1000);
+    const startIso = utcToHebronIso(occ);
+    const endIso = durationMs != null ? utcToHebronIso(new Date(occ.getTime() + durationMs)) : null;
+    const dateKey = calendarDate(startIso);
+    if (dateKey === masterDate) continue; // the series doc itself is this episode
+    considered++;
+
+    const instanceId = `${gcalId}_${dateKey.replace(/-/g, "")}`;
+    const existing = byGcalId.get(instanceId);
+    if (existing) {
+      matchedDocIds.add(existing._id);
+      actions.push({ action: "OK", id: existing._id, title: existing.title?.en || baseEn, date: dateKey, notes: "episode exists (left as the editor has it)" });
+      continue;
+    }
+    if (rememberedIds.has(instanceId)) {
+      actions.push({ action: "OK", id: instanceId, title: baseEn, date: dateKey, notes: "episode was created before and removed in Studio — not recreating" });
+      continue;
+    }
+    // A hand-made doc for this date with a matching title: adopt it rather than duplicate.
+    const hand = existingDocs.find(
+      (d) => d._id !== master._id && !d.googleCalendarEventId && d.startDateTime && calendarDate(d.startDateTime) === dateKey && titlesLikelyMatch(d.title?.en, baseEn)
+    );
+    if (hand) {
+      matchedDocIds.add(hand._id);
+      mutations.push({ patch: { id: hand._id, set: { googleCalendarEventId: instanceId } } });
+      newEpisodeIds.push(instanceId);
+      actions.push({ action: "ADOPT+PATCH", id: hand._id, title: hand.title?.en || baseEn, date: dateKey, notes: `existing hand-made doc adopted as this episode (googleCalendarEventId=${instanceId})` });
+      continue;
+    }
+
+    const docId = `${slugify(baseEn) || "episode"}-${dateKey}`;
+    const doc = {
+      _id: docId,
+      _type: "event",
+      title: { _type: "localeString", en: baseEn, ar: baseAr || undefined },
+      slug: { _type: "slug", current: docId },
+      eventType: master.eventType || inferEventType(baseEn),
+      startDateTime: startIso,
+      endDateTime: endIso || undefined,
+      recurring: false,
+      googleCalendarEventId: instanceId,
+      body: enBody || arBody ? { _type: "localeText", en: enBody || undefined, ar: arBody || undefined } : undefined,
+      // Series-wide settings carried over; everything episode-specific
+      // (subtitle, cover, artists, short description) starts empty.
+      location: master.location || undefined,
+      admissionType: master.admissionType || undefined,
+      registerUrl: master.registerUrl || undefined,
+      streamChannel: master.streamChannel || undefined,
+      colorTheme: master.colorTheme || undefined,
+    };
+    for (const k of Object.keys(doc)) if (doc[k] === undefined) delete doc[k];
+    creates.push(doc);
+    newEpisodeIds.push(instanceId);
+    actions.push({ action: "CREATE", id: docId, title: baseEn, date: dateKey, notes: `new episode of the series (${instanceId})` });
+  }
+
+  for (const doc of creates) mutations.push({ createIfNotExists: doc });
+
+  // The series doc: stop being the "rolling" recurring doc, remember the ids we created.
+  const masterPatch = { id: master._id };
+  const set = {};
+  if (master.recurring) set.recurring = false;
+  if (Object.keys(set).length) masterPatch.set = set;
+  if (newEpisodeIds.length) {
+    masterPatch.setIfMissing = { episodeIdsCreated: [] };
+    masterPatch.insert = { after: "episodeIdsCreated[-1]", items: newEpisodeIds };
+  }
+  if (masterPatch.set || masterPatch.insert) {
+    mutations.push({ patch: masterPatch });
+    actions.push({
+      action: "PATCH",
+      id: master._id,
+      title: master.title?.en || baseEn,
+      date: masterDate || "-",
+      notes: `episode series: kept as the ${masterDate || "current"} episode${set.recurring === false ? ", recurring switched off" : ""}${newEpisodeIds.length ? `, +${newEpisodeIds.length} episode id(s) remembered` : ""}`,
+    });
+  } else {
+    actions.push({ action: "OK", id: master._id, title: master.title?.en || baseEn, date: masterDate || "-", notes: "episode series: nothing to do" });
+  }
+}
+
+// ---------------------------------------------------------------------------
 // Main
 // ---------------------------------------------------------------------------
 
 async function main() {
-  const now = new Date();
+  // Test-only: WC_SYNC_NOW=<ISO instant> pins the clock for dry-run fixtures.
+  const now = process.env.WC_SYNC_NOW ? new Date(process.env.WC_SYNC_NOW) : new Date();
   const windowStart = addUtcDays(now, -WINDOW_PAST_DAYS);
   const windowEnd = addUtcDays(now, WINDOW_FUTURE_DAYS);
 
@@ -976,7 +1114,8 @@ async function main() {
     // reported 2026-08-03 (fixed by removing her artist doc + the 6
     // relatedArtists links by hand in Sanity; this guard stops it from
     // recurring on the next sync run).
-    const skipArtistDetection = eventType === "Class" || eventType === "Workshop";
+    const isEpisodeSeries = !!(ev.rrule && byGcalId.get(gcalId)?.separateEpisodes);
+    const skipArtistDetection = eventType === "Class" || eventType === "Workshop" || isEpisodeSeries;
     const artistRef = skipArtistDetection
       ? null
       : resolveArtistRef(artistNameEn, artistBioEn, artistNameAr, artistBioAr, existingArtists, mutations, actions);
@@ -994,6 +1133,11 @@ async function main() {
         adopted = true;
         adoptionCandidates.splice(candidateIdx, 1); // don't adopt the same doc twice in one run
       }
+    }
+
+    if (doc && !adopted && isRecurring && doc.separateEpisodes) {
+      planEpisodeSeries({ ev, master: doc, gcalId, enTitle, arTitle, enBody, arBody, now, existingDocs, byGcalId, matchedDocIds, mutations, actions });
+      continue;
     }
 
     if (doc) {
