@@ -91,7 +91,22 @@ function lastSaturdayOfMonth(year, monthIndex0) {
   return d; // UTC midnight of the last Saturday
 }
 
+const _hebronFmt = (() => {
+  try {
+    return new Intl.DateTimeFormat("en-US", { timeZone: "Asia/Hebron", timeZoneName: "longOffset" });
+  } catch { return null; }
+})();
+
 function hebronOffsetMinutes(utcDate) {
+  // Prefer the real tz database: Palestine's change dates are set yearly
+  // (2026: 24 Oct, not the last Saturday), so the fixed rule below drifts.
+  if (_hebronFmt) {
+    try {
+      const part = _hebronFmt.formatToParts(utcDate).find((x) => x.type === "timeZoneName")?.value || "";
+      const m = part.match(/GMT([+-])(\d{2}):(\d{2})/);
+      if (m) return (m[1] === "-" ? -1 : 1) * (+m[2] * 60 + +m[3]);
+    } catch { /* fall through */ }
+  }
   const year = utcDate.getUTCFullYear();
   const dstStart = lastSaturdayOfMonth(year, 2); // March
   dstStart.setUTCHours(0, 0, 0, 0); // rule fires at 02:00 local +02:00 = 00:00 UTC
