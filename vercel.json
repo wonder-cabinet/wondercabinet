@@ -40,15 +40,15 @@
   "rewrites": [
     {
       "source": "/events/:slug",
-      "destination": "/event.html?id=:slug"
+      "destination": "/event?id=:slug"
     },
     {
       "source": "/artists/:slug",
-      "destination": "/artist.html?id=:slug"
+      "destination": "/artist?id=:slug"
     },
     {
       "source": "/projects/:slug",
-      "destination": "/project.html?id=:slug"
+      "destination": "/project?id=:slug"
     }
   ]
 }
