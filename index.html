@@ -12,7 +12,7 @@
 <meta property="og:url" content="https://wondercabinet.space">
 <meta property="og:image" content="" id="og-image-meta">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="stylesheet" href="assets/app.css?v=119">
+<link rel="stylesheet" href="assets/app.css?v=120">
 </head>
 <body data-view="list">
 
@@ -1289,6 +1289,7 @@ function _gsEventCard(ev){
         <span class="en-only">${ev.title}</span>
         <span class="ar-only ar" dir="rtl">${ev.titleAr || ev.title}</span>
       </h3>
+      ${ev.featuredUpcoming && ev.location ? `<div class="gs-c-meta gs-c-where">${ev.location}</div>` : ""}
       ${ev.shortDesc ? `<p class="gs-c-desc">
         <span class="en-only">${ev.shortDesc}</span>
         ${ev.shortDescAr ? `<span class="ar-only ar" dir="rtl">${ev.shortDescAr}</span>` : ""}
@@ -3286,8 +3287,21 @@ async function _boot(){
     window.__WC_ABOUT = (result && result.about) || null;
 
     ALL = ((result && result.events) || []).map(doc => {
-      const s = _iso(doc.startDateTime), e = _iso(doc.endDateTime);
-      const hasTime = doc.startDateTime && (+doc.startDateTime.slice(11,13) || +doc.startDateTime.slice(14,16));
+      // Events outside Bethlehem (Studio: "Time zone") carry the venue's own
+      // zone. Shift the instant so its local fields read as the venue's wall
+      // clock (20:00 in Utrecht stays 20:00 for every visitor, same day/date).
+      const tz = (doc.timezone || '').trim();
+      const _tzShift = (d) => {
+        if (!d || !tz) return d;
+        try {
+          const p = Object.fromEntries(new Intl.DateTimeFormat('en-GB', { timeZone: tz, year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit', second:'2-digit', hourCycle:'h23' }).formatToParts(d).map(x => [x.type, x.value]));
+          return new Date(+p.year, +p.month - 1, +p.day, +p.hour, +p.minute, +p.second);
+        } catch { return d; }
+      };
+      const s = _tzShift(_iso(doc.startDateTime)), e = _tzShift(_iso(doc.endDateTime));
+      const hasTime = tz && s
+        ? !!(s.getHours() || s.getMinutes())
+        : doc.startDateTime && (+doc.startDateTime.slice(11,13) || +doc.startDateTime.slice(14,16));
       // location is now a reference doc; fall back to string for legacy events
       const locationName = typeof doc.location === 'object' && doc.location !== null
         ? (doc.location.name || '')
@@ -3309,7 +3323,7 @@ async function _boot(){
         monthFull:  s ? MFULL[s.getMonth()] : '',
         dayOrdinal: s ? _ordinal(s.getDate()) : '',
         start:    hasTime ? s.toTimeString().slice(0,5) : '',
-        end:      doc.endDateTime && (+doc.endDateTime.slice(11,13)||+doc.endDateTime.slice(14,16)) ? e.toTimeString().slice(0,5) : '',
+        end:      e && (tz ? (e.getHours()||e.getMinutes()) : (+doc.endDateTime.slice(11,13)||+doc.endDateTime.slice(14,16))) ? e.toTimeString().slice(0,5) : '',
         // Full end DATE (not just the time) — long-running things like
         // exhibitions span weeks, and "is this on view right now?" needs
         // the real closing date, not the start date.
@@ -3320,6 +3334,7 @@ async function _boot(){
         recurring: !!doc.recurring,
         neverHighlighted: !!doc.neverHighlighted,
         featuredUpcoming: !!doc.featuredUpcoming,
+        timezone: tz,
         recurringLabel:   doc.recurringLabel?.en || '',
         recurringLabelAr: doc.recurringLabel?.ar || '',
         status:   doc.status || 'upcoming',

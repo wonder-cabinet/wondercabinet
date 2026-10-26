@@ -3575,3 +3575,5 @@ html[data-lang="ar"] .about-kicker{ text-align: right; direction: rtl; }
   .gs-card-upnext{ flex: none; height: auto; min-height: 0; }
   .gs-card-upnext .gs-card-inner{ padding: 20px 24px; }
 }
+
+.gs-c-where{ margin-top: 10px; }
