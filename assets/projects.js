@@ -49,7 +49,7 @@
     "editions":*[_type=="residency"&&project._ref==^._id]|order(year desc, startDate desc){title,subtitle,"slug":slug.current,year,status,location,startDate,endDate,type,description,coverImage,
       "artists":artists[]->{"n":name,"slug":slug.current},"artworks":artworks[]->{title,"slug":slug.current}},
     "events":*[_type=="event"&&relatedProject._ref==^._id]|order(startDateTime desc){title,subtitle,"slug":slug.current,startDateTime,eventType,location,shortDescription},
-    "artworks":artworks[]->{title,"slug":slug.current,year,description,"artists":artist[]->{"n":name,"slug":slug.current}},
+    "artworks":artworks[]->{title,"slug":slug.current,year,description,documentation,"artists":artist[]->{"n":name,"slug":slug.current}},
     "artists":artists[]->{"n":name,"slug":slug.current}}`);
   if(!p){root.innerHTML=`<h1>Project not found.</h1><p><a href="projects.html">← All projects</a></p>`;return;}
   const tEn=(p.title&&(p.title.en||p.title.ar))||'Project';
@@ -83,7 +83,7 @@
         ${(r.artworks||[]).filter(Boolean).length?`<p style="font-size:14px"><b>Works</b> ${(r.artworks||[]).filter(Boolean).map(a=>L(a.title)).join(', ')}</p>`:''}
       </div></details>`).join('');
   const awHtml=(p.artworks||[]).filter(Boolean).map(a=>`<div class="pj-art"><h3>${L(a.title)}</h3>
-      <div style="font-size:13px;opacity:.75" class="pj-names">${names(a.artists)}${a.year?` · ${a.year}`:''}</div>${a.description?`<div class="pj-text" style="font-size:14px">${paras(a.description)}</div>`:''}</div>`).join('');
+      <div style="font-size:13px;opacity:.75" class="pj-names">${names(a.artists)}${a.year?` · ${a.year}`:''}</div>${a.description?`<div class="pj-text" style="font-size:14px">${paras(a.description)}</div>`:''}${a.documentation?`<p style="margin-top:12px"><a href="${esc(a.documentation)}" target="_blank" rel="noopener" style="color:inherit;font-weight:700"><span class="en-only">Listen / buy →</span><span class="ar-only ar" dir="rtl">← استمع / اشترِ</span></a></p>`:''}</div>`).join('');
   const kids=(p.children||[]).map(c=>`<a class="pj-row" href="project.html?id=${encodeURIComponent(c.slug)}"><span class="d">${c.year||''}</span><span class="t">${L(c.title)}</span><span class="a">→</span></a>`).join('');
   root.innerHTML=`
     <p style="font-size:13px;margin:0 0 20px"><a href="projects.html" style="color:inherit">← <span class="en-only">All projects</span><span class="ar-only ar">كل المشاريع</span></a>${p.parent?` · <a style="color:inherit" href="project.html?id=${encodeURIComponent(p.parent.slug)}">${L(p.parent.title)}</a>`:''}</p>
