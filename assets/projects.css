@@ -33,3 +33,9 @@
 .pj-names a{color:inherit}
 .pj-art{border-top:1px solid color-mix(in srgb,var(--ink) 30%,transparent);padding:16px 0;max-width:46em}
 .pj-art h3{margin:0 0 4px;font-size:20px;font-weight:500}.pj-art p{font-size:14px;line-height:1.6;margin:6px 0 0}
+
+.pj-player{width:100%;max-width:700px;height:472px;border:0;display:block;margin:20px 0 0}
+.pj-buy{display:flex;align-items:center;justify-content:space-between;max-width:700px;margin-top:12px;padding:14px 20px;border:1px solid var(--ink);color:var(--ink);text-decoration:none;font-size:18px;position:relative;overflow:hidden;isolation:isolate;transition:color .5s cubic-bezier(.4,0,0,1)}
+.pj-buy::before{content:"";position:absolute;inset:0;z-index:-1;background:var(--ink);transform:scaleY(0);transform-origin:50% 100%;transition:transform .6s cubic-bezier(.4,0,0,1)}
+.pj-buy:hover{color:var(--bg)}.pj-buy:hover::before{transform:scaleY(1)}
+.pj-album{max-width:none}

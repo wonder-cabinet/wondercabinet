@@ -26,7 +26,7 @@ export const artwork = defineType({
       type: 'array',
       of: [{type: 'string'}],
       options: {
-        list: ['Installation', 'Sound Art', 'Video', 'Photography', 'Sculpture', 'Performance', 'Drawing', 'Painting', 'Mixed Media'],
+        list: ['Installation', 'Sound Art', 'Video', 'Photography', 'Sculpture', 'Performance', 'Drawing', 'Painting', 'Mixed Media', 'Album', 'Game'],
       },
     }),
     defineField({name: 'dimensions', title: 'Dimensions', type: 'string'}),
@@ -45,7 +45,13 @@ export const artwork = defineType({
       options: {list: ['Wonder Cabinet', 'Europe', 'Online', 'Other'], layout: 'radio'},
     }),
     defineField({name: 'exhibitionDate', title: 'Exhibition date', type: 'date'}),
-    defineField({name: 'documentation', title: 'Documentation', type: 'url'}),
+    defineField({name: 'documentation', title: 'Link', type: 'url', description: 'Documentation, or for an Album the Bandcamp page where people can buy it.'}),
+    defineField({
+      name: 'bandcampAlbumId',
+      title: 'Bandcamp album ID (in-page player)',
+      type: 'string',
+      description: 'Only for medium "Album" with published tracks. The number in the Bandcamp embed code: bandcamp.com/EmbeddedPlayer/album=THIS-NUMBER. Shows a player on the project page.',
+    }),
     defineField({
       name: 'images',
       title: 'Images',

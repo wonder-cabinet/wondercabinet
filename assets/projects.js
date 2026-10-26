@@ -49,7 +49,7 @@
     "editions":*[_type=="residency"&&project._ref==^._id]|order(year desc, startDate desc){title,subtitle,"slug":slug.current,year,status,location,startDate,endDate,type,description,coverImage,
       "artists":artists[]->{"n":name,"slug":slug.current},"artworks":artworks[]->{title,"slug":slug.current}},
     "events":*[_type=="event"&&relatedProject._ref==^._id]|order(startDateTime desc){title,subtitle,"slug":slug.current,startDateTime,eventType,location,shortDescription},
-    "artworks":artworks[]->{title,"slug":slug.current,year,description,documentation,"artists":artist[]->{"n":name,"slug":slug.current}},
+    "artworks":artworks[]->{title,"slug":slug.current,year,description,documentation,bandcampAlbumId,medium,"artists":artist[]->{"n":name,"slug":slug.current}},
     "artists":artists[]->{"n":name,"slug":slug.current}}`);
   try{if(p&&new URLSearchParams(location.search).has('id'))history.replaceState(null,'','/projects/'+encodeURIComponent(id)+location.hash);}catch(_){}
   if(!p){root.innerHTML=`<h1>Project not found.</h1><p><a href="/projects">← All projects</a></p>`;return;}
@@ -83,8 +83,17 @@
         ${(r.artists||[]).filter(Boolean).length?`<p class="pj-names" style="font-size:14px;margin-top:16px"><b>Artists</b> ${names((r.artists||[]).filter(Boolean))}</p>`:''}
         ${(r.artworks||[]).filter(Boolean).length?`<p style="font-size:14px"><b>Works</b> ${(r.artworks||[]).filter(Boolean).map(a=>L(a.title)).join(', ')}</p>`:''}
       </div></details>`).join('');
-  const awHtml=(p.artworks||[]).filter(Boolean).map(a=>`<div class="pj-art"><h3>${L(a.title)}</h3>
-      <div style="font-size:13px;opacity:.75" class="pj-names">${names(a.artists)}${a.year?` · ${a.year}`:''}</div>${a.description?`<div class="pj-text" style="font-size:14px">${paras(a.description)}</div>`:''}${a.documentation?`<p style="margin-top:12px"><a href="${esc(a.documentation)}" target="_blank" rel="noopener" style="color:inherit;font-weight:700"><span class="en-only">Listen / buy →</span><span class="ar-only ar" dir="rtl">← استمع / اشترِ</span></a></p>`:''}</div>`).join('');
+  const isAlbum=a=>(a.medium||[]).includes('Album');
+  const works=(p.artworks||[]).filter(Boolean);
+  const awCard=a=>`<div class="pj-art"><h3>${L(a.title)}</h3>
+      <div style="font-size:13px;opacity:.75" class="pj-names">${names(a.artists)}${a.year?` · ${a.year}`:''}</div>${a.description?`<div class="pj-text" style="font-size:14px">${paras(a.description)}</div>`:''}${a.documentation?`<p style="margin-top:12px"><a href="${esc(a.documentation)}" target="_blank" rel="noopener" style="color:inherit;font-weight:700"><span class="en-only">Link →</span><span class="ar-only ar" dir="rtl">← رابط</span></a></p>`:''}</div>`;
+  const albumCard=a=>`<div class="pj-art pj-album"><h3>${L(a.title)}</h3>
+      <div style="font-size:13px;opacity:.75" class="pj-names">${names(a.artists)}${a.year?` · ${a.year}`:''}</div>
+      ${a.bandcampAlbumId?`<iframe class="pj-player" title="Listen" loading="lazy" src="https://bandcamp.com/EmbeddedPlayer/album=${encodeURIComponent(a.bandcampAlbumId)}/size=large/bgcol=f6f3ea/linkcol=1d24ff/tracklist=true/artwork=small/transparent=true/" seamless></iframe>`:''}
+      ${a.documentation?`<a class="pj-buy" href="${esc(a.documentation)}" target="_blank" rel="noopener"><span class="en-only">Get the album on Bandcamp →</span><span class="ar-only ar" dir="rtl">← احصل على الألبوم على باندكامب</span></a>`:''}
+      ${a.description?`<div class="pj-text" style="font-size:14px;margin-top:18px">${paras(a.description)}</div>`:''}</div>`;
+  const albumsHtml=works.filter(isAlbum).map(albumCard).join('');
+  const awHtml=works.filter(a=>!isAlbum(a)).map(awCard).join('');
   const kids=(p.children||[]).map(c=>`<a class="pj-row" href="/projects/${encodeURIComponent(c.slug)}"><span class="d">${c.year||''}</span><span class="t">${L(c.title)}</span><span class="a">→</span></a>`).join('');
   root.innerHTML=`
     <p style="font-size:13px;margin:0 0 20px"><a href="/projects" style="color:inherit">← <span class="en-only">All projects</span><span class="ar-only ar">كل المشاريع</span></a>${p.parent?` · <a style="color:inherit" href="/projects/${encodeURIComponent(p.parent.slug)}">${L(p.parent.title)}</a>`:''}</p>
@@ -98,6 +107,7 @@
     ${kids?`<section class="pj-sec"><h2><span class="en-only">Related projects</span><span class="ar-only ar" dir="rtl">مشاريع مرتبطة</span></h2>${kids}</section>`:''}
     ${blocks?`<section class="pj-sec">${blocks}</section>`:''}
     ${(p.artists||[]).filter(Boolean).length?`<section class="pj-sec"><h2><span class="en-only">Artists</span><span class="ar-only ar" dir="rtl">الفنانون</span></h2><p class="pj-names pj-text" style="font-size:clamp(20px,2.4vw,32px);line-height:1.35">${names((p.artists||[]).filter(Boolean))}</p></section>`:''}
+    ${albumsHtml?`<section class="pj-sec"><h2><span class="en-only">Album</span><span class="ar-only ar" dir="rtl">ألبوم</span></h2>${albumsHtml}</section>`:''}
     ${awHtml?`<section class="pj-sec"><h2><span class="en-only">Artworks</span><span class="ar-only ar" dir="rtl">الأعمال</span></h2>${awHtml}</section>`:''}`;
   }catch(err){console.warn('[WC] projects',err);root.innerHTML='<p>Could not load projects right now.</p>';}
 })();
