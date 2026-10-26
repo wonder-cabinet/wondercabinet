@@ -12,7 +12,7 @@
 <meta property="og:url" content="https://wondercabinet.space">
 <meta property="og:image" content="" id="og-image-meta">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="stylesheet" href="assets/app.css?v=120">
+<link rel="stylesheet" href="assets/app.css?v=121">
 </head>
 <body data-view="list">
 
@@ -34,6 +34,7 @@
     </a>
     <nav class="tpb-nav">
       <a href="#programme"><span class="en-only">Programme</span><span class="ar-only ar">البرنامج</span></a>
+      <a href="projects.html"><span class="en-only">Projects</span><span class="ar-only ar">مشاريع</span></a>
       <a href="/bar"><span class="en-only">Bar</span><span class="ar-only ar">بار</span></a>
       <a href="#" id="tb-archive" hidden><span class="en-only">Archive</span><span class="ar-only ar">الأرشيف</span></a>
       <div class="lang-toggle" role="group" aria-label="Language">
@@ -73,7 +74,7 @@
   </div>
 
   <section class="gs-vsection" id="gs-projects-section" hidden>
-    <h2><span class="en-only">Featured projects</span><span class="ar-only ar" dir="rtl">مشاريع مميزة</span></h2>
+    <h2><a href="projects.html" style="color:inherit;text-decoration:none"><span class="en-only">Featured projects →</span><span class="ar-only ar" dir="rtl">← مشاريع مميزة</span></a></h2>
     <div class="gs-marquee-wrap"><div class="gs-marquee" id="gs-marquee-projects"></div></div>
   </section>
 
@@ -1151,10 +1152,7 @@ function initStickyMonths(){
    Everything here is driven only by native scroll position —
    nothing animates on its own.
    ============================================================ */
-const PROJECT_PAGES = {
-  "sounds-of-places": "project-light.html",
-  "bethlehem-christmas-in-mourning": "project-dark.html",
-};
+const PROJECT_PAGES = {};
 function _gsWeekEvents(start){
   const end = new Date(start); end.setDate(start.getDate() + 6); end.setHours(23,59,59,999);
   return ALL.filter(ev => {
@@ -2996,7 +2994,7 @@ function renderFeatured(){
       ? `<span class="en-only">${evs.length} linked ${evs.length === 1 ? "event" : "events"}</span><span class="ar-only ar" dir="rtl">${arNum(evs.length)} فعاليات مرتبطة</span>`
       : `<span class="en-only">${p.year || ""}</span>`;
     link.innerHTML = `<span class="en-only">View project →</span><span class="ar-only ar" dir="rtl">← عرض المشروع</span>`;
-    link.href = PROJECT_PAGES[p.slug] || "#gscroll";
+    link.href = PROJECT_PAGES[p.slug] || (p.slug ? "project.html?id=" + encodeURIComponent(p.slug) : "projects.html");
     const archiveLinkP = document.getElementById("gs-archive-link");
     if (archiveLinkP) archiveLinkP.hidden = true;
     track.innerHTML = evs.length
@@ -3100,7 +3098,7 @@ function renderFeatured(){
   if (PROJECTS.length){
     projectsSection.hidden = false;
     marqueeProjects.innerHTML = PROJECTS.map(p => {
-      const href = PROJECT_PAGES[p.slug] || "#gscroll";
+      const href = PROJECT_PAGES[p.slug] || (p.slug ? "project.html?id=" + encodeURIComponent(p.slug) : "projects.html");
       return `<a class="gs-m-card" href="${href}">
         <h3 class="gs-m-title">${p.title}</h3>
         <span class="gs-m-sub">${p.year || ""}</span>
