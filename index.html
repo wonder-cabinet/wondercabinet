@@ -12,7 +12,7 @@
 <meta property="og:url" content="https://wondercabinet.space">
 <meta property="og:image" content="" id="og-image-meta">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="stylesheet" href="assets/app.css?v=118">
+<link rel="stylesheet" href="assets/app.css?v=119">
 </head>
 <body data-view="list">
 
@@ -2967,7 +2967,20 @@ function renderFeatured(){
     const secondaryHtml = secondaryEvs.length
       ? _gsListCard(secondaryEvs, "Also happening this week", "يحدث أيضاً هذا الأسبوع", secondaryBgVideoEv)
       : "";
-    track.innerHTML = mainHtml + secondaryHtml;
+    // "Coming up" — future events an editor ticked "Feature on homepage" on
+    // in Studio. The rail simply continues past this week into a narrow
+    // divider card followed by those events as normal cards (same cover /
+    // video / reader behaviour). Anything already shown above, or already
+    // over, is skipped; up to 6, soonest first.
+    const shownIds = new Set(evs.map(ev => ev.id).concat(secondaryIds));
+    const comingEvs = ALL
+      .filter(ev => ev.featuredUpcoming && !shownIds.has(ev.id) && !_gsHasElapsed(ev))
+      .sort((a,b) => eventTimestamp(a) - eventTimestamp(b))
+      .slice(0, 6);
+    const comingHtml = comingEvs.length
+      ? `<div class="gs-card gs-card-upnext" aria-hidden="true"><div class="gs-card-inner"><div class="gs-c-meta"><span class="en-only">Selected</span><span class="ar-only ar" dir="rtl">مختارة</span></div><h3 class="gs-c-title"><span class="en-only">Coming up →</span><span class="ar-only ar" dir="rtl">← قريباً</span></h3></div></div>` + comingEvs.map(_gsEventCard).join("")
+      : "";
+    track.innerHTML = mainHtml + secondaryHtml + comingHtml;
   }
 
   function renderProjectMode(){
@@ -3306,6 +3319,7 @@ async function _boot(){
         location: locationName,
         recurring: !!doc.recurring,
         neverHighlighted: !!doc.neverHighlighted,
+        featuredUpcoming: !!doc.featuredUpcoming,
         recurringLabel:   doc.recurringLabel?.en || '',
         recurringLabelAr: doc.recurringLabel?.ar || '',
         status:   doc.status || 'upcoming',

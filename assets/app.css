@@ -3564,3 +3564,14 @@ html[data-lang="ar"] .about-kicker{ text-align: right; direction: rtl; }
   .about-home{ min-height: 0; }
   .about-inner{ padding: 48px 24px; }
 }
+
+/* "Coming up" divider in the This Week rail (homepage): a narrow card that
+   introduces the hand-picked future events appended after this week's. */
+.gs-card-upnext{ flex: 0 0 min(300px, 70vw); background: var(--gs-fg); color: var(--gs-bg); }
+.gs-card-upnext .gs-card-inner{ justify-content: flex-end; }
+.gs-card-upnext .gs-c-meta,
+.gs-card-upnext .gs-c-title{ color: var(--gs-bg); }
+@media (max-width: 700px){
+  .gs-card-upnext{ flex: none; height: auto; min-height: 0; }
+  .gs-card-upnext .gs-card-inner{ padding: 20px 24px; }
+}

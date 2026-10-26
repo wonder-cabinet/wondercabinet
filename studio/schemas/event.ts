@@ -91,6 +91,13 @@ export const event = defineType({
       type: 'boolean',
       initialValue: false,
     }),
+    defineField({
+      name: 'featuredUpcoming',
+      title: 'Feature on homepage ("Coming up")',
+      description: 'Shows this event as a full card on the homepage, right after "This week", under a "Coming up" divider. Use it to pick out future events worth announcing early. Cards are ordered by date, up to 6, and drop off automatically once the event is over.',
+      type: 'boolean',
+      initialValue: false,
+    }),
     defineField({name: 'recurring', title: 'Recurring', type: 'boolean', initialValue: false}),
     defineField({name: 'recurringLabel', title: 'Recurring label', type: 'localeString', description: 'e.g. "Every Tuesday"'}),
     defineField({
