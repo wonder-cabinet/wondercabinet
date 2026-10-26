@@ -13,7 +13,7 @@
 <meta property="og:image" content="" id="og-image-meta">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="stylesheet" href="assets/app.css?v=121">
-<link rel="stylesheet" href="assets/hover.css?v=2" />
+<link rel="stylesheet" href="assets/hover.css?v=4" />
 </head>
 <body data-view="list">
 
@@ -1154,6 +1154,30 @@ function initStickyMonths(){
    nothing animates on its own.
    ============================================================ */
 const PROJECT_PAGES = {};
+// The reader iframe is pointer-events:none (the outer page drives scroll and
+// clicks), so :hover never fires inside it. Mirror hover the same way clicks
+// are mirrored: find what's under the pointer in the same-origin iframe and
+// toggle a .hv class that assets/hover.css treats exactly like :hover.
+function _gsFwdHover(frame, e){
+  try{
+    const doc = frame.contentDocument; if (!doc) return;
+    let t = null;
+    if (e){
+      const r = frame.getBoundingClientRect();
+      const x = e.clientX - r.left, y = e.clientY - r.top;
+      if (x >= 0 && y >= 0 && x <= r.width && y <= r.height){
+        const el = doc.elementFromPoint(x, y);
+        t = el && el.closest("a,button,.ep-register,.ep-nav-btn");
+      }
+    }
+    const prev = frame._hv;
+    if (prev && prev !== t) prev.classList.remove("hv");
+    if (t && t !== prev) t.classList.add("hv");
+    frame._hv = t || null;
+    if (frame.parentElement) frame.parentElement.style.cursor = t ? "pointer" : "";
+  }catch(_){}
+}
+
 function _gsWeekEvents(start){
   const end = new Date(start); end.setDate(start.getDate() + 6); end.setHours(23,59,59,999);
   return ALL.filter(ev => {
@@ -1890,6 +1914,8 @@ function _cxRowOpenReader(rowEl, trackEl){
   window.addEventListener("wheel", onWheel, { passive: false });
   // Capture phase so this runs before any track-level click delegate.
   rowEl.addEventListener("click", onClick, true);
+  rowEl.addEventListener("mousemove", ev => _gsFwdHover(frame, ev), true);
+  rowEl.addEventListener("mouseleave", () => _gsFwdHover(frame, null), true);
 }
 
 function _gsOpenReader(cardEl){
@@ -2205,6 +2231,8 @@ function _gsOpenReader(cardEl){
   // (which would otherwise just no-op on the already-open reader anyway,
   // but capture keeps the forwarding deterministic either way).
   cardEl.addEventListener("click", onClick, true);
+  cardEl.addEventListener("mousemove", ev => _gsFwdHover(frame, ev), true);
+  cardEl.addEventListener("mouseleave", () => _gsFwdHover(frame, null), true);
 }
 
 /* ---------- MOBILE IN-GRID READER ----------

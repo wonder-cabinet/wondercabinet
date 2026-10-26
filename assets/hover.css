@@ -19,29 +19,29 @@ a{ transition: color .2s var(--hv-ease); }
     transform: scaleY(0); transform-origin: 50% 100%;
     transition: transform .4s var(--hv-ease);
   }
-  .topbar:not(.gs-has-issue-bg) .tpb-nav a:hover{ background: transparent; color: var(--bg); }
-  .topbar:not(.gs-has-issue-bg) .tpb-nav a:hover::before{ transform: scaleY(1); }
+  .topbar:not(.gs-has-issue-bg) .tpb-nav a:is(:hover,.hv){ background: transparent; color: var(--bg); }
+  .topbar:not(.gs-has-issue-bg) .tpb-nav a:is(:hover,.hv)::before{ transform: scaleY(1); }
 
   /* Programme rows — the text slides, the row tints */
   .tl-row{ transition: background .4s var(--hv-ease), opacity .4s var(--hv-ease); }
   .tl-prog, .tl-venue{ transition: transform .4s var(--hv-ease); }
-  .tl-row:hover .tl-prog{ transform: translateX(10px); }
-  .tl-row:hover .tl-venue{ transform: translateX(6px); }
-  .tl-row:hover .tl-name{ text-decoration: none; }
+  .tl-row:is(:hover,.hv) .tl-prog{ transform: translateX(10px); }
+  .tl-row:is(:hover,.hv) .tl-venue{ transform: translateX(6px); }
+  .tl-row:is(:hover,.hv) .tl-name{ text-decoration: none; }
   .tl-name{
     background: linear-gradient(currentColor,currentColor) 0 100% / 0 2px no-repeat;
     transition: background-size .4s var(--hv-ease);
     padding-bottom: 2px; width: fit-content;
   }
-  .tl-row:hover .tl-name{ background-size: 100% 2px; }
+  .tl-row:is(:hover,.hv) .tl-name{ background-size: 100% 2px; }
 
   /* Project / event rows on the Projects pages */
   .pj-row .t, .pj-ed summary .t{ transition: transform .4s var(--hv-ease); }
-  .pj-row:hover .t, .pj-ed summary:hover .t{ transform: translateX(10px); }
+  .pj-row:is(:hover,.hv) .t, .pj-ed summary:is(:hover,.hv) .t{ transform: translateX(10px); }
   .pj-row .a, .ep-prog-arrow{ transition: transform .2s var(--hv-ease); display: inline-block; }
-  .pj-row:hover .a, .ep-prog-row:hover .ep-prog-arrow{ transform: translateX(6px); }
+  .pj-row:is(:hover,.hv) .a, .ep-prog-row:is(:hover,.hv) .ep-prog-arrow{ transform: translateX(6px); }
   .ep-prog-name{ transition: transform .4s var(--hv-ease); }
-  .ep-prog-row:hover .ep-prog-name{ transform: translateX(10px); }
+  .ep-prog-row:is(:hover,.hv) .ep-prog-name{ transform: translateX(10px); }
 
   /* Cards — a curtain of ink rises from the bottom, text inverts */
   .pj-card, .gs-m-card{
@@ -54,17 +54,17 @@ a{ transition: color .2s var(--hv-ease); }
     transform: scaleY(0); transform-origin: 50% 100%;
     transition: transform .6s var(--hv-ease);
   }
-  .pj-card:hover, .gs-m-card:hover{ background: transparent; color: var(--bg); }
-  .pj-card:hover::before, .gs-m-card:hover::before{ transform: scaleY(1); }
+  .pj-card:is(:hover,.hv), .gs-m-card:is(:hover,.hv){ background: transparent; color: var(--bg); }
+  .pj-card:is(:hover,.hv)::before, .gs-m-card:is(:hover,.hv)::before{ transform: scaleY(1); }
   .pj-card img{ transition: transform .8s var(--hv-ease); }
-  .pj-card:hover img{ transform: scale(1.04); }
+  .pj-card:is(:hover,.hv) img{ transform: scale(1.04); }
 
   /* This-week / Coming-up rail — photography eases in, no fills (cards carry their own colours) */
   .gs-card{ overflow: hidden; }
   .gs-card-bg-img, .gs-card-bg-video{ transition: transform .9s var(--hv-ease); }
-  .gs-card:hover .gs-card-bg-img, .gs-card:hover .gs-card-bg-video{ transform: scale(1.04); }
+  .gs-card:is(:hover,.hv) .gs-card-bg-img, .gs-card:is(:hover,.hv) .gs-card-bg-video{ transform: scale(1.04); }
   .gs-card .gs-c-title{ transition: transform .4s var(--hv-ease); }
-  .gs-card:hover .gs-c-title{ transform: translateX(6px); }
+  .gs-card:is(:hover,.hv) .gs-c-title{ transform: translateX(6px); }
 
   /* Text links — underline draws left to right */
   .foot-col-body a, .gs-lineup-name, .gs-lineup-all, .pj-names a{
@@ -72,7 +72,7 @@ a{ transition: color .2s var(--hv-ease); }
     transition: background-size .4s var(--hv-ease), color .2s var(--hv-ease);
     text-decoration: none; padding-bottom: 1px;
   }
-  .foot-col-body a:hover, .gs-lineup-name:hover, .gs-lineup-all:hover, .pj-names a:hover{ background-size: 100% 1px; }
+  .foot-col-body a:is(:hover,.hv), .gs-lineup-name:is(:hover,.hv), .gs-lineup-all:is(:hover,.hv), .pj-names a:is(:hover,.hv){ background-size: 100% 1px; }
 
   /* Focus gets the same treatment as hover for keyboard users */
   .tl-row:focus-visible .tl-prog{ transform: translateX(10px); }
@@ -90,12 +90,12 @@ a{ transition: color .2s var(--hv-ease); }
     transform: scaleY(0); transform-origin: 50% 100%;
     transition: transform .6s var(--hv-ease);
   }
-  .ep-register:hover, .ep-register-header:hover, .ep-nav-btn:not(.ep-nav-empty):hover{
+  .ep-register:is(:hover,.hv), .ep-register-header:is(:hover,.hv), .ep-nav-btn:not(.ep-nav-empty):is(:hover,.hv){
     opacity: 1; background: transparent; color: var(--bg, #f9f9f9);
   }
-  .ep-register:not(.ep-register-disabled):hover::before,
-  .ep-register-header:not(.ep-register-disabled):hover::before,
-  .ep-nav-btn:not(.ep-nav-empty):hover::before{ transform: scaleY(1); }
+  .ep-register:not(.ep-register-disabled):is(:hover,.hv)::before,
+  .ep-register-header:not(.ep-register-disabled):is(:hover,.hv)::before,
+  .ep-nav-btn:not(.ep-nav-empty):is(:hover,.hv)::before{ transform: scaleY(1); }
   .ep-register-disabled::before{ display:none; }
   /* artist / related links inside readers */
   .ep-text a, .ep-facts a, .ep-artists a, .ep-sub a, .ep-subtitle a, #arRoot a:not(.ep-prog-row):not(.art-close){
@@ -103,12 +103,12 @@ a{ transition: color .2s var(--hv-ease); }
     transition: background-size .4s var(--hv-ease), color .2s var(--hv-ease);
     text-decoration: none; padding-bottom: 1px;
   }
-  .ep-text a:hover, .ep-facts a:hover, .ep-artists a:hover, .ep-sub a:hover, .ep-subtitle a:hover,
-  #arRoot a:not(.ep-prog-row):not(.art-close):hover{ background-size: 100% 1px; }
+  .ep-text a:is(:hover,.hv), .ep-facts a:is(:hover,.hv), .ep-artists a:is(:hover,.hv), .ep-sub a:is(:hover,.hv), .ep-subtitle a:is(:hover,.hv),
+  #arRoot a:not(.ep-prog-row):not(.art-close):is(:hover,.hv){ background-size: 100% 1px; }
   /* close / pop-out icons: quarter turn like the reference */
   #epClose svg, .art-close{ transition: transform .4s var(--hv-ease); }
-  #epClose:hover svg{ transform: rotate(-90deg); }
-  .art-close:hover{ transform: rotate(-90deg); }
+  #epClose:is(:hover,.hv) svg{ transform: rotate(-90deg); }
+  .art-close:is(:hover,.hv){ transform: rotate(-90deg); }
 }
 
 /* Reduced motion: keep the colour inversion, drop the movement */

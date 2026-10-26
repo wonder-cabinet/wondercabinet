@@ -12,7 +12,7 @@
 <meta property="og:image" content="" id="og-image-meta">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="stylesheet" href="/assets/app.css?v=112" />
-<link rel="stylesheet" href="/assets/hover.css?v=3" />
+<link rel="stylesheet" href="/assets/hover.css?v=4" />
 <style>
   /* This page uses the exact same .ep-* / .event-panel template as every
      other entry point on the site (the homepage hero cards, the Programme
@@ -446,11 +446,11 @@
     const navSuffix = EMBED ? "&embed=1" : "";
     const navBar = `
 <div class="ep-nav">
-  ${prev ? `<a href="/event.html?id=${prev.id}${navSuffix}" class="ep-nav-btn ep-nav-prev">
+  ${prev ? `<a href="${EMBED ? '' : '/'}event.html?id=${prev.id}${navSuffix}" class="ep-nav-btn ep-nav-prev">
     <span class="ep-nav-dir"><span class="en-only">← Prev</span><span class="ar-only ar">التالي →</span></span>
     <span class="ep-nav-name"><span class="en-only">${prev.title}</span><span class="ar-only ar">${prev.titleAr||prev.title}</span></span>
   </a>` : `<div class="ep-nav-btn ep-nav-empty"></div>`}
-  ${next ? `<a href="/event.html?id=${next.id}${navSuffix}" class="ep-nav-btn ep-nav-next">
+  ${next ? `<a href="${EMBED ? '' : '/'}event.html?id=${next.id}${navSuffix}" class="ep-nav-btn ep-nav-next">
     <span class="ep-nav-dir"><span class="en-only">Next →</span><span class="ar-only ar">← السابق</span></span>
     <span class="ep-nav-name"><span class="en-only">${next.title}</span><span class="ar-only ar">${next.titleAr||next.title}</span></span>
   </a>` : `<div class="ep-nav-btn ep-nav-empty"></div>`}
@@ -470,7 +470,7 @@
       }
     }
     const popBtn = EMBED
-      ? `<a class="ep-pop" href="/event.html?id=${encodeURIComponent(ev.id)}" target="_top" aria-label="Open as its own page"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3H3v12h12v-4M10 3h5v5M14 4l-7 7"/></svg></a>`
+      ? `<a class="ep-pop" href="${EMBED ? '' : '/'}event.html?id=${encodeURIComponent(ev.id)}" target="_top" aria-label="Open as its own page"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3H3v12h12v-4M10 3h5v5M14 4l-7 7"/></svg></a>`
       : "";
     const closeBtn = EMBED
       ? `<a class="ep-close" id="epClose" href="/" aria-label="Back"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4l10 10M14 4L4 14"/></svg></a>`
@@ -578,7 +578,7 @@ ${audioBar}
       <span class="ar-only ar" dir="rtl">البرنامج</span>
     </div>
     ${ev.programmeEvents.map(pe => `
-      <a class="ep-prog-row" data-ev="${pe.id}" href="/event.html?id=${pe.id}${navSuffix}">
+      <a class="ep-prog-row" data-ev="${pe.id}" href="${EMBED ? '' : '/'}event.html?id=${pe.id}${navSuffix}">
         <span class="ep-prog-date">${parseInt(pe.day,10)} ${pe.monthFull}</span>
         <span class="ep-prog-type">${pe.type}</span>
         <span class="ep-prog-name">
