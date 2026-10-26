@@ -433,10 +433,11 @@ function buildSeasonBlocks(events){
 
     const months = {};
     inSeason.forEach(e => {
-      months[e.month] = months[e.month] || { key: e.month, evs: [] };
-      months[e.month].evs.push(e);
+      const mk = e.year + '-' + e.month;
+      months[mk] = months[mk] || { key: e.month, year: e.year, evs: [] };
+      months[mk].evs.push(e);
     });
-    const monthList = Object.values(months).sort((a,b) => MONTH_ORDER.indexOf(a.key) - MONTH_ORDER.indexOf(b.key));
+    const monthList = Object.values(months).sort((a,b) => (a.year - b.year) || (MONTH_ORDER.indexOf(a.key) - MONTH_ORDER.indexOf(b.key)));
 
     let yearMarker = "";
     if (prevYear === null) {
@@ -663,7 +664,7 @@ function renderMonth(month, season){
           <span class="ar-only ar" dir="rtl">${MONTH_NAME_AR[month.key]}</span>
         </h3>
         <div class="tl-month-meta">
-          <span class="tl-month-year">${season.year}</span>
+          <span class="tl-month-year">${month.year || season.year}</span>
           <span class="tl-month-count">${String(month.evs.length).padStart(2,"0")}</span>
         </div>
       </div>
