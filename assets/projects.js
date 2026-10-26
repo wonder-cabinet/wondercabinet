@@ -48,7 +48,7 @@
     "children":*[_type=="project"&&parentProject._ref==^._id]{title,subtitle,"slug":slug.current,year,type},
     "editions":*[_type=="residency"&&project._ref==^._id]|order(year desc, startDate desc){title,subtitle,"slug":slug.current,year,status,location,startDate,endDate,type,description,coverImage,
       "artists":artists[]->{"n":name,"slug":slug.current},"artworks":artworks[]->{title,"slug":slug.current}},
-    "events":*[_type=="event"&&relatedProject._ref==^._id]|order(startDateTime desc){title,subtitle,"slug":slug.current,startDateTime,eventType,location,shortDescription},
+    "events":*[_type=="event"&&relatedProject._ref==^._id]|order(startDateTime desc){title,subtitle,"slug":slug.current,startDateTime,eventType,"location":location->name,shortDescription},
     "artworks":artworks[]->{title,"slug":slug.current,year,description,documentation,bandcampAlbumId,medium,"artists":artist[]->{"n":name,"slug":slug.current}},
     "artists":artists[]->{"n":name,"slug":slug.current}}`);
   try{if(p&&new URLSearchParams(location.search).has('id'))history.replaceState(null,'','/projects/'+encodeURIComponent(id)+location.hash);}catch(_){}
