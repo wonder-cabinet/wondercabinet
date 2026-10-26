@@ -6,7 +6,7 @@
 :root{ --hv-ease: cubic-bezier(.4,0,0,1); }
 a{ transition: color .2s var(--hv-ease); }
 
-@media (hover:hover) and (prefers-reduced-motion:no-preference){
+@media (hover:hover){
 
   /* Top nav — fill slides up from the bottom instead of snapping */
   .topbar:not(.gs-has-issue-bg) .tpb-nav a{
@@ -79,7 +79,7 @@ a{ transition: color .2s var(--hv-ease); }
 }
 
 /* ---- Inside pages (event / artist / project readers) ---- */
-@media (hover:hover) and (prefers-reduced-motion:no-preference){
+@media (hover:hover){
   .ep-register, .ep-register-header, .ep-nav-btn:not(.ep-nav-empty){
     position: relative; overflow: hidden; isolation: isolate;
     transition: color .5s var(--hv-ease), border-color .5s var(--hv-ease);
@@ -109,4 +109,12 @@ a{ transition: color .2s var(--hv-ease); }
   #epClose svg, .art-close{ transition: transform .4s var(--hv-ease); }
   #epClose:hover svg{ transform: rotate(-90deg); }
   .art-close:hover{ transform: rotate(-90deg); }
+}
+
+/* Reduced motion: keep the colour inversion, drop the movement */
+@media (prefers-reduced-motion:reduce){
+  .tpb-nav a, .tpb-nav a::before, .pj-card, .pj-card::before, .gs-m-card, .gs-m-card::before,
+  .ep-register, .ep-register::before, .ep-register-header, .ep-register-header::before,
+  .ep-nav-btn, .ep-nav-btn::before{ transition-duration: .01s !important; }
+  .tl-prog, .tl-venue, .pj-row .t, .ep-prog-name, .gs-card .gs-c-title, .gs-card-bg-img{ transform: none !important; }
 }
