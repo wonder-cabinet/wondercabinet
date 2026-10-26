@@ -11,8 +11,8 @@
 <meta property="og:description" content="A space for art production and cultural development in Bethlehem, Palestine." id="og-desc-meta">
 <meta property="og:image" content="" id="og-image-meta">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="stylesheet" href="assets/app.css?v=112" />
-<link rel="stylesheet" href="assets/hover.css?v=2" />
+<link rel="stylesheet" href="/assets/app.css?v=112" />
+<link rel="stylesheet" href="/assets/hover.css?v=3" />
 <style>
   /* This page uses the exact same .ep-* / .event-panel template as every
      other entry point on the site (the homepage hero cards, the Programme
@@ -87,18 +87,18 @@
 
 <header class="topbar">
   <div class="topbar-inner">
-    <a class="tpb-logo" href="index.html">
+    <a class="tpb-logo" href="/">
       <span class="logo" role="img" aria-label="The Wonder Cabinet"></span>
     </a>
     <nav class="tpb-nav">
-      <a href="index.html#programme"><span class="en-only">Programme</span><span class="ar-only ar">البرنامج</span></a>
+      <a href="/#programme"><span class="en-only">Programme</span><span class="ar-only ar">البرنامج</span></a>
       <a href="/bar"><span class="en-only">Bar</span><span class="ar-only ar">بار</span></a>
-      <a href="index.html"><span class="en-only">Archive</span><span class="ar-only ar">الأرشيف</span></a>
+      <a href="/"><span class="en-only">Archive</span><span class="ar-only ar">الأرشيف</span></a>
       <div class="lang-toggle" role="group" aria-label="Language">
         <button data-lang-btn="en" aria-pressed="true">EN</button>
         <button data-lang-btn="ar" aria-pressed="false">AR</button>
       </div>
-      <a id="epClose" href="index.html" aria-label="Close"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M4 4l10 10M14 4L4 14"/></svg></a>
+      <a id="epClose" href="/" aria-label="Close"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M4 4l10 10M14 4L4 14"/></svg></a>
     </nav>
   </div>
 </header>
@@ -108,7 +108,7 @@
 </main>
 
 <footer class="foot" id="visit"></footer>
-<script src="assets/footer.js"></script>
+<script src="/assets/footer.js"></script>
 
 <script>
 (async function(){
@@ -446,11 +446,11 @@
     const navSuffix = EMBED ? "&embed=1" : "";
     const navBar = `
 <div class="ep-nav">
-  ${prev ? `<a href="event.html?id=${prev.id}${navSuffix}" class="ep-nav-btn ep-nav-prev">
+  ${prev ? `<a href="/event.html?id=${prev.id}${navSuffix}" class="ep-nav-btn ep-nav-prev">
     <span class="ep-nav-dir"><span class="en-only">← Prev</span><span class="ar-only ar">التالي →</span></span>
     <span class="ep-nav-name"><span class="en-only">${prev.title}</span><span class="ar-only ar">${prev.titleAr||prev.title}</span></span>
   </a>` : `<div class="ep-nav-btn ep-nav-empty"></div>`}
-  ${next ? `<a href="event.html?id=${next.id}${navSuffix}" class="ep-nav-btn ep-nav-next">
+  ${next ? `<a href="/event.html?id=${next.id}${navSuffix}" class="ep-nav-btn ep-nav-next">
     <span class="ep-nav-dir"><span class="en-only">Next →</span><span class="ar-only ar">← السابق</span></span>
     <span class="ep-nav-name"><span class="en-only">${next.title}</span><span class="ar-only ar">${next.titleAr||next.title}</span></span>
   </a>` : `<div class="ep-nav-btn ep-nav-empty"></div>`}
@@ -470,10 +470,10 @@
       }
     }
     const popBtn = EMBED
-      ? `<a class="ep-pop" href="event.html?id=${encodeURIComponent(ev.id)}" target="_top" aria-label="Open as its own page"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3H3v12h12v-4M10 3h5v5M14 4l-7 7"/></svg></a>`
+      ? `<a class="ep-pop" href="/event.html?id=${encodeURIComponent(ev.id)}" target="_top" aria-label="Open as its own page"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3H3v12h12v-4M10 3h5v5M14 4l-7 7"/></svg></a>`
       : "";
     const closeBtn = EMBED
-      ? `<a class="ep-close" id="epClose" href="index.html" aria-label="Back"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4l10 10M14 4L4 14"/></svg></a>`
+      ? `<a class="ep-close" id="epClose" href="/" aria-label="Back"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4l10 10M14 4L4 14"/></svg></a>`
       : "";
 
     return `
@@ -558,14 +558,14 @@ ${audioBar}
         <span class="ef-val">${ev.relatedArtists.map(a => {
           const inner = `<span class="en-only">${a.name}</span><span class="ar-only ar">${a.nameAr || a.name}</span>`;
           return a.slug
-            ? `<a class="ep-person-link" href="artist.html?id=${encodeURIComponent(a.slug)}"${EMBED ? ' target="_top"' : ''}>${inner}</a>`
+            ? `<a class="ep-person-link" href="/artists/${encodeURIComponent(a.slug)}"${EMBED ? ' target="_top"' : ''}>${inner}</a>`
             : inner;
         }).join(', ')}</span>
       </div>` : ""}
       ${ev.relatedProject ? `<div class="ep-fact">
         <span class="ef-key"><span class="en-only">Part of</span><span class="ar-only ar">جزء من</span></span>
         <span class="ef-leader"></span>
-        <span class="ef-val">${ev.relatedProject.title}</span>
+        <span class="ef-val">${ev.relatedProject.slug ? `<a class="ep-person-link" href="/projects/${encodeURIComponent(ev.relatedProject.slug)}"${EMBED ? ' target="_top"' : ''}>${ev.relatedProject.title}</a>` : ev.relatedProject.title}</span>
       </div>` : ""}
     </div>
     ${cta}
@@ -578,7 +578,7 @@ ${audioBar}
       <span class="ar-only ar" dir="rtl">البرنامج</span>
     </div>
     ${ev.programmeEvents.map(pe => `
-      <a class="ep-prog-row" data-ev="${pe.id}" href="event.html?id=${pe.id}${navSuffix}">
+      <a class="ep-prog-row" data-ev="${pe.id}" href="/event.html?id=${pe.id}${navSuffix}">
         <span class="ep-prog-date">${parseInt(pe.day,10)} ${pe.monthFull}</span>
         <span class="ep-prog-type">${pe.type}</span>
         <span class="ep-prog-name">
@@ -597,7 +597,7 @@ ${audioBar}
     ${ev.relatedArtists.map(a => {
       const nameInner = `<span class="en-only">${a.name}</span><span class="ar-only ar" dir="rtl">${a.nameAr || a.name}</span>`;
       const nameHtml = a.slug
-        ? `<a class="ep-related-artist-name" href="artist.html?id=${encodeURIComponent(a.slug)}"${EMBED ? ' target="_top"' : ''}>${nameInner}</a>`
+        ? `<a class="ep-related-artist-name" href="/artists/${encodeURIComponent(a.slug)}"${EMBED ? ' target="_top"' : ''}>${nameInner}</a>`
         : `<div class="ep-related-artist-name">${nameInner}</div>`;
       const hasBio = (a.bio && a.bio.length) || (a.bioAr && a.bioAr.length);
       return `<div class="ep-related-artist">
@@ -614,8 +614,10 @@ ${audioBar}
   }
 
   const params = new URLSearchParams(location.search);
-  const id = params.get('id') || '';
+  const id = (params.get('id') || (decodeURIComponent((location.pathname.match(/^\/(?:events|artists|projects)\/([^\/?#]+)/)||[])[1]||'')) || '');
   const EMBED = params.get('embed') === '1';
+  try { if (!EMBED && params.has('id') && [...params.keys()].length === 1) history.replaceState(null, '', '/events/' + encodeURIComponent(id) + location.hash); } catch(_) {}
+
   if (EMBED) document.documentElement.classList.add('embed');
   const _post = m => { try { if (window.parent !== window) window.parent.postMessage(m, '*'); } catch(_){} };
   const BASE = `https://${SANITY_PROJECT}.api.sanity.io/v2024-01-01/data/query/${SANITY_DATASET}?query=`;
@@ -631,7 +633,7 @@ ${audioBar}
   } catch(err) { console.warn('[WC] event fetch failed', err); }
 
   if (!ev) {
-    document.getElementById('epRoot').innerHTML = `<div class="ep-header"><h1 class="ep-title">Event not found.</h1><p class="ep-subtitle"><a href="index.html">← Back to programme</a></p></div>`;
+    document.getElementById('epRoot').innerHTML = `<div class="ep-header"><h1 class="ep-title">Event not found.</h1><p class="ep-subtitle"><a href="/">← Back to programme</a></p></div>`;
     return;
   }
 

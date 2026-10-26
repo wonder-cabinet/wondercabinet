@@ -32,7 +32,7 @@
       "editions":count(*[_type=="residency"&&project._ref==^._id]),"events":count(*[_type=="event"&&relatedProject._ref==^._id])}`)||[];
     root.innerHTML=`<h1><span class="en-only">Projects</span><span class="ar-only ar" dir="rtl">مشاريع</span></h1>
       <p class="pj-sub"><span class="en-only">Performances, artworks, residencies and games produced, co-produced or presented by The Wonder Cabinet.</span><span class="ar-only ar" dir="rtl">عروض وأعمال فنية وإقامات وألعاب ينتجها مجلس العجب أو يشارك في إنتاجها أو يقدّمها.</span></p>
-      <div class="pj-grid">${ps.filter(p=>p.slug).map(p=>`<a class="pj-card" href="project.html?id=${encodeURIComponent(p.slug)}">
+      <div class="pj-grid">${ps.filter(p=>p.slug).map(p=>`<a class="pj-card" href="/projects/${encodeURIComponent(p.slug)}">
         ${p.coverImage?`<img loading="lazy" alt="" src="${img(p.coverImage,800)}">`:''}
         <span class="pj-k">${esc([p.type,p.year].filter(Boolean).join(' · '))}</span>
         <h3>${L(p.title)}</h3>
@@ -41,7 +41,7 @@
       </a>`).join('')||'<p>No projects yet.</p>'}</div>`;
     return;
   }
-  const id=new URLSearchParams(location.search).get('id')||'';
+  const id=new URLSearchParams(location.search).get('id')||decodeURIComponent((location.pathname.match(/^\/projects\/([^\/?#]+)/)||[])[1]||'');
   const p=await groq(`*[_type=="project"&&slug.current==${JSON.stringify(id)}][0]{title,subtitle,description,type,status,year,wonderCabinetRole,funders,partners,coverImage,
     blocks,
     "parent":parentProject->{title,"slug":slug.current},
@@ -51,11 +51,12 @@
     "events":*[_type=="event"&&relatedProject._ref==^._id]|order(startDateTime desc){title,subtitle,"slug":slug.current,startDateTime,eventType,location,shortDescription},
     "artworks":artworks[]->{title,"slug":slug.current,year,description,documentation,"artists":artist[]->{"n":name,"slug":slug.current}},
     "artists":artists[]->{"n":name,"slug":slug.current}}`);
-  if(!p){root.innerHTML=`<h1>Project not found.</h1><p><a href="projects.html">← All projects</a></p>`;return;}
+  try{if(p&&new URLSearchParams(location.search).has('id'))history.replaceState(null,'','/projects/'+encodeURIComponent(id)+location.hash);}catch(_){}
+  if(!p){root.innerHTML=`<h1>Project not found.</h1><p><a href="/projects">← All projects</a></p>`;return;}
   const tEn=(p.title&&(p.title.en||p.title.ar))||'Project';
   document.title=`${tEn} · The Wonder Cabinet`;
   const m=(k,v)=>v?`<span><b>${k}</b>${esc(v)}</span>`:'';
-  const names=a=>(a||[]).filter(Boolean).map(x=>x.slug?`<a href="artist.html?id=${encodeURIComponent(x.slug)}">${L(x.n)}</a>`:L(x.n)).join(', ');
+  const names=a=>(a||[]).filter(Boolean).map(x=>x.slug?`<a href="/artists/${encodeURIComponent(x.slug)}">${L(x.n)}</a>`:L(x.n)).join(', ');
   const block=b=>{
     if(b._type==='contentText'){const en=(b.en||[]).map(t=>`<p>${esc(t)}</p>`).join(''),ar=(b.ar||[]).map(t=>`<p>${esc(t)}</p>`).join('');
       return `<div class="pj-text"><div class="en-only">${en||ar}</div><div class="ar-only ar" dir="rtl">${ar||en}</div></div>`;}
@@ -68,7 +69,7 @@
     if(b._type==='contentGallery'){return (b.images||[]).map(i=>`<figure class="pj-fig"><img loading="lazy" alt="" src="${img(i,1400)}"></figure>`).join('');}
     return '';};
   const blocks=(p.blocks||[]).map(block).join('');
-  const evHtml=(p.events||[]).map(e=>`<a class="pj-row" href="event.html?id=${encodeURIComponent(e.slug)}">
+  const evHtml=(p.events||[]).map(e=>`<a class="pj-row" href="/events/${encodeURIComponent(e.slug)}">
       <span class="d">${fmtDay(e.startDateTime)}</span>
       <span class="t">${L(e.title)}<span class="s">${[e.subtitle&&(e.subtitle.en||''),e.location].filter(Boolean).map(esc).join(' · ')}</span></span>
       <span class="a">→</span></a>`).join('');
@@ -84,9 +85,9 @@
       </div></details>`).join('');
   const awHtml=(p.artworks||[]).filter(Boolean).map(a=>`<div class="pj-art"><h3>${L(a.title)}</h3>
       <div style="font-size:13px;opacity:.75" class="pj-names">${names(a.artists)}${a.year?` · ${a.year}`:''}</div>${a.description?`<div class="pj-text" style="font-size:14px">${paras(a.description)}</div>`:''}${a.documentation?`<p style="margin-top:12px"><a href="${esc(a.documentation)}" target="_blank" rel="noopener" style="color:inherit;font-weight:700"><span class="en-only">Listen / buy →</span><span class="ar-only ar" dir="rtl">← استمع / اشترِ</span></a></p>`:''}</div>`).join('');
-  const kids=(p.children||[]).map(c=>`<a class="pj-row" href="project.html?id=${encodeURIComponent(c.slug)}"><span class="d">${c.year||''}</span><span class="t">${L(c.title)}</span><span class="a">→</span></a>`).join('');
+  const kids=(p.children||[]).map(c=>`<a class="pj-row" href="/projects/${encodeURIComponent(c.slug)}"><span class="d">${c.year||''}</span><span class="t">${L(c.title)}</span><span class="a">→</span></a>`).join('');
   root.innerHTML=`
-    <p style="font-size:13px;margin:0 0 20px"><a href="projects.html" style="color:inherit">← <span class="en-only">All projects</span><span class="ar-only ar">كل المشاريع</span></a>${p.parent?` · <a style="color:inherit" href="project.html?id=${encodeURIComponent(p.parent.slug)}">${L(p.parent.title)}</a>`:''}</p>
+    <p style="font-size:13px;margin:0 0 20px"><a href="/projects" style="color:inherit">← <span class="en-only">All projects</span><span class="ar-only ar">كل المشاريع</span></a>${p.parent?` · <a style="color:inherit" href="/projects/${encodeURIComponent(p.parent.slug)}">${L(p.parent.title)}</a>`:''}</p>
     <h1>${L(p.title)}</h1>
     ${p.subtitle?`<p class="pj-sub">${L(p.subtitle)}</p>`:''}
     <div class="pj-meta">${m('Type ',p.type)}${m('Year ',p.year)}${m('Status ',p.status)}${m('Wonder Cabinet ',p.wonderCabinetRole)}${(p.funders||[]).length?m('Supported by ',p.funders.join(', ')):''}${(p.partners||[]).length?m('Partners ',p.partners.join(', ')):''}</div>
@@ -96,6 +97,7 @@
     ${evHtml?`<section class="pj-sec"><h2><span class="en-only">Performances</span><span class="ar-only ar" dir="rtl">العروض</span></h2>${evHtml}</section>`:''}
     ${kids?`<section class="pj-sec"><h2><span class="en-only">Related projects</span><span class="ar-only ar" dir="rtl">مشاريع مرتبطة</span></h2>${kids}</section>`:''}
     ${blocks?`<section class="pj-sec">${blocks}</section>`:''}
+    ${(p.artists||[]).filter(Boolean).length?`<section class="pj-sec"><h2><span class="en-only">Artists</span><span class="ar-only ar" dir="rtl">الفنانون</span></h2><p class="pj-names pj-text" style="font-size:clamp(20px,2.4vw,32px);line-height:1.35">${names((p.artists||[]).filter(Boolean))}</p></section>`:''}
     ${awHtml?`<section class="pj-sec"><h2><span class="en-only">Artworks</span><span class="ar-only ar" dir="rtl">الأعمال</span></h2>${awHtml}</section>`:''}`;
   }catch(err){console.warn('[WC] projects',err);root.innerHTML='<p>Could not load projects right now.</p>';}
 })();

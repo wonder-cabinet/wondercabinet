@@ -36,5 +36,19 @@
         }
       ]
     }
+  ],
+  "rewrites": [
+    {
+      "source": "/events/:slug",
+      "destination": "/event.html?id=:slug"
+    },
+    {
+      "source": "/artists/:slug",
+      "destination": "/artist.html?id=:slug"
+    },
+    {
+      "source": "/projects/:slug",
+      "destination": "/project.html?id=:slug"
+    }
   ]
 }

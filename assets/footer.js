@@ -1,6 +1,6 @@
 // Shared site footer — single source of truth for the markup and the
 // Sanity-driven bits (address/hours/maps/social links), included on every
-// page via `<script src="assets/footer.js"></script>` right after an empty
+// page via `<script src="/assets/footer.js"></script>` right after an empty
 // `<footer class="foot" id="visit"></footer>` mount point.
 //
 // Previously this exact footer (markup + injection JS) was duplicated
@@ -26,12 +26,12 @@
     <div class="foot-col">
       <div class="foot-col-head">Programme</div>
       <div class="foot-col-body">
-        <a href="index.html#programme">Events</a>
-        <a href="projects.html">Projects</a>
+        <a href="/#programme">Events</a>
+        <a href="/projects">Projects</a>
         <a href="/bar">The Bar</a>
-        <a href="index.html">Archive</a>
-        <a href="index.html">Contribute</a>
-        <a href="index.html">About</a>
+        <a href="/">Archive</a>
+        <a href="/">Contribute</a>
+        <a href="/">About</a>
       </div>
     </div>
     <div class="foot-col">
@@ -48,14 +48,14 @@
       <div class="foot-col-body">
         <a href="mailto:office@wondercabinet.space">office@wondercabinet.space</a>
         <a href="https://radioalhara.net" target="_blank" rel="noopener">Radio Alhara</a>
-        <a href="index.html">Local Industries</a>
+        <a href="/">Local Industries</a>
         <a href="https://www.aauanastas.com" target="_blank" rel="noopener">AAU Anastas</a>
       </div>
     </div>
   </div>
   <div class="foot-base">
     <span>© The Wonder Cabinet · Bethlehem, Palestine</span>
-    <span><a href="index.html">مجلس العجب</a></span>
+    <span><a href="/">مجلس العجب</a></span>
   </div>`;
 
   function mount() {
