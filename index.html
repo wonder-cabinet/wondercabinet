@@ -478,11 +478,13 @@ function renderTimeline(){
   const { end: weekEnd } = currentWeekRange();
 
   const filtered = applyTypeFilter(ALL);
-  const future = filtered.filter(e => eventDateOnly(e) > weekEnd).sort((a,b) => eventTimestamp(a) - eventTimestamp(b));
+  const _today = new Date(); _today.setHours(0,0,0,0);
+  // Everything from today onward — including this week's events, which are also featured in the rail above.
+  const future = filtered.filter(e => eventEndDateOnly(e) >= _today).sort((a,b) => eventTimestamp(a) - eventTimestamp(b));
 
   const futureHtml = buildSeasonBlocks(future);
   const emptyHtml = `<div class="tl-empty">
-    <span class="en-only">No upcoming events${STATE.type ? " in this category" : ""} beyond this week — check back soon.</span>
+    <span class="en-only">No upcoming events${STATE.type ? " in this category" : ""} — check back soon.</span>
     <span class="ar-only ar" dir="rtl">لا توجد فعاليات قادمة${STATE.type ? " في هذه الفئة" : ""} بعد هذا الأسبوع — تابعونا قريباً.</span>
   </div>`;
 
