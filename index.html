@@ -3418,7 +3418,7 @@ async function _boot(){
     ALL.forEach(ev => { if (!sm[ev.season.key]) sm[ev.season.key] = ev.season; });
     SEASONS = Object.values(sm).sort((a,b) =>
       a.year !== b.year ? b.year-a.year
-      : ['Autumn','Summer','Spring','Winter'].indexOf(a.name) - ['Autumn','Summer','Spring','Winter'].indexOf(b.name)
+      : ['Winter','Autumn','Summer','Spring'].indexOf(a.name) - ['Winter','Autumn','Summer','Spring'].indexOf(b.name)
     );
     window.EVENTS = ALL;
     window.SEASONS = SEASONS;
