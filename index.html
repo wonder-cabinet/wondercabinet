@@ -3299,7 +3299,8 @@ async function _boot(){
     function _season(d){
       const mo = d.getMonth()+1, y = d.getFullYear();
       const n = mo>=3&&mo<=5?'Spring':mo>=6&&mo<=8?'Summer':mo>=9&&mo<=11?'Autumn':'Winter';
-      return { key:`${n.toLowerCase()}-${y}`, name:n, year:y };
+      const sy = (n==='Winter' && mo<=2) ? y-1 : y; // winter is named for the year it starts: Dec 2026 – Feb 2027 = Winter 2026 (matches assets/events.js)
+      return { key:`${n.toLowerCase()}-${sy}`, name:n, year:sy };
     }
     const q = encodeURIComponent(`{
       "events": *[_type == "event"] | order(startDateTime desc) { ..., location->{ name }, relatedArtists[]->{name, "slug": slug.current}, relatedProject->{title, slug}, programmeEvents[]->{_id, "slug": slug.current, title, eventType, startDateTime}, "coverPalette": cover.asset->metadata.palette, streamChannel->{name, streamUrl} },
