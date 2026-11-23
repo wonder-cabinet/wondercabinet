@@ -181,6 +181,15 @@
     </a>`;
   }
 
+  // First paragraph, trimmed to ~260 chars at a sentence/word boundary.
+  function shortBio(paras){
+    const t = (paras[0] || '').trim();
+    if (t.length <= 260) return t;
+    const cut = t.slice(0, 260);
+    const dot = Math.max(cut.lastIndexOf('. '), cut.lastIndexOf('؟ '), cut.lastIndexOf('. '));
+    return (dot > 120 ? cut.slice(0, dot + 1) : cut.slice(0, cut.lastIndexOf(' ')) + '…');
+  }
+
   function buildArtistPanel(a){
     const metaEn = [a.discipline, a.location].filter(Boolean).join(' — ');
     const metaAr = [a.disciplineAr, a.location].filter(Boolean).join(' — ');
@@ -191,10 +200,14 @@
 
     const photoHtml = a.photo ? `<div class="art-photo-wrap"><img src="${a.photo}" alt=""></div>` : '';
 
-    const bioHtml = (a.bio.length || a.bioAr.length) ? `<div class="ep-text" style="margin-top:8px;">
-      ${a.bio.length ? `<div class="en-only">${a.bio.map(p => `<p>${p}</p>`).join('')}</div>` : ''}
-      ${a.bioAr.length ? `<div class="ar-only ar" dir="rtl">${a.bioAr.map(p => `<p>${p}</p>`).join('')}</div>` : ''}
+    const bioEn = EMBED ? (a.bio.length ? [shortBio(a.bio)] : []) : a.bio;
+    const bioArL = EMBED ? (a.bioAr.length ? [shortBio(a.bioAr)] : []) : a.bioAr;
+    const bioHtml = (bioEn.length || bioArL.length) ? `<div class="ep-text" style="margin-top:8px;">
+      ${bioEn.length ? `<div class="en-only">${bioEn.map(p => `<p>${p}</p>`).join('')}</div>` : ''}
+      ${bioArL.length ? `<div class="ar-only ar" dir="rtl">${bioArL.map(p => `<p>${p}</p>`).join('')}</div>` : ''}
     </div>` : '';
+    // In the homepage's inline reader: short description + a link to the full page only.
+    const fullLinkHtml = (EMBED && a.slug) ? `<p style="margin-top:24px"><a class="ep-person-link" href="/artists/${encodeURIComponent(a.slug)}" target="_top"><span class="en-only">Full profile →</span><span class="ar-only ar" dir="rtl">← الصفحة الكاملة</span></a></p>` : '';
 
     const linksHtml = a.links.length ? `<div class="ep-facts" style="margin-top:8px;">
       ${a.links.map(l => `<div class="ep-fact">
@@ -237,9 +250,10 @@
 <div class="ep-body">
   <div class="ep-content">
     ${bioHtml}
-    ${linksHtml}
+    ${fullLinkHtml}
+    ${EMBED ? '' : linksHtml}
   </div>
-  ${eventsHtml}
+  ${EMBED ? '' : eventsHtml}
 </div>`;
   }
 
